@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Crema Arena Design System CSS Variables */
+  :root {
+    /* Color Tokens */
+    --espresso-900: #1F1410;
+    --espresso-700: #3E2A22;
+    --espresso-500: #7A5A4A;
+    --crema-50:  #FBF6EA;
+    --crema-100: #F5ECD8;
+    --crema-200: #EADBC0;
+    --crema-300: #DCC59E;
+    --cinnamon-50:  #FBEEE5;
+    --cinnamon-500: #C45A2C;
+    --cinnamon-600: #A8471E;
+    --cinnamon-700: #823516;
+    --marigold-100: #FAE7B6;
+    --marigold-500: #E6A636;
+    --mint-100: #D2E8DC;
+    --mint-500: #4F8C72;
+    --cherry-100: #F3CFC8;
+    --cherry-500: #B83A2E;
+
+    /* Semantic Colors */
+    --bg:             #FBF6EA;
+    --bg-2:           #F5ECD8;
+    --bg-3:           #EADBC0;
+    --bg-inverse:     #1F1410;
+    --surface:        #FBF6EA;
+    --surface-raised: #FFFCF3;
+
+    --fg:           #1F1410;
+    --fg-2:         #3E2A22;
+    --fg-3:         #7A5A4A;
+    --fg-muted:     #6B5A4F;
+    --fg-inverse:   #FBF6EA;
+
+    --border:        rgba(31,20,16,.12);
+    --border-strong: rgba(31,20,16,.24);
+
+    --brand:       #C45A2C;
+    --brand-hover: #A8471E;
+    --brand-press: #823516;
+    --brand-soft:  #FBEEE5;
+
+    --gold:      #E6A636;
+    --gold-soft: #FAE7B6;
+    --live:      #4F8C72;
+    --live-soft: #D2E8DC;
+    --danger:      #B83A2E;
+    --danger-soft: #F3CFC8;
+
+    --focus-ring: #C45A2C;
+
+    /* Border Radii */
+    --radius-xs:   6px;
+    --radius-sm:   10px;
+    --radius-md:   18px;
+    --radius-lg:   28px;
+    --radius-full: 999px;
+
+    /* Shadows */
+    --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
+    --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+
+    /* Animations */
+    --ease-standard:  cubic-bezier(.2,.7,.2,1);
+    --ease-overshoot: cubic-bezier(.34,1.56,.64,1);
+    --dur-fast:  120ms;
+    --dur-base:  180ms;
+    --dur-stage: 320ms;
+
+    /* Font Families */
+    --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    --font-serif:   'Instrument Serif', 'Times New Roman', serif;
+    --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    'Geist Mono', ui-monospace, monospace;
+  }
+
+  /* Font Face Declarations */
+  @font-face {
+    font-family: 'Bricolage Grotesque';
+    src: url('/fonts/BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-stretch: 75% 100%;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url('/fonts/InstrumentSerif-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Instrument Serif';
+    src: url('/fonts/InstrumentSerif-Italic.ttf') format('truetype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Geist Mono';
+    src: url('/fonts/GeistMono-VariableFont_wght.ttf') format('truetype-variations');
+    font-weight: 100 900;
+    font-display: swap;
+  }
+
+  /* Base Styles */
+  * {
+    @apply border-[var(--border)];
+  }
+
+  body {
+    @apply bg-[var(--bg)] text-[var(--fg)] font-body;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-feature-settings: "tnum";
+  }
+}

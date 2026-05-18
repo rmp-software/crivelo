@@ -1,0 +1,162 @@
+// Prisma schema for Crema Arena
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  admin
+  organizer
+}
+
+enum EventStatus {
+  setup
+  running
+  finished
+}
+
+enum EntryStatus {
+  active
+  eliminated
+  wildcard_in
+  dropped_out
+}
+
+enum DuelStatus {
+  pending
+  in_progress
+  completed
+  walkover
+}
+
+enum WildcardType {
+  walkover
+  manual
+  random
+}
+
+enum DuelSlot {
+  a
+  b
+}
+
+enum VoteSide {
+  a
+  b
+}
+
+model Organizer {
+  id            String      @id @default(uuid())
+  name          String
+  email         String      @unique
+  password_hash String
+  role          Role        @default(organizer)
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+
+  events        Event[]
+  competitors   Competitor[]
+
+  @@map("organizers")
+}
+
+model Competitor {
+  id          String   @id @default(uuid())
+  name        String
+  photo_url   String
+  coffee_shop String
+  created_by  String
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  creator     Organizer     @relation(fields: [created_by], references: [id], onDelete: Cascade)
+  entries     EventEntry[]
+
+  @@map("competitors")
+}
+
+model Event {
+  id            String       @id @default(uuid())
+  organizer_id  String
+  name          String
+  date          DateTime
+  location      String?
+  description   String?
+  judges_count  Int          @default(3)
+  status        EventStatus  @default(setup)
+  bracket_size  Int?
+  created_at    DateTime     @default(now())
+  updated_at    DateTime     @updatedAt
+
+  organizer     Organizer    @relation(fields: [organizer_id], references: [id], onDelete: Cascade)
+  entries       EventEntry[]
+  duels         Duel[]
+
+  @@map("events")
+}
+
+model EventEntry {
+  id                  String       @id @default(uuid())
+  event_id            String
+  competitor_id       String
+  seed                Int?
+  status              EntryStatus  @default(active)
+  eliminated_at_round Int?
+  created_at          DateTime     @default(now())
+
+  event               Event        @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  competitor          Competitor   @relation(fields: [competitor_id], references: [id], onDelete: Cascade)
+
+  duels_as_a          Duel[]       @relation("DuelEntryA")
+  duels_as_b          Duel[]       @relation("DuelEntryB")
+  wins                Duel[]       @relation("DuelWinner")
+
+  @@unique([event_id, competitor_id])
+  @@map("event_entries")
+}
+
+model Duel {
+  id              String        @id @default(uuid())
+  event_id        String
+  round           Int
+  position        Int
+  entry_a_id      String?
+  entry_b_id      String?
+  votes_a         Int           @default(0)
+  votes_b         Int           @default(0)
+  winner_entry_id String?
+  status          DuelStatus    @default(pending)
+  wildcard_type   WildcardType?
+  next_duel_id    String?
+  next_duel_slot  DuelSlot?
+  pour_photo_url  String?
+  completed_at    DateTime?
+  created_at      DateTime      @default(now())
+
+  event           Event         @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  entry_a         EventEntry?   @relation("DuelEntryA", fields: [entry_a_id], references: [id], onDelete: SetNull)
+  entry_b         EventEntry?   @relation("DuelEntryB", fields: [entry_b_id], references: [id], onDelete: SetNull)
+  winner_entry    EventEntry?   @relation("DuelWinner", fields: [winner_entry_id], references: [id], onDelete: SetNull)
+  next_duel       Duel?         @relation("DuelProgression", fields: [next_duel_id], references: [id], onDelete: SetNull)
+  previous_duels  Duel[]        @relation("DuelProgression")
+
+  votes           Vote[]
+
+  @@map("duels")
+}
+
+model Vote {
+  id         String   @id @default(uuid())
+  duel_id    String
+  side       VoteSide
+  created_at DateTime @default(now())
+
+  duel       Duel     @relation(fields: [duel_id], references: [id], onDelete: Cascade)
+
+  @@map("votes")
+}

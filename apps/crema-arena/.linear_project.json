@@ -1,0 +1,82 @@
+{
+  "initialized": true,
+  "created_at": "2026-05-18T00:00:00Z",
+  "project_name": "Crema Arena",
+  "project_description": "Specialty Coffee Competition Platform - MVP for organizing and broadcasting latte art TNTs, barista championships, and bar battles in Brazil",
+  "total_features": 12,
+  "meta_issue_id": "PENDING_LINEAR_CREATION",
+  "issues": [
+    {
+      "step": 1,
+      "title": "Project foundation",
+      "status": "Todo",
+      "description": "Initialize Next.js 14 with App Router, TypeScript, Tailwind CSS. Configure Prisma with initial schema and Neon connection. Add globals.css with Crema Arena CSS variables. Configure @font-face for Bricolage Grotesque, Instrument Serif, Geist Mono. Run first Prisma migration. Configure NextAuth.js with CredentialsProvider and JWT session. Create seed script for default admin user. Create init.sh for setup and configure vercel.json."
+    },
+    {
+      "step": 2,
+      "title": "Admin base layout and authentication",
+      "status": "Todo",
+      "description": "Create /login page with email + password form. Build /dashboard layout with responsive navigation sidebar. Implement route protection middleware for /dashboard/*. Create base components: Button, Card, Input, Badge, Modal. Build sidebar with conditional organizer management link. Create reusable page header component with title and actions slots."
+    },
+    {
+      "step": 3,
+      "title": "Organizer management (admin)",
+      "status": "Todo",
+      "description": "Build /dashboard/organizers page with list and search. Create/edit organizer form with name, email, password, and role fields. Implement delete with confirmation modal. Create corresponding API routes with role=admin validation."
+    },
+    {
+      "step": 4,
+      "title": "Competitor management (global pool)",
+      "status": "Todo",
+      "description": "Build /dashboard/competitors page with searchable list. Create/edit form for name, photo upload, and coffee shop. Implement photo upload to /public/uploads/ or Vercel Blob. Add delete with check for active event participation. Create API routes with pagination and search by name/coffee shop."
+    },
+    {
+      "step": 5,
+      "title": "Event creation and setup",
+      "status": "Todo",
+      "description": "Build /dashboard/events page with organizer's event list. Create event form for name, date, location, description, and judges_count. Build /dashboard/events/[id] detail page in setup status with registered competitors list, search/add competitors, and remove capabilities. Create API routes for event creation/editing and entry management."
+    },
+    {
+      "step": 6,
+      "title": "Bracket generation and event start",
+      "status": "Todo",
+      "description": "Implement bracket generation algorithm: calculate bracket_size as next power of 2, place seeds at standard single-elimination positions, fill remaining slots randomly, create byes for empty slots. Create BracketView component to visualize generated bracket. Build 'Iniciar evento' button with status transition. Implement automatic bye resolution. Create API routes: POST /api/events/:id/bracket/generate and POST /api/events/:id/start."
+    },
+    {
+      "step": 7,
+      "title": "Event running and tap-to-tally",
+      "status": "Todo",
+      "description": "Build running event panel showing current round and duel list with statuses. Create vote capture interface (tap-to-tally) with 'Fotografar copos' camera button, Cup A/B vote buttons, live counter. Implement pour photo upload to POST /api/duels/:id/photo with immediate live display update. Create close duel confirmation modal with competitor mapping. Implement bracket advancement logic. Create API routes: POST /api/duels/:id/start, /vote, /complete, /photo. Build 'Encerrar evento' button for final completion."
+    },
+    {
+      "step": 8,
+      "title": "Wildcard system",
+      "status": "Todo",
+      "description": "Create wildcard modal with three options: walkover (opponent advances automatically), manual pick (select from eliminated competitors), random pick (system selects with confirmation). Implement list view of eliminated competitors for manual selection. Build random selection logic with confirmation. Create API route: POST /api/duels/:id/wildcard. Implement event_entry status updates (dropped_out, wildcard_in). Add 'Wildcard' badge in BracketView."
+    },
+    {
+      "step": 9,
+      "title": "Live display surface",
+      "status": "Todo",
+      "description": "Build /live/[eventId] public route without admin layout. Create full-screen LiveDisplay component with espresso background. Implement 5-second polling for /api/events/:id/current-duel and /api/events/:id/bracket. Display large competitor cards with photo, name, coffee shop, and partial score. Generate QR code server-side via qrcode package at /api/events/:id/qr. Handle states: setup, running (active duel), running (between duels), finished. Ensure layout responsive and optimized for 1920x1080."
+    },
+    {
+      "step": 10,
+      "title": "Live companion (audience screen)",
+      "status": "Todo",
+      "description": "Build /e/[eventId] mobile-first public route without admin layout. Create tab navigation: Ao vivo | Chave | Leaderboard. Implement 'Ao vivo' tab with current duel votes and next duel. Build 'Chave' tab with adapted BracketView for mobile (horizontal scroll). Create 'Leaderboard' tab with partial standings (during event) and full final leaderboard (after close). Implement shared 5-second polling across tabs. Handle content states per event status."
+    },
+    {
+      "step": 11,
+      "title": "Event links in admin",
+      "status": "Todo",
+      "description": "Add 'Links' section on event detail page (visible in running/finished status). Implement 'Live Display' with read-only input showing /live/[eventId] URL and 'Copiar URL' button using Clipboard API. Add 'Audience (QR)' section with inline QR code image and download PNG button."
+    },
+    {
+      "step": 12,
+      "title": "Design polish and responsiveness",
+      "status": "Todo",
+      "description": "Audit all screens against Crema Arena design system (colors, typography, radii, shadows). Ensure collapsible sidebar works on mobile. Implement transitions and animations using dur-base 180ms ease-standard. Create empty states with pt-BR microcopy. Add loading states (skeleton loaders or spinner). Implement accessibility: cinnamon focus rings, aria-labels, keyboard navigation. Test live display at 1920x1080 and live companion at 375px (iPhone SE)."
+    }
+  ]
+}
