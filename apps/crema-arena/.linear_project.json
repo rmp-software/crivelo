@@ -9,19 +9,19 @@
     {
       "step": 1,
       "title": "Project foundation",
-      "status": "Todo",
+      "status": "Done",
       "description": "Initialize Next.js 14 with App Router, TypeScript, Tailwind CSS. Configure Prisma with initial schema and Neon connection. Add globals.css with Crema Arena CSS variables. Configure @font-face for Bricolage Grotesque, Instrument Serif, Geist Mono. Run first Prisma migration. Configure NextAuth.js with CredentialsProvider and JWT session. Create seed script for default admin user. Create init.sh for setup and configure vercel.json."
     },
     {
       "step": 2,
       "title": "Admin base layout and authentication",
-      "status": "Todo",
+      "status": "Done",
       "description": "Create /login page with email + password form. Build /dashboard layout with responsive navigation sidebar. Implement route protection middleware for /dashboard/*. Create base components: Button, Card, Input, Badge, Modal. Build sidebar with conditional organizer management link. Create reusable page header component with title and actions slots."
     },
     {
       "step": 3,
       "title": "Organizer management (admin)",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build /dashboard/organizers page with list and search. Create/edit organizer form with name, email, password, and role fields. Implement delete with confirmation modal. Create corresponding API routes with role=admin validation."
     },
     {
