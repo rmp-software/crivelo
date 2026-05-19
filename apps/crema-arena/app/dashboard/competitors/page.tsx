@@ -185,7 +185,7 @@ export default function CompetitorsPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
                     Cafeteria
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
                     Criado em
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
@@ -218,7 +218,7 @@ export default function CompetitorsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
                       {competitor.coffeeShop}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
                       <time dateTime={competitor.createdAt}>{formatDate(competitor.createdAt)}</time>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">

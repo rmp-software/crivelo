@@ -93,11 +93,14 @@ const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promis
 const tolerantFetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : null));
 
 export default function LiveDisplay({ eventId }: LiveDisplayProps) {
-  // 5s polling per spec — keep all three keys on the same cadence.
-  const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
-  const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
-  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
-  const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, swrOpts);
+  // Split-cadence polling: the current-duel payload is small and the hottest
+  // (vote ticks, pour photos, duel transitions) — poll fast. Bracket and
+  // leaderboard are heavier and change less often — keep the spec's 5s.
+  const fastOpts = { refreshInterval: 1000, revalidateOnFocus: false };
+  const slowOpts = { refreshInterval: 5000, revalidateOnFocus: false };
+  const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, fastOpts);
+  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, slowOpts);
+  const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, slowOpts);
   const loading = !data && !error;
 
   if (loading) {
@@ -232,9 +235,9 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
     const hasPour = !!currentDuel.pourPhotoUrl;
 
     return (
-      <div className="min-h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
         {/* Top bar: AO VIVO + title + duel timer */}
-        <header className="flex items-start justify-between p-6 md:p-10 lg:p-12">
+        <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
@@ -251,8 +254,8 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
           )}
         </header>
 
-        {/* Main area */}
-        <main className="flex-1 flex flex-col items-center justify-center px-6 md:px-10 lg:px-16 pb-40" role="main" aria-live="polite">
+        {/* Main area — no vertical scroll on TV */}
+        <main className="flex-1 min-h-0 flex flex-col items-center justify-center px-6 md:px-10 lg:px-16 pb-40 gap-6 md:gap-8" role="main" aria-live="polite">
           {hasPour ? (
             <PourPhotoCenterpiece
               pourPhotoUrl={currentDuel.pourPhotoUrl!}
@@ -270,56 +273,64 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
             />
           )}
 
-          {/* Mini bracket strip for current round */}
-          {currentRoundDuels.length > 1 && (
-            <MiniBracketStrip duels={currentRoundDuels} activeDuelId={currentDuel.id} />
+          {/* Mini bracket strip — only real duels (both slots filled) */}
+          {currentRoundDuels.filter((d) => d.entryA && d.entryB).length > 1 && (
+            <MiniBracketStrip
+              duels={currentRoundDuels.filter((d) => d.entryA && d.entryB)}
+              activeDuelId={currentDuel.id}
+            />
           )}
         </main>
 
-        {/* QR — bottom-right */}
+        {/* QR — bottom-right (fixed to viewport) */}
         <QrBadge eventId={eventId} />
       </div>
     );
   }
 
-  // Running between duels - show next matchup
+  // Between duels — show the next matchup using the same layout as the active
+  // state (avatars + names + coffee shops + mini-bracket strip) so context isn't
+  // lost. Timer area gets an "Próximo duelo" label instead of an elapsed clock.
   if (nextDuel && nextDuel.entryA && nextDuel.entryB) {
+    const roundLabel =
+      currentRound === totalRounds
+        ? 'Final'
+        : currentRound === totalRounds - 1
+          ? 'Semifinal'
+          : `Rodada ${currentRound} de ${totalRounds}`;
+    const currentRoundDuels = bracketData
+      ? bracketData.duels.filter((d) => d.round === currentRound)
+      : [];
+
     return (
-      <div className="min-h-screen bg-[var(--espresso-900)] flex flex-col relative">
-        <header className="flex items-start justify-between p-6 md:p-10 lg:p-12">
+      <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+        <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
               {event.name}
             </h1>
             <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
-              Rodada {currentRound} de {totalRounds}
+              {roundLabel}
             </p>
           </div>
-          <div className="w-[88px] md:w-[110px]" aria-hidden />
+          <NextDuelLabel />
         </header>
 
-        <main className="flex-1 flex flex-col items-center justify-center px-8 pb-40">
-          <p className="text-2xl md:text-3xl font-serif italic text-[var(--marigold-500)] mb-8">
-            A seguir
-          </p>
-          <div className="p-10 md:p-14 bg-[var(--espresso-700)] rounded-[var(--radius-lg)] shadow-[var(--shadow-2)] text-center max-w-4xl">
-            <p className="text-3xl md:text-4xl font-display font-bold text-[var(--crema-50)]">
-              {nextDuel.entryA.competitor.name}
-            </p>
-            <p className="text-xl md:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
-              {nextDuel.entryA.competitor.coffeeShop}
-            </p>
-            <p className="text-3xl md:text-4xl font-mono font-semibold text-[var(--marigold-500)] tabular-nums my-6">
-              VS
-            </p>
-            <p className="text-3xl md:text-4xl font-display font-bold text-[var(--crema-50)]">
-              {nextDuel.entryB.competitor.name}
-            </p>
-            <p className="text-xl md:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
-              {nextDuel.entryB.competitor.coffeeShop}
-            </p>
-          </div>
+        <main className="flex-1 min-h-0 flex flex-col items-center justify-center px-6 md:px-10 lg:px-16 pb-40 gap-6 md:gap-8" role="main" aria-live="polite">
+          <ProfileCardsCenterpiece
+            entryA={nextDuel.entryA}
+            entryB={nextDuel.entryB}
+            votesA={0}
+            votesB={0}
+          />
+
+          {currentRoundDuels.filter((d) => d.entryA && d.entryB).length > 1 && (
+            <MiniBracketStrip
+              duels={currentRoundDuels.filter((d) => d.entryA && d.entryB)}
+              activeDuelId={nextDuel.id}
+            />
+          )}
         </main>
 
         <QrBadge eventId={eventId} />
@@ -329,8 +340,8 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   // Default running state (no active or next duel)
   return (
-    <div className="min-h-screen bg-[var(--espresso-900)] flex flex-col relative">
-      <header className="flex items-start justify-between p-6 md:p-10 lg:p-12">
+    <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
         <LiveBadge />
         <div className="text-center flex-1 px-4">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
@@ -383,6 +394,19 @@ function DuelTimer({ startedAt }: { startedAt: string }) {
       </span>
       <span className="font-mono text-2xl md:text-3xl lg:text-4xl font-semibold tabular-nums text-[var(--crema-50)] leading-none mt-1">
         {display}
+      </span>
+    </div>
+  );
+}
+
+function NextDuelLabel() {
+  return (
+    <div className="inline-flex flex-col items-end flex-shrink-0">
+      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-[var(--crema-300)]">
+        A seguir
+      </span>
+      <span className="font-display text-lg md:text-xl font-semibold text-[var(--marigold-500)] leading-none mt-1">
+        Próximo duelo
       </span>
     </div>
   );
@@ -475,40 +499,42 @@ function PourPhotoCenterpiece({
   votesA: number;
   votesB: number;
 }) {
+  // No text overlay — sits cleanly above a separate competitor-info row so
+  // names stay readable regardless of the photo's exposure. Height capped so
+  // the TV viewport never scrolls.
   return (
-    <div className="relative w-full max-w-5xl rounded-[var(--radius-lg)] overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)]">
-      <img
-        src={pourPhotoUrl}
-        alt="Foto dos copos servidos"
-        className="w-full h-auto max-h-[70vh] object-cover"
-      />
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[var(--espresso-900)]/95 via-[var(--espresso-900)]/70 to-transparent p-6 md:p-10">
-        <div className="flex items-end justify-between gap-6">
-          <div className="flex-1 min-w-0">
-            <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
-              {entryA.competitor.name}
-            </p>
-            <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-              {entryA.competitor.coffeeShop}
-            </p>
-          </div>
+    <div className="flex flex-col items-center w-full max-w-5xl gap-4 md:gap-6">
+      <div className="rounded-[var(--radius-lg)] overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)]">
+        <img
+          src={pourPhotoUrl}
+          alt="Foto dos copos servidos"
+          className="block w-auto max-w-full max-h-[44vh] object-contain"
+        />
+      </div>
 
-          <div
-            className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
-            style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}
-            aria-label={`Placar atual: ${votesA} a ${votesB}`}
-          >
-            {votesA} × {votesB}
-          </div>
-
-          <div className="flex-1 min-w-0 text-right">
-            <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
-              {entryB.competitor.name}
-            </p>
-            <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-              {entryB.competitor.coffeeShop}
-            </p>
-          </div>
+      <div className="flex items-center justify-center gap-6 md:gap-10 w-full">
+        <div className="flex-1 min-w-0 text-right">
+          <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
+            {entryA.competitor.name}
+          </p>
+          <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
+            {entryA.competitor.coffeeShop}
+          </p>
+        </div>
+        <div
+          className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
+          style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}
+          aria-label={`Placar atual: ${votesA} a ${votesB}`}
+        >
+          {votesA} × {votesB}
+        </div>
+        <div className="flex-1 min-w-0 text-left">
+          <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
+            {entryB.competitor.name}
+          </p>
+          <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
+            {entryB.competitor.coffeeShop}
+          </p>
         </div>
       </div>
     </div>
@@ -573,7 +599,7 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
     return (
       <div className="flex items-center gap-2 flex-1 min-w-0 opacity-50">
         <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[var(--espresso-700)] border border-[var(--espresso-500)] flex-shrink-0" />
-        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] italic truncate">Bye</span>
+        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] truncate" aria-label="Sem oponente">—</span>
       </div>
     );
   }

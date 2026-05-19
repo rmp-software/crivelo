@@ -88,7 +88,7 @@ export default function OrganizersPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('pt-BR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -98,13 +98,13 @@ export default function OrganizersPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <PageHeader
-        title="Organizers"
-        description="Manage organizers and their permissions"
+        title="Organizadores"
+        description="Gerencie organizadores e suas permissões"
         actions={
           <Link href="/dashboard/organizers/new">
             <Button variant="primary">
               <Plus size={20} />
-              Add Organizer
+              Adicionar organizador
             </Button>
           </Link>
         }
@@ -146,18 +146,18 @@ export default function OrganizersPage() {
       {!isLoading && !error && organizers.length === 0 && (
         <div className="text-center py-12 bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)]">
           <p className="text-xl font-medium text-[var(--fg-2)] mb-2">
-            {search ? 'No organizers found' : 'No organizers yet'}
+            {search ? 'Nenhum organizador encontrado' : 'Nenhum organizador ainda'}
           </p>
           <p className="text-[var(--fg-3)] mb-6">
             {search
-              ? 'Try adjusting your search terms'
-              : 'Get started by creating your first organizer'}
+              ? 'Tente ajustar seus termos de busca'
+              : 'Comece adicionando seu primeiro organizador'}
           </p>
           {!search && (
             <Link href="/dashboard/organizers/new">
               <Button variant="primary">
                 <Plus size={20} />
-                Add Organizer
+                Adicionar organizador
               </Button>
             </Link>
           )}
@@ -173,19 +173,19 @@ export default function OrganizersPage() {
               <thead className="bg-[var(--bg-2)] border-b border-[var(--border)]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Name
+                    Nome
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Role
+                    Papel
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Created At
+                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                    Criado em
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Actions
+                    Ações
                   </th>
                 </tr>
               </thead>
@@ -203,15 +203,15 @@ export default function OrganizersPage() {
                         {organizer.role}
                       </Badge>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
                       {formatDate(organizer.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-4 py-4 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1">
                         <Link href={`/dashboard/organizers/${organizer.id}`}>
                           <Button variant="ghost" size="sm">
                             <Edit2 size={16} />
-                            Edit
+                            Editar
                           </Button>
                         </Link>
                         <Button
@@ -220,7 +220,7 @@ export default function OrganizersPage() {
                           onClick={() => setDeleteModal({ isOpen: true, organizer })}
                         >
                           <Trash2 size={16} />
-                          Delete
+                          Remover
                         </Button>
                       </div>
                     </td>
@@ -244,13 +244,13 @@ export default function OrganizersPage() {
                   </Badge>
                 </div>
                 <p className="text-sm text-[var(--fg-3)] mb-3">
-                  Created {formatDate(organizer.createdAt)}
+                  Criado em {formatDate(organizer.createdAt)}
                 </p>
                 <div className="flex items-center gap-2">
                   <Link href={`/dashboard/organizers/${organizer.id}`} className="flex-1">
                     <Button variant="secondary" size="sm" fullWidth>
                       <Edit2 size={16} />
-                      Edit
+                      Editar
                     </Button>
                   </Link>
                   <Button
@@ -273,7 +273,7 @@ export default function OrganizersPage() {
         onClose={() => setDeleteModal({ isOpen: false, organizer: null })}
         onConfirm={handleDelete}
         title="Excluir organizador"
-        message={`Are you sure you want to delete ${deleteModal.organizer?.name}? This action cannot be undone.`}
+        message={`Tem certeza que deseja excluir ${deleteModal.organizer?.name}? Esta ação não pode ser desfeita.`}
         confirmText="Excluir"
         isDanger
         isLoading={isDeleting}

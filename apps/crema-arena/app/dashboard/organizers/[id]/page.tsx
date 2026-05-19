@@ -22,9 +22,9 @@ export default function EditOrganizerPage() {
 
         if (!response.ok) {
           if (response.status === 404) {
-            throw new Error('Organizer not found');
+            throw new Error('Organizador não encontrado');
           }
-          throw new Error('Failed to fetch organizer');
+          throw new Error('Falha ao carregar organizador');
         }
 
         const data = await response.json();
@@ -90,11 +90,11 @@ export default function EditOrganizerPage() {
     <div className="max-w-2xl mx-auto">
       <PageHeader
         title="Editar organizador"
-        description="Update organizer information"
+        description="Atualize os dados do organizador"
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Organizers', href: '/dashboard/organizers' },
-          { label: 'Edit' },
+          { label: 'Organizadores', href: '/dashboard/organizers' },
+          { label: 'Editar' },
         ]}
       />
 

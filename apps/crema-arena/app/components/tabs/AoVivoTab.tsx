@@ -231,11 +231,14 @@ export default function AoVivoTab({
         </div>
       )}
 
-      {/* Compact history: other duels in the current round */}
+      {/* Compact history: other duels in the current round — exclude walkovers
+          (only show real head-to-head duels with both slots filled). */}
       {(() => {
-        const others = roundDuels.filter((d) => !currentDuel || d.id !== currentDuel.id);
+        const others = roundDuels.filter(
+          (d) => (!currentDuel || d.id !== currentDuel.id) && !!d.entryA && !!d.entryB
+        );
         const completed = others
-          .filter((d) => d.status === 'completed' || d.status === 'walkover')
+          .filter((d) => d.status === 'completed')
           .sort((a, b) => b.position - a.position); // newest first by position desc
         const pending = others.filter((d) => d.status === 'pending' || d.status === 'in_progress');
         if (completed.length === 0 && pending.length === 0) return null;
@@ -352,9 +355,9 @@ function CompactDuelRow({ duel, state }: { duel: Duel; state: 'completed' | 'pen
 function CompactCompetitor({ entry, isWinner }: { entry: Entry | null; isWinner: boolean }) {
   if (!entry) {
     return (
-      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)] italic">
+      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)]" aria-label="Sem oponente">
         <div className="w-8 h-8 rounded-full bg-[var(--bg-2)] border border-[var(--border)]" />
-        Bye
+        —
       </div>
     );
   }

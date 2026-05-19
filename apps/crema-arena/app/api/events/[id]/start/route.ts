@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { generateBracket, linkDuels } from '@/lib/bracket';
+import { generateBracket } from '@/lib/bracket';
 
 // POST /api/events/[id]/start - Start event (generate bracket + change status to running)
 export async function POST(
@@ -78,52 +78,24 @@ export async function POST(
       // Calculate bracket size
       bracketSize = Math.pow(2, Math.ceil(Math.log2(event.entries.length)));
 
-      // Create duels in database
-      const createdDuels = await prisma.$transaction(async (tx) => {
-        // Create all duels
-        const duels = await Promise.all(
-          bracketData.map((duelData) =>
-            tx.duel.create({
-              data: {
-                event_id: params.id,
-                round: duelData.round,
-                position: duelData.position,
-                entry_a_id: duelData.entry_a_id,
-                entry_b_id: duelData.entry_b_id,
-                status: duelData.status,
-                is_bronze_match: duelData.is_bronze_match ?? false,
-              },
-              select: {
-                id: true,
-                round: true,
-                position: true,
-                is_bronze_match: true,
-              },
-            })
-          )
-        );
-
-        // Link duels together (passes is_bronze_match so cascade math is correct)
-        const duelLinks = linkDuels(duels);
-
-        // Update duels with linking information
-        await Promise.all(
-          duelLinks.map((link) =>
-            tx.duel.update({
-              where: { id: link.id },
-              data: {
-                next_duel_id: link.next_duel_id,
-                next_duel_slot: link.next_duel_slot,
-                bronze_duel_id: link.bronze_duel_id ?? null,
-              },
-            })
-          )
-        );
-
-        return duels;
+      // Single multi-row INSERT — UUIDs and self-FKs are pre-resolved.
+      await prisma.duel.createMany({
+        data: bracketData.map((d) => ({
+          id: d.id,
+          event_id: params.id,
+          round: d.round,
+          position: d.position,
+          entry_a_id: d.entry_a_id,
+          entry_b_id: d.entry_b_id,
+          status: d.status,
+          next_duel_id: d.next_duel_id,
+          next_duel_slot: d.next_duel_slot,
+          bronze_duel_id: d.bronze_duel_id,
+          is_bronze_match: d.is_bronze_match,
+        })),
       });
 
-      duelsCreated = createdDuels.length;
+      duelsCreated = bracketData.length;
     }
 
     // Update event status to running and set bracket_size

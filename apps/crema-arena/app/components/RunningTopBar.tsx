@@ -1,9 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Calendar, MapPin, Users, Share2 } from 'lucide-react';
-import Button from './Button';
-import { useToast } from './Toast';
+import { Calendar, MapPin, Users } from 'lucide-react';
 
 interface RunningTopBarProps {
   eventName: string;
@@ -14,8 +12,6 @@ interface RunningTopBarProps {
   totalRounds: number;
   completedInRound: number;
   totalInRound: number;
-  audienceUrl: string;
-  liveUrl: string;
   /** Right-hand primary action — e.g. "Encerrar evento" when the final completes. */
   primaryAction?: ReactNode;
 }
@@ -46,21 +42,8 @@ export default function RunningTopBar({
   totalRounds,
   completedInRound,
   totalInRound,
-  audienceUrl,
-  liveUrl,
   primaryAction,
 }: RunningTopBarProps) {
-  const { showToast } = useToast();
-
-  const copyAudience = async () => {
-    try {
-      await navigator.clipboard.writeText(audienceUrl);
-      showToast('Link da plateia copiado.', 'success');
-    } catch {
-      showToast('Não foi possível copiar o link', 'error');
-    }
-  };
-
   return (
     <header className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -101,13 +84,9 @@ export default function RunningTopBar({
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Button variant="secondary" onClick={copyAudience}>
-            <Share2 size={16} />
-            Link da plateia
-          </Button>
-          {primaryAction}
-        </div>
+        {primaryAction && (
+          <div className="flex items-center gap-2 flex-shrink-0">{primaryAction}</div>
+        )}
       </div>
     </header>
   );

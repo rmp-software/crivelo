@@ -164,7 +164,7 @@ function CompetitorSlot({ competitor, votes, isWinner, showVotes }: CompetitorSl
           <Circle size={20} className="text-[var(--fg-4)]" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[var(--fg-3)] italic">BYE</p>
+          <p className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</p>
         </div>
       </div>
     );

@@ -8,10 +8,10 @@ export default function NewCompetitorPage() {
     <div className="max-w-7xl mx-auto">
       <PageHeader
         title="Adicionar competidor"
-        description="Create a new competitor profile"
+        description="Crie um novo perfil de competidor"
         breadcrumbs={[
           { label: 'Competidores', href: '/dashboard/competitors' },
-          { label: 'New' },
+          { label: 'Novo' },
         ]}
       />
 

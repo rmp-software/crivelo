@@ -54,7 +54,7 @@ export default function NowPouring({
         <div className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-3 md:gap-6">
           <div className="min-w-0">
             <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
-              {entryA?.name ?? 'Bye'}
+              {entryA?.name ?? '—'}
             </h2>
             <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
               {entryA?.coffeeShop || '—'}
@@ -65,7 +65,7 @@ export default function NowPouring({
           </span>
           <div className="min-w-0 text-right">
             <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
-              {entryB?.name ?? 'Bye'}
+              {entryB?.name ?? '—'}
             </h2>
             <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
               {entryB?.coffeeShop || '—'}

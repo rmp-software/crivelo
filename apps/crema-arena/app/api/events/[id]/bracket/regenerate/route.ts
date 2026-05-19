@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { generateBracket, linkDuels } from '@/lib/bracket';
+import { generateBracket } from '@/lib/bracket';
 
 // POST /api/events/[id]/bracket/regenerate
 // Wipe the bracket and re-build with current entries + seeds.
@@ -66,39 +66,25 @@ export async function POST(
         data: { bracket_size: bracketSize },
       });
 
-      const duels = await Promise.all(
-        bracketData.map((d) =>
-          tx.duel.create({
-            data: {
-              event_id: params.id,
-              round: d.round,
-              position: d.position,
-              entry_a_id: d.entry_a_id,
-              entry_b_id: d.entry_b_id,
-              status: d.status,
-              is_bronze_match: d.is_bronze_match ?? false,
-            },
-            select: { id: true, round: true, position: true, is_bronze_match: true },
-          })
-        )
-      );
+      // Single multi-row INSERT — UUIDs and self-FKs are pre-resolved.
+      await tx.duel.createMany({
+        data: bracketData.map((d) => ({
+          id: d.id,
+          event_id: params.id,
+          round: d.round,
+          position: d.position,
+          entry_a_id: d.entry_a_id,
+          entry_b_id: d.entry_b_id,
+          status: d.status,
+          next_duel_id: d.next_duel_id,
+          next_duel_slot: d.next_duel_slot,
+          bronze_duel_id: d.bronze_duel_id,
+          is_bronze_match: d.is_bronze_match,
+        })),
+      });
 
-      const links = linkDuels(duels);
-      await Promise.all(
-        links.map((link) =>
-          tx.duel.update({
-            where: { id: link.id },
-            data: {
-              next_duel_id: link.next_duel_id,
-              next_duel_slot: link.next_duel_slot,
-              bronze_duel_id: link.bronze_duel_id ?? null,
-            },
-          })
-        )
-      );
-
-      return duels;
-    });
+      return bracketData;
+    }, { timeout: 30_000, maxWait: 10_000 });
 
     return NextResponse.json({
       success: true,

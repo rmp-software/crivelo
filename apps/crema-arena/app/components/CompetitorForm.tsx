@@ -170,7 +170,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
       {/* Photo Upload */}
       <div className="mb-6">
         <label className="block text-sm font-medium text-[var(--fg-2)] mb-1.5">
-          Photo
+          Foto
           {mode === 'create' && <span className="text-[var(--danger)] ml-1">*</span>}
         </label>
 

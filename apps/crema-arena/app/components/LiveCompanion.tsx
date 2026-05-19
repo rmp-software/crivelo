@@ -48,10 +48,13 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
   // Default tab is set after data loads (status-aware).
   const [activeTab, setActiveTab] = useState<TabType>('chave');
 
-  const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
-  const { data: currentDuelData, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
-  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
-  const { data: leaderboardData } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, fetcher, swrOpts);
+  // Split-cadence polling: current-duel is small and hot (vote ticks, photo,
+  // transitions); bracket + leaderboard are heavier and change less often.
+  const fastOpts = { refreshInterval: 1000, revalidateOnFocus: false };
+  const slowOpts = { refreshInterval: 5000, revalidateOnFocus: false };
+  const { data: currentDuelData, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, fastOpts);
+  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, slowOpts);
+  const { data: leaderboardData } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, fetcher, slowOpts);
   const loading = !currentDuelData && !error;
   const eventStatus = currentDuelData?.event?.status;
 
