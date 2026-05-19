@@ -231,11 +231,14 @@ export default function AoVivoTab({
         </div>
       )}
 
-      {/* Compact history: other duels in the current round */}
+      {/* Compact history: other duels in the current round — exclude walkovers
+          (only show real head-to-head duels with both slots filled). */}
       {(() => {
-        const others = roundDuels.filter((d) => !currentDuel || d.id !== currentDuel.id);
+        const others = roundDuels.filter(
+          (d) => (!currentDuel || d.id !== currentDuel.id) && !!d.entryA && !!d.entryB
+        );
         const completed = others
-          .filter((d) => d.status === 'completed' || d.status === 'walkover')
+          .filter((d) => d.status === 'completed')
           .sort((a, b) => b.position - a.position); // newest first by position desc
         const pending = others.filter((d) => d.status === 'pending' || d.status === 'in_progress');
         if (completed.length === 0 && pending.length === 0) return null;
