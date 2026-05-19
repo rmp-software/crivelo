@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { Menu, X, Users, Calendar, Building2, LogOut } from 'lucide-react';
 import Button from './Button';
+import Wordmark from './Wordmark';
 
 interface SidebarProps {
   user: {
@@ -43,11 +44,9 @@ export default function Sidebar({ user }: SidebarProps) {
     <>
       {/* Logo/Branding */}
       <div className="p-6 border-b border-[var(--espresso-700)]">
-        <Link href="/dashboard" className="block">
-          <h1 className="text-2xl font-display font-bold text-[var(--crema-50)]">
-            Crema Arena
-          </h1>
-          <p className="text-sm text-[var(--crema-200)] font-serif italic mt-1">
+        <Link href="/dashboard" className="block" aria-label="Crema Arena — ir para o painel">
+          <Wordmark size="md" variant="light" />
+          <p className="text-xs text-[var(--crema-300)] font-mono uppercase tracking-wider mt-2">
             Painel admin
           </p>
         </Link>

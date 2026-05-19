@@ -5,6 +5,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Input from '@/app/components/Input';
+import Wordmark from '@/app/components/Wordmark';
 import Button from '@/app/components/Button';
 import Card from '@/app/components/Card';
 
@@ -45,12 +46,10 @@ export default function LoginPage() {
     <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-[var(--bg)] to-[var(--bg-2)]">
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-2" style={{ color: 'var(--brand)' }}>
-            Crema Arena
-          </h1>
-          <p className="text-lg font-serif italic text-[var(--fg-2)]">
-            Painel Administrativo
+        <div className="flex flex-col items-center mb-8">
+          <Wordmark size="lg" className="mb-2" />
+          <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
+            Painel administrativo
           </p>
         </div>
 

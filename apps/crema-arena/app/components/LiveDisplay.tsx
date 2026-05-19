@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Crown, Trophy } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -582,17 +581,13 @@ function PodiumSlot({
 
   return (
     <div className={`flex flex-col items-center flex-1 ${slotWidth}`}>
-      {/* CAMPEÃO stamp for 1st place */}
+      {/* Stamp-seal "VENCEDOR" badge for 1st place */}
       {isFirst && (
-        <div
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-[var(--radius-full)] bg-[var(--marigold-500)] text-[var(--espresso-900)] mb-3"
-          aria-label="Campeão"
-        >
-          <Crown size={18} strokeWidth={2} aria-hidden />
-          <span className="font-mono text-sm font-semibold uppercase tracking-wider">
-            Campeão
-          </span>
-        </div>
+        <img
+          src="/assets/stamp-seal.svg"
+          alt="Campeão"
+          className="w-24 h-24 md:w-28 md:h-28 mb-2 -mr-6 self-end"
+        />
       )}
       <div
         className={`relative ${photoSize} rounded-full overflow-hidden mb-4 shadow-[var(--shadow-2)]`}
@@ -604,10 +599,11 @@ function PodiumSlot({
           className="w-full h-full object-cover"
         />
         {isFirst && (
-          <Trophy
-            size={28}
-            className="absolute -bottom-2 -right-2 bg-[var(--marigold-500)] text-[var(--espresso-900)] rounded-full p-1.5"
+          <img
+            src="/assets/trophy.svg"
+            alt=""
             aria-hidden
+            className="absolute -bottom-2 -right-2 w-12 h-12 bg-[var(--marigold-500)] rounded-full p-1.5 shadow-[var(--shadow-1)]"
           />
         )}
       </div>
