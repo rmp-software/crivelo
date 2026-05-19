@@ -217,7 +217,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
                 ? 'Este duelo tem uma vaga vazia. Você pode adicionar um wildcard ou fazer um W.O.'
                 : 'Clique para iniciar o duelo, ou substitua um competidor com wildcard.'}
             </p>
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:justify-center items-stretch sm:items-center">
               <Button
                 variant="secondary"
                 size="lg"

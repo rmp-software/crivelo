@@ -368,8 +368,6 @@ export default function EventDetailPage() {
           totalRounds={event.bracketSize ? Math.log2(event.bracketSize) : 0}
           completedInRound={completedInCurrentRound}
           totalInRound={totalInCurrentRound}
-          audienceUrl={typeof window !== 'undefined' ? `${window.location.origin}/e/${eventId}` : ''}
-          liveUrl={typeof window !== 'undefined' ? `${window.location.origin}/live/${eventId}` : ''}
         />
       ) : null}
 
