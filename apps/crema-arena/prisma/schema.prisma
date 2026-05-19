@@ -135,6 +135,7 @@ model Duel {
   next_duel_id    String?
   next_duel_slot  DuelSlot?
   pour_photo_url  String?
+  started_at      DateTime?
   completed_at    DateTime?
   created_at      DateTime      @default(now())
 

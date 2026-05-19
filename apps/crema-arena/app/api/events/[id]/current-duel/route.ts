@@ -124,6 +124,7 @@ export async function GET(
             votesA: activeDuel.votes_a,
             votesB: activeDuel.votes_b,
             pourPhotoUrl: activeDuel.pour_photo_url,
+            startedAt: activeDuel.started_at ? activeDuel.started_at.toISOString() : null,
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,

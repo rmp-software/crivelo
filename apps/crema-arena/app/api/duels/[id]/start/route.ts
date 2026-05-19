@@ -57,7 +57,7 @@ export async function POST(
     // Update duel status to in_progress
     const updatedDuel = await prisma.duel.update({
       where: { id: params.id },
-      data: { status: 'in_progress' },
+      data: { status: 'in_progress', started_at: new Date() },
       include: {
         entry_a: {
           include: {

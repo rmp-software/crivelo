@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 
 interface Competitor {
@@ -22,6 +23,7 @@ interface Duel {
   votesA: number;
   votesB: number;
   pourPhotoUrl: string | null;
+  startedAt: string | null;
   entryA: Entry | null;
   entryB: Entry | null;
 }
@@ -226,7 +228,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
     return (
       <div className="min-h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
-        {/* Top bar: AO VIVO + title */}
+        {/* Top bar: AO VIVO + title + duel timer */}
         <header className="flex items-start justify-between p-6 md:p-10 lg:p-12">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
@@ -237,7 +239,11 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               {roundLabel}
             </p>
           </div>
-          <div className="w-[88px] md:w-[110px]" aria-hidden /> {/* spacer to balance LiveBadge */}
+          {currentDuel.startedAt ? (
+            <DuelTimer startedAt={currentDuel.startedAt} />
+          ) : (
+            <div className="w-[88px] md:w-[110px]" aria-hidden />
+          )}
         </header>
 
         {/* Main area */}
@@ -341,12 +347,51 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 function LiveBadge() {
   return (
     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-full)] bg-[var(--live-soft)] text-[var(--live)] flex-shrink-0">
-      <span className="w-2 h-2 rounded-full bg-[var(--live)]" aria-hidden />
+      <span className="w-2 h-2 rounded-full bg-[var(--live)] animate-pulse" aria-hidden />
       <span className="font-mono text-xs md:text-sm font-semibold tracking-wider uppercase">
         Ao vivo
       </span>
     </div>
   );
+}
+
+function DuelTimer({ startedAt }: { startedAt: string }) {
+  const startMs = new Date(startedAt).getTime();
+  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
+
+  useEffect(() => {
+    const tick = () => setElapsedMs(Math.max(0, Date.now() - startMs));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [startMs]);
+
+  const display = elapsedMs == null ? '--:--' : formatElapsed(elapsedMs);
+
+  return (
+    <div
+      className="inline-flex flex-col items-end flex-shrink-0"
+      aria-label={elapsedMs == null ? undefined : `Tempo do duelo ${display}`}
+    >
+      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-[var(--crema-300)]">
+        Tempo
+      </span>
+      <span className="font-mono text-2xl md:text-3xl lg:text-4xl font-semibold tabular-nums text-[var(--crema-50)] leading-none mt-1">
+        {display}
+      </span>
+    </div>
+  );
+}
+
+function formatElapsed(ms: number): string {
+  const totalSeconds = Math.floor(ms / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  const mm = String(minutes).padStart(2, '0');
+  const ss = String(seconds).padStart(2, '0');
+  if (hours > 0) return `${hours}:${mm}:${ss}`;
+  return `${mm}:${ss}`;
 }
 
 function QrBadge({ eventId }: { eventId: string }) {
@@ -482,41 +527,78 @@ function MiniBracketStrip({
   activeDuelId: string;
 }) {
   return (
-    <div className="mt-12 w-full max-w-5xl">
+    <div className="mt-12 w-full max-w-6xl">
       <p className="font-mono text-xs uppercase tracking-wider text-[var(--crema-300)] text-center mb-3">
         Duelos da rodada
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        {duels.map((d) => {
-          const isActive = d.id === activeDuelId;
-          const isCompleted = d.status === 'completed' || d.status === 'walkover';
-          const nameA = d.entryA?.competitor.name ?? 'Bye';
-          const nameB = d.entryB?.competitor.name ?? 'Bye';
-          return (
-            <div
-              key={d.id}
-              className={`px-3 py-2 rounded-[var(--radius-sm)] text-xs md:text-sm font-display border ${
-                isActive
-                  ? 'border-[var(--cinnamon-500)] bg-[var(--cinnamon-500)]/10 text-[var(--crema-50)]'
-                  : isCompleted
-                    ? 'border-transparent bg-[var(--espresso-700)] text-[var(--crema-200)]'
-                    : 'border-[var(--espresso-500)] text-[var(--crema-300)]'
-              }`}
-            >
-              <span className="font-mono tabular-nums mr-2 text-[var(--crema-300)]">
-                #{d.position + 1}
-              </span>
-              <span className="truncate">{nameA}</span>
-              <span className="mx-2 text-[var(--crema-300)]">×</span>
-              <span className="truncate">{nameB}</span>
-              {isCompleted && (
-                <span className="ml-2 font-mono tabular-nums text-[var(--crema-100)]">
-                  {d.votesA}–{d.votesB}
-                </span>
-              )}
-            </div>
-          );
-        })}
+      <div className="flex flex-wrap items-stretch justify-center gap-3">
+        {duels.map((d) => (
+          <MiniBracketCard key={d.id} duel={d} isActive={d.id === activeDuelId} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MiniBracketCard({ duel, isActive }: { duel: BracketDuel; isActive: boolean }) {
+  const isCompleted = duel.status === 'completed' || duel.status === 'walkover';
+  const winnerId = duel.winner?.id ?? null;
+
+  const containerCls = isActive
+    ? 'border-[var(--cinnamon-500)] bg-[var(--cinnamon-500)]/10'
+    : isCompleted
+      ? 'border-transparent bg-[var(--espresso-700)]'
+      : 'border-[var(--espresso-500)] bg-transparent';
+
+  return (
+    <div
+      className={`relative flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] border ${containerCls}`}
+      style={{ minWidth: 260, maxWidth: 360 }}
+    >
+      <span className="font-mono tabular-nums text-[10px] md:text-xs text-[var(--crema-300)] absolute -top-2 left-3 bg-[var(--espresso-900)] px-1 rounded">
+        #{duel.position + 1}
+      </span>
+      <MiniCompetitorRow entry={duel.entryA} isWinner={winnerId === duel.entryA?.id} />
+      <div className="flex flex-col items-center justify-center px-1 flex-shrink-0">
+        <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--crema-300)]">×</span>
+        {isCompleted && (
+          <span className="font-mono tabular-nums text-xs md:text-sm font-semibold text-[var(--crema-50)] mt-0.5">
+            {duel.votesA}–{duel.votesB}
+          </span>
+        )}
+      </div>
+      <MiniCompetitorRow entry={duel.entryB} isWinner={winnerId === duel.entryB?.id} />
+    </div>
+  );
+}
+
+function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner: boolean }) {
+  if (!entry) {
+    return (
+      <div className="flex items-center gap-2 flex-1 min-w-0 opacity-50">
+        <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[var(--espresso-700)] border border-[var(--espresso-500)] flex-shrink-0" />
+        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] italic truncate">Bye</span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2 flex-1 min-w-0">
+      <img
+        src={entry.competitor.photo_url}
+        alt={entry.competitor.name}
+        className={`w-8 h-8 md:w-9 md:h-9 rounded-full object-cover flex-shrink-0 border ${
+          isWinner ? 'border-[var(--marigold-500)]' : 'border-[var(--crema-200)]'
+        }`}
+      />
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className={`font-display text-xs md:text-sm font-semibold truncate leading-tight ${
+          isWinner ? 'text-[var(--crema-50)]' : 'text-[var(--crema-100)]'
+        }`}>
+          {entry.competitor.name}
+        </span>
+        <span className="font-serif italic text-[10px] md:text-xs text-[var(--crema-300)] truncate leading-tight">
+          {entry.competitor.coffee_shop}
+        </span>
       </div>
     </div>
   );
