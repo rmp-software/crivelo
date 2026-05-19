@@ -4,7 +4,8 @@ import { useState, useRef } from 'react';
 import Button from './Button';
 import Modal from './Modal';
 import ConfirmationModal from './ConfirmationModal';
-import { Camera, Trophy, Upload } from 'lucide-react';
+import WildcardModal from './WildcardModal';
+import { Camera, Trophy, Upload, User } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -40,6 +41,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
   const [isVoting, setIsVoting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showWildcardModal, setShowWildcardModal] = useState(false);
   const [selectedWinner, setSelectedWinner] = useState<string | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -161,35 +163,61 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
   };
 
   if (duel.status === 'pending') {
+    // Check if one of the slots is empty (BYE situation)
+    const hasEmptySlot = !duel.entryA || !duel.entryB;
+
     return (
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
-        <div className="text-center py-8">
-          <h3 className="text-xl font-semibold text-[var(--fg)] mb-4 font-[family-name:var(--font-display)]">
-            Duelo {duel.position + 1} - Pronto para começar
-          </h3>
-          <p className="text-[var(--fg-2)] mb-6">
-            Clique no botão abaixo para iniciar este duelo
-          </p>
-          <Button
-            variant="primary"
-            size="lg"
-            onClick={handleStartDuel}
-            disabled={isStarting}
-          >
-            {isStarting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Iniciando...
-              </>
-            ) : (
-              <>
-                <Trophy size={20} />
-                Iniciar Duelo
-              </>
-            )}
-          </Button>
+      <>
+        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+          <div className="text-center py-8">
+            <h3 className="text-xl font-semibold text-[var(--fg)] mb-4 font-[family-name:var(--font-display)]">
+              Duelo {duel.position + 1} - Pronto para começar
+            </h3>
+            <p className="text-[var(--fg-2)] mb-6">
+              {hasEmptySlot
+                ? 'Este duelo tem uma vaga vazia. Você pode adicionar um wildcard ou fazer um W.O.'
+                : 'Clique no botão abaixo para iniciar este duelo'}
+            </p>
+            <div className="flex gap-3 justify-center">
+              {hasEmptySlot && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => setShowWildcardModal(true)}
+                >
+                  <User size={20} />
+                  Adicionar Wildcard
+                </Button>
+              )}
+              <Button
+                variant="primary"
+                size="lg"
+                onClick={handleStartDuel}
+                disabled={isStarting}
+              >
+                {isStarting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Iniciando...
+                  </>
+                ) : (
+                  <>
+                    <Trophy size={20} />
+                    {hasEmptySlot ? 'Iniciar (W.O.)' : 'Iniciar Duelo'}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
+
+        <WildcardModal
+          isOpen={showWildcardModal}
+          onClose={() => setShowWildcardModal(false)}
+          duelId={duel.id}
+          onSuccess={onRefresh}
+        />
+      </>
     );
   }
 
@@ -358,7 +386,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
         {/* Complete Duel Button */}
         <div className="pt-6 border-t border-[var(--border)]">
           <Button
-            variant="success"
+            variant="primary"
             onClick={openCompleteModal}
             className="w-full"
           >
@@ -462,7 +490,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
               Cancelar
             </Button>
             <Button
-              variant="success"
+              variant="primary"
               onClick={handleCompleteDuel}
               disabled={!selectedWinner || isCompleting}
               className="flex-1"

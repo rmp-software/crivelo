@@ -140,7 +140,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
           </div>
           {allDuelsCompleted && (
             <Button
-              variant="success"
+              variant="primary"
               onClick={handleFinishEvent}
               disabled={isFinishing}
             >

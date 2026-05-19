@@ -132,6 +132,7 @@ export async function GET(
         votesA: duel.votes_a,
         votesB: duel.votes_b,
         pourPhotoUrl: duel.pour_photo_url,
+        wildcardType: duel.wildcard_type,
         entryA: duel.entry_a
           ? {
               id: duel.entry_a.id,

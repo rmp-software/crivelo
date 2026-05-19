@@ -138,6 +138,7 @@ export async function GET(
         status: duel.status,
         votesA: duel.votes_a,
         votesB: duel.votes_b,
+        wildcardType: duel.wildcard_type,
       })),
       totalEntries: event.entries.length,
     });
