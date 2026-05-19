@@ -1,0 +1,276 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import TapToTally from './TapToTally';
+import Badge from './Badge';
+import Button from './Button';
+import { CheckCircle, Circle, Play, Trophy } from 'lucide-react';
+
+interface Competitor {
+  id: string;
+  name: string;
+  photoUrl: string;
+  coffeeShop: string;
+}
+
+interface Entry {
+  id: string;
+  competitor: Competitor;
+}
+
+interface Duel {
+  id: string;
+  round: number;
+  position: number;
+  status: 'pending' | 'in_progress' | 'completed' | 'walkover';
+  votesA: number;
+  votesB: number;
+  pourPhotoUrl: string | null;
+  entryA: Entry | null;
+  entryB: Entry | null;
+  winner?: Entry | null;
+}
+
+interface RunningEventPanelProps {
+  eventId: string;
+  onEventFinished?: () => void;
+}
+
+export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
+  const [currentRound, setCurrentRound] = useState(1);
+  const [totalRounds, setTotalRounds] = useState(1);
+  const [activeDuel, setActiveDuel] = useState<Duel | null>(null);
+  const [duels, setDuels] = useState<Duel[]>([]);
+  const [allDuelsCompleted, setAllDuelsCompleted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFinishing, setIsFinishing] = useState(false);
+
+  const fetchRunningData = async () => {
+    try {
+      const response = await fetch(`/api/events/${eventId}/running`);
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch running event data');
+      }
+
+      const data = await response.json();
+      setCurrentRound(data.currentRound);
+      setTotalRounds(data.totalRounds);
+      setActiveDuel(data.activeDuel);
+      setDuels(data.duels);
+      setAllDuelsCompleted(data.allDuelsCompleted);
+    } catch (err: any) {
+      console.error('Error fetching running data:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRunningData();
+  }, [eventId]);
+
+  const handleFinishEvent = async () => {
+    if (!confirm('Tem certeza que deseja encerrar o evento? Esta ação não pode ser desfeita.')) {
+      return;
+    }
+
+    setIsFinishing(true);
+    try {
+      const response = await fetch(`/api/events/${eventId}/finish`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to finish event');
+      }
+
+      alert('Evento encerrado com sucesso!');
+      if (onEventFinished) {
+        onEventFinished();
+      }
+    } catch (err: any) {
+      alert(err.message || 'Failed to finish event');
+    } finally {
+      setIsFinishing(false);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'completed':
+        return <Badge variant="success">Concluído</Badge>;
+      case 'in_progress':
+        return <Badge variant="default">Em andamento</Badge>;
+      case 'walkover':
+        return <Badge variant="warning">W.O.</Badge>;
+      default:
+        return <Badge variant="default">Pendente</Badge>;
+    }
+  };
+
+  const getRoundName = (round: number, total: number) => {
+    if (round === total) return 'Final';
+    if (round === total - 1) return 'Semifinal';
+    return `Rodada ${round}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="text-center py-12">
+        <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-[var(--fg-2)]">Carregando dados do evento...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Round Header */}
+      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] shadow-[var(--shadow-1)]">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)]">
+              {getRoundName(currentRound, totalRounds)}
+            </h2>
+            <p className="text-sm text-[var(--fg-3)] mt-1">
+              {duels.filter((d) => d.status === 'completed').length} de {duels.length} duelos concluídos
+            </p>
+          </div>
+          {allDuelsCompleted && (
+            <Button
+              variant="success"
+              onClick={handleFinishEvent}
+              disabled={isFinishing}
+            >
+              {isFinishing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Encerrando...
+                </>
+              ) : (
+                <>
+                  <Trophy size={20} />
+                  Encerrar Evento
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Active Duel - Tap-to-Tally */}
+      {activeDuel && (
+        <TapToTally duel={activeDuel} onRefresh={fetchRunningData} />
+      )}
+
+      {/* Duel List */}
+      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+        <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] mb-4">
+          Todos os Duelos - {getRoundName(currentRound, totalRounds)}
+        </h3>
+
+        <div className="space-y-3">
+          {duels.map((duel) => (
+            <div
+              key={duel.id}
+              className={`p-4 rounded-[var(--radius-md)] border transition-colors ${
+                activeDuel?.id === duel.id
+                  ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
+                  : 'border-[var(--border)] bg-[var(--surface)]'
+              }`}
+            >
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-semibold text-[var(--fg)]">
+                    Duelo {duel.position + 1}
+                  </span>
+                  {getStatusBadge(duel.status)}
+                </div>
+                {duel.status === 'in_progress' && (
+                  <Play size={16} className="text-[var(--brand)] animate-pulse" />
+                )}
+                {duel.status === 'completed' && (
+                  <CheckCircle size={16} className="text-[var(--success)]" />
+                )}
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {/* Competitor A */}
+                {duel.entryA ? (
+                  <div
+                    className={`flex items-center gap-2 p-2 rounded-[var(--radius-sm)] ${
+                      duel.winner?.id === duel.entryA.id
+                        ? 'bg-[var(--success-soft)] border-2 border-[var(--success)]'
+                        : 'bg-[var(--bg)]'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                      <img
+                        src={duel.entryA.competitor.photoUrl}
+                        alt={duel.entryA.competitor.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--fg)] truncate">
+                        {duel.entryA.competitor.name}
+                      </p>
+                      {duel.status !== 'pending' && (
+                        <p className="text-xs text-[var(--fg-3)]">{duel.votesA} votos</p>
+                      )}
+                    </div>
+                    {duel.winner?.id === duel.entryA.id && (
+                      <Trophy size={14} className="text-[var(--success)] flex-shrink-0" />
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
+                    <Circle size={20} className="text-[var(--fg-4)]" />
+                    <span className="text-sm text-[var(--fg-3)] italic">BYE</span>
+                  </div>
+                )}
+
+                {/* Competitor B */}
+                {duel.entryB ? (
+                  <div
+                    className={`flex items-center gap-2 p-2 rounded-[var(--radius-sm)] ${
+                      duel.winner?.id === duel.entryB.id
+                        ? 'bg-[var(--success-soft)] border-2 border-[var(--success)]'
+                        : 'bg-[var(--bg)]'
+                    }`}
+                  >
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                      <img
+                        src={duel.entryB.competitor.photoUrl}
+                        alt={duel.entryB.competitor.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[var(--fg)] truncate">
+                        {duel.entryB.competitor.name}
+                      </p>
+                      {duel.status !== 'pending' && (
+                        <p className="text-xs text-[var(--fg-3)]">{duel.votesB} votos</p>
+                      )}
+                    </div>
+                    {duel.winner?.id === duel.entryB.id && (
+                      <Trophy size={14} className="text-[var(--success)] flex-shrink-0" />
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
+                    <Circle size={20} className="text-[var(--fg-4)]" />
+                    <span className="text-sm text-[var(--fg-3)] italic">BYE</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

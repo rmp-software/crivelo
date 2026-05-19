@@ -9,6 +9,7 @@ import Modal from '@/app/components/Modal';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
 import BracketView from '@/app/components/BracketView';
+import RunningEventPanel from '@/app/components/RunningEventPanel';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play } from 'lucide-react';
 
 interface EventData {
@@ -333,6 +334,11 @@ export default function EventDetailPage() {
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Running Event Panel - Show when event is running */}
+      {event.status === 'running' && (
+        <RunningEventPanel eventId={eventId} onEventFinished={fetchEventDetails} />
       )}
 
       {/* Bracket View - Show when event is running or finished */}
