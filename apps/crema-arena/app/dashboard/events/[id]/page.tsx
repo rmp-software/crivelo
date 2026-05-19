@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import PageHeader from '@/app/components/PageHeader';
 import Button from '@/app/components/Button';
 import Badge from '@/app/components/Badge';
 import Modal from '@/app/components/Modal';
@@ -316,11 +315,16 @@ export default function EventDetailPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      <PageHeader
-        title={event.name}
-        description={`Evento ${event.status === 'setup' ? 'em configuração' : event.status === 'running' ? 'ao vivo' : 'encerrado'}`}
-        actions={
-          canModify && (
+      {/* Event Info Card — primary header; replaces the stacked PageHeader */}
+      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+        <div className="flex items-start justify-between mb-6 gap-4">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-3xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)] mb-2">
+              {event.name}
+            </h1>
+            {getStatusBadge(event.status)}
+          </div>
+          {canModify && (
             <Button
               variant="secondary"
               onClick={() => router.push(`/dashboard/events/${eventId}/edit`)}
@@ -328,19 +332,7 @@ export default function EventDetailPage() {
               <Edit2 size={20} />
               Editar evento
             </Button>
-          )
-        }
-      />
-
-      {/* Event Info Card */}
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
-        <div className="flex items-start justify-between mb-6">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)] mb-2">
-              {event.name}
-            </h2>
-            {getStatusBadge(event.status)}
-          </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">

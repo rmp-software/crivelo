@@ -42,17 +42,19 @@ export default function Modal({ isOpen, onClose, title, children, footer, size =
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[var(--espresso-900)]/60 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
       onClick={onClose}
       aria-labelledby="modal-title"
       aria-modal="true"
       role="dialog"
+      style={{ backgroundColor: 'rgba(31,20,16,0.55)' }}
     >
       <div
         className={`relative bg-[var(--surface-raised)] rounded-[var(--radius-lg)] shadow-[var(--shadow-2)] w-full ${sizeStyles[size]} max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-200`}
         onClick={(e) => e.stopPropagation()}
         style={{
           transitionTimingFunction: 'var(--ease-overshoot)',
+          border: '1.5px solid var(--espresso-900)',
         }}
       >
         {/* Header */}
