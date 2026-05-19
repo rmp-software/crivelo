@@ -8,6 +8,7 @@ import Modal from '@/app/components/Modal';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
 import SeedInput from '@/app/components/SeedInput';
+import RunningTopBar from '@/app/components/RunningTopBar';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
@@ -315,9 +316,39 @@ export default function EventDetailPage() {
   const registeredCompetitorIds = competitors.map((c) => c.id);
   const canModify = event.status === 'setup';
 
+  const computedCurrentRound = (() => {
+    if (event.status !== 'running' || duels.length === 0) return null;
+    // Lowest round that still has any non-terminal duel.
+    const pending = duels.filter(
+      (d) => d.status !== 'completed' && d.status !== 'walkover'
+    );
+    if (pending.length === 0) return Math.max(...duels.map((d) => d.round));
+    return Math.min(...pending.map((d) => d.round));
+  })();
+  const completedInCurrentRound = duels.filter(
+    (d) => d.round === computedCurrentRound && d.status === 'completed'
+  ).length;
+  const totalInCurrentRound = duels.filter(
+    (d) => d.round === computedCurrentRound
+  ).length;
+
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Event Info Card — primary header; replaces the stacked PageHeader */}
+      {event.status === 'running' ? (
+        <RunningTopBar
+          eventName={event.name}
+          date={event.date}
+          location={event.location}
+          judgesCount={event.judgesCount}
+          currentRound={computedCurrentRound}
+          totalRounds={event.bracketSize ? Math.log2(event.bracketSize) : 0}
+          completedInRound={completedInCurrentRound}
+          totalInRound={totalInCurrentRound}
+          audienceUrl={typeof window !== 'undefined' ? `${window.location.origin}/e/${eventId}` : ''}
+          liveUrl={typeof window !== 'undefined' ? `${window.location.origin}/live/${eventId}` : ''}
+        />
+      ) : (
+      /* Event Info Card — primary header for setup/finished */
       <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
         <div className="flex items-start justify-between mb-6 gap-4">
           <div className="flex-1 min-w-0">
@@ -370,6 +401,7 @@ export default function EventDetailPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* Step 1: Generate Bracket */}
       {event.status === 'setup' && competitors.length >= 2 && duels.length === 0 && (
