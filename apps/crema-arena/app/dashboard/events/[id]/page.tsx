@@ -538,24 +538,9 @@ export default function EventDetailPage() {
         </>
       )}
 
-      {/* Running Event Panel - Two-column layout: BracketView + vote capture */}
+      {/* Running Event Panel — single-column (the two-col layout broke the UI). */}
       {event.status === 'running' && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-6 mb-6">
-          <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] order-2 lg:order-1">
-            <div className="mb-4">
-              <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
-                Chave
-              </h3>
-              <p className="text-sm text-[var(--fg-3)] mt-1">
-                {event.bracketSize} posições · {Math.log2(event.bracketSize!)} rodadas
-              </p>
-            </div>
-            <BracketView duels={duels} bracketSize={event.bracketSize!} />
-          </div>
-          <div className="order-1 lg:order-2">
-            <RunningEventPanel eventId={eventId} onEventFinished={fetchEventDetails} />
-          </div>
-        </div>
+        <RunningEventPanel eventId={eventId} onEventFinished={fetchEventDetails} />
       )}
 
       {/* Links Section - Show when event is running or finished */}
@@ -683,8 +668,8 @@ export default function EventDetailPage() {
         </div>
       )}
 
-      {/* Bracket View — kept only for the finished event recap (running already has its own bracket column) */}
-      {event.status === 'finished' && duels.length > 0 && (
+      {/* Bracket View — running + finished (was previously inlined in a 2-col layout, reverted). */}
+      {(event.status === 'running' || event.status === 'finished') && duels.length > 0 && (
         <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
           <div className="mb-6">
             <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
