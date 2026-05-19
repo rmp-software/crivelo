@@ -82,7 +82,7 @@ export default function EventDetailPage() {
     competitor: null,
   });
   const [isRemoving, setIsRemoving] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'live' | 'audience' | null>(null);
   const [qrDownloading, setQrDownloading] = useState(false);
 
   const fetchEventDetails = async () => {
@@ -242,12 +242,13 @@ export default function EventDetailPage() {
     }).format(date);
   };
 
-  const handleCopyUrl = async () => {
-    const liveUrl = `${window.location.origin}/live/${eventId}`;
+  const handleCopy = async (which: 'live' | 'audience') => {
+    const path = which === 'live' ? `/live/${eventId}` : `/e/${eventId}`;
+    const url = `${window.location.origin}${path}`;
     try {
-      await navigator.clipboard.writeText(liveUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(url);
+      setCopied(which);
+      setTimeout(() => setCopied(null), 2000);
     } catch (err) {
       console.error('Failed to copy URL:', err);
       alert('Falha ao copiar URL');
@@ -481,7 +482,7 @@ export default function EventDetailPage() {
             {/* Live Display URL */}
             <div>
               <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
-                Live Display
+                Display ao vivo
               </label>
               <div className="flex gap-2">
                 <input
@@ -492,13 +493,13 @@ export default function EventDetailPage() {
                 />
                 <Button
                   variant="secondary"
-                  onClick={handleCopyUrl}
+                  onClick={() => handleCopy('live')}
                   className="flex-shrink-0"
                 >
-                  {copied ? (
+                  {copied === 'live' ? (
                     <>
                       <Check size={20} />
-                      Copiado!
+                      Copiado
                     </>
                   ) : (
                     <>
@@ -513,10 +514,45 @@ export default function EventDetailPage() {
               </p>
             </div>
 
+            {/* Audience URL */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+                Link da plateia
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/e/${eventId}`}
+                  className="flex-1 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm"
+                />
+                <Button
+                  variant="secondary"
+                  onClick={() => handleCopy('audience')}
+                  className="flex-shrink-0"
+                >
+                  {copied === 'audience' ? (
+                    <>
+                      <Check size={20} />
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={20} />
+                      Copiar URL
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-[var(--fg-3)] mt-2">
+                URL mobile-first para a plateia acompanhar pelo celular
+              </p>
+            </div>
+
             {/* QR Code Section */}
             <div>
               <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
-                Audience (QR)
+                QR para audiência
               </label>
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                 <div className="bg-white p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)]">
