@@ -184,7 +184,7 @@ async function resolveByeDuels(eventId: string) {
     const winnerId = duel.entry_a_id || duel.entry_b_id;
 
     if (winnerId && duel.next_duel_id) {
-      // Update this duel as completed
+      // Mark this round-1 bye as completed (winner advanced without playing).
       await prisma.duel.update({
         where: { id: duel.id },
         data: {
@@ -194,32 +194,17 @@ async function resolveByeDuels(eventId: string) {
         },
       });
 
-      // Advance winner to next duel
-      const updateData: any = {};
-      if (duel.next_duel_slot === 'a') {
-        updateData.entry_a_id = winnerId;
-      } else if (duel.next_duel_slot === 'b') {
-        updateData.entry_b_id = winnerId;
-      }
+      // Advance winner into the next duel slot. The next duel stays `pending` —
+      // it only becomes playable once the sibling feeder also produces a winner.
+      const updateData =
+        duel.next_duel_slot === 'a'
+          ? { entry_a_id: winnerId }
+          : { entry_b_id: winnerId };
 
-      // Check if next duel becomes a walkover
-      const nextDuel = await prisma.duel.findUnique({
+      await prisma.duel.update({
         where: { id: duel.next_duel_id },
+        data: updateData,
       });
-
-      if (nextDuel) {
-        const nextEntryAId = duel.next_duel_slot === 'a' ? winnerId : nextDuel.entry_a_id;
-        const nextEntryBId = duel.next_duel_slot === 'b' ? winnerId : nextDuel.entry_b_id;
-
-        if (nextEntryAId && !nextEntryBId || !nextEntryAId && nextEntryBId) {
-          updateData.status = 'walkover';
-        }
-
-        await prisma.duel.update({
-          where: { id: duel.next_duel_id },
-          data: updateData,
-        });
-      }
     }
   }
 }

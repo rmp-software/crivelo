@@ -80,56 +80,23 @@ export async function POST(
         });
       }
 
-      // Advance winner to next duel if exists
+      // Advance winner to next duel if exists.
+      // In single-elim, every feeder produces exactly one winner (either via real
+      // play or via a round-1 bye walkover resolved at event start). The next duel
+      // must stay `pending` until the sibling feeder also finishes — never auto-
+      // promote it to walkover/completed here. Doing so before the sibling completes
+      // is the source of the cascade bug where an unfinished round-1 duel's
+      // semifinal shows a phantom winner.
       if (duel.next_duel_id && duel.next_duel_slot) {
-        const updateData: any = {};
-        if (duel.next_duel_slot === 'a') {
-          updateData.entry_a_id = winner_entry_id;
-        } else {
-          updateData.entry_b_id = winner_entry_id;
-        }
+        const updateData =
+          duel.next_duel_slot === 'a'
+            ? { entry_a_id: winner_entry_id }
+            : { entry_b_id: winner_entry_id };
 
-        // Check if next duel becomes a walkover or has both entries
-        const nextDuel = await tx.duel.findUnique({
+        await tx.duel.update({
           where: { id: duel.next_duel_id },
+          data: updateData,
         });
-
-        if (nextDuel) {
-          const nextEntryAId = duel.next_duel_slot === 'a' ? winner_entry_id : nextDuel.entry_a_id;
-          const nextEntryBId = duel.next_duel_slot === 'b' ? winner_entry_id : nextDuel.entry_b_id;
-
-          // If one side is filled and the other is empty, it's a walkover
-          if ((nextEntryAId && !nextEntryBId) || (!nextEntryAId && nextEntryBId)) {
-            updateData.status = 'walkover';
-            // Auto-complete walkover
-            const walkoverWinnerId = nextEntryAId || nextEntryBId;
-            if (walkoverWinnerId) {
-              updateData.winner_entry_id = walkoverWinnerId;
-              updateData.status = 'completed';
-              updateData.completed_at = new Date();
-
-              // Recursively advance if there's a next duel
-              if (nextDuel.next_duel_id && nextDuel.next_duel_slot) {
-                const nextNextUpdateData: any = {};
-                if (nextDuel.next_duel_slot === 'a') {
-                  nextNextUpdateData.entry_a_id = walkoverWinnerId;
-                } else {
-                  nextNextUpdateData.entry_b_id = walkoverWinnerId;
-                }
-
-                await tx.duel.update({
-                  where: { id: nextDuel.next_duel_id },
-                  data: nextNextUpdateData,
-                });
-              }
-            }
-          }
-
-          await tx.duel.update({
-            where: { id: duel.next_duel_id },
-            data: updateData,
-          });
-        }
       }
     });
 
