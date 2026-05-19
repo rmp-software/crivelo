@@ -114,7 +114,7 @@ export default function OrganizersPage() {
         <div className="relative max-w-md">
           <Input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Buscar por nome ou email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             fullWidth
@@ -137,7 +137,7 @@ export default function OrganizersPage() {
       {isLoading && (
         <div className="text-center py-12">
           <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-[var(--fg-2)]">Loading organizers...</p>
+          <p className="mt-4 text-[var(--fg-2)]">Carregando organizadores...</p>
         </div>
       )}
 

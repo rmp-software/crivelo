@@ -32,15 +32,15 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
     const newErrors: typeof errors = {};
 
     if (!name.trim() || name.length < 2) {
-      newErrors.name = 'Name is required and must be at least 2 characters';
+      newErrors.name = 'Nome obrigatório e com pelo menos 2 caracteres';
     }
 
     if (!coffeeShop.trim() || coffeeShop.length < 2) {
-      newErrors.coffeeShop = 'Coffee shop is required and must be at least 2 characters';
+      newErrors.coffeeShop = 'Cafeteria obrigatória e com pelo menos 2 caracteres';
     }
 
     if (mode === 'create' && !photoFile) {
-      newErrors.photo = 'Photo is required';
+      newErrors.photo = 'Foto obrigatória';
     }
 
     setErrors(newErrors);
@@ -53,13 +53,13 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
 
     // Validate file size
     if (file.size > 5 * 1024 * 1024) {
-      setErrors({ ...errors, photo: 'File size must be less than 5MB' });
+      setErrors({ ...errors, photo: 'Arquivo deve ter menos de 5MB' });
       return;
     }
 
     // Validate file type
     if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-      setErrors({ ...errors, photo: 'File must be a JPG or PNG image' });
+      setErrors({ ...errors, photo: 'Arquivo deve ser JPG ou PNG' });
       return;
     }
 
@@ -142,28 +142,28 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
       {/* Name Input */}
       <div className="mb-6">
         <Input
-          label="Name"
+          label="Nome"
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           error={errors.name}
           required
           fullWidth
-          placeholder="Enter competitor name"
+          placeholder="Nome do competidor"
         />
       </div>
 
       {/* Coffee Shop Input */}
       <div className="mb-6">
         <Input
-          label="Coffee Shop"
+          label="Cafeteria"
           type="text"
           value={coffeeShop}
           onChange={(e) => setCoffeeShop(e.target.value)}
           error={errors.coffeeShop}
           required
           fullWidth
-          placeholder="Enter coffee shop name"
+          placeholder="Nome da cafeteria"
         />
       </div>
 
@@ -204,17 +204,17 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
               </div>
               <div>
                 <p className="text-sm font-medium text-[var(--fg)]">
-                  Click to upload photo
+                  Toque para enviar foto
                 </p>
                 <p className="text-xs text-[var(--fg-3)] mt-1">
-                  JPG or PNG, max 5MB
+                  JPG ou PNG, máx. 4MB
                 </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Change Photo Button (Edit mode with existing photo) */}
+        {/* Trocar foto Button (Edit mode with existing photo) */}
         {photoPreview && mode === 'edit' && !photoFile && (
           <Button
             type="button"
@@ -223,7 +223,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
             onClick={() => fileInputRef.current?.click()}
           >
             <Upload size={16} />
-            Change Photo
+            Trocar foto
           </Button>
         )}
 
@@ -251,10 +251,10 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
           {isLoading ? (
             <>
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              {mode === 'create' ? 'Creating...' : 'Saving...'}
+              {mode === 'create' ? 'Criando...' : 'Salvando...'}
             </>
           ) : (
-            mode === 'create' ? 'Create Competitor' : 'Save Changes'
+            mode === 'create' ? 'Criar competidor' : 'Salvar alterações'
           )}
         </Button>
         <Button
@@ -263,7 +263,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
           onClick={handleCancel}
           disabled={isLoading}
         >
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>

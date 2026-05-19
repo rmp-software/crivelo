@@ -10,7 +10,7 @@ export default function NewCompetitorPage() {
         title="Adicionar competidor"
         description="Create a new competitor profile"
         breadcrumbs={[
-          { label: 'Competitors', href: '/dashboard/competitors' },
+          { label: 'Competidores', href: '/dashboard/competitors' },
           { label: 'New' },
         ]}
       />

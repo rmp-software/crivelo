@@ -74,7 +74,7 @@ export default function EditCompetitorPage() {
         title="Editar competidor"
         description={`Update ${competitor.name}'s profile`}
         breadcrumbs={[
-          { label: 'Competitors', href: '/dashboard/competitors' },
+          { label: 'Competidores', href: '/dashboard/competitors' },
           { label: competitor.name },
         ]}
       />

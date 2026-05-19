@@ -125,19 +125,19 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
 
       {/* Name Input */}
       <Input
-        label="Event Name"
+        label="Nome do evento"
         type="text"
         value={formData.name}
         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
         error={errors.name}
         required
         fullWidth
-        placeholder="e.g., Summer Latte Art Championship 2024"
+        placeholder="Ex.: TNT Vila Madá 2026"
       />
 
       {/* Date Input */}
       <Input
-        label="Event Date"
+        label="Data do evento"
         type="datetime-local"
         value={formData.date}
         onChange={(e) => setFormData({ ...formData, date: e.target.value })}
@@ -148,13 +148,13 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
 
       {/* Location Input */}
       <Input
-        label="Location"
+        label="Local"
         type="text"
         value={formData.location}
         onChange={(e) => setFormData({ ...formData, location: e.target.value })}
         fullWidth
-        placeholder="e.g., Downtown Coffee House"
-        helperText="Optional"
+        placeholder="Ex.: Coffee Lab · Vila Madalena"
+        helperText="Opcional"
       />
 
       {/* Description Textarea */}
@@ -163,7 +163,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
           htmlFor="description"
           className="block text-sm font-medium text-[var(--fg-2)] mb-1.5"
         >
-          Description
+          Descrição
         </label>
         <textarea
           id="description"
@@ -171,15 +171,15 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           rows={4}
           className="w-full px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 focus:border-[var(--brand)] bg-[var(--surface)] text-[var(--fg)] transition-all"
-          placeholder="Provide details about the event..."
+          placeholder="Detalhes do evento..."
           style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
         />
-        <p className="mt-1.5 text-sm text-[var(--fg-3)]">Optional</p>
+        <p className="mt-1.5 text-sm text-[var(--fg-3)]">Opcional</p>
       </div>
 
       {/* Judges Count Input */}
       <Input
-        label="Number of Judges"
+        label="Número de jurados"
         type="number"
         min="1"
         max="10"
@@ -188,7 +188,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
         error={errors.judges_count}
         required
         fullWidth
-        helperText="Between 1 and 10 judges"
+        helperText="Entre 1 e 10 jurados"
       />
 
       {/* Action Buttons */}
@@ -198,7 +198,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
           variant="primary"
           disabled={isSubmitting}
         >
-          {isSubmitting ? (mode === 'create' ? 'Creating...' : 'Saving...') : (mode === 'create' ? 'Create Event' : 'Save Changes')}
+          {isSubmitting ? (mode === 'create' ? 'Criando...' : 'Salvando...') : (mode === 'create' ? 'Criar evento' : 'Salvar alterações')}
         </Button>
         <Button
           type="button"
@@ -206,7 +206,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
           onClick={handleCancel}
           disabled={isSubmitting}
         >
-          Cancel
+          Cancelar
         </Button>
       </div>
     </form>
