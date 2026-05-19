@@ -55,13 +55,13 @@ function LoginForm() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError('Email ou senha inválidos');
       } else {
         const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
         router.push(callbackUrl);
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      setError('Ocorreu um erro inesperado. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

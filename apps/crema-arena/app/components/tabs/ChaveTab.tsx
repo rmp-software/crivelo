@@ -42,7 +42,7 @@ interface ChaveTabProps {
 }
 
 export default function ChaveTab({ event, duels, totalRounds, currentDuel }: ChaveTabProps) {
-  // Event not started yet
+  // Event not started yet — bracket may already be generated, but it's not public until the event starts.
   if (event.status === 'setup') {
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
@@ -51,7 +51,7 @@ export default function ChaveTab({ event, duels, totalRounds, currentDuel }: Cha
             <span className="text-3xl">📋</span>
           </div>
           <h2 className="text-xl font-bold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
-            Chave ainda não gerada
+            O evento ainda não começou
           </h2>
           <p className="text-[var(--fg-3)] text-sm">
             A chave será exibida quando o evento começar
