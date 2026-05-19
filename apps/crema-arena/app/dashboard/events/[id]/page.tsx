@@ -10,7 +10,7 @@ import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
-import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play } from 'lucide-react';
+import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
 
 interface EventData {
   id: string;
@@ -81,6 +81,8 @@ export default function EventDetailPage() {
     competitor: null,
   });
   const [isRemoving, setIsRemoving] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [qrDownloading, setQrDownloading] = useState(false);
 
   const fetchEventDetails = async () => {
     setIsLoading(true);
@@ -202,6 +204,41 @@ export default function EventDetailPage() {
       hour: '2-digit',
       minute: '2-digit',
     }).format(date);
+  };
+
+  const handleCopyUrl = async () => {
+    const liveUrl = `${window.location.origin}/live/${eventId}`;
+    try {
+      await navigator.clipboard.writeText(liveUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+      alert('Falha ao copiar URL');
+    }
+  };
+
+  const handleDownloadQr = async () => {
+    setQrDownloading(true);
+    try {
+      const response = await fetch(`/api/events/${eventId}/qr`);
+      if (!response.ok) throw new Error('Failed to fetch QR code');
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `event-${eventId}-qr.png`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Failed to download QR code:', err);
+      alert('Falha ao baixar QR code');
+    } finally {
+      setQrDownloading(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -339,6 +376,96 @@ export default function EventDetailPage() {
       {/* Running Event Panel - Show when event is running */}
       {event.status === 'running' && (
         <RunningEventPanel eventId={eventId} onEventFinished={fetchEventDetails} />
+      )}
+
+      {/* Links Section - Show when event is running or finished */}
+      {(event.status === 'running' || event.status === 'finished') && (
+        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] flex items-center gap-2">
+              <Link2 size={24} />
+              Links
+            </h3>
+            <p className="text-sm text-[var(--fg-3)] mt-1">
+              Compartilhe o display ao vivo e o QR code com o público
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Live Display URL */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+                Live Display
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  readOnly
+                  value={`${typeof window !== 'undefined' ? window.location.origin : ''}/live/${eventId}`}
+                  className="flex-1 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm"
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleCopyUrl}
+                  className="flex-shrink-0"
+                >
+                  {copied ? (
+                    <>
+                      <Check size={20} />
+                      Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={20} />
+                      Copiar URL
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-[var(--fg-3)] mt-2">
+                URL para exibir ao vivo em telas grandes ou projetores
+              </p>
+            </div>
+
+            {/* QR Code Section */}
+            <div>
+              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+                Audience (QR)
+              </label>
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="bg-white p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)]">
+                  <img
+                    src={`/api/events/${eventId}/qr`}
+                    alt="QR Code para acesso ao vivo"
+                    className="w-48 h-48 sm:w-32 sm:h-32"
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-[var(--fg-2)] mb-3">
+                    Escaneie este QR code para acessar o display ao vivo no celular
+                  </p>
+                  <Button
+                    variant="secondary"
+                    onClick={handleDownloadQr}
+                    disabled={qrDownloading}
+                  >
+                    {qrDownloading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                        Baixando...
+                      </>
+                    ) : (
+                      <>
+                        <Download size={20} />
+                        Download QR
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Bracket View - Show when event is running or finished */}
