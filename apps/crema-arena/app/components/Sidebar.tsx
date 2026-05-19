@@ -64,7 +64,7 @@ export default function Sidebar({ user }: SidebarProps) {
               key={item.href}
               href={item.href}
               onClick={() => setIsOpen(false)}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-sm)] text-sm font-medium transition-all ${
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-[var(--radius-sm)] text-sm font-medium transition-all min-h-[44px] touch-manipulation ${
                 active
                   ? 'bg-[var(--cinnamon-700)] text-[var(--crema-50)]'
                   : 'text-[var(--crema-100)] hover:bg-[var(--espresso-700)] hover:text-[var(--crema-50)]'
@@ -73,8 +73,9 @@ export default function Sidebar({ user }: SidebarProps) {
                 transitionDuration: 'var(--dur-base)',
                 transitionTimingFunction: 'var(--ease-standard)',
               }}
+              aria-current={active ? 'page' : undefined}
             >
-              <Icon size={18} />
+              <Icon size={18} aria-hidden="true" />
               <span>{item.label}</span>
             </Link>
           );
@@ -115,10 +116,15 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 md:hidden p-2 rounded-[var(--radius-sm)] bg-[var(--espresso-900)] text-[var(--crema-50)] shadow-lg"
-        aria-label="Toggle menu"
+        className="fixed top-4 left-4 z-50 md:hidden p-3 rounded-[var(--radius-sm)] bg-[var(--espresso-900)] text-[var(--crema-50)] shadow-[var(--shadow-2)] touch-manipulation min-h-[48px] min-w-[48px] flex items-center justify-center"
+        aria-label={isOpen ? 'Fechar menu' : 'Abrir menu'}
+        aria-expanded={isOpen}
+        style={{
+          transitionDuration: 'var(--dur-base)',
+          transitionTimingFunction: 'var(--ease-standard)',
+        }}
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        {isOpen ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
       </button>
 
       {/* Mobile Overlay */}
@@ -126,11 +132,21 @@ export default function Sidebar({ user }: SidebarProps) {
         <div
           className="fixed inset-0 bg-[var(--espresso-900)]/60 backdrop-blur-sm z-40 md:hidden"
           onClick={() => setIsOpen(false)}
+          role="button"
+          tabIndex={0}
+          aria-label="Fechar menu"
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setIsOpen(false);
+          }}
+          style={{
+            transitionDuration: 'var(--dur-base)',
+            transitionTimingFunction: 'var(--ease-standard)',
+          }}
         />
       )}
 
       {/* Sidebar - Desktop (always visible) */}
-      <aside className="hidden md:flex md:flex-col md:w-64 bg-[var(--espresso-900)] min-h-screen">
+      <aside className="hidden md:flex md:flex-col md:w-64 bg-[var(--espresso-900)] min-h-screen" role="navigation" aria-label="Menu principal">
         <SidebarContent />
       </aside>
 
@@ -143,6 +159,8 @@ export default function Sidebar({ user }: SidebarProps) {
           transitionDuration: 'var(--dur-stage)',
           transitionTimingFunction: 'var(--ease-standard)',
         }}
+        role="navigation"
+        aria-label="Menu principal"
       >
         <SidebarContent />
       </aside>

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import LiveDisplay from '@/components/LiveDisplay';
+import LiveDisplay from '@/app/components/LiveDisplay';
 import { prisma } from '@/lib/prisma';
 
 interface PageProps {

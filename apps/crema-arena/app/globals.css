@@ -127,6 +127,33 @@
     @apply font-display font-bold;
     letter-spacing: -0.02em;
   }
+
+  /* Accessibility: Focus Rings */
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    transition: outline-offset var(--dur-fast) var(--ease-standard);
+  }
+
+  /* Remove default focus outline for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Smooth transitions for interactive elements */
+  a, button, input, select, textarea {
+    transition-property: color, background-color, border-color, transform, box-shadow;
+    transition-duration: var(--dur-base);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  /* Minimum touch target size for accessibility */
+  @media (pointer: coarse) {
+    button, a, input[type="checkbox"], input[type="radio"] {
+      min-height: 48px;
+      min-width: 48px;
+    }
+  }
 }
 
 @layer utilities {

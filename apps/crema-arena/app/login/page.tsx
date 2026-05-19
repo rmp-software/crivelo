@@ -46,24 +46,28 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="text-center mb-8">
-          <h1 className="text-5xl font-display font-bold mb-2" style={{ color: 'var(--brand)' }}>
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-2" style={{ color: 'var(--brand)' }}>
             Crema Arena
           </h1>
           <p className="text-lg font-serif italic text-[var(--fg-2)]">
-            Admin Login
+            Painel Administrativo
           </p>
         </div>
 
         {/* Login Card */}
         <Card shadow="md">
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5" aria-label="Formulário de login">
             <h2 className="text-2xl font-display font-bold text-[var(--fg)] mb-6">
-              Sign In
+              Entrar
             </h2>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)] text-sm">
+              <div
+                className="p-3 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)] text-sm"
+                role="alert"
+                aria-live="assertive"
+              >
                 {error}
               </div>
             )}
@@ -74,24 +78,26 @@ export default function LoginPage() {
               label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
+              placeholder="seu@email.com"
               required
               fullWidth
               autoComplete="email"
               disabled={isLoading}
+              aria-label="Email"
             />
 
             {/* Password Input */}
             <Input
               type="password"
-              label="Password"
+              label="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Digite sua senha"
               required
               fullWidth
               autoComplete="current-password"
               disabled={isLoading}
+              aria-label="Senha"
             />
 
             {/* Submit Button */}
@@ -101,8 +107,9 @@ export default function LoginPage() {
               size="lg"
               fullWidth
               disabled={isLoading}
+              aria-label={isLoading ? 'Entrando...' : 'Entrar no sistema'}
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
         </Card>
@@ -113,8 +120,9 @@ export default function LoginPage() {
             href="/"
             className="text-sm text-[var(--fg-3)] hover:text-[var(--brand)] transition-colors"
             style={{ transitionDuration: 'var(--dur-base)' }}
+            aria-label="Voltar para a página inicial"
           >
-            Back to home
+            Voltar para home
           </Link>
         </div>
       </div>

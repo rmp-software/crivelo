@@ -6,7 +6,9 @@ import Link from 'next/link';
 import PageHeader from '@/app/components/PageHeader';
 import Button from '@/app/components/Button';
 import Badge from '@/app/components/Badge';
-import { Plus, Calendar, MapPin, Users } from 'lucide-react';
+import EmptyState from '@/app/components/EmptyState';
+import SkeletonLoader from '@/app/components/SkeletonLoader';
+import { Plus, Calendar, MapPin, Users, PartyPopper } from 'lucide-react';
 
 interface Event {
   id: string;
@@ -100,43 +102,44 @@ export default function EventsPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-[var(--fg-2)]">Carregando eventos...</p>
+        <div className="space-y-6">
+          <SkeletonLoader type="card" count={3} />
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !error && events.length === 0 && (
-        <div className="text-center py-12 bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)]">
-          <p className="text-xl font-medium text-[var(--fg-2)] mb-2">
-            Nenhum evento ainda
-          </p>
-          <p className="text-[var(--fg-3)] mb-6">
-            Comece criando seu primeiro evento
-          </p>
-          <Link href="/dashboard/events/new">
-            <Button variant="primary">
-              <Plus size={20} />
-              Novo Evento
-            </Button>
-          </Link>
-        </div>
+        <EmptyState
+          icon={PartyPopper}
+          title="Nenhum evento ainda"
+          description="Comece criando seu primeiro evento de competição"
+          action={{
+            label: 'Criar Primeiro Evento',
+            onClick: () => router.push('/dashboard/events/new'),
+          }}
+        />
       )}
 
       {/* Events Grid */}
       {!isLoading && !error && events.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {events.map((event) => (
             <Link
               key={event.id}
               href={`/dashboard/events/${event.id}`}
-              className="block"
+              className="block group"
+              aria-label={`Ver detalhes do evento ${event.name}`}
             >
-              <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] p-6 border border-[var(--border)] hover:border-[var(--brand)] hover:shadow-[var(--shadow-2)] transition-all cursor-pointer">
+              <div
+                className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] p-4 md:p-6 border border-[var(--border)] hover:border-[var(--brand)] hover:shadow-[var(--shadow-2)] transition-all cursor-pointer group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-[var(--focus-ring)] group-focus-visible:outline-offset-2"
+                style={{
+                  transitionDuration: 'var(--dur-base)',
+                  transitionTimingFunction: 'var(--ease-standard)',
+                }}
+              >
                 {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] leading-tight flex-1 pr-2">
+                <div className="flex items-start justify-between mb-4 gap-2">
+                  <h3 className="text-base md:text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] leading-tight flex-1">
                     {event.name}
                   </h3>
                   {getStatusBadge(event.status)}
@@ -144,14 +147,14 @@ export default function EventsPage() {
 
                 {/* Date */}
                 <div className="flex items-center gap-2 text-sm text-[var(--fg-2)] mb-2">
-                  <Calendar size={16} className="text-[var(--fg-3)]" />
-                  {formatDate(event.date)}
+                  <Calendar size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
+                  <time dateTime={event.date}>{formatDate(event.date)}</time>
                 </div>
 
                 {/* Location */}
                 {event.location && (
                   <div className="flex items-center gap-2 text-sm text-[var(--fg-2)] mb-4">
-                    <MapPin size={16} className="text-[var(--fg-3)]" />
+                    <MapPin size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
                     {event.location}
                   </div>
                 )}
@@ -159,7 +162,7 @@ export default function EventsPage() {
                 {/* Stats */}
                 <div className="flex items-center gap-4 pt-4 border-t border-[var(--border)]">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users size={16} className="text-[var(--fg-3)]" />
+                    <Users size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
                     <span className="text-[var(--fg-2)]">
                       {event.competitorCount} {event.competitorCount === 1 ? 'competidor' : 'competidores'}
                     </span>

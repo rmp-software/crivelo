@@ -45,31 +45,31 @@
     {
       "step": 7,
       "title": "Event running and tap-to-tally",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build running event panel showing current round and duel list with statuses. Create vote capture interface (tap-to-tally) with 'Fotografar copos' camera button, Cup A/B vote buttons, live counter. Implement pour photo upload to POST /api/duels/:id/photo with immediate live display update. Create close duel confirmation modal with competitor mapping. Implement bracket advancement logic. Create API routes: POST /api/duels/:id/start, /vote, /complete, /photo. Build 'Encerrar evento' button for final completion."
     },
     {
       "step": 8,
       "title": "Wildcard system",
-      "status": "Todo",
+      "status": "Done",
       "description": "Create wildcard modal with three options: walkover (opponent advances automatically), manual pick (select from eliminated competitors), random pick (system selects with confirmation). Implement list view of eliminated competitors for manual selection. Build random selection logic with confirmation. Create API route: POST /api/duels/:id/wildcard. Implement event_entry status updates (dropped_out, wildcard_in). Add 'Wildcard' badge in BracketView."
     },
     {
       "step": 9,
       "title": "Live display surface",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build /live/[eventId] public route without admin layout. Create full-screen LiveDisplay component with espresso background. Implement 5-second polling for /api/events/:id/current-duel and /api/events/:id/bracket. Display large competitor cards with photo, name, coffee shop, and partial score. Generate QR code server-side via qrcode package at /api/events/:id/qr. Handle states: setup, running (active duel), running (between duels), finished. Ensure layout responsive and optimized for 1920x1080."
     },
     {
       "step": 10,
       "title": "Live companion (audience screen)",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build /e/[eventId] mobile-first public route without admin layout. Create tab navigation: Ao vivo | Chave | Leaderboard. Implement 'Ao vivo' tab with current duel votes and next duel. Build 'Chave' tab with adapted BracketView for mobile (horizontal scroll). Create 'Leaderboard' tab with partial standings (during event) and full final leaderboard (after close). Implement shared 5-second polling across tabs. Handle content states per event status."
     },
     {
       "step": 11,
       "title": "Event links in admin",
-      "status": "Todo",
+      "status": "Done",
       "description": "Add 'Links' section on event detail page (visible in running/finished status). Implement 'Live Display' with read-only input showing /live/[eventId] URL and 'Copiar URL' button using Clipboard API. Add 'Audience (QR)' section with inline QR code image and download PNG button."
     },
     {

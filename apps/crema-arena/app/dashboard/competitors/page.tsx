@@ -7,7 +7,9 @@ import PageHeader from '@/app/components/PageHeader';
 import Button from '@/app/components/Button';
 import Input from '@/app/components/Input';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import EmptyState from '@/app/components/EmptyState';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -139,32 +141,31 @@ export default function CompetitorsPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-[var(--fg-2)]">Loading competitors...</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-[var(--fg-2)]">Carregando competidores...</p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !error && competitors.length === 0 && (
-        <div className="text-center py-12 bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)]">
-          <p className="text-xl font-medium text-[var(--fg-2)] mb-2">
-            {search ? 'No competitors found' : 'No competitors yet'}
-          </p>
-          <p className="text-[var(--fg-3)] mb-6">
-            {search
-              ? 'Try adjusting your search terms'
-              : 'Get started by adding your first competitor'}
-          </p>
-          {!search && (
-            <Link href="/dashboard/competitors/new">
-              <Button variant="primary">
-                <Plus size={20} />
-                Add Competitor
-              </Button>
-            </Link>
-          )}
-        </div>
+        <EmptyState
+          icon={Users}
+          title={search ? 'Nenhum competidor encontrado' : 'Nenhum competidor ainda'}
+          description={
+            search
+              ? 'Tente ajustar seus termos de busca'
+              : 'Comece adicionando seu primeiro competidor'
+          }
+          action={
+            !search
+              ? {
+                  label: 'Adicionar Competidor',
+                  onClick: () => router.push('/dashboard/competitors/new'),
+                }
+              : undefined
+          }
+        />
       )}
 
       {/* Competitors Table */}
@@ -194,12 +195,19 @@ export default function CompetitorsPage() {
               </thead>
               <tbody className="divide-y divide-[var(--border)]">
                 {competitors.map((competitor) => (
-                  <tr key={competitor.id} className="hover:bg-[var(--bg-2)] transition-colors">
+                  <tr
+                    key={competitor.id}
+                    className="hover:bg-[var(--bg-2)] transition-colors"
+                    style={{
+                      transitionDuration: 'var(--dur-base)',
+                      transitionTimingFunction: 'var(--ease-standard)',
+                    }}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)]">
                         <img
                           src={competitor.photoUrl}
-                          alt={competitor.name}
+                          alt={`Foto de ${competitor.name}`}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -211,23 +219,24 @@ export default function CompetitorsPage() {
                       {competitor.coffeeShop}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
-                      {formatDate(competitor.createdAt)}
+                      <time dateTime={competitor.createdAt}>{formatDate(competitor.createdAt)}</time>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link href={`/dashboard/competitors/${competitor.id}`}>
-                          <Button variant="ghost" size="sm">
-                            <Edit2 size={16} />
-                            Edit
+                          <Button variant="ghost" size="sm" aria-label={`Editar ${competitor.name}`}>
+                            <Edit2 size={16} aria-hidden="true" />
+                            Editar
                           </Button>
                         </Link>
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => setDeleteModal({ isOpen: true, competitor })}
+                          aria-label={`Deletar ${competitor.name}`}
                         >
-                          <Trash2 size={16} />
-                          Delete
+                          <Trash2 size={16} aria-hidden="true" />
+                          Deletar
                         </Button>
                       </div>
                     </td>
