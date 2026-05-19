@@ -47,7 +47,7 @@ export default function NowPouring({
         <div className="flex items-center gap-2 mb-4">
           <span className="w-2 h-2 rounded-full bg-[var(--live)]" aria-hidden />
           <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--mint-100)] font-semibold">
-            Vertendo agora · Bateria {duelPosition + 1}
+            Duelo ao vivo · Bateria {duelPosition + 1}
           </span>
         </div>
 
