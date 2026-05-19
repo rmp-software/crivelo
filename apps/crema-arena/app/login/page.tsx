@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { Suspense, useState, FormEvent } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -9,7 +9,32 @@ import Wordmark from '@/app/components/Wordmark';
 import Button from '@/app/components/Button';
 import Card from '@/app/components/Card';
 
+// useSearchParams() forces this page out of static prerender — wrap the inner
+// form in a Suspense boundary so the outer page can still be statically shipped.
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginShell />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginShell() {
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-[var(--bg)] to-[var(--bg-2)]">
+      <div className="w-full max-w-md">
+        <div className="flex flex-col items-center mb-8">
+          <Wordmark size="lg" className="mb-2" />
+          <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
+            Painel administrativo
+          </p>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
