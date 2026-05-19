@@ -318,6 +318,15 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
           )}
         </div>
 
+        {/* JudgePanel — 'jurados são cegos' callout */}
+        <div className="mb-4 px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--marigold-100)] text-[var(--marigold-700)] flex items-center gap-2 text-sm">
+          <span aria-hidden className="font-mono text-base">·</span>
+          <span>
+            <strong className="font-semibold">Jurados são cegos.</strong>{' '}
+            Você totaliza tocando o lado.
+          </span>
+        </div>
+
         {/* Vote buttons — competitor name is the primary label */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
           {duel.entryA && (
@@ -443,7 +452,7 @@ function VoteButton({
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">
-            Copa {side}
+            {side === 'A' ? 'Esquerda' : 'Direita'} · Copa {side}
           </p>
           <h4 className="text-xl md:text-2xl font-display font-bold text-[var(--fg)] leading-tight mt-0.5 line-clamp-2">
             {competitor.name}
