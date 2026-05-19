@@ -3,6 +3,22 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
+interface CompetitorDb {
+  id: string;
+  name: string;
+  photo_url: string;
+  coffee_shop: string;
+}
+
+function toCamelCompetitor(c: CompetitorDb) {
+  return {
+    id: c.id,
+    name: c.name,
+    photoUrl: c.photo_url,
+    coffeeShop: c.coffee_shop,
+  };
+}
+
 // GET /api/events/[id]/running - Get running event details
 export async function GET(
   request: NextRequest,
@@ -113,13 +129,13 @@ export async function GET(
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,
-                  competitor: activeDuel.entry_a.competitor,
+                  competitor: toCamelCompetitor(activeDuel.entry_a.competitor),
                 }
               : null,
             entryB: activeDuel.entry_b
               ? {
                   id: activeDuel.entry_b.id,
-                  competitor: activeDuel.entry_b.competitor,
+                  competitor: toCamelCompetitor(activeDuel.entry_b.competitor),
                 }
               : null,
           }
@@ -137,19 +153,19 @@ export async function GET(
         entryA: duel.entry_a
           ? {
               id: duel.entry_a.id,
-              competitor: duel.entry_a.competitor,
+              competitor: toCamelCompetitor(duel.entry_a.competitor),
             }
           : null,
         entryB: duel.entry_b
           ? {
               id: duel.entry_b.id,
-              competitor: duel.entry_b.competitor,
+              competitor: toCamelCompetitor(duel.entry_b.competitor),
             }
           : null,
         winner: duel.winner_entry
           ? {
               id: duel.winner_entry.id,
-              competitor: duel.winner_entry.competitor,
+              competitor: toCamelCompetitor(duel.winner_entry.competitor),
             }
           : null,
       })),
