@@ -53,6 +53,24 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
   const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
   const { data: leaderboardData } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, fetcher, swrOpts);
   const loading = !currentDuelData && !error;
+  const eventStatus = currentDuelData?.event?.status;
+
+  // Snap active tab to a valid one for the current event status — must run on every render
+  // (declared before any conditional return to satisfy the Rules of Hooks).
+  useEffect(() => {
+    if (!eventStatus) return;
+    const valid: TabType[] =
+      eventStatus === 'running'
+        ? ['ao-vivo', 'chave']
+        : eventStatus === 'finished'
+          ? ['chave', 'leaderboard']
+          : ['chave'];
+    if (!valid.includes(activeTab)) {
+      setActiveTab(
+        eventStatus === 'running' ? 'ao-vivo' : eventStatus === 'finished' ? 'leaderboard' : 'chave'
+      );
+    }
+  }, [eventStatus, activeTab]);
 
   if (loading) {
     return (
@@ -79,27 +97,15 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
           <p className="text-[var(--fg-2)] text-lg font-semibold mb-2">
             Erro ao carregar evento
           </p>
-          <p className="text-[var(--fg-3)] text-sm">{error || 'Evento não encontrado'}</p>
+          <p className="text-[var(--fg-3)] text-sm">
+            {error instanceof Error ? error.message : typeof error === 'string' ? error : 'Evento não encontrado'}
+          </p>
         </div>
       </div>
     );
   }
 
   const { event } = currentDuelData;
-  // Snap active tab to a valid one for the current event status.
-  // setup: [chave] · running: [ao-vivo, chave] · finished: [chave, leaderboard]
-  const validTabs: TabType[] =
-    event.status === 'running'
-      ? ['ao-vivo', 'chave']
-      : event.status === 'finished'
-        ? ['chave', 'leaderboard']
-        : ['chave'];
-  useEffect(() => {
-    if (!validTabs.includes(activeTab)) {
-      setActiveTab(event.status === 'running' ? 'ao-vivo' : event.status === 'finished' ? 'leaderboard' : 'chave');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [event.status]);
 
   const eventDate = new Date(event.date).toLocaleDateString('pt-BR', {
     day: 'numeric',

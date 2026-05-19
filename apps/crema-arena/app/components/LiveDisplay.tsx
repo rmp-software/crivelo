@@ -126,7 +126,11 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
             Erro ao Carregar
           </h1>
           <p className="text-2xl md:text-3xl text-[var(--crema-50)]">
-            {error || 'Não foi possível carregar o evento'}
+            {error instanceof Error
+              ? error.message
+              : typeof error === 'string'
+                ? error
+                : 'Não foi possível carregar o evento'}
           </p>
         </div>
       </div>
@@ -621,13 +625,15 @@ function PodiumSlot({
 
   return (
     <div className={`flex flex-col items-center flex-1 ${slotWidth}`}>
-      {/* Stamp-seal "VENCEDOR" badge for 1st place */}
+      {/* Stamp-seal "VENCEDOR" badge for 1st place — espresso-on-crema, set on a light disk so it reads on dark bg */}
       {isFirst && (
-        <img
-          src="/assets/stamp-seal.svg"
-          alt="Campeão"
-          className="w-24 h-24 md:w-28 md:h-28 mb-2 -mr-6 self-end"
-        />
+        <div className="w-24 h-24 md:w-28 md:h-28 mb-2 -mr-6 self-end rounded-full bg-[var(--crema-50)] flex items-center justify-center shadow-[var(--shadow-1)]">
+          <img
+            src="/assets/stamp-seal.svg"
+            alt="Campeão"
+            className="w-[90%] h-[90%]"
+          />
+        </div>
       )}
       <div
         className={`relative ${photoSize} rounded-full overflow-hidden mb-4 shadow-[var(--shadow-2)]`}
@@ -654,10 +660,6 @@ function PodiumSlot({
       </p>
       <p className="text-sm md:text-base font-serif italic text-[var(--crema-200)] text-center mt-1">
         {entry.competitor.coffeeShop}
-      </p>
-      <p className="font-mono text-xs md:text-sm tabular-nums text-[var(--crema-300)] mt-2">
-        {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'} · {entry.totalVotesReceived}{' '}
-        {entry.totalVotesReceived === 1 ? 'voto' : 'votos'}
       </p>
       <div
         className={`mt-4 w-full ${blockHeight} rounded-t-[var(--radius-sm)] flex items-center justify-center`}
@@ -686,10 +688,6 @@ function FlankSlot({ entry, position }: { entry: LeaderboardEntry; position: 4 |
       </p>
       <p className="text-xs md:text-sm font-serif italic text-[var(--crema-200)] text-center mt-0.5 line-clamp-1">
         {entry.competitor.coffeeShop}
-      </p>
-      <p className="font-mono text-[10px] md:text-xs tabular-nums text-[var(--crema-300)] mt-1">
-        {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'} · {entry.totalVotesReceived}{' '}
-        {entry.totalVotesReceived === 1 ? 'voto' : 'votos'}
       </p>
       <div className="mt-3 w-full py-2 md:py-3 rounded-t-[var(--radius-sm)] bg-[var(--espresso-700)] flex items-center justify-center">
         <span className="text-xl md:text-2xl font-display font-bold text-[var(--crema-100)] tabular-nums">

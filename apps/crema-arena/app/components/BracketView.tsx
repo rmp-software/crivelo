@@ -21,6 +21,7 @@ interface Duel {
   votesA: number;
   votesB: number;
   wildcardType?: 'walkover' | 'manual' | 'random' | null;
+  isBronzeMatch?: boolean;
 }
 
 interface BracketViewProps {
@@ -116,7 +117,7 @@ function DuelCard({ duel }: { duel: Duel }) {
               aria-label="Duelo ao vivo"
             />
           )}
-          Duelo {duel.position + 1}
+          {duel.isBronzeMatch ? 'Disputa de 3º lugar' : `Duelo ${duel.position + 1}`}
         </span>
         <div className="flex items-center gap-2">
           {getStatusBadge()}
