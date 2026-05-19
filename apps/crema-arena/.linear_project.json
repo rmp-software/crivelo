@@ -33,13 +33,13 @@
     {
       "step": 5,
       "title": "Event creation and setup",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build /dashboard/events page with organizer's event list. Create event form for name, date, location, description, and judges_count. Build /dashboard/events/[id] detail page in setup status with registered competitors list, search/add competitors, and remove capabilities. Create API routes for event creation/editing and entry management."
     },
     {
       "step": 6,
       "title": "Bracket generation and event start",
-      "status": "Todo",
+      "status": "Done",
       "description": "Implement bracket generation algorithm: calculate bracket_size as next power of 2, place seeds at standard single-elimination positions, fill remaining slots randomly, create byes for empty slots. Create BracketView component to visualize generated bracket. Build 'Iniciar evento' button with status transition. Implement automatic bye resolution. Create API routes: POST /api/events/:id/bracket/generate and POST /api/events/:id/start."
     },
     {
