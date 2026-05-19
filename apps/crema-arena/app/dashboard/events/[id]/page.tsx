@@ -120,25 +120,45 @@ export default function EventDetailPage() {
     }
   }, [eventId]);
 
-  const handleAddCompetitor = async (competitorId: string) => {
+  const handleAddCompetitor = async (pool: { id: string; name: string; coffeeShop: string; photoUrl: string }) => {
+    // Optimistic insert — show in the inscribed list immediately, keep modal open.
+    const tempEntryId = `temp-${pool.id}-${Date.now()}`;
+    const optimistic: Competitor = {
+      entryId: tempEntryId,
+      id: pool.id,
+      name: pool.name,
+      coffeeShop: pool.coffeeShop,
+      photoUrl: pool.photoUrl,
+      seed: null,
+      status: 'active',
+    };
+    setCompetitors((prev) => [...prev, optimistic]);
+
     try {
       const response = await fetch(`/api/events/${eventId}/entries`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ competitor_id: competitorId }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ competitor_id: pool.id }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to add competitor');
+        throw new Error(data.error || 'Falha ao inscrever competidor');
       }
 
-      // Refresh event details
-      await fetchEventDetails();
+      const entry = await response.json();
+      // Replace the optimistic placeholder with the server-provided entryId.
+      setCompetitors((prev) =>
+        prev.map((c) =>
+          c.entryId === tempEntryId
+            ? { ...c, entryId: entry.entryId, seed: entry.seed ?? null, status: entry.status ?? 'active' }
+            : c
+        )
+      );
     } catch (err: any) {
-      alert(err.message || 'Failed to add competitor to event');
+      // Roll back the optimistic insert and surface the error.
+      setCompetitors((prev) => prev.filter((c) => c.entryId !== tempEntryId));
+      alert(err.message || 'Falha ao inscrever competidor');
       throw err;
     }
   };
@@ -649,7 +669,6 @@ export default function EventDetailPage() {
         title="Adicionar competidores"
       >
         <CompetitorPoolList
-          eventId={eventId}
           registeredCompetitorIds={registeredCompetitorIds}
           onAddCompetitor={handleAddCompetitor}
         />

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Button from './Button';
 import Modal from './Modal';
 import ConfirmationModal from './ConfirmationModal';
@@ -41,19 +41,29 @@ interface TapToTallyProps {
 export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyProps) {
   const { showToast } = useToast();
   const [isStarting, setIsStarting] = useState(false);
-  const [isVoting, setIsVoting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showWildcardModal, setShowWildcardModal] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const totalVotes = duel.votesA + duel.votesB;
-  const computedWinnerId = duel.votesA >= duel.votesB ? duel.entryA?.id : duel.entryB?.id;
-  const computedWinnerName = duel.votesA >= duel.votesB
+  // Local optimistic vote overlay: increments instantly on tap; reconciled when
+  // the parent's refresh comes back with the authoritative server state.
+  const [optimisticA, setOptimisticA] = useState(duel.votesA);
+  const [optimisticB, setOptimisticB] = useState(duel.votesB);
+  useEffect(() => {
+    setOptimisticA(duel.votesA);
+    setOptimisticB(duel.votesB);
+  }, [duel.id, duel.votesA, duel.votesB]);
+
+  const votesA = optimisticA;
+  const votesB = optimisticB;
+  const totalVotes = votesA + votesB;
+  const computedWinnerId = votesA >= votesB ? duel.entryA?.id : duel.entryB?.id;
+  const computedWinnerName = votesA >= votesB
     ? duel.entryA?.competitor.name
     : duel.entryB?.competitor.name;
-  const scoreDisplay = `${Math.max(duel.votesA, duel.votesB)} × ${Math.min(duel.votesA, duel.votesB)}`;
+  const scoreDisplay = `${Math.max(votesA, votesB)} × ${Math.min(votesA, votesB)}`;
 
   const handleStartDuel = async () => {
     setIsStarting(true);
@@ -76,15 +86,14 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
   };
 
   const handleVote = async (cup: 'A' | 'B') => {
-    if (isVoting) return;
+    // Optimistic: increment immediately so rapid taps register without freeze.
+    if (cup === 'A') setOptimisticA((v) => v + 1);
+    else setOptimisticB((v) => v + 1);
 
-    setIsVoting(true);
     try {
       const response = await fetch(`/api/duels/${duel.id}/vote`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cup }),
       });
 
@@ -93,13 +102,13 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
         throw new Error(data.error || 'Failed to record vote');
       }
 
-      const newTotal = duel.votesA + duel.votesB + 1;
-      showToast(`Voto registrado. ${newTotal} de ${judgesCount} votos.`, 'success');
+      // Quietly refresh in the background to sync the server state.
       onRefresh();
     } catch (err: any) {
+      // Roll back this optimistic tick.
+      if (cup === 'A') setOptimisticA((v) => Math.max(0, v - 1));
+      else setOptimisticB((v) => Math.max(0, v - 1));
       showToast(err.message || 'Não foi possível registrar o voto', 'error');
-    } finally {
-      setIsVoting(false);
     }
   };
 
@@ -315,8 +324,8 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
             <VoteButton
               competitor={duel.entryA.competitor}
               side="A"
-              votes={duel.votesA}
-              disabled={isVoting}
+              votes={votesA}
+              disabled={false}
               onClick={() => handleVote('A')}
             />
           )}
@@ -324,8 +333,8 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
             <VoteButton
               competitor={duel.entryB.competitor}
               side="B"
-              votes={duel.votesB}
-              disabled={isVoting}
+              votes={votesB}
+              disabled={false}
               onClick={() => handleVote('B')}
             />
           )}
