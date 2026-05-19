@@ -1,10 +1,3 @@
 {
-  "buildCommand": "prisma generate && next build",
-  "env": {
-    "DATABASE_URL": "@database_url",
-    "NEXTAUTH_SECRET": "@nextauth_secret",
-    "NEXTAUTH_URL": "@nextauth_url",
-    "ADMIN_EMAIL": "@admin_email",
-    "ADMIN_PASSWORD": "@admin_password"
-  }
+  "buildCommand": "prisma generate && next build"
 }
