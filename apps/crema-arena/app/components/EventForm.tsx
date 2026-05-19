@@ -4,6 +4,7 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from './Button';
 import Input from './Input';
+import DateTime24h from './DateTime24h';
 
 interface EventFormProps {
   eventId?: string;
@@ -135,15 +136,13 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
         placeholder="Ex.: TNT Vila Madá 2026"
       />
 
-      {/* Date Input */}
-      <Input
+      {/* Date + 24h time (locale-independent) */}
+      <DateTime24h
         label="Data do evento"
-        type="datetime-local"
         value={formData.date}
-        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+        onChange={(date) => setFormData({ ...formData, date })}
         error={errors.date}
         required
-        fullWidth
       />
 
       {/* Location Input */}
