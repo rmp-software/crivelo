@@ -9,6 +9,8 @@ import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
 import SeedInput from '@/app/components/SeedInput';
 import RunningTopBar from '@/app/components/RunningTopBar';
+import EventStatStrip from '@/app/components/EventStatStrip';
+import NowPouring from '@/app/components/NowPouring';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
@@ -347,7 +349,50 @@ export default function EventDetailPage() {
           audienceUrl={typeof window !== 'undefined' ? `${window.location.origin}/e/${eventId}` : ''}
           liveUrl={typeof window !== 'undefined' ? `${window.location.origin}/live/${eventId}` : ''}
         />
-      ) : (
+      ) : null}
+
+      {event.status === 'running' && (
+        <>
+          <EventStatStrip
+            totalEntries={competitors.length}
+            duels={duels.map((d) => ({
+              id: d.id,
+              round: d.round,
+              status: d.status,
+              votesA: d.votesA,
+              votesB: d.votesB,
+            }))}
+            currentRound={computedCurrentRound}
+            judgesCount={event.judgesCount}
+          />
+          {(() => {
+            const active = duels.find((d) => d.status === 'in_progress');
+            if (!active || !active.entryA || !active.entryB) return null;
+            return (
+              <NowPouring
+                duelPosition={active.position}
+                entryA={{
+                  id: active.entryA.id,
+                  name: active.entryA.name,
+                  photoUrl: active.entryA.photoUrl,
+                  coffeeShop: active.entryA.coffeeShop,
+                }}
+                entryB={{
+                  id: active.entryB.id,
+                  name: active.entryB.name,
+                  photoUrl: active.entryB.photoUrl,
+                  coffeeShop: active.entryB.coffeeShop,
+                }}
+                votesA={active.votesA}
+                votesB={active.votesB}
+                judgesCount={event.judgesCount}
+              />
+            );
+          })()}
+        </>
+      )}
+
+      {event.status !== 'running' && (
       /* Event Info Card — primary header for setup/finished */
       <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
         <div className="flex items-start justify-between mb-6 gap-4">
