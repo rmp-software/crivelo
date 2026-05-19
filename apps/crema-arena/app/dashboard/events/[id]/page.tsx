@@ -77,6 +77,8 @@ export default function EventDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
   const [isGeneratingBracket, setIsGeneratingBracket] = useState(false);
+  const [isRegeneratingBracket, setIsRegeneratingBracket] = useState(false);
+  const [showRegenerateModal, setShowRegenerateModal] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
 
@@ -211,6 +213,25 @@ export default function EventDetailPage() {
       alert(err.message || 'Failed to generate bracket');
     } finally {
       setIsGeneratingBracket(false);
+    }
+  };
+
+  const handleRegenerateBracket = async () => {
+    setIsRegeneratingBracket(true);
+    try {
+      const response = await fetch(`/api/events/${eventId}/bracket/regenerate`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to regenerate bracket');
+      }
+      setShowRegenerateModal(false);
+      await fetchEventDetails();
+    } catch (err: any) {
+      alert(err.message || 'Failed to regenerate bracket');
+    } finally {
+      setIsRegeneratingBracket(false);
     }
   };
 
@@ -485,21 +506,55 @@ export default function EventDetailPage() {
       {event.status === 'setup' && duels.length > 0 && (
         <>
           <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
               <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
                 Chave gerada
               </h3>
-              <Button
-                variant="primary"
-                onClick={() => setShowStartModal(true)}
-                disabled={isStarting}
-              >
-                <Play size={20} />
-                Iniciar evento
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowRegenerateModal(true)}
+                  disabled={isRegeneratingBracket || isStarting}
+                >
+                  Re-gerar chave
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={() => setShowStartModal(true)}
+                  disabled={isStarting}
+                >
+                  <Play size={20} />
+                  Iniciar evento
+                </Button>
+              </div>
             </div>
             <BracketView duels={duels} bracketSize={event.bracketSize ?? competitors.length} />
           </div>
+
+          <Modal
+            isOpen={showRegenerateModal}
+            onClose={() => setShowRegenerateModal(false)}
+            title="Re-gerar chave"
+          >
+            <div className="space-y-4">
+              <p className="text-[var(--fg-2)]">
+                Re-gerar chave? Esta ação substitui a chave atual.
+              </p>
+              <div className="flex gap-3 pt-2">
+                <Button variant="ghost" onClick={() => setShowRegenerateModal(false)} className="flex-1">
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleRegenerateBracket}
+                  disabled={isRegeneratingBracket}
+                  className="flex-1"
+                >
+                  {isRegeneratingBracket ? 'Gerando...' : 'Confirmar'}
+                </Button>
+              </div>
+            </div>
+          </Modal>
 
           <Modal
             isOpen={showStartModal}
@@ -567,7 +622,7 @@ export default function EventDetailPage() {
                   type="text"
                   readOnly
                   value={`${typeof window !== 'undefined' ? window.location.origin : ''}/live/${eventId}`}
-                  className="flex-1 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm truncate"
                 />
                 <Button
                   variant="secondary"
@@ -602,7 +657,7 @@ export default function EventDetailPage() {
                   type="text"
                   readOnly
                   value={`${typeof window !== 'undefined' ? window.location.origin : ''}/e/${eventId}`}
-                  className="flex-1 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm truncate"
                 />
                 <Button
                   variant="secondary"

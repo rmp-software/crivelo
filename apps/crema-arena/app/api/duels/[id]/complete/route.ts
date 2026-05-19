@@ -39,6 +39,7 @@ export async function POST(
       },
     });
 
+
     if (!duel) {
       return NextResponse.json({ error: 'Duel not found' }, { status: 404 });
     }
@@ -68,9 +69,10 @@ export async function POST(
         },
       });
 
-      // Update loser entry status
+      // Update loser entry status. Skip elimination if this duel feeds the bronze
+      // match — the semi loser is still in contention for 3rd place.
       const loser_entry_id = winner_entry_id === duel.entry_a_id ? duel.entry_b_id : duel.entry_a_id;
-      if (loser_entry_id) {
+      if (loser_entry_id && !duel.bronze_duel_id) {
         await tx.eventEntry.update({
           where: { id: loser_entry_id },
           data: {
@@ -78,6 +80,24 @@ export async function POST(
             eliminated_at_round: duel.round,
           },
         });
+      }
+
+      // Bronze-match cascade: semi loser flows into the 3rd-place playoff (first
+      // open slot — slot A on the first semi to complete, slot B on the second).
+      if (loser_entry_id && duel.bronze_duel_id) {
+        const bronze = await tx.duel.findUnique({
+          where: { id: duel.bronze_duel_id },
+          select: { entry_a_id: true, entry_b_id: true },
+        });
+        if (bronze) {
+          const slotData = bronze.entry_a_id == null
+            ? { entry_a_id: loser_entry_id }
+            : { entry_b_id: loser_entry_id };
+          await tx.duel.update({
+            where: { id: duel.bronze_duel_id },
+            data: slotData,
+          });
+        }
       }
 
       // Advance winner to next duel if exists.

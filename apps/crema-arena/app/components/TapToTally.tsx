@@ -85,6 +85,36 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
     }
   };
 
+  const handleUndoVote = async (cup: 'A' | 'B') => {
+    if (cup === 'A' && optimisticA <= 0) {
+      showToast('Sem votos para remover desse lado.', 'error');
+      return;
+    }
+    if (cup === 'B' && optimisticB <= 0) {
+      showToast('Sem votos para remover desse lado.', 'error');
+      return;
+    }
+    // Optimistic decrement
+    if (cup === 'A') setOptimisticA((v) => Math.max(0, v - 1));
+    else setOptimisticB((v) => Math.max(0, v - 1));
+
+    try {
+      const response = await fetch(`/api/duels/${duel.id}/vote/last?cup=${cup}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to remove vote');
+      }
+      onRefresh();
+    } catch (err: any) {
+      // Roll back
+      if (cup === 'A') setOptimisticA((v) => v + 1);
+      else setOptimisticB((v) => v + 1);
+      showToast(err.message || 'Não foi possível remover o voto', 'error');
+    }
+  };
+
   const handleVote = async (cup: 'A' | 'B') => {
     // Optimistic: increment immediately so rapid taps register without freeze.
     if (cup === 'A') setOptimisticA((v) => v + 1);
@@ -318,34 +348,47 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
           )}
         </div>
 
-        {/* JudgePanel — 'jurados são cegos' callout */}
-        <div className="mb-4 px-3 py-2 rounded-[var(--radius-sm)] bg-[var(--marigold-100)] text-[var(--marigold-700)] flex items-center gap-2 text-sm">
-          <span aria-hidden className="font-mono text-base">·</span>
-          <span>
-            <strong className="font-semibold">Jurados são cegos.</strong>{' '}
-            Você totaliza tocando o lado.
-          </span>
-        </div>
-
         {/* Vote buttons — competitor name is the primary label */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
           {duel.entryA && (
-            <VoteButton
-              competitor={duel.entryA.competitor}
-              side="A"
-              votes={votesA}
-              disabled={false}
-              onClick={() => handleVote('A')}
-            />
+            <div className="flex flex-col gap-2">
+              <VoteButton
+                competitor={duel.entryA.competitor}
+                side="A"
+                votes={votesA}
+                disabled={false}
+                onClick={() => handleVote('A')}
+              />
+              <button
+                type="button"
+                onClick={() => handleUndoVote('A')}
+                disabled={votesA <= 0}
+                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[var(--fg-3)] hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                aria-label={`Remover último voto de ${duel.entryA.competitor.name}`}
+              >
+                <span aria-hidden className="text-base leading-none">−</span> Remover voto
+              </button>
+            </div>
           )}
           {duel.entryB && (
-            <VoteButton
-              competitor={duel.entryB.competitor}
-              side="B"
-              votes={votesB}
-              disabled={false}
-              onClick={() => handleVote('B')}
-            />
+            <div className="flex flex-col gap-2">
+              <VoteButton
+                competitor={duel.entryB.competitor}
+                side="B"
+                votes={votesB}
+                disabled={false}
+                onClick={() => handleVote('B')}
+              />
+              <button
+                type="button"
+                onClick={() => handleUndoVote('B')}
+                disabled={votesB <= 0}
+                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[var(--fg-3)] hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                aria-label={`Remover último voto de ${duel.entryB.competitor.name}`}
+              >
+                <span aria-hidden className="text-base leading-none">−</span> Remover voto
+              </button>
+            </div>
           )}
         </div>
 
@@ -451,10 +494,7 @@ function VoteButton({
           />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">
-            {side === 'A' ? 'Esquerda' : 'Direita'} · Copa {side}
-          </p>
-          <h4 className="text-xl md:text-2xl font-display font-bold text-[var(--fg)] leading-tight mt-0.5 line-clamp-2">
+          <h4 className="text-xl md:text-2xl font-display font-bold text-[var(--fg)] leading-tight line-clamp-2">
             {competitor.name}
           </h4>
           <p className="text-sm font-serif italic text-[var(--fg-2)] mt-1 line-clamp-1">

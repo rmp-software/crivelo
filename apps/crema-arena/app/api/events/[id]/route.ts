@@ -139,6 +139,7 @@ export async function GET(
         votesA: duel.votes_a,
         votesB: duel.votes_b,
         wildcardType: duel.wildcard_type,
+        isBronzeMatch: duel.is_bronze_match,
       })),
       totalEntries: event.entries.length,
     });

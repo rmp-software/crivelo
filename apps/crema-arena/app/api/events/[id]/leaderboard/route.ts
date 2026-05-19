@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+interface CompetitorDb {
+  id: string;
+  name: string;
+  photo_url: string;
+  coffee_shop: string;
+}
+function toCamelCompetitor(c: CompetitorDb) {
+  return { id: c.id, name: c.name, photoUrl: c.photo_url, coffeeShop: c.coffee_shop };
+}
+
 // GET /api/events/[id]/leaderboard - Get event leaderboard (public endpoint)
 export async function GET(
   request: NextRequest,
@@ -77,7 +87,7 @@ export async function GET(
 
       return {
         entryId: entry.id,
-        competitor: entry.competitor,
+        competitor: toCamelCompetitor(entry.competitor),
         status: entry.status,
         wins,
         eliminatedAtRound: entry.eliminated_at_round,
@@ -112,6 +122,54 @@ export async function GET(
 
       return 0;
     });
+
+    // When a bronze match exists and is complete, force positions 1–4 from the
+    // bracket so we don't depend on tie-breaks for the podium.
+    if (event.status === 'finished') {
+      const decisiveDuels = await prisma.duel.findMany({
+        where: { event_id: params.id, round: event.bracket_size ? Math.log2(event.bracket_size) : 0 },
+        select: {
+          is_bronze_match: true,
+          status: true,
+          winner_entry_id: true,
+          entry_a_id: true,
+          entry_b_id: true,
+        },
+      });
+      const finalDuel = decisiveDuels.find((d) => !d.is_bronze_match);
+      const bronzeDuel = decisiveDuels.find((d) => d.is_bronze_match);
+      if (
+        finalDuel?.status === 'completed' &&
+        bronzeDuel?.status === 'completed' &&
+        finalDuel.winner_entry_id &&
+        bronzeDuel.winner_entry_id
+      ) {
+        const firstId = finalDuel.winner_entry_id;
+        const secondId =
+          finalDuel.winner_entry_id === finalDuel.entry_a_id
+            ? finalDuel.entry_b_id
+            : finalDuel.entry_a_id;
+        const thirdId = bronzeDuel.winner_entry_id;
+        const fourthId =
+          bronzeDuel.winner_entry_id === bronzeDuel.entry_a_id
+            ? bronzeDuel.entry_b_id
+            : bronzeDuel.entry_a_id;
+
+        const reorder = (ids: (string | null)[]) => {
+          const picked: typeof leaderboard = [];
+          for (const id of ids) {
+            if (!id) continue;
+            const idx = leaderboard.findIndex((e) => e.entryId === id);
+            if (idx >= 0) picked.push(leaderboard.splice(idx, 1)[0]);
+          }
+          return [...picked, ...leaderboard];
+        };
+
+        const reordered = reorder([firstId, secondId, thirdId, fourthId]);
+        leaderboard.length = 0;
+        leaderboard.push(...reordered);
+      }
+    }
 
     // Add position numbers
     const rankedLeaderboard = leaderboard.map((entry, index) => ({

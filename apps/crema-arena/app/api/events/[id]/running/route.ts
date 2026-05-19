@@ -150,6 +150,7 @@ export async function GET(
         votesB: duel.votes_b,
         pourPhotoUrl: duel.pour_photo_url,
         wildcardType: duel.wildcard_type,
+        isBronzeMatch: duel.is_bronze_match,
         entryA: duel.entry_a
           ? {
               id: duel.entry_a.id,

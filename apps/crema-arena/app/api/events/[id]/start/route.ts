@@ -91,17 +91,19 @@ export async function POST(
                 entry_a_id: duelData.entry_a_id,
                 entry_b_id: duelData.entry_b_id,
                 status: duelData.status,
+                is_bronze_match: duelData.is_bronze_match ?? false,
               },
               select: {
                 id: true,
                 round: true,
                 position: true,
+                is_bronze_match: true,
               },
             })
           )
         );
 
-        // Link duels together
+        // Link duels together (passes is_bronze_match so cascade math is correct)
         const duelLinks = linkDuels(duels);
 
         // Update duels with linking information
@@ -112,6 +114,7 @@ export async function POST(
               data: {
                 next_duel_id: link.next_duel_id,
                 next_duel_slot: link.next_duel_slot,
+                bronze_duel_id: link.bronze_duel_id ?? null,
               },
             })
           )

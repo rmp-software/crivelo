@@ -214,9 +214,9 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
 
           <div className="space-y-3">
             {([
-              { slot: 'a' as const, entry: entryA, label: 'Copa A' },
-              { slot: 'b' as const, entry: entryB, label: 'Copa B' },
-            ]).map(({ slot, entry, label }) => (
+              { slot: 'a' as const, entry: entryA },
+              { slot: 'b' as const, entry: entryB },
+            ]).map(({ slot, entry }) => (
               <button
                 key={slot}
                 onClick={() => {
@@ -236,7 +236,6 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                   <div className="flex-1">
                     <p className="font-semibold text-[var(--fg)]">{entry.competitor.name}</p>
                     <p className="text-sm text-[var(--fg-2)]">{entry.competitor.coffeeShop}</p>
-                    <p className="text-xs text-[var(--fg-3)] mt-1">{label}</p>
                   </div>
                 </div>
               </button>

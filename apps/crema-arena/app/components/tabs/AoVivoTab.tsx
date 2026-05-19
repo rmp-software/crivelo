@@ -24,6 +24,8 @@ interface Duel {
   pourPhotoUrl?: string | null;
   entryA: Entry | null;
   entryB: Entry | null;
+  winner?: Entry | null;
+  isBronzeMatch?: boolean;
 }
 
 interface EventData {
@@ -39,6 +41,7 @@ interface AoVivoTabProps {
   nextDuel: Duel | null;
   currentRound: number;
   totalRounds: number;
+  roundDuels?: Duel[];
 }
 
 export default function AoVivoTab({
@@ -47,6 +50,7 @@ export default function AoVivoTab({
   nextDuel,
   currentRound,
   totalRounds,
+  roundDuels = [],
 }: AoVivoTabProps) {
   // Event not started yet
   if (event.status === 'setup') {
@@ -227,6 +231,31 @@ export default function AoVivoTab({
         </div>
       )}
 
+      {/* Compact history: other duels in the current round */}
+      {(() => {
+        const others = roundDuels.filter((d) => !currentDuel || d.id !== currentDuel.id);
+        const completed = others
+          .filter((d) => d.status === 'completed' || d.status === 'walkover')
+          .sort((a, b) => b.position - a.position); // newest first by position desc
+        const pending = others.filter((d) => d.status === 'pending' || d.status === 'in_progress');
+        if (completed.length === 0 && pending.length === 0) return null;
+        return (
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">
+              Duelos da rodada
+            </h3>
+            <div className="space-y-2">
+              {completed.map((d) => (
+                <CompactDuelRow key={d.id} duel={d} state="completed" />
+              ))}
+              {pending.map((d) => (
+                <CompactDuelRow key={d.id} duel={d} state="pending" />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Next Duel */}
       {!currentDuel && nextDuel && (
         <div>
@@ -284,6 +313,68 @@ export default function AoVivoTab({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function CompactDuelRow({ duel, state }: { duel: Duel; state: 'completed' | 'pending' }) {
+  const winnerId = duel.winner?.id ?? null;
+  const isWalkover = duel.status === 'walkover';
+  const subtitle = duel.isBronzeMatch
+    ? 'Disputa de 3º lugar'
+    : `Duelo ${duel.position + 1}`;
+  return (
+    <div
+      className={`rounded-[var(--radius-sm)] border p-3 ${
+        state === 'completed'
+          ? 'border-[var(--border)] bg-[var(--surface)]'
+          : 'border-[var(--border)] bg-[var(--bg-2)] opacity-80'
+      }`}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-3)]">
+          {subtitle} · {state === 'completed' ? (isWalkover ? 'W.O.' : 'Concluído') : 'Pendente'}
+        </span>
+        {state === 'completed' && (
+          <span className="font-mono text-sm font-semibold tabular-nums text-[var(--fg)]">
+            {duel.votesA} × {duel.votesB}
+          </span>
+        )}
+      </div>
+      <div className="grid grid-cols-2 gap-2">
+        <CompactCompetitor entry={duel.entryA} isWinner={winnerId === duel.entryA?.id && state === 'completed'} />
+        <CompactCompetitor entry={duel.entryB} isWinner={winnerId === duel.entryB?.id && state === 'completed'} />
+      </div>
+    </div>
+  );
+}
+
+function CompactCompetitor({ entry, isWinner }: { entry: Entry | null; isWinner: boolean }) {
+  if (!entry) {
+    return (
+      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)] italic">
+        <div className="w-8 h-8 rounded-full bg-[var(--bg-2)] border border-[var(--border)]" />
+        Bye
+      </div>
+    );
+  }
+  return (
+    <div
+      className={`flex items-center gap-2 ${
+        isWinner ? 'font-semibold' : ''
+      }`}
+    >
+      <img
+        src={entry.competitor.photoUrl}
+        alt={entry.competitor.name}
+        className={`w-8 h-8 rounded-full object-cover border ${
+          isWinner ? 'border-[var(--gold)]' : 'border-[var(--border)]'
+        }`}
+      />
+      <div className="min-w-0 flex-1">
+        <p className="text-xs text-[var(--fg)] truncate leading-tight">{entry.competitor.name}</p>
+        <p className="text-[10px] text-[var(--fg-3)] truncate leading-tight">{entry.competitor.coffeeShop}</p>
+      </div>
     </div>
   );
 }

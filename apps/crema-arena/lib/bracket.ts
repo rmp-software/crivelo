@@ -27,6 +27,7 @@ interface DuelData {
   next_duel_id?: string;
   next_duel_slot?: 'a' | 'b';
   status: 'pending' | 'walkover';
+  is_bronze_match?: boolean;
 }
 
 /**
@@ -180,6 +181,19 @@ export function generateBracket(entries: EventEntry[]): DuelData[] {
     }
   }
 
+  // 3rd-place playoff: only when there are semifinals (totalRounds >= 2).
+  // Position = 1 so it sits next to the final (position 0) in the same round.
+  if (totalRounds >= 2) {
+    duels.push({
+      round: totalRounds,
+      position: 1,
+      entry_a_id: null,
+      entry_b_id: null,
+      status: 'pending',
+      is_bronze_match: true,
+    });
+  }
+
   return duels;
 }
 
@@ -187,16 +201,24 @@ export function generateBracket(entries: EventEntry[]): DuelData[] {
  * Link duels together to form the tournament tree
  * This should be called after duels are created in the database
  */
-export function linkDuels(duels: { id: string; round: number; position: number }[]): Array<{
+export function linkDuels(duels: { id: string; round: number; position: number; is_bronze_match?: boolean }[]): Array<{
   id: string;
   next_duel_id: string | null;
   next_duel_slot: 'a' | 'b' | null;
+  bronze_duel_id?: string | null;
 }> {
   const updates: Array<{
     id: string;
     next_duel_id: string | null;
     next_duel_slot: 'a' | 'b' | null;
+    bronze_duel_id?: string | null;
   }> = [];
+
+  // The "main" bracket excludes the bronze match for cascade math.
+  const mainDuels = duels.filter((d) => !d.is_bronze_match);
+  const bronzeDuel = duels.find((d) => d.is_bronze_match);
+  const maxMainRound = mainDuels.length > 0 ? Math.max(...mainDuels.map((d) => d.round)) : 0;
+  const semifinalRound = maxMainRound - 1;
 
   // Sort duels by round and position
   const sortedDuels = [...duels].sort((a, b) => {
@@ -204,37 +226,46 @@ export function linkDuels(duels: { id: string; round: number; position: number }
     return a.position - b.position;
   });
 
-  // Create a map for quick lookup
+  // Lookup for the main-bracket duel at (round,position)
   const duelMap = new Map<string, string>();
-  sortedDuels.forEach(duel => {
+  mainDuels.forEach((duel) => {
     duelMap.set(`${duel.round}-${duel.position}`, duel.id);
   });
 
-  // Link each duel to its next duel
-  sortedDuels.forEach(duel => {
-    const maxRound = Math.max(...sortedDuels.map(d => d.round));
+  sortedDuels.forEach((duel) => {
+    if (duel.is_bronze_match) {
+      // Bronze duel itself doesn't cascade anywhere.
+      updates.push({ id: duel.id, next_duel_id: null, next_duel_slot: null });
+      return;
+    }
 
-    if (duel.round < maxRound) {
+    if (duel.round < maxMainRound) {
       const nextRound = duel.round + 1;
       const nextPosition = Math.floor(duel.position / 2);
-      const nextSlot = duel.position % 2 === 0 ? 'a' : 'b';
+      const nextSlot: 'a' | 'b' = duel.position % 2 === 0 ? 'a' : 'b';
       const nextDuelKey = `${nextRound}-${nextPosition}`;
       const nextDuelId = duelMap.get(nextDuelKey);
 
-      if (nextDuelId) {
-        updates.push({
-          id: duel.id,
-          next_duel_id: nextDuelId,
-          next_duel_slot: nextSlot,
-        });
-      }
-    } else {
-      // Final round - no next duel
-      updates.push({
+      const update: {
+        id: string;
+        next_duel_id: string | null;
+        next_duel_slot: 'a' | 'b' | null;
+        bronze_duel_id?: string | null;
+      } = {
         id: duel.id,
-        next_duel_id: null,
-        next_duel_slot: null,
-      });
+        next_duel_id: nextDuelId ?? null,
+        next_duel_slot: nextDuelId ? nextSlot : null,
+      };
+
+      // Semi losers feed the bronze duel: even-position semi → bronze slot A, odd → slot B
+      if (bronzeDuel && duel.round === semifinalRound) {
+        update.bronze_duel_id = bronzeDuel.id;
+      }
+
+      updates.push(update);
+    } else {
+      // Final - no next duel
+      updates.push({ id: duel.id, next_duel_id: null, next_duel_slot: null });
     }
   });
 

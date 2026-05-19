@@ -51,21 +51,27 @@ export default function NowPouring({
           </span>
         </div>
 
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight">
-            {entryA?.name ?? 'Bye'}
-          </h2>
-          <span className="font-serif italic text-xl md:text-2xl text-[var(--marigold-300)]">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-3 md:gap-6">
+          <div className="min-w-0">
+            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
+              {entryA?.name ?? 'Bye'}
+            </h2>
+            <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
+              {entryA?.coffeeShop || '—'}
+            </p>
+          </div>
+          <span className="font-serif italic text-xl md:text-2xl text-[var(--marigold-300)] self-baseline">
             vs
           </span>
-          <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight">
-            {entryB?.name ?? 'Bye'}
-          </h2>
+          <div className="min-w-0 text-right">
+            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
+              {entryB?.name ?? 'Bye'}
+            </h2>
+            <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
+              {entryB?.coffeeShop || '—'}
+            </p>
+          </div>
         </div>
-
-        <p className="mt-2 text-sm text-[var(--crema-200)]">
-          {entryA?.coffeeShop || '—'} · {entryB?.coffeeShop || '—'}
-        </p>
 
         <div className="mt-5 flex items-center gap-4 flex-wrap">
           {/* Live score */}

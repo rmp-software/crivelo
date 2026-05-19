@@ -6,8 +6,8 @@ import useSWR from 'swr';
 interface Competitor {
   id: string;
   name: string;
-  photo_url: string;
-  coffee_shop: string;
+  photoUrl: string;
+  coffeeShop: string;
 }
 
 interface Entry {
@@ -55,6 +55,7 @@ interface BracketDuel {
   entryA: Entry | null;
   entryB: Entry | null;
   winner: Entry | null;
+  isBronzeMatch?: boolean;
 }
 
 interface BracketData {
@@ -303,7 +304,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               {nextDuel.entryA.competitor.name}
             </p>
             <p className="text-xl md:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
-              {nextDuel.entryA.competitor.coffee_shop}
+              {nextDuel.entryA.competitor.coffeeShop}
             </p>
             <p className="text-3xl md:text-4xl font-mono font-semibold text-[var(--marigold-500)] tabular-nums my-6">
               VS
@@ -312,7 +313,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               {nextDuel.entryB.competitor.name}
             </p>
             <p className="text-xl md:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
-              {nextDuel.entryB.competitor.coffee_shop}
+              {nextDuel.entryB.competitor.coffeeShop}
             </p>
           </div>
         </main>
@@ -396,7 +397,7 @@ function formatElapsed(ms: number): string {
 
 function QrBadge({ eventId }: { eventId: string }) {
   return (
-    <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex items-center gap-3 bg-[var(--crema-50)] rounded-[var(--radius-md)] p-3 md:p-4 shadow-[var(--shadow-2)]">
+    <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center gap-3 bg-[var(--crema-50)] rounded-[var(--radius-md)] p-3 md:p-4 shadow-[var(--shadow-2)]">
       <img
         src={`/api/events/${eventId}/qr`}
         alt="QR code para acompanhar pelo celular"
@@ -429,20 +430,17 @@ function ProfileCardsCenterpiece({
   );
 }
 
-function CompetitorBlock({ competitor, side }: { competitor: Competitor; side: 'A' | 'B' }) {
+function CompetitorBlock({ competitor }: { competitor: Competitor; side: 'A' | 'B' }) {
   return (
     <div className="flex flex-col items-center text-center max-w-md flex-1">
       <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)] mb-5">
-        <img src={competitor.photo_url} alt={competitor.name} className="w-full h-full object-cover" />
+        <img src={competitor.photoUrl} alt={competitor.name} className="w-full h-full object-cover" />
       </div>
-      <p className="font-mono text-xs md:text-sm tracking-wider uppercase text-[var(--crema-300)] mb-2">
-        Copa {side}
-      </p>
       <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
         {competitor.name}
       </h2>
       <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-[var(--crema-200)] mt-2">
-        {competitor.coffee_shop}
+        {competitor.coffeeShop}
       </p>
     </div>
   );
@@ -483,14 +481,11 @@ function PourPhotoCenterpiece({
       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[var(--espresso-900)]/95 via-[var(--espresso-900)]/70 to-transparent p-6 md:p-10">
         <div className="flex items-end justify-between gap-6">
           <div className="flex-1 min-w-0">
-            <p className="font-mono text-xs md:text-sm uppercase tracking-wider text-[var(--crema-300)]">
-              Copa A
-            </p>
             <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
               {entryA.competitor.name}
             </p>
             <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-              {entryA.competitor.coffee_shop}
+              {entryA.competitor.coffeeShop}
             </p>
           </div>
 
@@ -503,14 +498,11 @@ function PourPhotoCenterpiece({
           </div>
 
           <div className="flex-1 min-w-0 text-right">
-            <p className="font-mono text-xs md:text-sm uppercase tracking-wider text-[var(--crema-300)]">
-              Copa B
-            </p>
             <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
               {entryB.competitor.name}
             </p>
             <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-              {entryB.competitor.coffee_shop}
+              {entryB.competitor.coffeeShop}
             </p>
           </div>
         </div>
@@ -584,7 +576,7 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
   return (
     <div className="flex items-center gap-2 flex-1 min-w-0">
       <img
-        src={entry.competitor.photo_url}
+        src={entry.competitor.photoUrl}
         alt={entry.competitor.name}
         className={`w-8 h-8 md:w-9 md:h-9 rounded-full object-cover flex-shrink-0 border ${
           isWinner ? 'border-[var(--marigold-500)]' : 'border-[var(--crema-200)]'
@@ -597,7 +589,7 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
           {entry.competitor.name}
         </span>
         <span className="font-serif italic text-[10px] md:text-xs text-[var(--crema-300)] truncate leading-tight">
-          {entry.competitor.coffee_shop}
+          {entry.competitor.coffeeShop}
         </span>
       </div>
     </div>
@@ -642,7 +634,7 @@ function PodiumSlot({
         style={{ border: `${isFirst ? 6 : 4}px solid ${accent}` }}
       >
         <img
-          src={entry.competitor.photo_url}
+          src={entry.competitor.photoUrl}
           alt={entry.competitor.name}
           className="w-full h-full object-cover"
         />
@@ -661,7 +653,7 @@ function PodiumSlot({
         {entry.competitor.name}
       </p>
       <p className="text-sm md:text-base font-serif italic text-[var(--crema-200)] text-center mt-1">
-        {entry.competitor.coffee_shop}
+        {entry.competitor.coffeeShop}
       </p>
       <p className="font-mono text-xs md:text-sm tabular-nums text-[var(--crema-300)] mt-2">
         {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'} · {entry.totalVotesReceived}{' '}
@@ -684,7 +676,7 @@ function FlankSlot({ entry, position }: { entry: LeaderboardEntry; position: 4 |
     <div className="flex flex-col items-center flex-1 max-w-[170px] opacity-90 self-end">
       <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-[var(--espresso-500)] mb-3">
         <img
-          src={entry.competitor.photo_url}
+          src={entry.competitor.photoUrl}
           alt={entry.competitor.name}
           className="w-full h-full object-cover"
         />
@@ -693,7 +685,7 @@ function FlankSlot({ entry, position }: { entry: LeaderboardEntry; position: 4 |
         {entry.competitor.name}
       </p>
       <p className="text-xs md:text-sm font-serif italic text-[var(--crema-200)] text-center mt-0.5 line-clamp-1">
-        {entry.competitor.coffee_shop}
+        {entry.competitor.coffeeShop}
       </p>
       <p className="font-mono text-[10px] md:text-xs tabular-nums text-[var(--crema-300)] mt-1">
         {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'} · {entry.totalVotesReceived}{' '}

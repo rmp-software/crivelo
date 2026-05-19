@@ -35,6 +35,7 @@ export async function POST(
             id: true,
             organizer_id: true,
             status: true,
+            judges_count: true,
           },
         },
       },
@@ -54,6 +55,14 @@ export async function POST(
       return NextResponse.json(
         { error: 'Can only vote on duels in progress' },
         { status: 400 }
+      );
+    }
+
+    // Enforce vote cap (votes_a + votes_b ≤ judges_count)
+    if (duel.votes_a + duel.votes_b >= duel.event.judges_count) {
+      return NextResponse.json(
+        { error: 'Todos os votos já foram registrados.' },
+        { status: 409 }
       );
     }
 

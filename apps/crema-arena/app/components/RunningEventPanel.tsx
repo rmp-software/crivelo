@@ -6,7 +6,7 @@ import TapToTally from './TapToTally';
 import Badge from './Badge';
 import Button from './Button';
 import Modal from './Modal';
-import { CheckCircle, Circle, Play, Trophy } from 'lucide-react';
+import { CheckCircle, Circle, Play, RotateCcw, SkipForward, Trophy } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -31,6 +31,7 @@ interface Duel {
   entryA: Entry | null;
   entryB: Entry | null;
   winner?: Entry | null;
+  isBronzeMatch?: boolean;
 }
 
 interface RunningEventPanelProps {
@@ -44,6 +45,8 @@ const runningFetcher = (url: string) =>
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  // Client-side deferred duels (session-scoped — resets on reload).
+  const [deferredIds, setDeferredIds] = useState<Set<string>>(new Set());
 
   const { data, mutate: fetchRunningData } = useSWR(
     `/api/events/${eventId}/running`,
@@ -54,10 +57,37 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   const currentRound = data?.currentRound ?? 1;
   const totalRounds = data?.totalRounds ?? 1;
   const judgesCount = data?.judgesCount ?? 3;
-  const activeDuel: Duel | null = data?.activeDuel ?? null;
+  const serverActiveDuel: Duel | null = data?.activeDuel ?? null;
   const duels: Duel[] = data?.duels ?? [];
   const allDuelsCompleted: boolean = data?.allDuelsCompleted ?? false;
   const isLoading = !data;
+
+  // Pick the first non-deferred pending/in_progress duel; fall back to server's choice.
+  const activeDuel: Duel | null = (() => {
+    if (!serverActiveDuel) return null;
+    if (!deferredIds.has(serverActiveDuel.id)) return serverActiveDuel;
+    const next = duels.find(
+      (d) =>
+        (d.status === 'pending' || d.status === 'in_progress') &&
+        !deferredIds.has(d.id)
+    );
+    return next ?? serverActiveDuel;
+  })();
+
+  const handleSkipDuel = (id: string) => {
+    setDeferredIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  };
+  const handleResumeDuel = (id: string) => {
+    setDeferredIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  };
 
   const handleFinishEvent = async () => {
     setIsFinishing(true);
@@ -139,7 +169,27 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
 
       {/* Active Duel - Tap-to-Tally */}
       {activeDuel && (
-        <TapToTally duel={activeDuel} judgesCount={judgesCount} onRefresh={fetchRunningData} />
+        <>
+          <TapToTally duel={activeDuel} judgesCount={judgesCount} onRefresh={fetchRunningData} />
+          {/* Skip-duel control: only meaningful when another pending duel exists in this round */}
+          {duels.some(
+            (d) =>
+              d.id !== activeDuel.id &&
+              (d.status === 'pending' || d.status === 'in_progress') &&
+              !deferredIds.has(d.id)
+          ) && (
+            <div className="flex justify-end">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSkipDuel(activeDuel.id)}
+              >
+                <SkipForward size={16} />
+                Pular duelo
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
       {/* Finish Event Confirmation Modal */}
@@ -201,16 +251,31 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <span className="font-semibold text-[var(--fg)]">
-                    Duelo {duel.position + 1}
+                    {duel.isBronzeMatch ? 'Disputa de 3º lugar' : `Duelo ${duel.position + 1}`}
                   </span>
                   {getStatusBadge(duel.status)}
+                  {deferredIds.has(duel.id) && (
+                    <Badge variant="warning">Adiado</Badge>
+                  )}
                 </div>
-                {duel.status === 'in_progress' && (
-                  <Play size={16} className="text-[var(--brand)] animate-pulse" />
-                )}
-                {duel.status === 'completed' && (
-                  <CheckCircle size={16} className="text-[var(--success)]" />
-                )}
+                <div className="flex items-center gap-2">
+                  {deferredIds.has(duel.id) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleResumeDuel(duel.id)}
+                    >
+                      <RotateCcw size={14} />
+                      Retomar duelo
+                    </Button>
+                  )}
+                  {duel.status === 'in_progress' && (
+                    <Play size={16} className="text-[var(--brand)] animate-pulse" />
+                  )}
+                  {duel.status === 'completed' && (
+                    <CheckCircle size={16} className="text-[var(--success)]" />
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">

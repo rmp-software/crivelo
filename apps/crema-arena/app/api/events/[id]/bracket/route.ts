@@ -4,6 +4,16 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { generateBracket, linkDuels } from '@/lib/bracket';
 
+interface CompetitorDb {
+  id: string;
+  name: string;
+  photo_url: string;
+  coffee_shop: string;
+}
+function toCamelCompetitor(c: CompetitorDb) {
+  return { id: c.id, name: c.name, photoUrl: c.photo_url, coffeeShop: c.coffee_shop };
+}
+
 // GET /api/events/[id]/bracket - Get bracket state (public endpoint for live display)
 export async function GET(
   request: NextRequest,
@@ -77,23 +87,15 @@ export async function GET(
         status: duel.status,
         votesA: duel.votes_a,
         votesB: duel.votes_b,
+        isBronzeMatch: duel.is_bronze_match,
         entryA: duel.entry_a
-          ? {
-              id: duel.entry_a.id,
-              competitor: duel.entry_a.competitor,
-            }
+          ? { id: duel.entry_a.id, competitor: toCamelCompetitor(duel.entry_a.competitor) }
           : null,
         entryB: duel.entry_b
-          ? {
-              id: duel.entry_b.id,
-              competitor: duel.entry_b.competitor,
-            }
+          ? { id: duel.entry_b.id, competitor: toCamelCompetitor(duel.entry_b.competitor) }
           : null,
         winner: duel.winner_entry
-          ? {
-              id: duel.winner_entry.id,
-              competitor: duel.winner_entry.competitor,
-            }
+          ? { id: duel.winner_entry.id, competitor: toCamelCompetitor(duel.winner_entry.competitor) }
           : null,
       })),
       totalRounds,
@@ -202,17 +204,19 @@ export async function POST(
               entry_a_id: duelData.entry_a_id,
               entry_b_id: duelData.entry_b_id,
               status: duelData.status,
+              is_bronze_match: duelData.is_bronze_match ?? false,
             },
             select: {
               id: true,
               round: true,
               position: true,
+              is_bronze_match: true,
             },
           })
         )
       );
 
-      // Link duels together
+      // Link duels together (passes is_bronze_match so cascade math is correct)
       const duelLinks = linkDuels(duels);
 
       // Update duels with linking information
@@ -223,6 +227,7 @@ export async function POST(
             data: {
               next_duel_id: link.next_duel_id,
               next_duel_slot: link.next_duel_slot,
+              bronze_duel_id: link.bronze_duel_id ?? null,
             },
           })
         )

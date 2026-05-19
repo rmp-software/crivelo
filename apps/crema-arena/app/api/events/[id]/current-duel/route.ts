@@ -1,6 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
+interface CompetitorDb {
+  id: string;
+  name: string;
+  photo_url: string;
+  coffee_shop: string;
+}
+function toCamelCompetitor(c: CompetitorDb) {
+  return { id: c.id, name: c.name, photoUrl: c.photo_url, coffeeShop: c.coffee_shop };
+}
+
 // GET /api/events/[id]/current-duel - Get current active duel (public endpoint for live display)
 export async function GET(
   request: NextRequest,
@@ -128,13 +138,13 @@ export async function GET(
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,
-                  competitor: activeDuel.entry_a.competitor,
+                  competitor: toCamelCompetitor(activeDuel.entry_a.competitor),
                 }
               : null,
             entryB: activeDuel.entry_b
               ? {
                   id: activeDuel.entry_b.id,
-                  competitor: activeDuel.entry_b.competitor,
+                  competitor: toCamelCompetitor(activeDuel.entry_b.competitor),
                 }
               : null,
           }
@@ -147,13 +157,13 @@ export async function GET(
             entryA: nextDuel.entry_a
               ? {
                   id: nextDuel.entry_a.id,
-                  competitor: nextDuel.entry_a.competitor,
+                  competitor: toCamelCompetitor(nextDuel.entry_a.competitor),
                 }
               : null,
             entryB: nextDuel.entry_b
               ? {
                   id: nextDuel.entry_b.id,
-                  competitor: nextDuel.entry_b.competitor,
+                  competitor: toCamelCompetitor(nextDuel.entry_b.competitor),
                 }
               : null,
           }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import AoVivoTab from './tabs/AoVivoTab';
 import ChaveTab from './tabs/ChaveTab';
@@ -45,7 +45,8 @@ interface LeaderboardData {
 const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
 
 export default function LiveCompanion({ eventId }: LiveCompanionProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('ao-vivo');
+  // Default tab is set after data loads (status-aware).
+  const [activeTab, setActiveTab] = useState<TabType>('chave');
 
   const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
   const { data: currentDuelData, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
@@ -85,6 +86,21 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
   }
 
   const { event } = currentDuelData;
+  // Snap active tab to a valid one for the current event status.
+  // setup: [chave] · running: [ao-vivo, chave] · finished: [chave, leaderboard]
+  const validTabs: TabType[] =
+    event.status === 'running'
+      ? ['ao-vivo', 'chave']
+      : event.status === 'finished'
+        ? ['chave', 'leaderboard']
+        : ['chave'];
+  useEffect(() => {
+    if (!validTabs.includes(activeTab)) {
+      setActiveTab(event.status === 'running' ? 'ao-vivo' : event.status === 'finished' ? 'leaderboard' : 'chave');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event.status]);
+
   const eventDate = new Date(event.date).toLocaleDateString('pt-BR', {
     day: 'numeric',
     month: 'long',
@@ -127,25 +143,30 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             {getStatusBadge()}
           </div>
 
-          {/* Tab Navigation */}
+          {/* Tab Navigation — visible tabs depend on event status:
+              setup: [Chave]
+              running: [Ao vivo, Chave]
+              finished: [Chave, Classificação] */}
           <nav className="flex gap-1 bg-[var(--bg-2)] rounded-[var(--radius-sm)] p-1" role="tablist">
-            <button
-              onClick={() => setActiveTab('ao-vivo')}
-              className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
-                activeTab === 'ao-vivo'
-                  ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
-                  : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
-              }`}
-              style={{
-                transitionDuration: 'var(--dur-base)',
-                transitionTimingFunction: 'var(--ease-standard)',
-              }}
-              role="tab"
-              aria-selected={activeTab === 'ao-vivo'}
-              aria-controls="ao-vivo-panel"
-            >
-              Ao vivo
-            </button>
+            {event.status === 'running' && (
+              <button
+                onClick={() => setActiveTab('ao-vivo')}
+                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
+                  activeTab === 'ao-vivo'
+                    ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
+                    : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
+                }`}
+                style={{
+                  transitionDuration: 'var(--dur-base)',
+                  transitionTimingFunction: 'var(--ease-standard)',
+                }}
+                role="tab"
+                aria-selected={activeTab === 'ao-vivo'}
+                aria-controls="ao-vivo-panel"
+              >
+                Ao vivo
+              </button>
+            )}
             <button
               onClick={() => setActiveTab('chave')}
               className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
@@ -163,23 +184,25 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             >
               Chave
             </button>
-            <button
-              onClick={() => setActiveTab('leaderboard')}
-              className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
-                activeTab === 'leaderboard'
-                  ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
-                  : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
-              }`}
-              style={{
-                transitionDuration: 'var(--dur-base)',
-                transitionTimingFunction: 'var(--ease-standard)',
-              }}
-              role="tab"
-              aria-selected={activeTab === 'leaderboard'}
-              aria-controls="leaderboard-panel"
-            >
-              Leaderboard
-            </button>
+            {event.status === 'finished' && (
+              <button
+                onClick={() => setActiveTab('leaderboard')}
+                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
+                  activeTab === 'leaderboard'
+                    ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
+                    : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
+                }`}
+                style={{
+                  transitionDuration: 'var(--dur-base)',
+                  transitionTimingFunction: 'var(--ease-standard)',
+                }}
+                role="tab"
+                aria-selected={activeTab === 'leaderboard'}
+                aria-controls="leaderboard-panel"
+              >
+                Classificação
+              </button>
+            )}
           </nav>
         </div>
       </header>
@@ -199,6 +222,7 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
               nextDuel={currentDuelData.nextDuel}
               currentRound={currentDuelData.currentRound}
               totalRounds={currentDuelData.totalRounds}
+              roundDuels={bracketData?.duels.filter((d: any) => d.round === currentDuelData.currentRound) ?? []}
             />
           )}
         </div>

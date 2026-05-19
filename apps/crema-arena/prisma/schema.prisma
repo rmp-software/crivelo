@@ -134,6 +134,8 @@ model Duel {
   wildcard_type   WildcardType?
   next_duel_id    String?
   next_duel_slot  DuelSlot?
+  is_bronze_match Boolean       @default(false)
+  bronze_duel_id  String?
   pour_photo_url  String?
   started_at      DateTime?
   completed_at    DateTime?

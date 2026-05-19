@@ -43,10 +43,10 @@ export default function LeaderboardTab({ event, leaderboard, isComplete }: Leade
             <span className="text-3xl">📊</span>
           </div>
           <h2 className="text-xl font-bold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
-            Leaderboard indisponível
+            Classificação indisponível
           </h2>
           <p className="text-[var(--fg-3)] text-sm">
-            O leaderboard será exibido quando o evento começar
+            A classificação será exibida quando o evento começar
           </p>
         </div>
       </div>
@@ -63,7 +63,7 @@ export default function LeaderboardTab({ event, leaderboard, isComplete }: Leade
             Aguardando resultados...
           </h2>
           <p className="text-[var(--fg-3)] text-sm">
-            O leaderboard será atualizado após os primeiros duelos
+            A classificação será atualizada após os primeiros duelos
           </p>
         </div>
       </div>
@@ -165,33 +165,18 @@ export default function LeaderboardTab({ event, leaderboard, isComplete }: Leade
                   />
                 </div>
 
-                {/* Info */}
+                {/* Info — position + name + cafeteria only (wildcards make wins/votes confusing) */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p
-                      className={`font-semibold truncate ${
-                        isFirst ? 'text-base text-[var(--gold)]' : 'text-sm text-[var(--fg)]'
-                      }`}
-                    >
-                      {entry.competitor.name}
-                    </p>
-                    {getStatusBadge(entry.status)}
-                  </div>
-                  <p className="text-xs text-[var(--fg-3)] truncate mb-2">
+                  <p
+                    className={`font-semibold truncate ${
+                      isFirst ? 'text-base text-[var(--gold)]' : 'text-sm text-[var(--fg)]'
+                    }`}
+                  >
+                    {entry.competitor.name}
+                  </p>
+                  <p className="text-xs text-[var(--fg-3)] truncate">
                     {entry.competitor.coffeeShop}
                   </p>
-                  <div className="flex items-center gap-3 text-xs">
-                    <div className="flex items-center gap-1">
-                      <Trophy size={12} className="text-[var(--fg-3)]" />
-                      <span className="text-[var(--fg-2)] font-semibold font-[family-name:var(--font-mono)]">
-                        {entry.wins} {entry.wins === 1 ? 'vitória' : 'vitórias'}
-                      </span>
-                    </div>
-                    <span className="text-[var(--fg-3)]">•</span>
-                    <span className="text-[var(--fg-3)] font-[family-name:var(--font-mono)]">
-                      {entry.totalVotesReceived} {entry.totalVotesReceived === 1 ? 'voto' : 'votos'}
-                    </span>
-                  </div>
                 </div>
               </div>
 
