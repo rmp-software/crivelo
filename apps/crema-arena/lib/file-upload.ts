@@ -1,9 +1,8 @@
-import { writeFile, unlink, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { put, del } from '@vercel/blob';
 
-const UPLOAD_DIR = path.join(process.cwd(), 'public', 'uploads', 'competitors');
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+// Vercel serverless body limit is 4.5 MB. Keep a safety margin under that so
+// requests don't 413 at the platform edge before we ever see them.
+const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4 MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/jpg'];
 
 export interface FileValidationResult {
@@ -13,113 +12,68 @@ export interface FileValidationResult {
 
 export interface SaveFileResult {
   success: boolean;
-  fileName?: string;
+  /** Full HTTPS URL of the uploaded blob (returned by Vercel Blob). */
+  url?: string;
   error?: string;
 }
 
-/**
- * Validate uploaded file size and type
- */
 export function validateFile(file: File): FileValidationResult {
-  // Check file size
   if (file.size > MAX_FILE_SIZE) {
-    return {
-      valid: false,
-      error: 'File size must be less than 5MB',
-    };
+    return { valid: false, error: 'File size must be less than 4MB' };
   }
-
-  // Check file type
   if (!ALLOWED_TYPES.includes(file.type)) {
-    return {
-      valid: false,
-      error: 'File must be a JPG or PNG image',
-    };
+    return { valid: false, error: 'File must be a JPG or PNG image' };
   }
-
   return { valid: true };
 }
 
 /**
- * Generate unique filename with timestamp
+ * Upload a file to Vercel Blob under the given prefix (e.g. `competitors`,
+ * `duels`). Returns the full HTTPS URL to store in the DB. The Blob SDK reads
+ * `BLOB_READ_WRITE_TOKEN` from env automatically.
  */
-export function generateUniqueFileName(originalName: string): string {
-  const timestamp = Date.now();
-  const randomString = Math.random().toString(36).substring(2, 8);
-  const extension = path.extname(originalName);
-  return `${timestamp}-${randomString}${extension}`;
-}
+export async function saveUploadedFile(
+  file: File,
+  prefix: string = 'competitors'
+): Promise<SaveFileResult> {
+  const validation = validateFile(file);
+  if (!validation.valid) {
+    return { success: false, error: validation.error };
+  }
 
-/**
- * Save uploaded file to disk
- */
-export async function saveUploadedFile(file: File): Promise<SaveFileResult> {
   try {
-    // Ensure upload directory exists
-    if (!existsSync(UPLOAD_DIR)) {
-      await mkdir(UPLOAD_DIR, { recursive: true });
-    }
-
-    // Validate file
-    const validation = validateFile(file);
-    if (!validation.valid) {
-      return {
-        success: false,
-        error: validation.error,
-      };
-    }
-
-    // Generate unique filename
-    const fileName = generateUniqueFileName(file.name);
-    const filePath = path.join(UPLOAD_DIR, fileName);
-
-    // Convert file to buffer and write to disk
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    await writeFile(filePath, buffer);
-
-    return {
-      success: true,
-      fileName,
-    };
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const safePrefix = prefix.replace(/^\/+|\/+$/g, '');
+    // `addRandomSuffix: true` lets Blob avoid collisions; the returned URL is
+    // the source of truth (the pathname embeds the random part).
+    const blob = await put(`${safePrefix}/upload.${ext}`, file, {
+      access: 'public',
+      addRandomSuffix: true,
+      contentType: file.type,
+    });
+    return { success: true, url: blob.url };
   } catch (error: any) {
-    console.error('Error saving file:', error);
-    return {
-      success: false,
-      error: 'Failed to save file to disk',
-    };
+    console.error('Error uploading to Vercel Blob:', error);
+    return { success: false, error: 'Failed to upload file' };
   }
 }
 
 /**
- * Delete file from disk
+ * Delete a previously uploaded blob by its full URL. No-op if URL is empty or
+ * doesn't look like a blob URL (e.g. legacy `/uploads/...` paths from before
+ * the migration — those have no Blob to delete).
  */
-export async function deleteUploadedFile(fileName: string): Promise<boolean> {
-  try {
-    const filePath = path.join(UPLOAD_DIR, fileName);
-
-    if (existsSync(filePath)) {
-      await unlink(filePath);
-      return true;
-    }
-
-    return false;
-  } catch (error: any) {
-    console.error('Error deleting file:', error);
+export async function deleteUploadedFile(url: string | null | undefined): Promise<boolean> {
+  if (!url) return false;
+  if (!url.startsWith('http')) {
+    // Legacy local /uploads/... path. Not in Blob; nothing to delete remotely.
     return false;
   }
-}
-
-/**
- * Get public URL for uploaded file
- */
-export function getFileUrl(fileName: string): string {
-  return `/uploads/competitors/${fileName}`;
-}
-
-/**
- * Extract filename from photo URL
- */
-export function getFileNameFromUrl(photoUrl: string): string {
-  return path.basename(photoUrl);
+  try {
+    await del(url);
+    return true;
+  } catch (error: any) {
+    console.error('Error deleting blob:', error);
+    return false;
+  }
 }

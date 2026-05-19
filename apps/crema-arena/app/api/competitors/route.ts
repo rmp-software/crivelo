@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { saveUploadedFile, getFileUrl } from '@/lib/file-upload';
+import { saveUploadedFile } from '@/lib/file-upload';
 
 // GET /api/competitors - List competitors with search and pagination
 export async function GET(request: NextRequest) {
@@ -118,16 +118,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save photo file
-    const fileResult = await saveUploadedFile(photo);
-    if (!fileResult.success || !fileResult.fileName) {
+    // Save photo to Vercel Blob
+    const fileResult = await saveUploadedFile(photo, 'competitors');
+    if (!fileResult.success || !fileResult.url) {
       return NextResponse.json(
         { error: fileResult.error || 'Failed to upload photo' },
         { status: 400 }
       );
     }
 
-    const photoUrl = getFileUrl(fileResult.fileName);
+    const photoUrl = fileResult.url;
 
     // Create competitor
     const competitor = await prisma.competitor.create({

@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
+import { saveUploadedFile, deleteUploadedFile } from '@/lib/file-upload';
 
 // POST /api/duels/[id]/photo - Upload pour photo for a duel
 export async function POST(
@@ -48,31 +47,21 @@ export async function POST(
       return NextResponse.json({ error: 'No photo file provided' }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
+    // Upload to Vercel Blob (validation handled inside)
+    const result = await saveUploadedFile(file, `duels/${params.id}`);
+    if (!result.success || !result.url) {
       return NextResponse.json(
-        { error: 'File must be an image' },
+        { error: result.error || 'Failed to upload photo' },
         { status: 400 }
       );
     }
 
-    // Generate unique filename
-    const timestamp = Date.now();
-    const ext = file.name.split('.').pop() || 'jpg';
-    const filename = `duel-${params.id}-${timestamp}.${ext}`;
+    // Clean up previous pour photo if any (safe no-op for legacy local paths)
+    if (duel.pour_photo_url) {
+      await deleteUploadedFile(duel.pour_photo_url);
+    }
 
-    // Ensure upload directory exists
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'duels');
-    await mkdir(uploadDir, { recursive: true });
-
-    // Save file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const filepath = path.join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-
-    // Update duel with photo URL
-    const photoUrl = `/uploads/duels/${filename}`;
+    const photoUrl = result.url;
     const updatedDuel = await prisma.duel.update({
       where: { id: params.id },
       data: { pour_photo_url: photoUrl },

@@ -4,6 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+**Required env (in `.env.local`, gitignored):**
+- `DATABASE_URL` — Neon Postgres
+- `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+- `ADMIN_EMAIL`, `ADMIN_PASSWORD` — seeded admin
+- `BLOB_READ_WRITE_TOKEN` — Vercel Blob (photo uploads). Without it, every upload fails. Set in Vercel project env vars for dev/preview/production too.
+
 ```bash
 npm run dev               # Next dev server on :3000 (the team always runs it here)
 npm run build             # Production build
@@ -55,6 +61,15 @@ The full spec — including the canonical pt-BR copy, color tokens, typography r
 ### Feedback UI
 
 Use `useToast()` from `app/components/Toast.tsx` for transient feedback and `ConfirmationModal` for destructive confirmations. **Do not use native `alert()` / `confirm()`** — every occurrence was deliberately removed. The toast container is portal-mounted by `ToastProvider` in the root layout.
+
+## Photo uploads
+
+Photo uploads (competitor portraits, duel pour photos) go through
+`lib/file-upload.ts` → `@vercel/blob`. They write to **Vercel Blob**, not the local filesystem. The DB stores the full HTTPS URL the Blob SDK returns (`https://*.public.blob.vercel-storage.com/...`).
+
+- `/public/uploads/` is no longer used. Legacy DB rows with `/uploads/...` paths still resolve in dev (files exist locally) but won't survive a deploy.
+- Server-side body limit on Vercel is 4.5 MB; `MAX_FILE_SIZE` is capped at 4 MB. For larger files in the future, switch to `@vercel/blob/client` `upload()` + a token-issuer route.
+- `deleteUploadedFile()` is a no-op for legacy `/uploads/...` paths so old data won't trip up edit/delete flows.
 
 ## Process notes
 

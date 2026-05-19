@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { saveUploadedFile, getFileUrl, deleteUploadedFile, getFileNameFromUrl } from '@/lib/file-upload';
+import { saveUploadedFile, deleteUploadedFile } from '@/lib/file-upload';
 
 // GET /api/competitors/[id] - Get single competitor
 export async function GET(
@@ -120,20 +120,18 @@ export async function PUT(
 
     // Handle photo update if new photo provided
     if (photo && photo.size > 0) {
-      // Save new photo
-      const fileResult = await saveUploadedFile(photo);
-      if (!fileResult.success || !fileResult.fileName) {
+      const fileResult = await saveUploadedFile(photo, 'competitors');
+      if (!fileResult.success || !fileResult.url) {
         return NextResponse.json(
           { error: fileResult.error || 'Failed to upload photo' },
           { status: 400 }
         );
       }
 
-      // Delete old photo
-      const oldFileName = getFileNameFromUrl(existingCompetitor.photo_url);
-      await deleteUploadedFile(oldFileName);
+      // Delete old blob (safe no-op if it's a legacy /uploads path)
+      await deleteUploadedFile(existingCompetitor.photo_url);
 
-      photoUrl = getFileUrl(fileResult.fileName);
+      photoUrl = fileResult.url;
     }
 
     // Update competitor
@@ -212,9 +210,8 @@ export async function DELETE(
       );
     }
 
-    // Delete photo file
-    const fileName = getFileNameFromUrl(competitor.photo_url);
-    await deleteUploadedFile(fileName);
+    // Delete photo from Blob (no-op for legacy local paths)
+    await deleteUploadedFile(competitor.photo_url);
 
     // Delete competitor (entries will be cascade deleted)
     await prisma.competitor.delete({
