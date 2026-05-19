@@ -352,9 +352,9 @@ function CompactDuelRow({ duel, state }: { duel: Duel; state: 'completed' | 'pen
 function CompactCompetitor({ entry, isWinner }: { entry: Entry | null; isWinner: boolean }) {
   if (!entry) {
     return (
-      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)] italic">
+      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)]" aria-label="Sem oponente">
         <div className="w-8 h-8 rounded-full bg-[var(--bg-2)] border border-[var(--border)]" />
-        Bye
+        —
       </div>
     );
   }

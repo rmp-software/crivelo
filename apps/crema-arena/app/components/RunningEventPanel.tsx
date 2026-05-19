@@ -312,7 +312,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                 ) : (
                   <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
                     <Circle size={20} className="text-[var(--fg-4)]" />
-                    <span className="text-sm text-[var(--fg-3)] italic">BYE</span>
+                    <span className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</span>
                   </div>
                 )}
 
@@ -349,7 +349,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                 ) : (
                   <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
                     <Circle size={20} className="text-[var(--fg-4)]" />
-                    <span className="text-sm text-[var(--fg-3)] italic">BYE</span>
+                    <span className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</span>
                   </div>
                 )}
               </div>

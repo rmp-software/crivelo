@@ -573,7 +573,7 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
     return (
       <div className="flex items-center gap-2 flex-1 min-w-0 opacity-50">
         <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[var(--espresso-700)] border border-[var(--espresso-500)] flex-shrink-0" />
-        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] italic truncate">Bye</span>
+        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] truncate" aria-label="Sem oponente">—</span>
       </div>
     );
   }
