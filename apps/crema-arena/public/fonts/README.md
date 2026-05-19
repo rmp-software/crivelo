@@ -1,15 +1,13 @@
-# Fonts Directory
+# Fonts
 
-This directory should contain the following font files from the Crema Arena design system:
+Crema Arena design system fonts. All loaded via `next/font/local` in `app/layout.tsx`.
 
-- `BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf`
-- `InstrumentSerif-Regular.ttf`
-- `InstrumentSerif-Italic.ttf`
-- `GeistMono-VariableFont_wght.ttf`
+| File | Family | License |
+|------|--------|---------|
+| `BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf` | Bricolage Grotesque (display) | SIL OFL 1.1 — [ateliertriay/bricolage](https://github.com/ateliertriay/bricolage) |
+| `InstrumentSerif-Regular.ttf` | Instrument Serif (serif) | SIL OFL 1.1 — [Instrument/instrument-serif](https://github.com/Instrument/instrument-serif) |
+| `InstrumentSerif-Italic.ttf` | Instrument Serif Italic (serif) | SIL OFL 1.1 — [Instrument/instrument-serif](https://github.com/Instrument/instrument-serif) |
+| `Geist-VariableFont_wght.ttf` | Geist (body) | SIL OFL 1.1 — [vercel/geist-font](https://github.com/vercel/geist-font) |
+| `GeistMono-VariableFont_wght.ttf` | Geist Mono (mono) | SIL OFL 1.1 — [vercel/geist-font](https://github.com/vercel/geist-font) |
 
-These files are referenced in `app/globals.css` via `@font-face` declarations.
-
-**Note:** For development without the actual font files, the CSS includes fallback fonts:
-- Bricolage Grotesque → ui-sans-serif, system-ui, sans-serif
-- Instrument Serif → Times New Roman, serif
-- Geist Mono → ui-monospace, monospace
+CSS variables exposed: `--font-display`, `--font-serif`, `--font-body`, `--font-mono`.
