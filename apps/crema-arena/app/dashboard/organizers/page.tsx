@@ -8,6 +8,7 @@ import Button from '@/app/components/Button';
 import Input from '@/app/components/Input';
 import Badge from '@/app/components/Badge';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 interface Organizer {
@@ -135,8 +136,8 @@ export default function OrganizersPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando organizadores...</p>
         </div>
       )}

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import PageHeader from '@/app/components/PageHeader';
 import CompetitorForm from '@/app/components/CompetitorForm';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface CompetitorData {
   id: string;
@@ -50,9 +51,9 @@ export default function EditCompetitorPage() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto">
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-[var(--fg-2)]">Loading competitor...</p>
+        <div className="flex flex-col items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-[var(--fg-2)]">Carregando competidor...</p>
         </div>
       </div>
     );

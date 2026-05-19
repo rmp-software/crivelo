@@ -7,7 +7,7 @@ import PageHeader from '@/app/components/PageHeader';
 import Button from '@/app/components/Button';
 import Badge from '@/app/components/Badge';
 import EmptyState from '@/app/components/EmptyState';
-import SkeletonLoader from '@/app/components/SkeletonLoader';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { Plus, Calendar, MapPin, Users, PartyPopper } from 'lucide-react';
 
 interface Event {
@@ -102,8 +102,9 @@ export default function EventsPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="space-y-6">
-          <SkeletonLoader type="card" count={3} />
+        <div className="flex flex-col items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
+          <p className="mt-4 text-[var(--fg-2)]">Carregando eventos...</p>
         </div>
       )}
 
