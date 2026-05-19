@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import useSWR from 'swr';
 import AoVivoTab from './tabs/AoVivoTab';
 import ChaveTab from './tabs/ChaveTab';
 import LeaderboardTab from './tabs/LeaderboardTab';
@@ -41,58 +42,16 @@ interface LeaderboardData {
   isComplete: boolean;
 }
 
+const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
+
 export default function LiveCompanion({ eventId }: LiveCompanionProps) {
   const [activeTab, setActiveTab] = useState<TabType>('ao-vivo');
-  const [currentDuelData, setCurrentDuelData] = useState<CurrentDuelData | null>(null);
-  const [bracketData, setBracketData] = useState<BracketData | null>(null);
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Shared polling function - fetches all data
-  const fetchAllData = async () => {
-    try {
-      const [currentDuelRes, bracketRes, leaderboardRes] = await Promise.all([
-        fetch(`/api/events/${eventId}/current-duel`),
-        fetch(`/api/events/${eventId}/bracket`),
-        fetch(`/api/events/${eventId}/leaderboard`),
-      ]);
-
-      if (!currentDuelRes.ok || !bracketRes.ok || !leaderboardRes.ok) {
-        throw new Error('Failed to fetch event data');
-      }
-
-      const [currentDuel, bracket, leaderboard] = await Promise.all([
-        currentDuelRes.json(),
-        bracketRes.json(),
-        leaderboardRes.json(),
-      ]);
-
-      setCurrentDuelData(currentDuel);
-      setBracketData(bracket);
-      setLeaderboardData(leaderboard);
-      setError(null);
-      setLoading(false);
-    } catch (err: any) {
-      console.error('Error fetching data:', err);
-      setError(err.message || 'Failed to load event data');
-      setLoading(false);
-    }
-  };
-
-  // Initial fetch
-  useEffect(() => {
-    fetchAllData();
-  }, [eventId]);
-
-  // Polling every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchAllData();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [eventId]);
+  const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
+  const { data: currentDuelData, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
+  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
+  const { data: leaderboardData } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, fetcher, swrOpts);
+  const loading = !currentDuelData && !error;
 
   if (loading) {
     return (

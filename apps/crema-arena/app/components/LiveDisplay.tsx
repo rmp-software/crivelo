@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import useSWR from 'swr';
 
 interface Competitor {
   id: string;
@@ -86,50 +86,16 @@ interface LiveDisplayProps {
   eventId: string;
 }
 
+const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
+const tolerantFetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : null));
+
 export default function LiveDisplay({ eventId }: LiveDisplayProps) {
-  const [data, setData] = useState<CurrentDuelData | null>(null);
-  const [bracketData, setBracketData] = useState<BracketData | null>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch current duel, bracket, and leaderboard data
-  const fetchData = async () => {
-    try {
-      const [currentDuelResponse, bracketResponse, leaderboardResponse] = await Promise.all([
-        fetch(`/api/events/${eventId}/current-duel`),
-        fetch(`/api/events/${eventId}/bracket`),
-        fetch(`/api/events/${eventId}/leaderboard`),
-      ]);
-
-      if (!currentDuelResponse.ok || !bracketResponse.ok) {
-        throw new Error('Failed to fetch event data');
-      }
-
-      const currentDuelData = await currentDuelResponse.json();
-      const bracketData = await bracketResponse.json();
-      const leaderboardData = leaderboardResponse.ok ? await leaderboardResponse.json() : null;
-
-      setData(currentDuelData);
-      setBracketData(bracketData);
-      setLeaderboard(leaderboardData);
-      setError(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load event data');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Initial fetch and polling setup
-  useEffect(() => {
-    fetchData();
-
-    // Poll every 5 seconds
-    const interval = setInterval(fetchData, 5000);
-
-    return () => clearInterval(interval);
-  }, [eventId]);
+  // 5s polling per spec — keep all three keys on the same cadence.
+  const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
+  const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
+  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
+  const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, swrOpts);
+  const loading = !data && !error;
 
   if (loading) {
     return (

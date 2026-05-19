@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import useSWR from 'swr';
 import TapToTally from './TapToTally';
 import Badge from './Badge';
 import Button from './Button';
@@ -37,42 +38,26 @@ interface RunningEventPanelProps {
   onEventFinished?: () => void;
 }
 
+const runningFetcher = (url: string) =>
+  fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error('Failed to fetch running event data'))));
+
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
-  const [currentRound, setCurrentRound] = useState(1);
-  const [totalRounds, setTotalRounds] = useState(1);
-  const [judgesCount, setJudgesCount] = useState(3);
-  const [activeDuel, setActiveDuel] = useState<Duel | null>(null);
-  const [duels, setDuels] = useState<Duel[]>([]);
-  const [allDuelsCompleted, setAllDuelsCompleted] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFinishing, setIsFinishing] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
 
-  const fetchRunningData = async () => {
-    try {
-      const response = await fetch(`/api/events/${eventId}/running`);
+  const { data, mutate: fetchRunningData } = useSWR(
+    `/api/events/${eventId}/running`,
+    runningFetcher,
+    { refreshInterval: 5000, revalidateOnFocus: false }
+  );
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch running event data');
-      }
-
-      const data = await response.json();
-      setCurrentRound(data.currentRound);
-      setTotalRounds(data.totalRounds);
-      setJudgesCount(data.judgesCount ?? 3);
-      setActiveDuel(data.activeDuel);
-      setDuels(data.duels);
-      setAllDuelsCompleted(data.allDuelsCompleted);
-    } catch (err: any) {
-      console.error('Error fetching running data:', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRunningData();
-  }, [eventId]);
+  const currentRound = data?.currentRound ?? 1;
+  const totalRounds = data?.totalRounds ?? 1;
+  const judgesCount = data?.judgesCount ?? 3;
+  const activeDuel: Duel | null = data?.activeDuel ?? null;
+  const duels: Duel[] = data?.duels ?? [];
+  const allDuelsCompleted: boolean = data?.allDuelsCompleted ?? false;
+  const isLoading = !data;
 
   const handleFinishEvent = async () => {
     setIsFinishing(true);
