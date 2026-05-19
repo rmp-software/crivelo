@@ -74,6 +74,7 @@ Photo uploads (competitor portraits, duel pour photos) go through
 ## Process notes
 
 - Linear bug-fix project: `Crema Arena – Bug Fixes & Spec Compliance` (RMP-46 onward). File new spec-compliance bugs there.
+- **Playwright validation artifacts** (screenshots, console logs, snapshots) all live in `.playwright-mcp/` — that directory is gitignored. When taking screenshots with `browser_take_screenshot` or saving any validation asset, save into `.playwright-mcp/` (e.g. `.playwright-mcp/val-livedisplay-1920.png`). Don't drop PNGs at the repo root.
 - Remote `origin` is `git@github.com:rmp-software/crema-arena.git`; `personal` points at the LucasRMP fork.
 - `prisma/migrations` IS committed (don't reintroduce it to `.gitignore`).
 - The brand SVG assets (`trophy.svg`, `stamp-seal.svg`, `rings.svg`, `wordmark.svg`, `monogram.svg`) referenced in `app_spec.txt` are NOT in `public/assets/` yet — current code substitutes Lucide icons (`Crown`, `Trophy`). If a real asset shows up, prefer it over the icon substitute.
