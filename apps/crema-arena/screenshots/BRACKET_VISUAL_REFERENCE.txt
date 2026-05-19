@@ -1,0 +1,178 @@
+BRACKET VISUAL REFERENCE
+========================
+
+This document shows what the bracket visualization should look like when rendered.
+
+EXAMPLE 1: 5 Competitors (8-slot bracket with 3 byes)
+------------------------------------------------------
+
+Round 1              Semifinal           Final
+--------             ---------           -----
+
+┌─────────────┐
+│ Barista 1   │──┐
+│ Coffee #1   │  │    ┌─────────────┐
+└─────────────┘  ├───>│   Winner    │──┐
+      VS         │    │   R1-P0     │  │    ┌─────────────┐
+┌─────────────┐  │    └─────────────┘  │    │             │
+│    BYE      │──┘          VS         ├───>│   Champion  │
+└─────────────┘                        │    │             │
+                   ┌─────────────┐     │    └─────────────┘
+┌─────────────┐    │   Winner    │──┘
+│ Barista 2   │──┐ │   R1-P1     │
+│ Coffee #2   │  │ └─────────────┘
+└─────────────┘  ├───>
+      VS         │
+┌─────────────┐  │
+│ Barista 3   │──┘
+│ Coffee #3   │
+└─────────────┘
+
+
+┌─────────────┐
+│ Barista 4   │──┐
+│ Coffee #4   │  │    ┌─────────────┐
+└─────────────┘  ├───>│   Winner    │──┐
+      VS         │    │   R1-P2     │  │    ┌─────────────┐
+┌─────────────┐  │    └─────────────┘  │    │             │
+│    BYE      │──┘          VS         ├───>│   Finalist  │
+└─────────────┘                        │    │             │
+                   ┌─────────────┐     │    └─────────────┘
+┌─────────────┐    │   Winner    │──┘
+│ Barista 5   │──┐ │   R1-P3     │
+│ Coffee #5   │  │ └─────────────┘
+└─────────────┘  ├───>
+      VS         │
+┌─────────────┐  │
+│    BYE      │──┘
+└─────────────┘
+
+
+BRACKET STRUCTURE DETAILS:
+---------------------------
+
+Total Bracket Size: 8
+Total Competitors: 5
+Total Byes: 3
+
+Round 1 (4 duels):
+  - Duel 0: Barista 1 vs BYE (walkover → Barista 1 advances)
+  - Duel 1: Barista 2 vs Barista 3
+  - Duel 2: Barista 4 vs BYE (walkover → Barista 4 advances)
+  - Duel 3: Barista 5 vs BYE (walkover → Barista 5 advances)
+
+Semifinal (2 duels):
+  - Duel 0: Winner(R1-D0) vs Winner(R1-D1)
+  - Duel 1: Winner(R1-D2) vs Winner(R1-D3)
+
+Final (1 duel):
+  - Duel 0: Winner(SF-D0) vs Winner(SF-D1)
+
+
+EXAMPLE 2: 3 Competitors (4-slot bracket with 1 bye)
+-----------------------------------------------------
+
+Round 1              Final
+--------             -----
+
+┌─────────────┐
+│ Barista 1   │──┐
+│ Coffee #1   │  │    ┌─────────────┐
+└─────────────┘  ├───>│             │
+      VS         │    │   Champion  │
+┌─────────────┐  │    │             │
+│ Barista 2   │──┘    └─────────────┘
+│ Coffee #2   │             ^
+└─────────────┘             │
+                            │
+┌─────────────┐             │
+│ Barista 3   │──┐          │
+│ Coffee #3   │  │          │
+└─────────────┘  ├───────────┘
+      VS         │
+┌─────────────┐  │
+│    BYE      │──┘
+└─────────────┘
+
+
+BRACKET STRUCTURE DETAILS:
+---------------------------
+
+Total Bracket Size: 4
+Total Competitors: 3
+Total Byes: 1
+
+Round 1 (2 duels):
+  - Duel 0: Barista 1 vs Barista 2
+  - Duel 1: Barista 3 vs BYE (walkover → Barista 3 advances)
+
+Final (1 duel):
+  - Duel 0: Winner(R1-D0) vs Winner(R1-D1)
+
+
+UI COMPONENT BREAKDOWN:
+========================
+
+Each Duel Card Shows:
+---------------------
+┌────────────────────────────────┐
+│ Duelo 1        [Status Badge]  │
+├────────────────────────────────┤
+│ [Photo] Barista 1        [0]   │ ← Competitor A
+│         Coffee Shop 1          │
+├────────────────────────────────┤
+│            VS                  │
+├────────────────────────────────┤
+│ [Photo] Barista 2        [0]   │ ← Competitor B
+│         Coffee Shop 2          │
+└────────────────────────────────┘
+
+BYE Card Shows:
+---------------
+┌────────────────────────────────┐
+│ Duelo 3        [W.O.]          │
+├────────────────────────────────┤
+│ [○] BYE                        │ ← Empty slot
+│                                │
+├────────────────────────────────┤
+│            VS                  │
+├────────────────────────────────┤
+│ [Photo] Barista 5              │ ← Real competitor
+│         Coffee Shop 5          │
+└────────────────────────────────┘
+
+Status Badges:
+--------------
+- "Pendente" (gray) - Not started
+- "Em andamento" (blue) - Currently active
+- "W.O." (yellow) - Walkover/Bye
+- "Concluído" (green) - Finished
+
+Winner Indicator:
+-----------------
+When a duel is completed, the winner's row shows:
+- Green background (success color)
+- Left green border (4px)
+- Trophy icon next to name
+- Higher vote count highlighted
+
+Round Headers:
+--------------
+- "Rodada 1" for first round
+- "Semifinal" for second-to-last round
+- "Final" for final round
+- Shows duel count per round
+
+
+RESPONSIVE DESIGN:
+==================
+
+Desktop View:
+- All rounds displayed side-by-side
+- Horizontal scroll if needed
+- Minimum 280px per round column
+
+Mobile View:
+- Horizontal scroll enabled
+- Touch-friendly duel cards
+- Compact spacing for small screens

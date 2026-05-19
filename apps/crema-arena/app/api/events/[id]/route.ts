@@ -31,6 +31,47 @@ export async function GET(
           },
           orderBy: { seed: 'asc' },
         },
+        duels: {
+          include: {
+            entry_a: {
+              include: {
+                competitor: {
+                  select: {
+                    id: true,
+                    name: true,
+                    photo_url: true,
+                    coffee_shop: true,
+                  },
+                },
+              },
+            },
+            entry_b: {
+              include: {
+                competitor: {
+                  select: {
+                    id: true,
+                    name: true,
+                    photo_url: true,
+                    coffee_shop: true,
+                  },
+                },
+              },
+            },
+            winner_entry: {
+              include: {
+                competitor: {
+                  select: {
+                    id: true,
+                    name: true,
+                    photo_url: true,
+                    coffee_shop: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: [{ round: 'asc' }, { position: 'asc' }],
+        },
       },
     });
 
@@ -65,6 +106,38 @@ export async function GET(
         photoUrl: entry.competitor.photo_url,
         seed: entry.seed,
         status: entry.status,
+      })),
+      duels: event.duels.map((duel) => ({
+        id: duel.id,
+        round: duel.round,
+        position: duel.position,
+        entryA: duel.entry_a
+          ? {
+              id: duel.entry_a.competitor.id,
+              name: duel.entry_a.competitor.name,
+              photoUrl: duel.entry_a.competitor.photo_url,
+              coffeeShop: duel.entry_a.competitor.coffee_shop,
+            }
+          : null,
+        entryB: duel.entry_b
+          ? {
+              id: duel.entry_b.competitor.id,
+              name: duel.entry_b.competitor.name,
+              photoUrl: duel.entry_b.competitor.photo_url,
+              coffeeShop: duel.entry_b.competitor.coffee_shop,
+            }
+          : null,
+        winner: duel.winner_entry
+          ? {
+              id: duel.winner_entry.competitor.id,
+              name: duel.winner_entry.competitor.name,
+              photoUrl: duel.winner_entry.competitor.photo_url,
+              coffeeShop: duel.winner_entry.competitor.coffee_shop,
+            }
+          : null,
+        status: duel.status,
+        votesA: duel.votes_a,
+        votesB: duel.votes_b,
       })),
       totalEntries: event.entries.length,
     });

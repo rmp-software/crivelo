@@ -27,7 +27,7 @@
     {
       "step": 4,
       "title": "Competitor management (global pool)",
-      "status": "Todo",
+      "status": "Done",
       "description": "Build /dashboard/competitors page with searchable list. Create/edit form for name, photo upload, and coffee shop. Implement photo upload to /public/uploads/ or Vercel Blob. Add delete with check for active event participation. Create API routes with pagination and search by name/coffee shop."
     },
     {

@@ -8,7 +8,8 @@ import Badge from '@/app/components/Badge';
 import Modal from '@/app/components/Modal';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
-import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText } from 'lucide-react';
+import BracketView from '@/app/components/BracketView';
+import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play } from 'lucide-react';
 
 interface EventData {
   id: string;
@@ -34,6 +35,33 @@ interface Competitor {
   status: string;
 }
 
+interface Duel {
+  id: string;
+  round: number;
+  position: number;
+  entryA: {
+    id: string;
+    name: string;
+    photoUrl: string;
+    coffeeShop: string;
+  } | null;
+  entryB: {
+    id: string;
+    name: string;
+    photoUrl: string;
+    coffeeShop: string;
+  } | null;
+  winner: {
+    id: string;
+    name: string;
+    photoUrl: string;
+    coffeeShop: string;
+  } | null;
+  status: 'pending' | 'in_progress' | 'completed' | 'walkover';
+  votesA: number;
+  votesB: number;
+}
+
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -41,8 +69,10 @@ export default function EventDetailPage() {
 
   const [event, setEvent] = useState<EventData | null>(null);
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
+  const [duels, setDuels] = useState<Duel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [isStarting, setIsStarting] = useState(false);
 
   const [addModal, setAddModal] = useState(false);
   const [removeModal, setRemoveModal] = useState<{ isOpen: boolean; competitor: Competitor | null }>({
@@ -71,6 +101,7 @@ export default function EventDetailPage() {
       const data = await response.json();
       setEvent(data.event);
       setCompetitors(data.competitors || []);
+      setDuels(data.duels || []);
     } catch (err: any) {
       setError(err.message || 'An error occurred');
     } finally {
@@ -132,6 +163,32 @@ export default function EventDetailPage() {
       alert(err.message || 'Failed to remove competitor from event');
     } finally {
       setIsRemoving(false);
+    }
+  };
+
+  const handleStartEvent = async () => {
+    if (!confirm('Tem certeza que deseja iniciar o evento? Isso irá gerar as chaves e bloquear modificações nas inscrições.')) {
+      return;
+    }
+
+    setIsStarting(true);
+
+    try {
+      const response = await fetch(`/api/events/${eventId}/start`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to start event');
+      }
+
+      // Refresh event details to show bracket
+      await fetchEventDetails();
+    } catch (err: any) {
+      alert(err.message || 'Failed to start event');
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -244,6 +301,54 @@ export default function EventDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Start Event Button */}
+      {event.status === 'setup' && competitors.length >= 2 && (
+        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+                Pronto para começar?
+              </h3>
+              <p className="text-sm text-[var(--fg-3)] mt-1">
+                Inicie o evento para gerar as chaves e começar a competição
+              </p>
+            </div>
+            <Button
+              variant="primary"
+              onClick={handleStartEvent}
+              disabled={isStarting}
+            >
+              {isStarting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Iniciando...
+                </>
+              ) : (
+                <>
+                  <Play size={20} />
+                  Iniciar Evento
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Bracket View - Show when event is running or finished */}
+      {(event.status === 'running' || event.status === 'finished') && duels.length > 0 && (
+        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+              Chaveamento
+            </h3>
+            <p className="text-sm text-[var(--fg-3)] mt-1">
+              {event.bracketSize} posições • {Math.log2(event.bracketSize!)} rodadas
+            </p>
+          </div>
+          <BracketView duels={duels} bracketSize={event.bracketSize!} />
+        </div>
+      )}
 
       {/* Registered Competitors Section */}
       <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
