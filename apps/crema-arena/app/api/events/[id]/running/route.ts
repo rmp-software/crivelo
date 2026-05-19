@@ -124,6 +124,7 @@ export async function GET(
               : null,
           }
         : null,
+      judgesCount: event.judges_count,
       duels: currentRoundDuels.map((duel) => ({
         id: duel.id,
         round: duel.round,

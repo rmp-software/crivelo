@@ -36,8 +36,22 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma
-prisma/migrations
-
 # uploads
 /public/uploads
+
+# editor / IDE
+.idea/
+.vscode/
+
+# claude / agent local config
+.claude/
+.claude_settings.json
+
+# playwright MCP transient session
+.playwright-mcp/
+
+# dev artifacts kept locally but not committed
+/screenshots/
+/playwright-check.png
+/CREMA-*.txt
+/CREMA-*.md

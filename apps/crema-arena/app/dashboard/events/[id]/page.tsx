@@ -73,7 +73,9 @@ export default function EventDetailPage() {
   const [duels, setDuels] = useState<Duel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [isGeneratingBracket, setIsGeneratingBracket] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [showStartModal, setShowStartModal] = useState(false);
 
   const [addModal, setAddModal] = useState(false);
   const [removeModal, setRemoveModal] = useState<{ isOpen: boolean; competitor: Competitor | null }>({
@@ -169,13 +171,28 @@ export default function EventDetailPage() {
     }
   };
 
-  const handleStartEvent = async () => {
-    if (!confirm('Tem certeza que deseja iniciar o evento? Isso irá gerar as chaves e bloquear modificações nas inscrições.')) {
-      return;
+  const handleGenerateBracket = async () => {
+    setIsGeneratingBracket(true);
+    try {
+      const response = await fetch(`/api/events/${eventId}/bracket`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to generate bracket');
+      }
+
+      await fetchEventDetails();
+    } catch (err: any) {
+      alert(err.message || 'Failed to generate bracket');
+    } finally {
+      setIsGeneratingBracket(false);
     }
+  };
 
+  const handleStartEvent = async () => {
     setIsStarting(true);
-
     try {
       const response = await fetch(`/api/events/${eventId}/start`, {
         method: 'POST',
@@ -186,7 +203,7 @@ export default function EventDetailPage() {
         throw new Error(data.error || 'Failed to start event');
       }
 
-      // Refresh event details to show bracket
+      setShowStartModal(false);
       await fetchEventDetails();
     } catch (err: any) {
       alert(err.message || 'Failed to start event');
@@ -340,37 +357,94 @@ export default function EventDetailPage() {
         )}
       </div>
 
-      {/* Start Event Button */}
-      {event.status === 'setup' && competitors.length >= 2 && (
+      {/* Step 1: Generate Bracket */}
+      {event.status === 'setup' && competitors.length >= 2 && duels.length === 0 && (
         <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
-                Pronto para começar?
+                Gerar chave
               </h3>
               <p className="text-sm text-[var(--fg-3)] mt-1">
-                Inicie o evento para gerar as chaves e começar a competição
+                Monte a chave de eliminação com {competitors.length} competidores
               </p>
             </div>
             <Button
-              variant="primary"
-              onClick={handleStartEvent}
-              disabled={isStarting}
+              variant="secondary"
+              onClick={handleGenerateBracket}
+              disabled={isGeneratingBracket}
             >
-              {isStarting ? (
+              {isGeneratingBracket ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Iniciando...
+                  <div className="w-5 h-5 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                  Gerando...
                 </>
               ) : (
                 <>
-                  <Play size={20} />
-                  Iniciar Evento
+                  <FileText size={20} />
+                  Gerar chave
                 </>
               )}
             </Button>
           </div>
         </div>
+      )}
+
+      {/* Step 2: Review Bracket & Start */}
+      {event.status === 'setup' && duels.length > 0 && (
+        <>
+          <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+                Chave gerada
+              </h3>
+              <Button
+                variant="primary"
+                onClick={() => setShowStartModal(true)}
+                disabled={isStarting}
+              >
+                <Play size={20} />
+                Iniciar Evento
+              </Button>
+            </div>
+            <BracketView duels={duels} bracketSize={event.bracketSize ?? competitors.length} />
+          </div>
+
+          <Modal
+            isOpen={showStartModal}
+            onClose={() => setShowStartModal(false)}
+            title="Iniciar Evento"
+          >
+            <div className="space-y-4">
+              <p className="text-[var(--fg-2)]">
+                Tem certeza? Após iniciar o evento, não será possível alterar as inscrições.
+              </p>
+              <div className="flex gap-3 pt-2">
+                <Button variant="ghost" onClick={() => setShowStartModal(false)} className="flex-1">
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleStartEvent}
+                  disabled={isStarting}
+                  className="flex-1"
+                >
+                  {isStarting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      Iniciando...
+                    </>
+                  ) : (
+                    <>
+                      <Play size={20} />
+                      Confirmar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Modal>
+        </>
       )}
 
       {/* Running Event Panel - Show when event is running */}

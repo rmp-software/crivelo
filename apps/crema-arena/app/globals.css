@@ -53,6 +53,12 @@
     --danger:      #B83A2E;
     --danger-soft: #F3CFC8;
 
+    --success:      #4F8C72;
+    --success-soft: #D2E8DC;
+    --warning:      #E6A636;
+    --warning-soft: #FAE7B6;
+    --fg-4:         #B8A89E;
+
     --focus-ring: #C45A2C;
 
     /* Border Radii */
@@ -73,43 +79,11 @@
     --dur-base:  180ms;
     --dur-stage: 320ms;
 
-    /* Font Families */
+    /* Font Families — values are overridden at runtime by next/font CSS variables on <body> */
     --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
     --font-serif:   'Instrument Serif', 'Times New Roman', serif;
     --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
     --font-mono:    'Geist Mono', ui-monospace, monospace;
-  }
-
-  /* Font Face Declarations */
-  @font-face {
-    font-family: 'Bricolage Grotesque';
-    src: url('/fonts/BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf') format('truetype-variations');
-    font-weight: 100 900;
-    font-stretch: 75% 100%;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Instrument Serif';
-    src: url('/fonts/InstrumentSerif-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Instrument Serif';
-    src: url('/fonts/InstrumentSerif-Italic.ttf') format('truetype');
-    font-weight: 400;
-    font-style: italic;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: 'Geist Mono';
-    src: url('/fonts/GeistMono-VariableFont_wght.ttf') format('truetype-variations');
-    font-weight: 100 900;
-    font-display: swap;
   }
 
   /* Base Styles */

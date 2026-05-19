@@ -93,7 +93,7 @@ export default function CompetitorsPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat('pt-BR', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -103,13 +103,13 @@ export default function CompetitorsPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <PageHeader
-        title="Competitors"
-        description="Manage your global pool of competitors"
+        title="Competidores"
+        description="Gerencie o pool global de competidores"
         actions={
           <Link href="/dashboard/competitors/new">
             <Button variant="primary">
               <Plus size={20} />
-              Add Competitor
+              Adicionar Competidor
             </Button>
           </Link>
         }
@@ -120,7 +120,7 @@ export default function CompetitorsPage() {
         <div className="relative max-w-md">
           <Input
             type="text"
-            placeholder="Search by name or coffee shop..."
+            placeholder="Buscar por nome ou cafeteria..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             fullWidth
@@ -177,19 +177,19 @@ export default function CompetitorsPage() {
               <thead className="bg-[var(--bg-2)] border-b border-[var(--border)]">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Photo
+                    Foto
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Name
+                    Nome
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Coffee Shop
+                    Cafeteria
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Created At
+                    Criado em
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
-                    Actions
+                    Ações
                   </th>
                 </tr>
               </thead>

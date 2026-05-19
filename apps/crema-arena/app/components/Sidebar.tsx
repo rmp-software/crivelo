@@ -23,9 +23,9 @@ export default function Sidebar({ user }: SidebarProps) {
 
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Menu, exact: true },
-    { href: '/dashboard/competitors', label: 'Competitors', icon: Users },
-    { href: '/dashboard/events', label: 'Events', icon: Calendar },
-    ...(isAdmin ? [{ href: '/dashboard/organizers', label: 'Organizers', icon: Building2 }] : []),
+    { href: '/dashboard/competitors', label: 'Competidores', icon: Users },
+    { href: '/dashboard/events', label: 'Eventos', icon: Calendar },
+    ...(isAdmin ? [{ href: '/dashboard/organizers', label: 'Organizadores', icon: Building2 }] : []),
   ];
 
   const isActive = (href: string, exact?: boolean) => {
@@ -105,7 +105,7 @@ export default function Sidebar({ user }: SidebarProps) {
           className="!text-[var(--crema-100)] hover:!bg-[var(--espresso-700)] hover:!text-[var(--crema-50)]"
         >
           <LogOut size={16} />
-          <span>Logout</span>
+          <span>Sair</span>
         </Button>
       </div>
     </>

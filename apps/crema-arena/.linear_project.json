@@ -75,7 +75,7 @@
     {
       "step": 12,
       "title": "Design polish and responsiveness",
-      "status": "Todo",
+      "status": "Done",
       "description": "Audit all screens against Crema Arena design system (colors, typography, radii, shadows). Ensure collapsible sidebar works on mobile. Implement transitions and animations using dur-base 180ms ease-standard. Create empty states with pt-BR microcopy. Add loading states (skeleton loaders or spinner). Implement accessibility: cinnamon focus rings, aria-labels, keyboard navigation. Test live display at 1920x1080 and live companion at 375px (iPhone SE)."
     }
   ]

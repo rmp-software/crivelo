@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import TapToTally from './TapToTally';
 import Badge from './Badge';
 import Button from './Button';
+import Modal from './Modal';
 import { CheckCircle, Circle, Play, Trophy } from 'lucide-react';
 
 interface Competitor {
@@ -39,11 +40,13 @@ interface RunningEventPanelProps {
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
   const [currentRound, setCurrentRound] = useState(1);
   const [totalRounds, setTotalRounds] = useState(1);
+  const [judgesCount, setJudgesCount] = useState(3);
   const [activeDuel, setActiveDuel] = useState<Duel | null>(null);
   const [duels, setDuels] = useState<Duel[]>([]);
   const [allDuelsCompleted, setAllDuelsCompleted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isFinishing, setIsFinishing] = useState(false);
+  const [showFinishModal, setShowFinishModal] = useState(false);
 
   const fetchRunningData = async () => {
     try {
@@ -56,6 +59,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       const data = await response.json();
       setCurrentRound(data.currentRound);
       setTotalRounds(data.totalRounds);
+      setJudgesCount(data.judgesCount ?? 3);
       setActiveDuel(data.activeDuel);
       setDuels(data.duels);
       setAllDuelsCompleted(data.allDuelsCompleted);
@@ -71,10 +75,6 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   }, [eventId]);
 
   const handleFinishEvent = async () => {
-    if (!confirm('Tem certeza que deseja encerrar o evento? Esta ação não pode ser desfeita.')) {
-      return;
-    }
-
     setIsFinishing(true);
     try {
       const response = await fetch(`/api/events/${eventId}/finish`, {
@@ -86,12 +86,12 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
         throw new Error(data.error || 'Failed to finish event');
       }
 
-      alert('Evento encerrado com sucesso!');
+      setShowFinishModal(false);
       if (onEventFinished) {
         onEventFinished();
       }
     } catch (err: any) {
-      alert(err.message || 'Failed to finish event');
+      console.error(err);
     } finally {
       setIsFinishing(false);
     }
@@ -141,8 +141,44 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
           {allDuelsCompleted && (
             <Button
               variant="primary"
+              onClick={() => setShowFinishModal(true)}
+              disabled={isFinishing}
+            >
+              <Trophy size={20} />
+              Encerrar Evento
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Active Duel - Tap-to-Tally */}
+      {activeDuel && (
+        <TapToTally duel={activeDuel} judgesCount={judgesCount} onRefresh={fetchRunningData} />
+      )}
+
+      {/* Finish Event Confirmation Modal */}
+      <Modal
+        isOpen={showFinishModal}
+        onClose={() => setShowFinishModal(false)}
+        title="Encerrar Evento"
+      >
+        <div className="space-y-4">
+          <p className="text-[var(--fg-2)]">
+            Tem certeza que deseja encerrar o evento? Esta ação não pode ser desfeita.
+          </p>
+          <div className="flex gap-3 pt-2">
+            <Button
+              variant="ghost"
+              onClick={() => setShowFinishModal(false)}
+              className="flex-1"
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="primary"
               onClick={handleFinishEvent}
               disabled={isFinishing}
+              className="flex-1"
             >
               {isFinishing ? (
                 <>
@@ -152,18 +188,13 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
               ) : (
                 <>
                   <Trophy size={20} />
-                  Encerrar Evento
+                  Confirmar
                 </>
               )}
             </Button>
-          )}
+          </div>
         </div>
-      </div>
-
-      {/* Active Duel - Tap-to-Tally */}
-      {activeDuel && (
-        <TapToTally duel={activeDuel} onRefresh={fetchRunningData} />
-      )}
+      </Modal>
 
       {/* Duel List */}
       <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">

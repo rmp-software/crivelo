@@ -72,7 +72,6 @@ export async function PUT(
       select: {
         id: true,
         seed: true,
-        updated_at: true,
       },
     });
 

@@ -33,18 +33,25 @@ interface Duel {
 
 interface TapToTallyProps {
   duel: Duel;
+  judgesCount: number;
   onRefresh: () => void;
 }
 
-export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
+export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyProps) {
   const [isStarting, setIsStarting] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [showCompleteModal, setShowCompleteModal] = useState(false);
   const [showWildcardModal, setShowWildcardModal] = useState(false);
-  const [selectedWinner, setSelectedWinner] = useState<string | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const totalVotes = duel.votesA + duel.votesB;
+  const computedWinnerId = duel.votesA >= duel.votesB ? duel.entryA?.id : duel.entryB?.id;
+  const computedWinnerName = duel.votesA >= duel.votesB
+    ? duel.entryA?.competitor.name
+    : duel.entryB?.competitor.name;
+  const scoreDisplay = `${Math.max(duel.votesA, duel.votesB)} × ${Math.min(duel.votesA, duel.votesB)}`;
 
   const handleStartDuel = async () => {
     setIsStarting(true);
@@ -123,7 +130,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
   };
 
   const handleCompleteDuel = async () => {
-    if (!selectedWinner) return;
+    if (!computedWinnerId) return;
 
     setIsCompleting(true);
     try {
@@ -132,7 +139,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ winner_entry_id: selectedWinner }),
+        body: JSON.stringify({ winner_entry_id: computedWinnerId }),
       });
 
       if (!response.ok) {
@@ -141,25 +148,12 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
       }
 
       setShowCompleteModal(false);
-      setSelectedWinner(null);
       onRefresh();
     } catch (err: any) {
       alert(err.message || 'Failed to complete duel');
     } finally {
       setIsCompleting(false);
     }
-  };
-
-  const openCompleteModal = () => {
-    // Auto-select winner based on votes
-    if (duel.votesA > duel.votesB && duel.entryA) {
-      setSelectedWinner(duel.entryA.id);
-    } else if (duel.votesB > duel.votesA && duel.entryB) {
-      setSelectedWinner(duel.entryB.id);
-    } else if (duel.entryA) {
-      setSelectedWinner(duel.entryA.id);
-    }
-    setShowCompleteModal(true);
   };
 
   if (duel.status === 'pending') {
@@ -176,19 +170,17 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
             <p className="text-[var(--fg-2)] mb-6">
               {hasEmptySlot
                 ? 'Este duelo tem uma vaga vazia. Você pode adicionar um wildcard ou fazer um W.O.'
-                : 'Clique no botão abaixo para iniciar este duelo'}
+                : 'Clique para iniciar o duelo, ou substitua um competidor com wildcard.'}
             </p>
             <div className="flex gap-3 justify-center">
-              {hasEmptySlot && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => setShowWildcardModal(true)}
-                >
-                  <User size={20} />
-                  Adicionar Wildcard
-                </Button>
-              )}
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => setShowWildcardModal(true)}
+              >
+                <User size={20} />
+                {hasEmptySlot ? 'Adicionar Wildcard' : 'Substituir com Wildcard'}
+              </Button>
               <Button
                 variant="primary"
                 size="lg"
@@ -216,6 +208,8 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
           onClose={() => setShowWildcardModal(false)}
           duelId={duel.id}
           onSuccess={onRefresh}
+          entryA={duel.entryA}
+          entryB={duel.entryB}
         />
       </>
     );
@@ -281,7 +275,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
                 ) : (
                   <>
                     <Upload size={16} />
-                    Alterar Foto
+                    Refotografar
                   </>
                 )}
               </Button>
@@ -385,9 +379,15 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
 
         {/* Complete Duel Button */}
         <div className="pt-6 border-t border-[var(--border)]">
+          {totalVotes < judgesCount && (
+            <p className="text-center text-sm text-[var(--fg-3)] mb-3">
+              Faltam {judgesCount - totalVotes} {judgesCount - totalVotes === 1 ? 'voto' : 'votos'}
+            </p>
+          )}
           <Button
             variant="primary"
-            onClick={openCompleteModal}
+            onClick={() => setShowCompleteModal(true)}
+            disabled={totalVotes < judgesCount}
             className="w-full"
           >
             <Trophy size={20} />
@@ -399,92 +399,26 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
       {/* Complete Duel Modal */}
       <Modal
         isOpen={showCompleteModal}
-        onClose={() => {
-          setShowCompleteModal(false);
-          setSelectedWinner(null);
-        }}
+        onClose={() => setShowCompleteModal(false)}
         title="Encerrar Duelo"
       >
-        <div className="space-y-4">
-          <p className="text-[var(--fg-2)]">
-            Selecione o vencedor deste duelo. O vencedor avançará para a próxima rodada.
-          </p>
-
-          {/* Winner Selection */}
-          <div className="space-y-3">
-            {duel.entryA && (
-              <button
-                onClick={() => setSelectedWinner(duel.entryA!.id)}
-                className={`w-full p-4 rounded-[var(--radius-md)] border-2 transition-colors ${
-                  selectedWinner === duel.entryA.id
-                    ? 'border-[var(--success)] bg-[var(--success-soft)]'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--fg-4)]'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
-                    <img
-                      src={duel.entryA.competitor.photoUrl}
-                      alt={duel.entryA.competitor.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-[var(--fg)]">
-                      {duel.entryA.competitor.name}
-                    </p>
-                    <p className="text-sm text-[var(--fg-2)]">
-                      Copa A - {duel.votesA} votos
-                    </p>
-                  </div>
-                  {selectedWinner === duel.entryA.id && (
-                    <Trophy size={20} className="text-[var(--success)]" />
-                  )}
-                </div>
-              </button>
-            )}
-
-            {duel.entryB && (
-              <button
-                onClick={() => setSelectedWinner(duel.entryB!.id)}
-                className={`w-full p-4 rounded-[var(--radius-md)] border-2 transition-colors ${
-                  selectedWinner === duel.entryB.id
-                    ? 'border-[var(--success)] bg-[var(--success-soft)]'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--fg-4)]'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
-                    <img
-                      src={duel.entryB.competitor.photoUrl}
-                      alt={duel.entryB.competitor.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <p className="font-semibold text-[var(--fg)]">
-                      {duel.entryB.competitor.name}
-                    </p>
-                    <p className="text-sm text-[var(--fg-2)]">
-                      Copa B - {duel.votesB} votos
-                    </p>
-                  </div>
-                  {selectedWinner === duel.entryB.id && (
-                    <Trophy size={20} className="text-[var(--success)]" />
-                  )}
-                </div>
-              </button>
-            )}
+        <div className="space-y-6">
+          <div className="text-center py-4">
+            <p className="text-3xl font-mono font-bold text-[var(--fg)] mb-2">
+              {scoreDisplay}
+            </p>
+            <p className="text-lg text-[var(--fg-2)]">
+              para <span className="font-semibold text-[var(--fg)]">{computedWinnerName}</span>
+            </p>
+            <p className="text-sm text-[var(--fg-3)] mt-3">
+              Confirmar resultado e avançar para a próxima rodada?
+            </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3">
             <Button
               variant="ghost"
-              onClick={() => {
-                setShowCompleteModal(false);
-                setSelectedWinner(null);
-              }}
+              onClick={() => setShowCompleteModal(false)}
               className="flex-1"
             >
               Cancelar
@@ -492,7 +426,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
             <Button
               variant="primary"
               onClick={handleCompleteDuel}
-              disabled={!selectedWinner || isCompleting}
+              disabled={isCompleting}
               className="flex-1"
             >
               {isCompleting ? (
@@ -503,7 +437,7 @@ export default function TapToTally({ duel, onRefresh }: TapToTallyProps) {
               ) : (
                 <>
                   <Trophy size={20} />
-                  Confirmar Vencedor
+                  Confirmar
                 </>
               )}
             </Button>

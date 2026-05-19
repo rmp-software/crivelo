@@ -1,0 +1,768 @@
+<project_specification>
+  <project_name>Crema Arena — Specialty Coffee Competition Platform</project_name>
+
+  <overview>
+    Crema Arena is an MVP platform for organizing and broadcasting specialty coffee competitions in Brazil —
+    latte art TNTs, barista championships, and bar battles. The goal is to validate the idea with minimal
+    complexity: an authenticated organizer dashboard, a live display for TV screens, and an audience
+    companion screen accessible via QR code.
+
+    Judging model: judge selection, NOT a 0-100 score. In each duel, N judges (default: 3) each pick
+    the side they preferred. Final score: "2 × 1" (common win) or "3 × 0" (unanimous). No decimals,
+    no averages, no scoring sliders.
+
+    All code, database fields, API routes, and variable names must be in English.
+    All user-facing UI text must be in Brazilian Portuguese (pt-BR).
+
+    Bracket format: single elimination. Bracket size is rounded up to the nearest power of 2 —
+    unfilled slots receive automatic byes (advance without playing).
+  </overview>
+
+  <technology_stack>
+    <frontend_and_backend>
+      <framework>Next.js 14+ (App Router) — server components + client components as needed</framework>
+      <styling>Tailwind CSS with Crema Arena design system CSS variables (see design_system section)</styling>
+      <icons>Lucide React</icons>
+      <fonts>Bricolage Grotesque, Instrument Serif, Geist, Geist Mono — local files in /public/fonts/</fonts>
+      <qr_code>qrcode (npm) — generated server-side as PNG/SVG</qr_code>
+      <port>3000 in local development</port>
+    </frontend_and_backend>
+    <backend>
+      <runtime>Next.js API routes / Server Actions (no separate server)</runtime>
+      <orm>Prisma</orm>
+      <database>PostgreSQL via Neon (DATABASE_URL in .env)</database>
+      <auth>NextAuth.js with CredentialsProvider (email + password) — JWT cookie session</auth>
+    </backend>
+    <deployment>
+      <platform>Vercel</platform>
+      <env_vars>DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD</env_vars>
+    </deployment>
+  </technology_stack>
+
+  <prerequisites>
+    <environment_setup>
+      - .env with DATABASE_URL (Neon PostgreSQL), NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD
+      - Font files from the Crema Arena design system bundle in /public/fonts/:
+          BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf
+          InstrumentSerif-Regular.ttf
+          InstrumentSerif-Italic.ttf
+          GeistMono-VariableFont_wght.ttf
+          Geist available via next/font/google or npm
+      - Brand assets from the design system bundle in /public/assets/:
+          wordmark.svg, monogram.svg, stamp-seal.svg, rings.svg, trophy.svg
+      - Neon account with PostgreSQL database created and connection string available
+      - Vercel account linked to the repository for continuous deployment
+    </environment_setup>
+  </prerequisites>
+
+  <core_features>
+
+    <auth>
+      - Login via email + password (NextAuth CredentialsProvider)
+      - Two roles: admin | organizer (role field on the organizers table)
+      - Admin: full access including CRUD of other organizer accounts
+      - Organizer: manages competitors (global pool) and their own events
+      - Middleware protects all /dashboard/* routes
+      - Login page at /login with redirect to /dashboard after authentication
+      - Initial seed creates a default admin user (ADMIN_EMAIL + ADMIN_PASSWORD from env)
+      - No public registration — only admins create new organizer accounts
+    </auth>
+
+    <admin_dashboard>
+      <organizer_management>
+        - Visible only to role=admin
+        - List organizers (name, email, created at, role)
+        - Create organizer (name, email, password, role: admin|organizer)
+        - Edit organizer (name, email, optional password reset, role)
+        - Delete organizer (with confirmation modal, cannot delete self)
+      </organizer_management>
+
+      <competitor_management>
+        - Global competitor pool — reused across multiple events
+        - List competitors with search by name or coffee shop
+        - Create competitor: name (required), photo (image upload, stored in /public/uploads/
+          or Vercel Blob), coffee shop (required)
+        - Edit competitor
+        - Delete competitor (check for active event participation before deleting)
+        - Photo is required — displayed in duel cards on the live display and companion screen
+      </competitor_management>
+
+      <event_management>
+        - List the organizer's events with status badge (setup | running | finished)
+        - Create event: name, date, location (optional), description (optional),
+          judges count (default: 3)
+        - On creation, event starts with status=setup
+        - Event detail page in setup status:
+            * Add competitors to the event: search global pool, assign optional seed (integer >= 1)
+            * Remove competitors (only in setup)
+            * View list of registered competitors with their seeds
+            * "Generate bracket" button: calculates bracket_size = next power of 2 >= number
+              of registered competitors, places seeds at standard positions, fills remaining
+              slots randomly for unseeded competitors, creates byes for empty slots
+            * View generated bracket before starting
+            * "Start event" button: changes status to running, activates the first round of duels
+        - Event detail page in running status:
+            * Main panel: current round, list of duels with status (pending/in_progress/completed)
+            * "Start duel" button on each pending duel → opens vote capture interface
+            * Vote capture interface (tap-to-tally):
+                - Shows duel number and round
+                - "Fotografar copos" button at the top: uses
+                  &lt;input type="file" accept="image/*" capture="environment"&gt; to open
+                  the native camera on mobile; photo uploads immediately via
+                  POST /api/duels/:id/photo and live display updates on next poll.
+                  Button changes to a thumbnail + "Refotografar" once a photo exists.
+                  Photo is optional — voting can proceed without it.
+                - Two large buttons labeled with each competitor's name
+                - Vote counter per side (starts at 0)
+                - Total votes required = event's judges_count
+                - "Close duel" button active only when all votes are recorded
+                - Confirmation modal before closing: displays final score and winner's name,
+                  asks for confirmation ("2 × 1 para [Nome]. Confirmar?")
+                - On confirm: winner_entry_id saved, duel marked completed, next bracket duel
+                  updated with the winner
+            * Wildcard: when a competitor drops out before their next duel:
+                - "Wildcard" button on the affected pending duel
+                - Three options presented to the organizer:
+                    1. Walkover — opponent advances automatically without playing
+                    2. Pick eliminated — scrollable list of eliminated competitors in the event,
+                       organizer selects one manually
+                    3. Random pick — system randomly selects from eliminated competitors,
+                       shows selected name and photo for confirmation
+                - Original competitor marked as dropped_out
+            * Full bracket view with progress
+            * "Close event" button when all final duels are complete (status → finished)
+        - Event detail page in finished status:
+            * Final bracket with winner highlighted and trophy mark
+            * Final leaderboard
+        - Links section (visible in running and finished status):
+            * "Live Display" — "Copy URL" button that copies /live/[eventId] to clipboard
+            * "Audience (QR)" — displays server-generated QR code linking to /e/[eventId]
+              and a button to download the QR as PNG
+      </event_management>
+    </admin_dashboard>
+
+    <live_display>
+      - Route: /live/[eventId] — public, unauthenticated, optimized for large screens (TV 1920×1080)
+      - Auto-refresh via polling every 5 seconds (fetch in useEffect with setInterval)
+      - Full-screen layout, espresso background (--bg-inverse), no nav, no user interaction
+      - Content when event is running:
+          * Central focus: active duel — when pour_photo_url is set, display the pour photo
+            large and centered (the actual latte art photo taken by the organizer), with
+            competitor names and coffee shops as overlaid captions at the bottom of the image.
+            When no pour photo exists yet, fall back to the two competitor profile cards
+            side by side with photo, name, and coffee shop.
+          * Duel score in large Geist Mono ("2 × 1")
+          * LIVE status (mint dot + "AO VIVO" mono caps label)
+          * Simplified mini bracket of the current round below or to the side
+          * Next duel (if any) displayed with less prominence
+          * QR code in the bottom-right corner linking to /e/[eventId]
+            with label "Acompanhe pelo celular"
+      - Content when event is finished:
+          * Full-screen podium UI showing the top 5 competitors:
+              - Ranking determined by elimination round (later round = higher rank),
+                with total votes received across the tournament as tiebreaker
+              - Classic podium layout: 2nd left, 1st center (tallest), 3rd right,
+                4th and 5th flanking lower on each side
+              - Each podium slot shows: competitor photo (large, circular), name,
+                coffee shop, position number, and score summary (e.g. "3 vitórias · 8 votos")
+              - 1st place slot uses --gold accent, trophy.svg mark, and "CAMPEÃO" stamp seal
+              - 2nd and 3rd slots use --fg-2 / --brand-soft treatment
+              - 4th and 5th slots smaller, same card style but less prominent
+              - Espresso background (--bg-inverse) with crema text (--fg-inverse)
+              - Event name and date displayed at the top in Bricolage Grotesque
+          * If the bracket has fewer than 5 competitors total, show only as many
+            positions as there are eliminated competitors (minimum: just 1st place)
+      - Content when event is in setup (not yet started):
+          * Event name, date, "O evento ainda não começou"
+      - No interactive elements except auto-refresh
+    </live_display>
+
+    <live_companion>
+      - Route: /e/[eventId] — public, unauthenticated, mobile-first
+      - Same URL before, during, and after the event — content changes based on status
+      - Auto-refresh via polling every 5 seconds
+      - Mobile-first layout with sticky header (event name + status badge)
+      - Tab navigation: Ao vivo | Chave | Leaderboard
+      - "Ao vivo" tab:
+          * Current duel: if pour_photo_url is set, show the pour photo prominently with
+            competitor names as captions; otherwise show competitor profile cards.
+          * Partial score in Geist Mono
+          * "Próximo duelo" section below when available
+          * When no duel is in progress: "Aguardando próximo duelo..."
+      - "Chave" tab:
+          * Scrollable full bracket view
+          * Each duel shows: competitors, final score (if completed), winner badge
+          * Byes labeled as such with no extra detail
+          * Wildcard entries with "Wildcard" badge
+      - "Leaderboard" tab:
+          * During event: partial standings (winners by round)
+          * After close: full final leaderboard with position, name, coffee shop,
+            duels won, and total votes received in the tournament
+      - Content when setup: event name, date, list of registered competitors
+      - Content when finished: focus on leaderboard + final bracket, no "Ao vivo" tab
+    </live_companion>
+
+  </core_features>
+
+  <database_schema>
+    <tables>
+      <organizers>
+        - id (uuid, PK)
+        - name (text)
+        - email (text, unique)
+        - password_hash (text)
+        - role (enum: admin | organizer, default organizer)
+        - created_at, updated_at
+      </organizers>
+
+      <competitors>
+        - id (uuid, PK)
+        - name (text)
+        - photo_url (text) — path in /public/uploads/ or Vercel Blob URL
+        - coffee_shop (text)
+        - created_by (uuid, FK organizers.id)
+        - created_at, updated_at
+      </competitors>
+
+      <events>
+        - id (uuid, PK)
+        - organizer_id (uuid, FK organizers.id)
+        - name (text)
+        - date (date)
+        - location (text, nullable)
+        - description (text, nullable)
+        - judges_count (int, default 3)
+        - status (enum: setup | running | finished, default setup)
+        - bracket_size (int, nullable) — power of 2, calculated on bracket generation
+        - created_at, updated_at
+      </events>
+
+      <event_entries>
+        - id (uuid, PK)
+        - event_id (uuid, FK events.id)
+        - competitor_id (uuid, FK competitors.id)
+        - seed (int, nullable) — bracket seed position
+        - status (enum: active | eliminated | wildcard_in | dropped_out, default active)
+        - eliminated_at_round (int, nullable) — round in which they were eliminated
+        - created_at
+        - UNIQUE(event_id, competitor_id)
+      </event_entries>
+
+      <duels>
+        - id (uuid, PK)
+        - event_id (uuid, FK events.id)
+        - round (int) — round number (1 = first round, increases each phase)
+        - position (int) — position within the round (1-based)
+        - entry_a_id (uuid, FK event_entries.id, nullable) — null = bye
+        - entry_b_id (uuid, FK event_entries.id, nullable) — null = bye
+        - votes_a (int, default 0)
+        - votes_b (int, default 0)
+        - winner_entry_id (uuid, FK event_entries.id, nullable)
+        - status (enum: pending | in_progress | completed | walkover, default pending)
+        - wildcard_type (enum: walkover | manual | random, nullable)
+        - next_duel_id (uuid, FK duels.id, nullable) — destination duel for the winner
+        - next_duel_slot (enum: a | b, nullable) — which slot the winner fills in the next duel
+        - pour_photo_url (text, nullable) — photo of the two cups taken by the organizer during the duel
+        - completed_at (timestamp, nullable)
+        - created_at
+      </duels>
+
+      <votes>
+        - id (uuid, PK)
+        - duel_id (uuid, FK duels.id)
+        - side (enum: a | b)
+        - created_at
+      </votes>
+    </tables>
+  </database_schema>
+
+  <api_endpoints_summary>
+    <auth>
+      - POST /api/auth/[...nextauth] — NextAuth handler (login, logout, session)
+    </auth>
+
+    <organizers>
+      <!-- Admin only -->
+      - GET    /api/organizers           — list all organizers
+      - POST   /api/organizers           — create organizer
+      - PUT    /api/organizers/:id       — edit organizer
+      - DELETE /api/organizers/:id       — delete organizer
+    </organizers>
+
+    <competitors>
+      - GET    /api/competitors           — list with search (?q=)
+      - POST   /api/competitors           — create (with photo upload)
+      - PUT    /api/competitors/:id       — edit
+      - DELETE /api/competitors/:id       — delete
+    </competitors>
+
+    <events>
+      - GET    /api/events                — list organizer's events
+      - POST   /api/events                — create event
+      - GET    /api/events/:id            — event detail
+      - PUT    /api/events/:id            — edit event
+      - DELETE /api/events/:id            — delete event (setup only)
+
+      - POST   /api/events/:id/entries          — add competitor to event
+      - DELETE /api/events/:id/entries/:entryId — remove competitor (setup only)
+
+      - POST   /api/events/:id/bracket/generate — generate bracket (setup only)
+      - POST   /api/events/:id/start            — start event (setup → running)
+      - POST   /api/events/:id/finish           — close event (running → finished)
+
+      - GET    /api/events/:id/bracket          — full bracket (public)
+      - GET    /api/events/:id/current-duel     — active duel (public)
+      - GET    /api/events/:id/leaderboard      — standings (public)
+      - GET    /api/events/:id/qr               — QR code as PNG (public)
+    </events>
+
+    <duels>
+      - POST   /api/duels/:id/start     — start duel (→ in_progress)
+      - POST   /api/duels/:id/vote      — record vote { side: "a" | "b" }
+      - POST   /api/duels/:id/complete  — close duel { winner: "a" | "b" }
+      - POST   /api/duels/:id/wildcard  — apply wildcard { type: "walkover"|"manual"|"random", entry_id? }
+      - POST   /api/duels/:id/photo    — upload pour photo (multipart/form-data); saves to storage,
+                                         updates pour_photo_url, immediately visible on live display
+    </duels>
+  </api_endpoints_summary>
+
+  <ui_layout>
+    <admin_dashboard>
+      - Root layout: left navigation sidebar (collapsible on mobile) + content area
+      - Sidebar: Crema Arena logo, navigation links (Events, Competitors, Organizers[admin only]),
+        logged-in user name and logout button at the bottom
+      - Reusable page header: title slot + primary actions slot (e.g., "New event" button)
+      - Responsive: sidebar hidden by default on mobile with hamburger toggle
+      - Colors: --bg (crema) background, --bg-2 (latte) sidebar, cards with --shadow-1
+    </admin_dashboard>
+
+    <live_display>
+      - Full viewport, --bg-inverse (dark espresso) background
+      - No nav, no header — content only
+      - Central grid for duel: two large competitor cards (~40vw each)
+      - Cards: large photo (rounded-md), name in Bricolage Grotesque, small coffee shop text
+      - Score centered between cards in large Geist Mono
+      - LIVE badge (mint dot + mono caps text) at the top
+      - QR code bottom-right corner with "Acompanhe pelo celular" label
+      - Text colors: --fg-inverse (light crema) on espresso background
+    </live_display>
+
+    <live_companion>
+      - Mobile-first, max-width 480px, centered on desktop
+      - Sticky header: monogram + event name + status badge
+      - Tab bar at top: Ao vivo | Chave | Leaderboard
+      - Scrollable content below tabs
+      - --bg (crema) background, cards with --shadow-1
+    </live_companion>
+
+    <bracket_visualization>
+      - Used in admin (running/finished) and in the companion's Chave tab
+      - Horizontal scrollable render: rounds as columns, duels as connected rows
+      - Each duel card: two competitors, score (when completed), winner badge
+      - Byes: shown as "[Bye]" in muted color, auto-advance indicated
+      - Wildcard entries: "Wildcard" badge on the competitor card
+      - Active duel: 1.5px cinnamon border + LIVE dot
+    </bracket_visualization>
+
+    <modals>
+      - Delete confirmation (competitor, organizer, event)
+      - Wildcard options (three choices + list/confirmation)
+      - Duel close confirmation (displays score + winner name, asks to confirm)
+    </modals>
+  </ui_layout>
+
+  <design_system>
+    <!-- Follow the Crema Arena design system strictly. Implement as globals.css with @layer base. -->
+
+    <color_tokens>
+      /* Paste these variables into globals.css */
+      :root {
+        --espresso-900: #1F1410;
+        --espresso-700: #3E2A22;
+        --espresso-500: #7A5A4A;
+        --crema-50:  #FBF6EA;
+        --crema-100: #F5ECD8;
+        --crema-200: #EADBC0;
+        --crema-300: #DCC59E;
+        --cinnamon-50:  #FBEEE5;
+        --cinnamon-500: #C45A2C;
+        --cinnamon-600: #A8471E;
+        --cinnamon-700: #823516;
+        --marigold-100: #FAE7B6;
+        --marigold-500: #E6A636;
+        --mint-100: #D2E8DC;
+        --mint-500: #4F8C72;
+        --cherry-100: #F3CFC8;
+        --cherry-500: #B83A2E;
+
+        --bg:             #FBF6EA;
+        --bg-2:           #F5ECD8;
+        --bg-3:           #EADBC0;
+        --bg-inverse:     #1F1410;
+        --surface:        #FBF6EA;
+        --surface-raised: #FFFCF3;
+
+        --fg:           #1F1410;
+        --fg-2:         #3E2A22;
+        --fg-3:         #7A5A4A;
+        --fg-muted:     #6B5A4F;
+        --fg-inverse:   #FBF6EA;
+
+        --border:        rgba(31,20,16,.12);
+        --border-strong: rgba(31,20,16,.24);
+
+        --brand:       #C45A2C;
+        --brand-hover: #A8471E;
+        --brand-press: #823516;
+        --brand-soft:  #FBEEE5;
+
+        --gold:      #E6A636;
+        --gold-soft: #FAE7B6;
+        --live:      #4F8C72;
+        --live-soft: #D2E8DC;
+        --danger:      #B83A2E;
+        --danger-soft: #F3CFC8;
+
+        --focus-ring: #C45A2C;
+
+        --radius-xs:   6px;
+        --radius-sm:   10px;
+        --radius-md:   18px;
+        --radius-lg:   28px;
+        --radius-full: 999px;
+
+        --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
+        --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+
+        --ease-standard:  cubic-bezier(.2,.7,.2,1);
+        --ease-overshoot: cubic-bezier(.34,1.56,.64,1);
+        --dur-fast:  120ms;
+        --dur-base:  180ms;
+        --dur-stage: 320ms;
+
+        --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+        --font-serif:   'Instrument Serif', 'Times New Roman', serif;
+        --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
+        --font-mono:    'Geist Mono', ui-monospace, monospace;
+      }
+    </color_tokens>
+
+    <typography>
+      - Display/headings: Bricolage Grotesque, font-weight 700–800, letter-spacing -0.02em
+      - Editorial italic (hero subtitles, pull quotes): Instrument Serif Italic
+      - Body/UI text: Geist, 16px, line-height 1.5
+      - Scores, timers, seeds, bracket positions: Geist Mono, tabular figures
+        (font-feature-settings: "tnum")
+      - UI copy language rules (pt-BR):
+          * Sentence case everywhere. TNT always in ALL CAPS. No ALL CAPS for emphasis elsewhere.
+          * Address as "você" always. Short imperative verbs. Never "tu" or "o senhor".
+          * Maximum one "!" per screen. No period at end of button labels or toasts.
+          * Score format: "2 × 1" or "3 × 0" (× Unicode U+00D7 with spaces, not "x")
+    </typography>
+
+    <components>
+      <buttons>
+        - Primary: --brand background, --fg-inverse text, --radius-sm (10px), padding 10px 20px
+        - Secondary: --border-strong border, --fg text, no fill, hover: --bg-2 fill
+        - Destructive: --danger background, --fg-inverse text
+        - Ghost/icon: no border, hover: --bg-2 fill
+        - Press state: translateY(1px) + tighter shadow on all variants
+        - Focus: 2px solid --focus-ring, offset 2px
+        - Disabled: opacity 0.45, cursor not-allowed
+      </buttons>
+
+      <cards>
+        - --surface-raised background, --radius-md (18px), --shadow-1
+        - No border by default; 1.5px --brand border when highlighted (active duel)
+        - Press/hover: translateY(1px) + shadow tightens (no lift)
+        - Padding: 16px mobile, 24px desktop
+      </cards>
+
+      <inputs>
+        - 1px --border border, --radius-sm (10px), padding 10px 14px
+        - Focus: --brand border + cinnamon focus ring
+        - Placeholder: --fg-muted
+        - Error state: --danger border
+      </inputs>
+
+      <badges>
+        - --radius-full (999px), padding 4px 10px, font-size 12px, font-weight 600
+        - AO VIVO: --live-soft background, --live text, static mint dot (no blink)
+        - VENCEDOR: --gold-soft background, --marigold-700 text
+        - FORA: --danger-soft background, --danger text
+        - Wildcard: --brand-soft background, --brand text
+      </badges>
+
+      <score_display>
+        - Font: Geist Mono, font-weight 600, tabular figures
+        - Format: "2 × 1" or "3 × 0"
+        - Large on live display: clamp(40px, 6vw, 72px)
+        - Medium in bracket cards: 24–28px
+      </score_display>
+    </components>
+
+    <iconography>
+      - Lucide React, stroke 1.75 on mobile (24px), stroke 1.5 on desktop (20px)
+      - Default color: --fg (espresso), inherits currentColor
+      - Outline style only. Never filled or duotone.
+      - 8px gap between icon and label in buttons
+      - Brand status icons (not Lucide) from /public/assets/:
+          rings.svg (live dot, avatar frames), stamp-seal.svg (award badges), trophy.svg (winner)
+    </iconography>
+
+    <ui_copy_examples>
+      <!-- These are the pt-BR strings used in the actual UI -->
+      - Empty state:          "Nenhum competidor ainda. Adicione o primeiro →"
+      - Vote recorded:        "Voto registrado. X de Y votos."
+      - Duel closed:          "2 × 1 para [Nome]. Vencedor avança."
+      - Wildcard confirmed:   "[Nome] entra como wildcard."
+      - Event started:        "Evento iniciado. Primeiro duelo pronto."
+      - Delete confirmation:  "Tem certeza? Essa ação não pode ser desfeita."
+      - Waiting for duel:     "Aguardando próximo duelo..."
+      - Button labels:        "Inscrever", "Iniciar duelo", "Encerrar duelo", "Gerar chave",
+                              "Iniciar evento", "Encerrar evento", "Sortear", "Walkover",
+                              "Copiar URL", "Salvar", "Cancelar", "Excluir"
+      - Nav labels:           "Eventos", "Competidores", "Organizadores"
+      - Tab labels:           "Ao vivo", "Chave", "Leaderboard"
+    </ui_copy_examples>
+  </design_system>
+
+  <key_interactions>
+    <bracket_generation>
+      1. Organizer adds competitors to the event with optional seeds
+      2. Clicks "Gerar chave"
+      3. System calculates bracket_size = next power of 2 >= total registered competitors
+      4. Seeds are placed at standard single-elimination positions (1 at top, 2 on opposite side, etc.)
+      5. Unseeded competitors fill remaining slots in random order
+      6. Remaining slots (bracket_size - total_competitors) become byes
+      7. System creates duel records for round 1 and cascades next_duel_id + next_duel_slot
+         through the entire bracket tree upfront
+      8. Byes are resolved automatically: the competitor advances without a played duel
+      9. Organizer reviews the generated bracket, then clicks "Iniciar evento"
+         (no bracket editing after generation)
+    </bracket_generation>
+
+    <running_a_duel>
+      1. Admin panel shows current round with pending duels
+      2. Organizer clicks "Iniciar duelo" — status changes to in_progress
+      3. Tap-to-tally interface opens with a "Fotografar copos" button at the top.
+         Organizer points their phone at the table and taps it — native camera opens,
+         photo is taken, uploaded immediately. Live display switches from competitor
+         profile cards to the pour photo within the next poll cycle (~5s).
+         Button becomes a thumbnail + "Refotografar" if they want to retake.
+      4. Two large buttons labeled with each competitor's name — each tap records a vote
+         and increments the on-screen counter (photo and voting are independent)
+      5. When all judges_count votes are recorded: "Encerrar duelo" button activates
+      6. Confirmation modal displays the final score and winner's name:
+         "2 × 1 para [Nome]. Confirmar?" — no name mapping needed
+      7. On confirm: winner_entry_id saved, loser marked as eliminated, next duel in the
+         bracket updated with the winner, live display and companion update on next poll
+    </running_a_duel>
+
+    <wildcard_flow>
+      1. Competitor drops out before their next scheduled duel
+      2. Organizer opens the affected pending duel and clicks "Wildcard"
+      3. Modal presents three options:
+         a. Walkover — opponent advances automatically, duel marked as walkover
+         b. Pick eliminated — paginated list of competitors with status=eliminated
+            in that event; organizer selects one manually
+         c. Random pick — system randomly selects from eliminated competitors,
+            displays selected name and photo for confirmation ("Confirmar ou sortear novamente")
+      4. Original competitor marked as dropped_out
+      5. If wildcard (b or c): new event_entry created with status=wildcard_in,
+         duel updated with new entry
+      6. If walkover (a): duel marked completed/walkover with opponent as winner
+    </wildcard_flow>
+
+    <live_surface_updates>
+      - Live display (/live/[eventId]): useEffect with setInterval 5000ms fetching
+        /api/events/:id/current-duel and /api/events/:id/bracket — no WebSocket, no SSE
+      - Live companion (/e/[eventId]): same 5-second polling pattern
+      - No real-time optimization needed for MVP — polling is sufficient
+    </live_surface_updates>
+  </key_interactions>
+
+  <implementation_steps>
+    <step number="1">
+      <title>Project foundation</title>
+      <tasks>
+        - Initialize Next.js 14 with App Router, TypeScript, Tailwind CSS
+        - Configure Prisma with initial schema and Neon connection (DATABASE_URL)
+        - Add globals.css with Crema Arena CSS variables (tokens listed above)
+        - Configure @font-face for Bricolage Grotesque, Instrument Serif, Geist Mono
+          (files in /public/fonts/) and Geist via next/font or Google Fonts
+        - Run first Prisma migration to create all tables
+        - Configure NextAuth.js (CredentialsProvider, JWT session, route middleware)
+        - Seed script: create default admin user (ADMIN_EMAIL + ADMIN_PASSWORD from env)
+        - Create init.sh to install dependencies and run migrations
+        - Configure vercel.json if needed
+      </tasks>
+    </step>
+
+    <step number="2">
+      <title>Admin base layout and authentication</title>
+      <tasks>
+        - /login page with email + password form, Crema Arena design, post-login redirect
+        - /dashboard layout with responsive navigation sidebar
+        - Route protection middleware for /dashboard/*
+        - Base components: Button, Card, Input, Badge, confirmation Modal
+        - Sidebar with links: Events, Competitors, Organizers (conditional on admin role)
+        - Reusable page header component with title and actions slots
+      </tasks>
+    </step>
+
+    <step number="3">
+      <title>Organizer management (admin)</title>
+      <tasks>
+        - /dashboard/organizers page with list + search
+        - Create/edit organizer form (name, email, password, role)
+        - Delete with confirmation modal
+        - Corresponding API routes with role=admin validation
+      </tasks>
+    </step>
+
+    <step number="4">
+      <title>Competitor management (global pool)</title>
+      <tasks>
+        - /dashboard/competitors page with searchable list
+        - Create/edit form (name, photo, coffee shop)
+        - Photo upload: save to /public/uploads/ (or Vercel Blob if available)
+        - Delete with check for active event participation
+        - API routes with pagination and search by name/coffee shop
+      </tasks>
+    </step>
+
+    <step number="5">
+      <title>Event creation and setup</title>
+      <tasks>
+        - /dashboard/events page with organizer's event list
+        - Create event form (name, date, location, description, judges_count)
+        - /dashboard/events/[id] detail page in setup status:
+            * Registered competitors list with seeds
+            * Search and add competitors from the global pool
+            * Remove competitors
+        - API routes for event creation/editing and entry management
+      </tasks>
+    </step>
+
+    <step number="6">
+      <title>Bracket generation and event start</title>
+      <tasks>
+        - Bracket generation algorithm: calculate bracket_size, place seeds at standard
+          single-elimination positions, fill remaining slots randomly, create byes,
+          create all duel records with next_duel_id and next_duel_slot pre-populated
+          for the entire bracket tree
+        - View generated bracket before starting (BracketView component)
+        - "Iniciar evento" button + status transition + automatic bye resolution
+        - API routes: POST /api/events/:id/bracket/generate and POST /api/events/:id/start
+      </tasks>
+    </step>
+
+    <step number="7">
+      <title>Event running and tap-to-tally</title>
+      <tasks>
+        - Running event panel: current round, duel list with statuses
+        - Vote capture interface (tap-to-tally): "Fotografar copos" button (camera capture),
+          Cup A / Cup B vote buttons, live counter, votes-complete gating
+        - Pour photo upload: POST /api/duels/:id/photo, store file, update pour_photo_url;
+          live display and companion pick it up on next poll
+        - Close duel confirmation modal with Cup A/B → competitor mapping
+        - API routes: POST /api/duels/:id/start, /vote, /complete, /photo
+        - Bracket advancement logic: update next duel after closing current one
+        - "Encerrar evento" button when the final duel is complete
+      </tasks>
+    </step>
+
+    <step number="8">
+      <title>Wildcard system</title>
+      <tasks>
+        - Wildcard modal with three options (walkover, manual pick, random pick)
+        - List of eliminated competitors for manual selection
+        - Random selection logic with confirmation step
+        - API route: POST /api/duels/:id/wildcard
+        - event_entry status updates (dropped_out, wildcard_in)
+        - "Wildcard" badge in BracketView for wildcard entries
+      </tasks>
+    </step>
+
+    <step number="9">
+      <title>Live display surface</title>
+      <tasks>
+        - /live/[eventId] route without admin layout
+        - Full-screen LiveDisplay component with espresso background
+        - 5-second polling: fetch /api/events/:id/current-duel and /api/events/:id/bracket
+        - Large competitor cards with photo, name, coffee shop, partial score
+        - QR code generated server-side at /api/events/:id/qr via `qrcode` package
+        - States: setup, running (active duel), running (between duels), finished
+        - Layout responsive but optimized for 1920×1080
+      </tasks>
+    </step>
+
+    <step number="10">
+      <title>Live companion (audience screen)</title>
+      <tasks>
+        - /e/[eventId] route, mobile-first, without admin layout
+        - Tab navigation: Ao vivo | Chave | Leaderboard
+        - "Ao vivo" tab: current duel with votes, next duel
+        - "Chave" tab: BracketView adapted for mobile (horizontal scroll)
+        - "Leaderboard" tab: partial standings (during) and full final leaderboard (after close)
+        - Shared 5-second polling across tabs
+        - Content states per event status
+      </tasks>
+    </step>
+
+    <step number="11">
+      <title>Event links in admin</title>
+      <tasks>
+        - "Links" section on the event detail page (running/finished)
+        - "Live Display": read-only input with /live/[eventId] URL + "Copiar URL" button
+          (Clipboard API)
+        - "Audience (QR)": inline QR code image + download PNG button
+      </tasks>
+    </step>
+
+    <step number="12">
+      <title>Design polish and responsiveness</title>
+      <tasks>
+        - Audit all screens against the design system (colors, typography, radii, shadows)
+        - Ensure collapsible sidebar works on mobile admin
+        - Transitions and animations: dur-base 180ms ease-standard on hover/press states
+        - Empty states with pt-BR microcopy in Crema Arena voice
+        - Loading states (skeleton loaders or concentric rings spinner)
+        - Accessibility: cinnamon focus rings, aria-labels, keyboard navigation
+        - Test live display at 1920×1080 viewport
+        - Test live companion at 375px viewport (iPhone SE)
+      </tasks>
+    </step>
+  </implementation_steps>
+
+  <success_criteria>
+    <functionality>
+      - Organizer can create an event, add competitors, generate a bracket, and start
+      - Tap-to-tally correctly records votes and closes duels with the winner advancing
+      - Wildcard works in all three modes (walkover, manual pick, random pick)
+      - Live display auto-updates showing the active duel and partial score
+      - Live companion shows bracket, current duel, and leaderboard
+      - QR code on the live display leads to the correct companion screen
+      - Admin can create and manage organizer accounts
+    </functionality>
+
+    <design>
+      - Visually consistent with the Crema Arena design system (colors, typography, components)
+      - All user-facing text is in pt-BR; no unexpected English in the UI
+      - No 0-100 scores anywhere — only judge selection and "2 × 1" style scores
+      - Live display legible on a large TV (1920×1080) from a distance
+      - Live companion fully usable on mobile without zooming
+      - No emoji in UI chrome — only in user-generated content if any
+    </design>
+
+    <technical>
+      - Zero console errors in production
+      - Functional Vercel deployment with environment variables configured
+      - Clean, reproducible Prisma migrations via init.sh
+      - Polling does not cause visible network errors or race conditions
+      - Photo upload works and photos appear in duel cards on the live display
+    </technical>
+  </success_criteria>
+
+</project_specification>

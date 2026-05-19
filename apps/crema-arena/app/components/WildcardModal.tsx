@@ -14,15 +14,33 @@ interface EliminatedCompetitor {
   eliminatedAtRound: number;
 }
 
+interface SlotEntry {
+  id: string;
+  competitor: {
+    id: string;
+    name: string;
+    photoUrl: string;
+    coffeeShop: string;
+  };
+}
+
 interface WildcardModalProps {
   isOpen: boolean;
   onClose: () => void;
   duelId: string;
   onSuccess: () => void;
+  entryA: SlotEntry | null;
+  entryB: SlotEntry | null;
 }
 
-export default function WildcardModal({ isOpen, onClose, duelId, onSuccess }: WildcardModalProps) {
-  const [step, setStep] = useState<'select-type' | 'manual-pick' | 'random-confirm'>('select-type');
+export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entryA, entryB }: WildcardModalProps) {
+  const emptySlot: 'a' | 'b' | null = !entryA ? 'a' : !entryB ? 'b' : null;
+  const bothFilled = !!entryA && !!entryB;
+
+  const [step, setStep] = useState<'select-slot' | 'select-type' | 'manual-pick' | 'random-confirm'>(
+    bothFilled ? 'select-slot' : 'select-type'
+  );
+  const [targetSlot, setTargetSlot] = useState<'a' | 'b' | null>(emptySlot);
   const [eliminatedCompetitors, setEliminatedCompetitors] = useState<EliminatedCompetitor[]>([]);
   const [selectedCompetitor, setSelectedCompetitor] = useState<EliminatedCompetitor | null>(null);
   const [randomCompetitor, setRandomCompetitor] = useState<EliminatedCompetitor | null>(null);
@@ -32,12 +50,16 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess }: Wi
   useEffect(() => {
     if (isOpen) {
       fetchEliminatedCompetitors();
+      setStep(bothFilled ? 'select-slot' : 'select-type');
+      setTargetSlot(emptySlot);
     } else {
       // Reset state when modal closes
-      setStep('select-type');
+      setStep(bothFilled ? 'select-slot' : 'select-type');
+      setTargetSlot(emptySlot);
       setSelectedCompetitor(null);
       setRandomCompetitor(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
   const fetchEliminatedCompetitors = async () => {
@@ -106,6 +128,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess }: Wi
         body: JSON.stringify({
           wildcard_type: 'manual',
           selected_competitor_id: selectedCompetitor.competitorId,
+          target_slot: targetSlot,
         }),
       });
 
@@ -150,6 +173,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess }: Wi
         body: JSON.stringify({
           wildcard_type: 'random',
           selected_competitor_id: randomCompetitor.competitorId,
+          target_slot: targetSlot,
         }),
       });
 
@@ -179,33 +203,86 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess }: Wi
     );
   }
 
+  if (step === 'select-slot' && bothFilled && entryA && entryB) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} title="Substituir Competidor">
+        <div className="space-y-4">
+          <p className="text-[var(--fg-2)]">
+            Qual competidor você deseja substituir?
+          </p>
+
+          <div className="space-y-3">
+            {([
+              { slot: 'a' as const, entry: entryA, label: 'Copa A' },
+              { slot: 'b' as const, entry: entryB, label: 'Copa B' },
+            ]).map(({ slot, entry, label }) => (
+              <button
+                key={slot}
+                onClick={() => {
+                  setTargetSlot(slot);
+                  setStep('select-type');
+                }}
+                className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+                    <img
+                      src={entry.competitor.photoUrl}
+                      alt={entry.competitor.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-[var(--fg)]">{entry.competitor.name}</p>
+                    <p className="text-sm text-[var(--fg-2)]">{entry.competitor.coffeeShop}</p>
+                    <p className="text-xs text-[var(--fg-3)] mt-1">{label}</p>
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Button variant="ghost" onClick={onClose} className="flex-1">
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    );
+  }
+
   if (step === 'select-type') {
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Selecione Tipo de Wildcard">
         <div className="space-y-4">
           <p className="text-[var(--fg-2)]">
-            Escolha como deseja preencher a vaga vazia neste duelo:
+            {bothFilled
+              ? 'Escolha como substituir o competidor selecionado:'
+              : 'Escolha como deseja preencher a vaga vazia neste duelo:'}
           </p>
 
           <div className="space-y-3">
-            {/* Walkover Option */}
-            <button
-              onClick={handleWalkover}
-              disabled={isSubmitting}
-              className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--warning)] hover:bg-[var(--warning-soft)] transition-colors text-left"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[var(--warning-soft)] border-2 border-[var(--warning)] flex items-center justify-center flex-shrink-0">
-                  <Trophy size={24} className="text-[var(--warning)]" />
+            {/* Walkover Option — only when there's an empty slot */}
+            {!bothFilled && (
+              <button
+                onClick={handleWalkover}
+                disabled={isSubmitting}
+                className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--warning)] hover:bg-[var(--warning-soft)] transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-[var(--warning-soft)] border-2 border-[var(--warning)] flex items-center justify-center flex-shrink-0">
+                    <Trophy size={24} className="text-[var(--warning)]" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-[var(--fg)]">Walkover (W.O.)</p>
+                    <p className="text-sm text-[var(--fg-2)]">
+                      Oponente avança automaticamente sem competidor adversário
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-[var(--fg)]">Walkover (W.O.)</p>
-                  <p className="text-sm text-[var(--fg-2)]">
-                    Oponente avança automaticamente sem competidor adversário
-                  </p>
-                </div>
-              </div>
-            </button>
+              </button>
+            )}
 
             {/* Manual Pick Option */}
             <button

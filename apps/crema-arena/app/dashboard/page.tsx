@@ -1,5 +1,6 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Users, Calendar, Building2, TrendingUp } from 'lucide-react';
 import PageHeader from '@/app/components/PageHeader';
@@ -10,18 +11,24 @@ export default async function DashboardPage() {
 
   const isAdmin = session?.user?.role === 'admin';
 
+  const [totalEvents, totalCompetitors, activeEvents] = await Promise.all([
+    prisma.event.count(),
+    prisma.competitor.count(),
+    prisma.event.count({ where: { status: 'running' } }),
+  ]);
+
   const quickLinks = [
     {
       href: '/dashboard/competitors',
-      label: 'Competitors',
-      description: 'Manage competitor registrations',
+      label: 'Competidores',
+      description: 'Gerencie os competidores cadastrados',
       icon: Users,
       color: 'var(--cinnamon-500)',
     },
     {
       href: '/dashboard/events',
-      label: 'Events',
-      description: 'View and manage events',
+      label: 'Eventos',
+      description: 'Visualize e gerencie eventos',
       icon: Calendar,
       color: 'var(--mint-500)',
     },
@@ -29,8 +36,8 @@ export default async function DashboardPage() {
       ? [
           {
             href: '/dashboard/organizers',
-            label: 'Organizers',
-            description: 'Manage organizer accounts',
+            label: 'Organizadores',
+            description: 'Gerencie contas de organizadores',
             icon: Building2,
             color: 'var(--gold)',
           },
@@ -41,11 +48,11 @@ export default async function DashboardPage() {
   return (
     <div>
       <PageHeader
-        title={`Welcome back, ${session?.user?.name || 'Admin'}!`}
-        description="Manage your coffee competition platform from here"
+        title={`Bem-vindo, ${session?.user?.name || 'Admin'}!`}
+        description="Gerencie sua plataforma de competições de café especial"
       />
 
-      {/* Quick Stats - Placeholder for future implementation */}
+      {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
         <Card padding="md" shadow="sm">
           <div className="flex items-center gap-4">
@@ -53,8 +60,8 @@ export default async function DashboardPage() {
               <TrendingUp size={24} style={{ color: 'var(--brand)' }} />
             </div>
             <div>
-              <p className="text-sm text-[var(--fg-3)]">Total Events</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">-</p>
+              <p className="text-sm text-[var(--fg-3)]">Total de Eventos</p>
+              <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalEvents}</p>
             </div>
           </div>
         </Card>
@@ -65,8 +72,8 @@ export default async function DashboardPage() {
               <Users size={24} style={{ color: 'var(--live)' }} />
             </div>
             <div>
-              <p className="text-sm text-[var(--fg-3)]">Total Competitors</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">-</p>
+              <p className="text-sm text-[var(--fg-3)]">Total de Competidores</p>
+              <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalCompetitors}</p>
             </div>
           </div>
         </Card>
@@ -77,8 +84,8 @@ export default async function DashboardPage() {
               <Calendar size={24} style={{ color: 'var(--gold)' }} />
             </div>
             <div>
-              <p className="text-sm text-[var(--fg-3)]">Active Events</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">-</p>
+              <p className="text-sm text-[var(--fg-3)]">Eventos ao Vivo</p>
+              <p className="text-2xl font-display font-bold text-[var(--fg)]">{activeEvents}</p>
             </div>
           </div>
         </Card>
@@ -87,7 +94,7 @@ export default async function DashboardPage() {
       {/* Quick Links */}
       <div>
         <h2 className="text-xl font-display font-bold text-[var(--fg)] mb-4">
-          Quick Access
+          Acesso Rápido
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {quickLinks.map((link) => {

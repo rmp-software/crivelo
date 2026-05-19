@@ -16,7 +16,14 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { wildcard_type, selected_competitor_id } = body;
+    const { wildcard_type, selected_competitor_id, target_slot } = body;
+
+    if (target_slot && !['a', 'b'].includes(target_slot)) {
+      return NextResponse.json(
+        { error: 'target_slot must be "a" or "b" when provided' },
+        { status: 400 }
+      );
+    }
 
     if (!wildcard_type || !['walkover', 'manual', 'random'].includes(wildcard_type)) {
       return NextResponse.json(
@@ -149,18 +156,41 @@ export async function POST(
       );
     }
 
-    // Determine which slot needs the wildcard (the empty one)
-    const wildcardSlot = !duel.entry_a_id ? 'a' : !duel.entry_b_id ? 'b' : null;
+    // Determine target slot: explicit param wins; otherwise pick the empty slot.
+    const wildcardSlot: 'a' | 'b' | null =
+      (target_slot as 'a' | 'b' | undefined) ??
+      (!duel.entry_a_id ? 'a' : !duel.entry_b_id ? 'b' : null);
 
     if (!wildcardSlot) {
       return NextResponse.json(
-        { error: 'Both slots are filled, cannot add wildcard' },
+        { error: 'Both slots are filled; specify target_slot to replace a competitor' },
+        { status: 400 }
+      );
+    }
+
+    const replacedEntryId =
+      wildcardSlot === 'a' ? duel.entry_a_id : duel.entry_b_id;
+
+    if (replacedEntryId === selectedEntry.id) {
+      return NextResponse.json(
+        { error: 'Selected competitor already occupies this slot' },
         { status: 400 }
       );
     }
 
     // Perform the wildcard substitution
     await prisma.$transaction(async (tx) => {
+      // If we're replacing a filled slot, mark the displaced entry as eliminated
+      if (replacedEntryId) {
+        await tx.eventEntry.update({
+          where: { id: replacedEntryId },
+          data: {
+            status: 'eliminated',
+            eliminated_at_round: duel.round,
+          },
+        });
+      }
+
       // Update the event entry status to wildcard_in
       await tx.eventEntry.update({
         where: { id: selectedEntry.id },
