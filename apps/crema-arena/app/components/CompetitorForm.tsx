@@ -231,6 +231,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
           ref={fileInputRef}
           type="file"
           accept="image/*"
+          capture="environment"
           onChange={handleFileChange}
           className="hidden"
         />
