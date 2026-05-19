@@ -7,7 +7,7 @@ export default function NewCompetitorPage() {
   return (
     <div className="max-w-7xl mx-auto">
       <PageHeader
-        title="Add Competitor"
+        title="Adicionar competidor"
         description="Create a new competitor profile"
         breadcrumbs={[
           { label: 'Competitors', href: '/dashboard/competitors' },

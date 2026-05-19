@@ -7,12 +7,12 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Get the base URL from the request
+    // QR points to the audience companion (/e/:id), per spec.
     const baseUrl = request.nextUrl.origin;
-    const liveUrl = `${baseUrl}/live/${params.id}`;
+    const audienceUrl = `${baseUrl}/e/${params.id}`;
 
     // Generate QR code as data URL
-    const qrCodeDataUrl = await QRCode.toDataURL(liveUrl, {
+    const qrCodeDataUrl = await QRCode.toDataURL(audienceUrl, {
       width: 300,
       margin: 2,
       color: {

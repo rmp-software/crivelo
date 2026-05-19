@@ -76,7 +76,7 @@ export default function EditEventPage() {
     return (
       <div className="max-w-3xl mx-auto">
         <div className="p-6 rounded-[var(--radius-lg)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
-          <h3 className="font-semibold mb-2">Não Permitido</h3>
+          <h3 className="font-semibold mb-2">Não permitido</h3>
           <p>Este evento não pode ser editado porque não está em modo de configuração.</p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function EditEventPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <PageHeader
-        title="Editar Evento"
+        title="Editar evento"
         description={`Editar detalhes de ${event.name}`}
       />
 

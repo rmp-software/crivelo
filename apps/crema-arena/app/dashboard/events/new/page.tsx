@@ -7,7 +7,7 @@ export default function NewEventPage() {
   return (
     <div className="max-w-3xl mx-auto">
       <PageHeader
-        title="Novo Evento"
+        title="Novo evento"
         description="Crie um novo evento de competição"
       />
 

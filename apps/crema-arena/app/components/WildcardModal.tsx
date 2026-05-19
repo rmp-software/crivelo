@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import Modal from './Modal';
 import Button from './Button';
+import ConfirmationModal from './ConfirmationModal';
+import { useToast } from './Toast';
 import { Trophy, User, Shuffle, CheckCircle } from 'lucide-react';
 
 interface EliminatedCompetitor {
@@ -34,6 +36,7 @@ interface WildcardModalProps {
 }
 
 export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entryA, entryB }: WildcardModalProps) {
+  const { showToast } = useToast();
   const emptySlot: 'a' | 'b' | null = !entryA ? 'a' : !entryB ? 'b' : null;
   const bothFilled = !!entryA && !!entryB;
 
@@ -46,6 +49,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
   const [randomCompetitor, setRandomCompetitor] = useState<EliminatedCompetitor | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showWalkoverConfirm, setShowWalkoverConfirm] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -74,7 +78,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
       const data = await response.json();
       setEliminatedCompetitors(data.eliminatedCompetitors);
     } catch (err: any) {
-      alert(err.message || 'Failed to load eliminated competitors');
+      showToast(err.message || 'Não foi possível carregar competidores eliminados', 'error');
       onClose();
     } finally {
       setIsLoading(false);
@@ -82,10 +86,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
   };
 
   const handleWalkover = async () => {
-    if (!confirm('Tem certeza que deseja fazer um W.O.? O oponente presente avançará automaticamente.')) {
-      return;
-    }
-
+    setShowWalkoverConfirm(false);
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/duels/${duelId}/wildcard`, {
@@ -101,11 +102,11 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
         throw new Error(data.error || 'Failed to process walkover');
       }
 
-      alert('W.O. processado com sucesso!');
+      showToast('W.O. processado. Oponente avança.', 'success');
       onSuccess();
       onClose();
     } catch (err: any) {
-      alert(err.message || 'Failed to process walkover');
+      showToast(err.message || 'Não foi possível processar o W.O.', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -137,11 +138,11 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
         throw new Error(data.error || 'Failed to add wildcard');
       }
 
-      alert(`${selectedCompetitor.name} foi adicionado como wildcard!`);
+      showToast(`${selectedCompetitor.name} entra como wildcard.`, 'success');
       onSuccess();
       onClose();
     } catch (err: any) {
-      alert(err.message || 'Failed to add wildcard');
+      showToast(err.message || 'Não foi possível adicionar wildcard', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -149,7 +150,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
 
   const handleRandomPick = () => {
     if (eliminatedCompetitors.length === 0) {
-      alert('Não há competidores eliminados disponíveis');
+      showToast('Não há competidores eliminados disponíveis', 'error');
       return;
     }
 
@@ -182,11 +183,11 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
         throw new Error(data.error || 'Failed to add wildcard');
       }
 
-      alert(`${randomCompetitor.name} foi sorteado e adicionado como wildcard!`);
+      showToast(`${randomCompetitor.name} entra como wildcard.`, 'success');
       onSuccess();
       onClose();
     } catch (err: any) {
-      alert(err.message || 'Failed to add wildcard');
+      showToast(err.message || 'Não foi possível adicionar wildcard', 'error');
     } finally {
       setIsSubmitting(false);
     }
@@ -205,7 +206,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
 
   if (step === 'select-slot' && bothFilled && entryA && entryB) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Substituir Competidor">
+      <Modal isOpen={isOpen} onClose={onClose} title="Substituir competidor">
         <div className="space-y-4">
           <p className="text-[var(--fg-2)]">
             Qual competidor você deseja substituir?
@@ -254,7 +255,18 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
 
   if (step === 'select-type') {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Selecione Tipo de Wildcard">
+      <>
+      <ConfirmationModal
+        isOpen={showWalkoverConfirm}
+        onClose={() => setShowWalkoverConfirm(false)}
+        onConfirm={handleWalkover}
+        title="Confirmar walkover"
+        message="Tem certeza? O oponente presente avançará automaticamente."
+        confirmText="Confirmar W.O."
+        cancelText="Cancelar"
+        isLoading={isSubmitting}
+      />
+      <Modal isOpen={isOpen} onClose={onClose} title="Selecione tipo de wildcard">
         <div className="space-y-4">
           <p className="text-[var(--fg-2)]">
             {bothFilled
@@ -266,7 +278,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
             {/* Walkover Option — only when there's an empty slot */}
             {!bothFilled && (
               <button
-                onClick={handleWalkover}
+                onClick={() => setShowWalkoverConfirm(true)}
                 disabled={isSubmitting}
                 className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--warning)] hover:bg-[var(--warning-soft)] transition-colors text-left"
               >
@@ -295,7 +307,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                   <User size={24} className="text-[var(--brand)]" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-[var(--fg)]">Escolha Manual</p>
+                  <p className="font-semibold text-[var(--fg)]">Escolha manual</p>
                   <p className="text-sm text-[var(--fg-2)]">
                     Selecione um competidor eliminado para retornar
                     {eliminatedCompetitors.length === 0 && ' (nenhum disponível)'}
@@ -315,7 +327,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                   <Shuffle size={24} className="text-[var(--success)]" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-[var(--fg)]">Sorteio Aleatório</p>
+                  <p className="font-semibold text-[var(--fg)]">Sorteio aleatório</p>
                   <p className="text-sm text-[var(--fg-2)]">
                     Sistema sorteia um competidor eliminado
                     {eliminatedCompetitors.length === 0 && ' (nenhum disponível)'}
@@ -326,12 +338,13 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
           </div>
         </div>
       </Modal>
+      </>
     );
   }
 
   if (step === 'manual-pick') {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Selecione um Competidor">
+      <Modal isOpen={isOpen} onClose={onClose} title="Selecione um competidor">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-[var(--fg-2)]">
@@ -402,7 +415,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                   Adicionando...
                 </>
               ) : (
-                'Confirmar Wildcard'
+                'Confirmar wildcard'
               )}
             </Button>
           </div>
@@ -413,7 +426,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
 
   if (step === 'random-confirm' && randomCompetitor) {
     return (
-      <Modal isOpen={isOpen} onClose={onClose} title="Competidor Sorteado">
+      <Modal isOpen={isOpen} onClose={onClose} title="Competidor sorteado">
         <div className="space-y-4">
           <p className="text-[var(--fg-2)]">
             O sistema sorteou o seguinte competidor:
@@ -467,7 +480,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
               className="flex-1"
             >
               <Shuffle size={20} />
-              Sortear Novamente
+              Sortear novamente
             </Button>
             <Button
               variant="primary"

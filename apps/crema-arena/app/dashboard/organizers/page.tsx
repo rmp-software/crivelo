@@ -271,9 +271,9 @@ export default function OrganizersPage() {
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, organizer: null })}
         onConfirm={handleDelete}
-        title="Delete Organizer"
+        title="Excluir organizador"
         message={`Are you sure you want to delete ${deleteModal.organizer?.name}? This action cannot be undone.`}
-        confirmText="Delete"
+        confirmText="Excluir"
         isDanger
         isLoading={isDeleting}
       />

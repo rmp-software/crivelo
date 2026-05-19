@@ -48,7 +48,7 @@ export default function Sidebar({ user }: SidebarProps) {
             Crema Arena
           </h1>
           <p className="text-sm text-[var(--crema-200)] font-serif italic mt-1">
-            Admin Panel
+            Painel admin
           </p>
         </Link>
       </div>

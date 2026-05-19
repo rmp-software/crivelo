@@ -91,7 +91,7 @@ export default function CompetitorPoolList({
     <div className="space-y-4">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold text-[var(--fg)] mb-2">Add Competitors</h3>
+        <h3 className="text-lg font-semibold text-[var(--fg)] mb-2">Adicionar competidores</h3>
         <p className="text-sm text-[var(--fg-2)]">
           Search and select competitors from your global pool
         </p>

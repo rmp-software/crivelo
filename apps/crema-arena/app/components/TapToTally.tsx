@@ -5,6 +5,7 @@ import Button from './Button';
 import Modal from './Modal';
 import ConfirmationModal from './ConfirmationModal';
 import WildcardModal from './WildcardModal';
+import { useToast } from './Toast';
 import { Camera, Trophy, Upload, User } from 'lucide-react';
 
 interface Competitor {
@@ -38,6 +39,7 @@ interface TapToTallyProps {
 }
 
 export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyProps) {
+  const { showToast } = useToast();
   const [isStarting, setIsStarting] = useState(false);
   const [isVoting, setIsVoting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -67,7 +69,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
 
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Failed to start duel');
+      showToast(err.message || 'Não foi possível iniciar o duelo', 'error');
     } finally {
       setIsStarting(false);
     }
@@ -91,9 +93,11 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
         throw new Error(data.error || 'Failed to record vote');
       }
 
+      const newTotal = duel.votesA + duel.votesB + 1;
+      showToast(`Voto registrado. ${newTotal} de ${judgesCount} votos.`, 'success');
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Failed to record vote');
+      showToast(err.message || 'Não foi possível registrar o voto', 'error');
     } finally {
       setIsVoting(false);
     }
@@ -118,9 +122,10 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
         throw new Error(data.error || 'Failed to upload photo');
       }
 
+      showToast('Foto enviada.', 'success');
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Failed to upload photo');
+      showToast(err.message || 'Não foi possível enviar a foto', 'error');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) {
@@ -148,9 +153,10 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
       }
 
       setShowCompleteModal(false);
+      showToast(`${scoreDisplay} para ${computedWinnerName}. Vencedor avança.`, 'success');
       onRefresh();
     } catch (err: any) {
-      alert(err.message || 'Failed to complete duel');
+      showToast(err.message || 'Não foi possível encerrar o duelo', 'error');
     } finally {
       setIsCompleting(false);
     }
@@ -179,7 +185,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
                 onClick={() => setShowWildcardModal(true)}
               >
                 <User size={20} />
-                {hasEmptySlot ? 'Adicionar Wildcard' : 'Substituir com Wildcard'}
+                {hasEmptySlot ? 'Adicionar wildcard' : 'Substituir com wildcard'}
               </Button>
               <Button
                 variant="primary"
@@ -195,7 +201,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
                 ) : (
                   <>
                     <Trophy size={20} />
-                    {hasEmptySlot ? 'Iniciar (W.O.)' : 'Iniciar Duelo'}
+                    {hasEmptySlot ? 'Iniciar (W.O.)' : 'Iniciar duelo'}
                   </>
                 )}
               </Button>
@@ -221,7 +227,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
         <div className="text-center py-8">
           <Trophy size={48} className="mx-auto text-[var(--success)] mb-4" />
           <h3 className="text-xl font-semibold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
-            Duelo Concluído
+            Duelo concluído
           </h3>
           <p className="text-[var(--fg-2)]">
             Este duelo já foi finalizado
@@ -295,85 +301,32 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
               ) : (
                 <>
                   <Camera size={20} />
-                  Fotografar Copos
+                  Fotografar copos
                 </>
               )}
             </Button>
           )}
         </div>
 
-        {/* Competitors Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Competitor A */}
+        {/* Vote buttons — competitor name is the primary label */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
           {duel.entryA && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-4 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)]">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
-                  <img
-                    src={duel.entryA.competitor.photoUrl}
-                    alt={duel.entryA.competitor.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[var(--fg)] truncate">
-                    {duel.entryA.competitor.name}
-                  </h4>
-                  <p className="text-sm text-[var(--fg-2)] truncate">
-                    {duel.entryA.competitor.coffeeShop}
-                  </p>
-                  <p className="text-xs text-[var(--fg-3)] mt-1">Copa A</p>
-                </div>
-              </div>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => handleVote('A')}
-                disabled={isVoting}
-                className="w-full"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>Votar Copa A</span>
-                  <span className="text-2xl font-bold">{duel.votesA}</span>
-                </div>
-              </Button>
-            </div>
+            <VoteButton
+              competitor={duel.entryA.competitor}
+              side="A"
+              votes={duel.votesA}
+              disabled={isVoting}
+              onClick={() => handleVote('A')}
+            />
           )}
-
-          {/* Competitor B */}
           {duel.entryB && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-4 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)]">
-                <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
-                  <img
-                    src={duel.entryB.competitor.photoUrl}
-                    alt={duel.entryB.competitor.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[var(--fg)] truncate">
-                    {duel.entryB.competitor.name}
-                  </h4>
-                  <p className="text-sm text-[var(--fg-2)] truncate">
-                    {duel.entryB.competitor.coffeeShop}
-                  </p>
-                  <p className="text-xs text-[var(--fg-3)] mt-1">Copa B</p>
-                </div>
-              </div>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={() => handleVote('B')}
-                disabled={isVoting}
-                className="w-full"
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>Votar Copa B</span>
-                  <span className="text-2xl font-bold">{duel.votesB}</span>
-                </div>
-              </Button>
-            </div>
+            <VoteButton
+              competitor={duel.entryB.competitor}
+              side="B"
+              votes={duel.votesB}
+              disabled={isVoting}
+              onClick={() => handleVote('B')}
+            />
           )}
         </div>
 
@@ -391,7 +344,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
             className="w-full"
           >
             <Trophy size={20} />
-            Encerrar Duelo
+            Encerrar duelo
           </Button>
         </div>
       </div>
@@ -400,7 +353,7 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
       <Modal
         isOpen={showCompleteModal}
         onClose={() => setShowCompleteModal(false)}
-        title="Encerrar Duelo"
+        title="Encerrar duelo"
       >
         <div className="space-y-6">
           <div className="text-center py-4">
@@ -445,5 +398,59 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
         </div>
       </Modal>
     </>
+  );
+}
+
+function VoteButton({
+  competitor,
+  side,
+  votes,
+  disabled,
+  onClick,
+}: {
+  competitor: Competitor;
+  side: 'A' | 'B';
+  votes: number;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={`Votar em ${competitor.name} (Copa ${side})`}
+      className="group relative w-full text-left rounded-[var(--radius-lg)] border-2 border-[var(--border-strong)] bg-[var(--surface-raised)] p-4 md:p-5 transition-all duration-[var(--dur-base)] ease-[var(--ease-standard)] hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      <div className="flex items-center gap-4">
+        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+          <img
+            src={competitor.photoUrl}
+            alt=""
+            aria-hidden
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">
+            Copa {side}
+          </p>
+          <h4 className="text-xl md:text-2xl font-display font-bold text-[var(--fg)] leading-tight mt-0.5 line-clamp-2">
+            {competitor.name}
+          </h4>
+          <p className="text-sm font-serif italic text-[var(--fg-2)] mt-1 line-clamp-1">
+            {competitor.coffeeShop}
+          </p>
+        </div>
+        <div className="flex-shrink-0 min-w-[64px] text-right">
+          <span className="block font-mono text-4xl md:text-5xl font-semibold tabular-nums text-[var(--fg)]">
+            {votes}
+          </span>
+          <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--fg-3)] mt-0.5">
+            {votes === 1 ? 'voto' : 'votos'}
+          </span>
+        </div>
+      </div>
+    </button>
   );
 }

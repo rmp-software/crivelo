@@ -32,7 +32,7 @@ export default function NewOrganizerPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <PageHeader
-        title="Create Organizer"
+        title="Criar organizador"
         description="Add a new organizer to the system"
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },

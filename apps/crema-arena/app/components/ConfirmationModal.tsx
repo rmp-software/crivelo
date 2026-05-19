@@ -21,8 +21,8 @@ export default function ConfirmationModal({
   onConfirm,
   title,
   message,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
   isDanger = false,
   isLoading = false,
 }: ConfirmationModalProps) {
@@ -42,7 +42,7 @@ export default function ConfirmationModal({
             onClick={onConfirm}
             disabled={isLoading}
           >
-            {isLoading ? 'Processing...' : confirmText}
+            {isLoading ? 'Processando...' : confirmText}
           </Button>
         </>
       }

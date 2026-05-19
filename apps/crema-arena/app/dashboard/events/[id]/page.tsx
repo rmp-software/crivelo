@@ -306,7 +306,7 @@ export default function EventDetailPage() {
               onClick={() => router.push(`/dashboard/events/${eventId}/edit`)}
             >
               <Edit2 size={20} />
-              Editar Evento
+              Editar evento
             </Button>
           )
         }
@@ -404,7 +404,7 @@ export default function EventDetailPage() {
                 disabled={isStarting}
               >
                 <Play size={20} />
-                Iniciar Evento
+                Iniciar evento
               </Button>
             </div>
             <BracketView duels={duels} bracketSize={event.bracketSize ?? competitors.length} />
@@ -413,7 +413,7 @@ export default function EventDetailPage() {
           <Modal
             isOpen={showStartModal}
             onClose={() => setShowStartModal(false)}
-            title="Iniciar Evento"
+            title="Iniciar evento"
           >
             <div className="space-y-4">
               <p className="text-[var(--fg-2)]">
@@ -562,7 +562,7 @@ export default function EventDetailPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
-              Competidores Inscritos
+              Competidores inscritos
             </h3>
             <p className="text-sm text-[var(--fg-3)] mt-1">
               {competitors.length} {competitors.length === 1 ? 'competidor' : 'competidores'}
@@ -590,7 +590,7 @@ export default function EventDetailPage() {
             {canModify && (
               <Button variant="primary" onClick={() => setAddModal(true)}>
                 <UserPlus size={20} />
-                Adicionar Competidor
+                Adicionar competidor
               </Button>
             )}
           </div>
@@ -646,7 +646,7 @@ export default function EventDetailPage() {
       <Modal
         isOpen={addModal}
         onClose={() => setAddModal(false)}
-        title="Adicionar Competidores"
+        title="Adicionar competidores"
       >
         <CompetitorPoolList
           eventId={eventId}
@@ -660,7 +660,7 @@ export default function EventDetailPage() {
         isOpen={removeModal.isOpen}
         onClose={() => setRemoveModal({ isOpen: false, competitor: null })}
         onConfirm={handleRemoveCompetitor}
-        title="Remover Competidor"
+        title="Remover competidor"
         message={`Tem certeza que deseja remover ${removeModal.competitor?.name} deste evento?`}
         confirmText="Remover"
         isDanger

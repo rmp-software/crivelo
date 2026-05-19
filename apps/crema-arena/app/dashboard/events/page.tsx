@@ -87,7 +87,7 @@ export default function EventsPage() {
           <Link href="/dashboard/events/new">
             <Button variant="primary">
               <Plus size={20} />
-              Novo Evento
+              Novo evento
             </Button>
           </Link>
         }

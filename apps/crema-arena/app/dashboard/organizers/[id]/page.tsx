@@ -88,7 +88,7 @@ export default function EditOrganizerPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <PageHeader
-        title="Edit Organizer"
+        title="Editar organizador"
         description="Update organizer information"
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },

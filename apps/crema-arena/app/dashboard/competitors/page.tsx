@@ -109,7 +109,7 @@ export default function CompetitorsPage() {
           <Link href="/dashboard/competitors/new">
             <Button variant="primary">
               <Plus size={20} />
-              Adicionar Competidor
+              Adicionar competidor
             </Button>
           </Link>
         }
@@ -160,7 +160,7 @@ export default function CompetitorsPage() {
           action={
             !search
               ? {
-                  label: 'Adicionar Competidor',
+                  label: 'Adicionar competidor',
                   onClick: () => router.push('/dashboard/competitors/new'),
                 }
               : undefined
@@ -292,9 +292,9 @@ export default function CompetitorsPage() {
         isOpen={deleteModal.isOpen}
         onClose={() => setDeleteModal({ isOpen: false, competitor: null })}
         onConfirm={handleDelete}
-        title="Delete Competitor"
+        title="Excluir competidor"
         message={`Are you sure you want to delete ${deleteModal.competitor?.name}? This action cannot be undone.`}
-        confirmText="Delete"
+        confirmText="Excluir"
         isDanger
         isLoading={isDeleting}
       />

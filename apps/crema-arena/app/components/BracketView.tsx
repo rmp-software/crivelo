@@ -98,11 +98,26 @@ function DuelCard({ duel }: { duel: Duel }) {
     return competitor.id === duel.winner.id;
   };
 
+  const isActive = duel.status === 'in_progress';
+
   return (
-    <div className="bg-[var(--surface-raised)] border border-[var(--border)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-1)]">
+    <div
+      className={`bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-1)] ${
+        isActive ? 'border-[var(--cinnamon-500)]' : 'border border-[var(--border)]'
+      }`}
+      style={isActive ? { borderWidth: '1.5px', borderStyle: 'solid' } : undefined}
+    >
       {/* Status Badge */}
       <div className="px-3 py-2 bg-[var(--bg-2)] border-b border-[var(--border)] flex items-center justify-between">
-        <span className="text-xs text-[var(--fg-3)]">Duelo {duel.position + 1}</span>
+        <span className="text-xs text-[var(--fg-3)] flex items-center gap-1.5">
+          {isActive && (
+            <span
+              className="inline-block w-2 h-2 rounded-full bg-[var(--live)]"
+              aria-label="Duelo ao vivo"
+            />
+          )}
+          Duelo {duel.position + 1}
+        </span>
         <div className="flex items-center gap-2">
           {getStatusBadge()}
           {getWildcardBadge()}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Serif, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "./components/Toast";
 
 const bricolageGrotesque = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -41,7 +42,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${bricolageGrotesque.variable} ${instrumentSerif.variable} ${inter.variable} ${jetbrainsMono.variable}`}>
-        {children}
+        <ToastProvider>{children}</ToastProvider>
       </body>
     </html>
   );

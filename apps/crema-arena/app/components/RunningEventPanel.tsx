@@ -145,7 +145,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
               disabled={isFinishing}
             >
               <Trophy size={20} />
-              Encerrar Evento
+              Encerrar evento
             </Button>
           )}
         </div>
@@ -160,7 +160,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       <Modal
         isOpen={showFinishModal}
         onClose={() => setShowFinishModal(false)}
-        title="Encerrar Evento"
+        title="Encerrar evento"
       >
         <div className="space-y-4">
           <p className="text-[var(--fg-2)]">
@@ -199,7 +199,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       {/* Duel List */}
       <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
         <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] mb-4">
-          Todos os Duelos - {getRoundName(currentRound, totalRounds)}
+          Todos os duelos - {getRoundName(currentRound, totalRounds)}
         </h3>
 
         <div className="space-y-3">
@@ -249,7 +249,9 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                         {duel.entryA.competitor.name}
                       </p>
                       {duel.status !== 'pending' && (
-                        <p className="text-xs text-[var(--fg-3)]">{duel.votesA} votos</p>
+                        <p className="text-xs text-[var(--fg-3)]">
+                          {duel.votesA} {duel.votesA === 1 ? 'voto' : 'votos'}
+                        </p>
                       )}
                     </div>
                     {duel.winner?.id === duel.entryA.id && (
@@ -284,7 +286,9 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                         {duel.entryB.competitor.name}
                       </p>
                       {duel.status !== 'pending' && (
-                        <p className="text-xs text-[var(--fg-3)]">{duel.votesB} votos</p>
+                        <p className="text-xs text-[var(--fg-3)]">
+                          {duel.votesB} {duel.votesB === 1 ? 'voto' : 'votos'}
+                        </p>
                       )}
                     </div>
                     {duel.winner?.id === duel.entryB.id && (

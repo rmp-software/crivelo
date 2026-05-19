@@ -157,7 +157,7 @@ export default function OrganizerForm({
           variant="primary"
           disabled={isLoading}
         >
-          {isLoading ? 'Saving...' : isEdit ? 'Update Organizer' : 'Create Organizer'}
+          {isLoading ? 'Salvando...' : isEdit ? 'Atualizar organizador' : 'Criar organizador'}
         </Button>
       </div>
     </form>
