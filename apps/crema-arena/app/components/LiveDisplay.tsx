@@ -93,11 +93,14 @@ const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promis
 const tolerantFetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : null));
 
 export default function LiveDisplay({ eventId }: LiveDisplayProps) {
-  // 5s polling per spec — keep all three keys on the same cadence.
-  const swrOpts = { refreshInterval: 5000, revalidateOnFocus: false };
-  const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, swrOpts);
-  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, swrOpts);
-  const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, swrOpts);
+  // Split-cadence polling: the current-duel payload is small and the hottest
+  // (vote ticks, pour photos, duel transitions) — poll fast. Bracket and
+  // leaderboard are heavier and change less often — keep the spec's 5s.
+  const fastOpts = { refreshInterval: 1000, revalidateOnFocus: false };
+  const slowOpts = { refreshInterval: 5000, revalidateOnFocus: false };
+  const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, fastOpts);
+  const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, slowOpts);
+  const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, slowOpts);
   const loading = !data && !error;
 
   if (loading) {
