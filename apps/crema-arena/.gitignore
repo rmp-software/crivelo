@@ -55,3 +55,6 @@ next-env.d.ts
 /playwright-check.png
 /CREMA-*.txt
 /CREMA-*.md
+
+# design system handoff (local reference)
+/.design-system/
