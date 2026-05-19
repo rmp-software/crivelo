@@ -73,7 +73,7 @@ export default function EditCompetitorPage() {
     <div className="max-w-7xl mx-auto">
       <PageHeader
         title="Editar competidor"
-        description={`Update ${competitor.name}'s profile`}
+        description={`Atualize o perfil de ${competitor.name}`}
         breadcrumbs={[
           { label: 'Competidores', href: '/dashboard/competitors' },
           { label: competitor.name },

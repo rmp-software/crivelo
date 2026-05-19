@@ -49,7 +49,7 @@ export default function OrganizerForm({
     if (!formData.email.trim()) {
       newErrors.email = 'Email obrigatório';
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = 'Formato de email inválido';
     }
 
     if (!isEdit && !formData.password) {
@@ -77,7 +77,7 @@ export default function OrganizerForm({
     try {
       await onSubmit(formData);
     } catch (error: any) {
-      setServerError(error.message || 'An error occurred. Please try again.');
+      setServerError(error.message || 'Ocorreu um erro. Tente novamente.');
     } finally {
       setIsLoading(false);
     }

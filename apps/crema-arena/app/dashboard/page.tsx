@@ -53,13 +53,13 @@ export default async function DashboardPage() {
       />
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
         <Card padding="md" shadow="sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--brand-soft)]">
+          <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
+            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--brand-soft)] flex-shrink-0">
               <TrendingUp size={24} style={{ color: 'var(--brand)' }} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-[var(--fg-3)]">Total de Eventos</p>
               <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalEvents}</p>
             </div>
@@ -67,11 +67,11 @@ export default async function DashboardPage() {
         </Card>
 
         <Card padding="md" shadow="sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--live-soft)]">
+          <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
+            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--live-soft)] flex-shrink-0">
               <Users size={24} style={{ color: 'var(--live)' }} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-[var(--fg-3)]">Total de Competidores</p>
               <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalCompetitors}</p>
             </div>
@@ -79,11 +79,11 @@ export default async function DashboardPage() {
         </Card>
 
         <Card padding="md" shadow="sm">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--gold-soft)]">
+          <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
+            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--gold-soft)] flex-shrink-0">
               <Calendar size={24} style={{ color: 'var(--gold)' }} />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-sm text-[var(--fg-3)]">Eventos ao Vivo</p>
               <p className="text-2xl font-display font-bold text-[var(--fg)]">{activeEvents}</p>
             </div>
@@ -96,7 +96,7 @@ export default async function DashboardPage() {
         <h2 className="text-xl font-display font-bold text-[var(--fg)] mb-4">
           Acesso rápido
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             return (

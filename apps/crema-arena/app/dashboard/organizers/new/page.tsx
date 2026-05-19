@@ -33,11 +33,11 @@ export default function NewOrganizerPage() {
     <div className="max-w-2xl mx-auto">
       <PageHeader
         title="Criar organizador"
-        description="Add a new organizer to the system"
+        description="Adicione um novo organizador ao sistema"
         breadcrumbs={[
           { label: 'Dashboard', href: '/dashboard' },
-          { label: 'Organizers', href: '/dashboard/organizers' },
-          { label: 'New' },
+          { label: 'Organizadores', href: '/dashboard/organizers' },
+          { label: 'Novo' },
         ]}
       />
 

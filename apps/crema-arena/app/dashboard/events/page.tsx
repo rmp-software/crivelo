@@ -123,7 +123,7 @@ export default function EventsPage() {
 
       {/* Events Grid */}
       {!isLoading && !error && events.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
           {events.map((event) => (
             <Link
               key={event.id}
