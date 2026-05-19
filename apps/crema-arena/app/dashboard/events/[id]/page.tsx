@@ -7,6 +7,7 @@ import Badge from '@/app/components/Badge';
 import Modal from '@/app/components/Modal';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
+import SeedInput from '@/app/components/SeedInput';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
@@ -666,12 +667,26 @@ export default function EventDetailPage() {
                   <p className="text-sm text-[var(--fg-2)] truncate">
                     {competitor.coffeeShop}
                   </p>
-                  {competitor.seed && (
-                    <p className="text-xs text-[var(--fg-3)] mt-1">
-                      Seed: {competitor.seed}
-                    </p>
-                  )}
                 </div>
+
+                {/* Seed Editor (setup only) */}
+                {canModify && (
+                  <SeedInput
+                    entryId={competitor.entryId}
+                    eventId={eventId}
+                    seed={competitor.seed}
+                    onSaved={(s) =>
+                      setCompetitors((prev) =>
+                        prev.map((c) => (c.entryId === competitor.entryId ? { ...c, seed: s } : c))
+                      )
+                    }
+                  />
+                )}
+                {!canModify && competitor.seed != null && (
+                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">
+                    Seed {competitor.seed}
+                  </span>
+                )}
 
                 {/* Remove Button */}
                 {canModify && (

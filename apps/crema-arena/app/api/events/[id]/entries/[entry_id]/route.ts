@@ -54,13 +54,29 @@ export async function PUT(
     }
 
     // Validate seed if provided
-    let seedValue = null;
+    let seedValue: number | null = null;
     if (seed !== undefined && seed !== null && seed !== '') {
       seedValue = parseInt(seed, 10);
       if (isNaN(seedValue) || seedValue < 1) {
         return NextResponse.json(
-          { error: 'Seed must be a positive integer' },
+          { error: 'Cabeça-de-chave deve ser um número inteiro positivo' },
           { status: 400 }
+        );
+      }
+
+      // Reject duplicates within the same event.
+      const conflict = await prisma.eventEntry.findFirst({
+        where: {
+          event_id: params.id,
+          seed: seedValue,
+          id: { not: params.entry_id },
+        },
+        select: { id: true },
+      });
+      if (conflict) {
+        return NextResponse.json(
+          { error: `Já existe um competidor com cabeça-de-chave ${seedValue} neste evento` },
+          { status: 409 }
         );
       }
     }
