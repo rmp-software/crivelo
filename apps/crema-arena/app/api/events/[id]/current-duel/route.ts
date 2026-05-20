@@ -148,6 +148,7 @@ export async function GET(
             votesB: activeDuel.votes_b,
             pourPhotoUrl: activeDuel.pour_photo_url,
             startedAt: activeDuel.started_at ? activeDuel.started_at.toISOString() : null,
+            isBronzeMatch: activeDuel.is_bronze_match,
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,
@@ -167,6 +168,7 @@ export async function GET(
             id: nextDuel.id,
             round: nextDuel.round,
             position: nextDuel.position,
+            isBronzeMatch: nextDuel.is_bronze_match,
             entryA: nextDuel.entry_a
               ? {
                   id: nextDuel.entry_a.id,

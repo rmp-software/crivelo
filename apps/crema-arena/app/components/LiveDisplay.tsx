@@ -24,6 +24,7 @@ interface Duel {
   votesB: number;
   pourPhotoUrl: string | null;
   startedAt: string | null;
+  isBronzeMatch?: boolean;
   entryA: Entry | null;
   entryB: Entry | null;
 }
@@ -223,12 +224,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   // Running with active duel
   if (currentDuel && currentDuel.entryA && currentDuel.entryB) {
-    const roundLabel =
-      currentRound === totalRounds
-        ? 'Final'
-        : currentRound === totalRounds - 1
-          ? 'Semifinal'
-          : `Rodada ${currentRound} de ${totalRounds}`;
+    const roundLabel = duelSubtitle(currentDuel, currentRound, totalRounds);
     const currentRoundDuels = bracketData
       ? bracketData.duels.filter((d) => d.round === currentRound)
       : [];
@@ -293,12 +289,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
   // state (avatars + names + coffee shops + mini-bracket strip) so context isn't
   // lost. Timer area gets an "Próximo duelo" label instead of an elapsed clock.
   if (nextDuel && nextDuel.entryA && nextDuel.entryB) {
-    const roundLabel =
-      currentRound === totalRounds
-        ? 'Final'
-        : currentRound === totalRounds - 1
-          ? 'Semifinal'
-          : `Rodada ${currentRound} de ${totalRounds}`;
+    const roundLabel = duelSubtitle(nextDuel, currentRound, totalRounds);
     const currentRoundDuels = bracketData
       ? bracketData.duels.filter((d) => d.round === currentRound)
       : [];
@@ -541,6 +532,26 @@ function PourPhotoCenterpiece({
       </div>
     </div>
   );
+}
+
+/**
+ * Stage-aware subtitle for the Live Display header. Prefixes the stage of the
+ * specific duel being shown — so when the bronze (3rd place) match is active
+ * during the final round, the audience reads "Disputa de 3º lugar · Rodada 3 de 3"
+ * instead of the confusing "Final". Falls back to plain round counter for early
+ * rounds.
+ */
+function duelSubtitle(
+  duel: { round: number; isBronzeMatch?: boolean },
+  currentRound: number | null,
+  totalRounds: number,
+): string {
+  const round = currentRound ?? duel.round;
+  const roundCounter = `Rodada ${round} de ${totalRounds}`;
+  if (duel.isBronzeMatch) return `Disputa de 3º lugar · ${roundCounter}`;
+  if (duel.round === totalRounds) return `Final · ${roundCounter}`;
+  if (duel.round === totalRounds - 1) return `Semifinal · ${roundCounter}`;
+  return roundCounter;
 }
 
 function miniCardLabel(duel: BracketDuel, totalRounds: number): string {
