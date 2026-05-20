@@ -45,8 +45,14 @@ interface LeaderboardData {
 const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
 
 export default function LiveCompanion({ eventId }: LiveCompanionProps) {
-  // Default tab is set after data loads (status-aware).
+  // Default tab is status-aware once data loads. We also track whether the user
+  // has explicitly changed the tab so we don't snap them back after a manual pick.
   const [activeTab, setActiveTab] = useState<TabType>('chave');
+  const [userPickedTab, setUserPickedTab] = useState(false);
+  const pickTab = (t: TabType) => {
+    setActiveTab(t);
+    setUserPickedTab(true);
+  };
 
   // Split-cadence polling: current-duel is small and hot (vote ticks, photo,
   // transitions); bracket + leaderboard are heavier and change less often.
@@ -58,8 +64,9 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
   const loading = !currentDuelData && !error;
   const eventStatus = currentDuelData?.event?.status;
 
-  // Snap active tab to a valid one for the current event status — must run on every render
-  // (declared before any conditional return to satisfy the Rules of Hooks).
+  // Pick the default tab based on event status. Once the user has manually
+  // picked a tab, respect that and only snap back if their choice is no longer
+  // valid for the current status.
   useEffect(() => {
     if (!eventStatus) return;
     const valid: TabType[] =
@@ -68,12 +75,16 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
         : eventStatus === 'finished'
           ? ['chave', 'leaderboard']
           : ['chave'];
-    if (!valid.includes(activeTab)) {
-      setActiveTab(
-        eventStatus === 'running' ? 'ao-vivo' : eventStatus === 'finished' ? 'leaderboard' : 'chave'
-      );
+    const preferred: TabType =
+      eventStatus === 'running' ? 'ao-vivo' : eventStatus === 'finished' ? 'leaderboard' : 'chave';
+    if (!userPickedTab) {
+      // No manual pick yet: always land on the preferred tab for this status.
+      if (activeTab !== preferred) setActiveTab(preferred);
+    } else if (!valid.includes(activeTab)) {
+      // Manual pick is no longer valid (event transitioned): snap to preferred.
+      setActiveTab(preferred);
     }
-  }, [eventStatus, activeTab]);
+  }, [eventStatus, activeTab, userPickedTab]);
 
   if (loading) {
     return (
@@ -159,7 +170,7 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
           <nav className="flex gap-1 bg-[var(--bg-2)] rounded-[var(--radius-sm)] p-1" role="tablist">
             {event.status === 'running' && (
               <button
-                onClick={() => setActiveTab('ao-vivo')}
+                onClick={() => pickTab('ao-vivo')}
                 className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
                   activeTab === 'ao-vivo'
                     ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
@@ -177,7 +188,7 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
               </button>
             )}
             <button
-              onClick={() => setActiveTab('chave')}
+              onClick={() => pickTab('chave')}
               className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
                 activeTab === 'chave'
                   ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
@@ -195,7 +206,7 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             </button>
             {event.status === 'finished' && (
               <button
-                onClick={() => setActiveTab('leaderboard')}
+                onClick={() => pickTab('leaderboard')}
                 className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
                   activeTab === 'leaderboard'
                     ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'

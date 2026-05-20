@@ -278,6 +278,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
             <MiniBracketStrip
               duels={currentRoundDuels.filter((d) => d.entryA && d.entryB)}
               activeDuelId={currentDuel.id}
+              totalRounds={totalRounds}
             />
           )}
         </main>
@@ -329,6 +330,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
             <MiniBracketStrip
               duels={currentRoundDuels.filter((d) => d.entryA && d.entryB)}
               activeDuelId={nextDuel.id}
+              totalRounds={totalRounds}
             />
           )}
         </main>
@@ -541,28 +543,51 @@ function PourPhotoCenterpiece({
   );
 }
 
+function miniCardLabel(duel: BracketDuel, totalRounds: number): string {
+  if (duel.isBronzeMatch) return '3º lugar';
+  if (duel.round === totalRounds) return 'Final';
+  return `#${duel.position + 1}`;
+}
+
 function MiniBracketStrip({
   duels,
   activeDuelId,
+  totalRounds,
 }: {
   duels: BracketDuel[];
   activeDuelId: string;
+  totalRounds: number;
 }) {
+  // Sort by play order: in the final round, bronze (3rd-place playoff) plays
+  // BEFORE the grand final per standard tournament convention.
+  const ordered = [...duels].sort((a, b) => {
+    if (a.round !== b.round) return a.round - b.round;
+    if (a.round === totalRounds) {
+      if (a.isBronzeMatch && !b.isBronzeMatch) return -1;
+      if (!a.isBronzeMatch && b.isBronzeMatch) return 1;
+    }
+    return a.position - b.position;
+  });
   return (
     <div className="mt-12 w-full max-w-6xl">
       <p className="font-mono text-xs uppercase tracking-wider text-[var(--crema-300)] text-center mb-3">
         Duelos da rodada
       </p>
       <div className="flex flex-wrap items-stretch justify-center gap-3">
-        {duels.map((d) => (
-          <MiniBracketCard key={d.id} duel={d} isActive={d.id === activeDuelId} />
+        {ordered.map((d) => (
+          <MiniBracketCard
+            key={d.id}
+            duel={d}
+            isActive={d.id === activeDuelId}
+            label={miniCardLabel(d, totalRounds)}
+          />
         ))}
       </div>
     </div>
   );
 }
 
-function MiniBracketCard({ duel, isActive }: { duel: BracketDuel; isActive: boolean }) {
+function MiniBracketCard({ duel, isActive, label }: { duel: BracketDuel; isActive: boolean; label: string }) {
   const isCompleted = duel.status === 'completed' || duel.status === 'walkover';
   const winnerId = duel.winner?.id ?? null;
 
@@ -577,8 +602,8 @@ function MiniBracketCard({ duel, isActive }: { duel: BracketDuel; isActive: bool
       className={`relative flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] border ${containerCls}`}
       style={{ minWidth: 260, maxWidth: 360 }}
     >
-      <span className="font-mono tabular-nums text-[10px] md:text-xs text-[var(--crema-300)] absolute -top-2 left-3 bg-[var(--espresso-900)] px-1 rounded">
-        #{duel.position + 1}
+      <span className="font-mono tabular-nums text-[10px] md:text-xs text-[var(--crema-300)] absolute -top-2 left-3 bg-[var(--espresso-900)] px-1 rounded whitespace-nowrap">
+        {label}
       </span>
       <MiniCompetitorRow entry={duel.entryA} isWinner={winnerId === duel.entryA?.id} />
       <div className="flex flex-col items-center justify-center px-1 flex-shrink-0">
