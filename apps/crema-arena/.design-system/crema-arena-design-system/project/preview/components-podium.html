@@ -1,0 +1,148 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Podium · live display final</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors the finished-event surface in app/components/LiveDisplay.tsx —
+   * 5-position podium on espresso. Slots take their intrinsic height; the row
+   * aligns them to a single bottom floor. The head block (avatar → name →
+   * shop) sits directly on top of the riser, no gap. 1st-place is naturally
+   * taller because the "Vencedor" stamp seal sits above the avatar in flow.
+   */
+  .stage {
+    background:var(--espresso-900); color:var(--crema-50);
+    border-radius:var(--radius-lg);
+    padding:48px 40px 0;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .stage h1 {
+    font-family:var(--font-display); font-weight:700;
+    font-size:36px; color:var(--crema-50); text-align:center;
+    letter-spacing:-0.02em; margin:0;
+  }
+  .stage .sub {
+    margin-top:4px;
+    font-family:var(--font-serif); font-style:italic; font-size:22px;
+    color:var(--marigold-500);
+  }
+  .stage .date {
+    margin-top:4px; font-size:13px; color:var(--crema-300);
+  }
+
+  /* Bottoms-align floor — each slot's intrinsic height is its content height. */
+  .row {
+    display:flex; align-items:flex-end; justify-content:center;
+    gap:16px; width:100%; max-width:840px; margin-top:48px;
+  }
+
+  .slot {
+    display:flex; flex-direction:column; align-items:center;
+    width:160px;
+  }
+  .slot.first  { width:200px; }
+  .slot.flank  { width:140px; opacity:.95; }
+
+  /* Stamp seal — sits ABOVE the 1st-place avatar in flow, on its own circle. */
+  .stamp {
+    width:84px; height:84px; border-radius:999px; background:var(--crema-50);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--shadow-1);
+    margin-bottom:-8px; /* slight overlap onto the avatar below */
+  }
+  .stamp img { width:88%; height:88%; }
+
+  .photo {
+    position:relative;
+    border-radius:999px; overflow:hidden; box-shadow:var(--shadow-2);
+    display:flex; align-items:center; justify-content:center;
+    background:var(--espresso-700); color:var(--crema-200);
+    font-family:var(--font-display); font-weight:700;
+  }
+  .slot.first  .photo { width:140px; height:140px; border:6px solid var(--marigold-500); font-size:36px; }
+  .slot.second .photo { width:112px; height:112px; border:4px solid var(--crema-300);   font-size:28px; }
+  .slot.third  .photo { width:104px; height:104px; border:4px solid var(--cinnamon-500); font-size:26px; }
+  .slot.flank  .photo { width:80px;  height:80px;  border:2px solid var(--espresso-500); font-size:20px; }
+
+  .name {
+    margin-top:14px;
+    font-family:var(--font-display); font-weight:700;
+    color:var(--crema-50); text-align:center; letter-spacing:-0.01em;
+    line-height:1.2;
+  }
+  .slot.first  .name { font-size:20px; }
+  .slot.second .name, .slot.third .name { font-size:16px; }
+  .slot.flank  .name { font-size:14px; }
+
+  .shop {
+    margin-top:4px;
+    font-family:var(--font-serif); font-style:italic; font-size:13px;
+    color:var(--crema-200); text-align:center;
+    line-height:1.2;
+  }
+  .slot.flank .shop { font-size:12px; }
+
+  /* Riser sits directly under the shop label. Heights vary for the stagger
+   * we want; bottoms all hit the row's flex-end floor. */
+  .riser {
+    margin-top:16px; width:100%;
+    border-top-left-radius:var(--radius-sm); border-top-right-radius:var(--radius-sm);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:700; color:var(--espresso-900);
+    font-feature-settings:"tnum";
+  }
+  .slot.first  .riser { background:var(--marigold-500); height:120px; font-size:52px; }
+  .slot.second .riser { background:var(--crema-300);   height:90px;  font-size:42px; }
+  .slot.third  .riser { background:var(--cinnamon-500); color:#fff;  height:72px; font-size:34px; }
+  .slot.flank  .riser { background:var(--espresso-700); color:var(--crema-100); height:50px; font-size:22px; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:620px;padding:0;background:transparent">
+  <div class="stage">
+    <h1>TNT Casa do Lucas</h1>
+    <div class="sub">Resultado final</div>
+    <div class="date">20 de maio de 2026</div>
+
+    <div class="row">
+      <!-- 4th flank -->
+      <div class="slot flank">
+        <div class="photo">SR</div>
+        <div class="name">Pequeno Bambu</div>
+        <div class="shop">Muy</div>
+        <div class="riser">4</div>
+      </div>
+
+      <!-- 2nd -->
+      <div class="slot second">
+        <div class="photo">KM</div>
+        <div class="name">Kamys</div>
+        <div class="shop">Estação I4</div>
+        <div class="riser">2</div>
+      </div>
+
+      <!-- 1st -->
+      <div class="slot first">
+        <div class="stamp"><img src="../assets/stamp-seal.svg" alt="Vencedor"></div>
+        <div class="photo">LC</div>
+        <div class="name">Lucas</div>
+        <div class="shop">Independente</div>
+        <div class="riser">1</div>
+      </div>
+
+      <!-- 3rd -->
+      <div class="slot third">
+        <div class="photo">JM</div>
+        <div class="name">Ju Morgado</div>
+        <div class="shop">Três</div>
+        <div class="riser">3</div>
+      </div>
+
+      <!-- 5th flank -->
+      <div class="slot flank">
+        <div class="photo">GB</div>
+        <div class="name">Gabs</div>
+        <div class="shop">Muy</div>
+        <div class="riser">5</div>
+      </div>
+    </div>
+  </div>
+</div>
+</body></html>

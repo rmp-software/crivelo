@@ -1,0 +1,134 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Tap to tally</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/TapToTally.tsx — head-judge captures one vote per tap on a competitor card. */
+  .tally {
+    background:var(--surface-raised); border:1px solid var(--border);
+    border-radius:var(--radius-lg); box-shadow:var(--shadow-1);
+    padding:24px; width:100%; max-width:720px; margin:0 auto;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  .tally h3 {
+    font-family:var(--font-display); font-weight:700; font-size:20px; color:var(--fg);
+    letter-spacing:-0.01em; margin:0;
+  }
+  .tally .help { font-size:13px; color:var(--fg-3); }
+
+  .pour-stub {
+    background:repeating-linear-gradient(135deg, var(--bg-2) 0 14px, var(--bg-3) 14px 28px);
+    border-radius:var(--radius-md); height:140px; display:flex; align-items:center; justify-content:center;
+    color:var(--fg-3); font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+  }
+
+  .sides { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+
+  .vote-btn {
+    display:flex; align-items:center; gap:16px;
+    background:var(--surface-raised); border:2px solid var(--border-strong);
+    border-radius:var(--radius-lg); padding:18px; cursor:pointer; text-align:left;
+    transition: all var(--dur-base) var(--ease-standard);
+  }
+  .vote-btn:hover { border-color:var(--brand); background:var(--brand-soft); }
+  .vote-btn:active { transform:translateY(1px); }
+
+  .avatar {
+    width:80px; height:80px; border-radius:999px; overflow:hidden;
+    background:var(--bg-2); border:2px solid var(--border); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--fg-3); font-family:var(--font-display); font-weight:700; font-size:24px;
+  }
+  .vote-info { flex:1; min-width:0; }
+  .vote-info .name {
+    font-family:var(--font-display); font-weight:700; font-size:22px;
+    color:var(--fg); line-height:1.1; letter-spacing:-0.01em;
+  }
+  .vote-info .shop {
+    font-family:var(--font-serif); font-style:italic; font-size:14px;
+    color:var(--fg-2); margin-top:4px;
+  }
+  .count-block { text-align:right; flex-shrink:0; }
+  .count-block .n {
+    display:block; font-family:var(--font-mono); font-size:44px; font-weight:600;
+    color:var(--fg); line-height:1; font-feature-settings:"tnum"; letter-spacing:-0.02em;
+  }
+  .count-block .l {
+    display:block; font-family:var(--font-mono); font-size:10px; font-weight:500;
+    color:var(--fg-3); text-transform:uppercase; letter-spacing:.1em; margin-top:4px;
+  }
+
+  .undo {
+    align-self:center; display:inline-flex; align-items:center; gap:6px;
+    background:none; border:none; cursor:pointer;
+    font-family:var(--font-mono); font-size:11px; font-weight:500;
+    color:var(--fg-3); text-transform:uppercase; letter-spacing:.08em;
+    padding:6px 12px;
+  }
+  .undo:hover { color:var(--fg); }
+  .undo .minus { font-size:14px; line-height:1; }
+
+  .footer {
+    border-top:1px solid var(--border); padding-top:16px; display:flex; flex-direction:column; gap:10px;
+  }
+  .pending { font-size:13px; color:var(--fg-3); text-align:center; }
+  .close {
+    width:100%; height:52px; border:none; border-radius:var(--radius-md);
+    background:var(--brand); color:var(--fg-inverse);
+    font-family:var(--font-body); font-weight:500; font-size:18px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center; gap:10px;
+  }
+  .close:hover { background:var(--brand-hover); }
+  .ico { width:1em; height:1em; stroke:currentColor; fill:none; stroke-width:1.75; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:480px">
+  <div class="tally">
+    <div>
+      <h3>Duelo 5 · Rodada 2</h3>
+      <div class="help">Toque no copo escolhido pelo jurado. Um toque = um voto.</div>
+    </div>
+
+    <div class="pour-stub">[foto dos copos servidos · 16:9]</div>
+
+    <div class="sides">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="vote-btn">
+          <div class="avatar">CT</div>
+          <div class="vote-info">
+            <div class="name">Cléo Trani</div>
+            <div class="shop">Veloso Café</div>
+          </div>
+          <div class="count-block">
+            <span class="n">2</span>
+            <span class="l">votos</span>
+          </div>
+        </button>
+        <button class="undo"><span class="minus">−</span> Remover voto</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="vote-btn" style="border-color:var(--border)">
+          <div class="avatar">JV</div>
+          <div class="vote-info">
+            <div class="name">Júlia Vasques</div>
+            <div class="shop">Octavio Café</div>
+          </div>
+          <div class="count-block">
+            <span class="n">1</span>
+            <span class="l">voto</span>
+          </div>
+        </button>
+        <button class="undo"><span class="minus">−</span> Remover voto</button>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="pending">3 de 3 votos · pronto para encerrar</div>
+      <button class="close">
+        <svg class="ico" viewBox="0 0 24 24"><path d="M6 9V6a3 3 0 0 1 6 0v3"/><path d="M5 9h14l-1 11H6Z"/></svg>
+        Encerrar duelo
+      </button>
+    </div>
+  </div>
+</div>
+</body></html>

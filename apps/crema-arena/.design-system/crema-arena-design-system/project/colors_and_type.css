@@ -1,0 +1,226 @@
+/* Crema Arena — Color + Type Tokens
+ * Mobile-first. All tokens are :root scoped.
+ * Pair with fonts.css (Google Fonts import).
+ */
+
+@import url('./fonts.css');
+
+:root {
+  /* ---------- Color: raw palette ---------- */
+  /* Espresso — near-black brown. Used for text, ink, deep surfaces. */
+  --espresso-900: #1F1410;
+  --espresso-800: #2C1D17;
+  --espresso-700: #3E2A22;
+  --espresso-600: #5A3F33;
+  --espresso-500: #7A5A4A;
+
+  /* Crema / cream — primary background family. */
+  --crema-50:  #FBF6EA;   /* default bg */
+  --crema-100: #F5ECD8;   /* bg-2 */
+  --crema-200: #EADBC0;   /* latte / bg-3 */
+  --crema-300: #DCC59E;   /* warm divider */
+  --crema-400: #C7AB7C;   /* muted on-cream */
+
+  /* Cinnamon — primary brand accent (rust). */
+  --cinnamon-50:  #FBEEE5;
+  --cinnamon-100: #F5D5BE;
+  --cinnamon-300: #E1885A;
+  --cinnamon-500: #C45A2C;   /* brand */
+  --cinnamon-600: #A8471E;
+  --cinnamon-700: #823516;
+
+  /* Marigold — gold accent (wins, scoring highlights). */
+  --marigold-100: #FAE7B6;
+  --marigold-300: #F0C56C;
+  --marigold-500: #E6A636;   /* gold */
+  --marigold-700: #B07A1E;
+
+  /* Mint — live / success. Used sparingly. */
+  --mint-100: #D2E8DC;
+  --mint-500: #4F8C72;
+  --mint-700: #2F6A52;
+
+  /* Cherry — eliminated / error. Used sparingly. */
+  --cherry-100: #F3CFC8;
+  --cherry-500: #B83A2E;
+  --cherry-700: #8A2620;
+
+  /* ---------- Semantic surface + ink ---------- */
+  --bg:           var(--crema-50);
+  --bg-2:         var(--crema-100);
+  --bg-3:         var(--crema-200);
+  --bg-inverse:   var(--espresso-900);
+
+  --surface:      var(--crema-50);
+  --surface-raised: #FFFCF3; /* slightly lifted card */
+  --surface-sunken: var(--crema-100);
+
+  --fg:           var(--espresso-900);
+  --fg-2:         var(--espresso-700);
+  --fg-3:         var(--espresso-500);
+  --fg-4:         #B8A89E;          /* lightest ink — empty-state placeholders */
+  --fg-muted:     #6B5A4F;
+  --fg-inverse:   var(--crema-50);
+
+  --border:       rgba(31, 20, 16, 0.12);
+  --border-strong: rgba(31, 20, 16, 0.24);
+  --border-cinnamon: var(--cinnamon-500);
+
+  /* ---------- Semantic intent ---------- */
+  --brand:        var(--cinnamon-500);
+  --brand-hover:  var(--cinnamon-600);
+  --brand-press:  var(--cinnamon-700);
+  --brand-soft:   var(--cinnamon-50);
+
+  --gold:         var(--marigold-500);
+  --gold-soft:    var(--marigold-100);
+
+  --live:         var(--mint-500);
+  --live-soft:    var(--mint-100);
+
+  --danger:       var(--cherry-500);
+  --danger-soft:  var(--cherry-100);
+
+  /* Aliases the production app emits as `success` / `warning` Badge variants —
+   * keep them in lock-step with the live/gold intents. */
+  --success:      var(--mint-500);
+  --success-soft: var(--mint-100);
+  --warning:      var(--marigold-500);
+  --warning-soft: var(--marigold-100);
+
+  /* ---------- Focus ---------- */
+  --focus-ring:   var(--cinnamon-500);
+
+  /* ---------- Radii ---------- */
+  --radius-xs:    6px;
+  --radius-sm:    10px;
+  --radius-md:    18px;
+  --radius-lg:    28px;
+  --radius-full:  999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
+  --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+  --shadow-inset: inset 0 1px 0 rgba(255, 252, 243, 0.6);
+
+  /* ---------- Spacing scale (4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---------- Motion ---------- */
+  --ease-standard: cubic-bezier(.2,.7,.2,1);
+  --ease-overshoot: cubic-bezier(.34,1.56,.64,1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-stage: 320ms;
+
+  /* ---------- Type: families ---------- */
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-serif:   'Instrument Serif', 'Times New Roman', serif;
+  --font-body:    'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ---------- Type: scale ---------- */
+  --fs-display:   clamp(40px, 8vw, 64px);
+  --fs-h1:        clamp(30px, 5.5vw, 44px);
+  --fs-h2:        clamp(24px, 4vw, 32px);
+  --fs-h3:        20px;
+  --fs-h4:        17px;
+  --fs-body:      16px;
+  --fs-small:     14px;
+  --fs-xs:        12px;
+  --fs-mono-lg:   28px;
+  --fs-mono:      15px;
+
+  --lh-tight:     1.05;
+  --lh-snug:      1.2;
+  --lh-body:      1.5;
+  --lh-loose:     1.65;
+
+  --tracking-display: -0.02em;
+  --tracking-caps:    0.08em;
+}
+
+/* ---------- Element-level semantic styles ---------- */
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+  font-family: var(--font-display);
+  color: var(--fg);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: var(--lh-tight);
+}
+.editorial {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+h1, .h1 { font-size: var(--fs-h1); }
+h2, .h2 { font-size: var(--fs-h2); }
+h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-snug); letter-spacing: -0.01em; }
+h4, .h4 { font-size: var(--fs-h4); line-height: var(--lh-snug); letter-spacing: -0.005em; font-weight: 600; }
+
+p { margin: 0 0 var(--space-4); text-wrap: pretty; color: var(--fg-2); }
+
+.lead { font-size: 18px; line-height: var(--lh-loose); color: var(--fg-2); }
+.small, small { font-size: var(--fs-small); color: var(--fg-3); }
+.caption {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-weight: 600;
+  color: var(--fg-3);
+}
+
+code, .mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum", "zero";
+  font-size: var(--fs-mono);
+}
+.score {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-lg);
+  font-weight: 600;
+  font-feature-settings: "tnum", "zero";
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+a { color: var(--brand); text-decoration: none; }
+a:hover { color: var(--brand-hover); text-decoration: underline; text-underline-offset: 3px; }
+
+::selection { background: var(--cinnamon-100); color: var(--espresso-900); }
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

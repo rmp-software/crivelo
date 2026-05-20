@@ -1,0 +1,30 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Motion</title><link rel="stylesheet" href="_card.css">
+<style>
+  @keyframes pourSpin { to { transform: rotate(360deg); } }
+  .spinner { position:relative; width:64px; height:64px; }
+  .spinner::before, .spinner::after, .spinner > span {
+    content:""; position:absolute; inset:0; border:2px solid transparent; border-top-color:var(--cinnamon-500); border-radius:50%;
+    animation: pourSpin 1.4s linear infinite;
+  }
+  .spinner::after { inset:8px; border-top-color:var(--marigold-500); animation-duration: 2.1s; animation-direction:reverse; }
+  .spinner > span { inset:16px; border-top-color:var(--espresso-900); animation-duration: 3.2s; display:block; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:200px">
+  <div class="row" style="gap:24px;align-items:center;justify-content:space-around;width:100%">
+    <div class="stack" style="align-items:center;gap:10px">
+      <div class="spinner"><span></span></div>
+      <div class="caption">Crema rings loader</div>
+    </div>
+    <div class="stack" style="gap:8px;flex:1;max-width:340px">
+      <div class="token-row"><span class="name">--ease-standard</span><span class="val">cubic-bezier(.2,.7,.2,1)</span></div>
+      <div class="token-row"><span class="name">--ease-overshoot</span><span class="val">.34,1.56,.64,1</span></div>
+      <div class="token-row"><span class="name">--dur-fast</span><span class="val">120ms</span></div>
+      <div class="token-row"><span class="name">--dur-base</span><span class="val">180ms</span></div>
+      <div class="token-row"><span class="name">--dur-stage</span><span class="val">320ms</span></div>
+    </div>
+  </div>
+</div>
+</body></html>

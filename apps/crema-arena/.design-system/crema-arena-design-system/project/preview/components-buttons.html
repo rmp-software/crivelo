@@ -1,0 +1,79 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Buttons</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Button.tsx — 4 variants × 3 sizes. */
+  .btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:var(--font-body); font-weight:500;
+    border:1px solid transparent; cursor:pointer;
+    transition: background var(--dur-base) var(--ease-standard),
+                border-color var(--dur-base) var(--ease-standard),
+                box-shadow var(--dur-base) var(--ease-standard),
+                transform var(--dur-fast) var(--ease-standard);
+    touch-action: manipulation;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; }
+
+  /* Variants */
+  .btn-primary { background:var(--brand); color:var(--fg-inverse); box-shadow:0 1px 2px rgba(31,20,16,.08); }
+  .btn-primary:hover { background:var(--brand-hover); box-shadow:var(--shadow-1); }
+  .btn-primary:active { background:var(--brand-press); }
+
+  .btn-secondary { background:var(--bg-2); color:var(--fg); border-color:var(--border-strong); }
+  .btn-secondary:hover { background:var(--bg-3); border-color:var(--brand); }
+
+  .btn-danger { background:var(--danger); color:#fff; box-shadow:0 1px 2px rgba(31,20,16,.08); }
+  .btn-danger:hover { background:#9E2F24; box-shadow:var(--shadow-1); }
+
+  .btn-ghost { background:transparent; color:var(--fg-2); border-color:transparent; }
+  .btn-ghost:hover { background:var(--bg-2); color:var(--fg); }
+
+  /* Sizes — min-heights match touch-target minimums in Button.tsx */
+  .btn-sm { font-size:14px; padding:6px 12px; border-radius:var(--radius-xs); min-height:36px; gap:6px; }
+  .btn-md { font-size:16px; padding:8px 16px; border-radius:var(--radius-sm); min-height:44px; gap:8px; }
+  .btn-lg { font-size:18px; padding:12px 24px; border-radius:var(--radius-md); min-height:52px; gap:10px; }
+
+  .ico { width:1em; height:1em; stroke-width:1.75; stroke:currentColor; fill:none; }
+
+  .row-label { font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-3); min-width:80px; }
+  .stack-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:240px;gap:16px">
+  <div class="stack-row">
+    <span class="row-label">Primary</span>
+    <button class="btn btn-primary btn-sm">Iniciar bateria</button>
+    <button class="btn btn-primary btn-md">
+      <svg class="ico" viewBox="0 0 24 24"><polygon points="13 19 22 12 13 5 13 9 2 9 2 15 13 15"/></svg>
+      Encerrar duelo
+    </button>
+    <button class="btn btn-primary btn-lg">Confirmar 2 × 1</button>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Secondary</span>
+    <button class="btn btn-secondary btn-sm">Cancelar</button>
+    <button class="btn btn-secondary btn-md">Adicionar wildcard</button>
+    <button class="btn btn-secondary btn-lg">Inscrever competidor</button>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Danger</span>
+    <button class="btn btn-danger btn-sm">Apagar</button>
+    <button class="btn btn-danger btn-md">Desclassificar</button>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Ghost</span>
+    <button class="btn btn-ghost btn-sm">Voltar</button>
+    <button class="btn btn-ghost btn-md">Pular</button>
+    <button class="btn btn-primary btn-md" disabled>Bloqueado · 2 / 3</button>
+  </div>
+
+  <div class="caption" style="margin-top:4px">
+    primary · secondary · danger · ghost — sm 36 / md 44 / lg 52 (touch-target floor)
+  </div>
+</div>
+</body></html>

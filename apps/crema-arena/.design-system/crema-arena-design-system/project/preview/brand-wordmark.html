@@ -1,0 +1,57 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Wordmark</title><link rel="stylesheet" href="_card.css">
+<style>
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    color: var(--fg);
+  }
+  .ring-mark {
+    width: 56px; height: 56px; flex-shrink: 0;
+  }
+  .ring-mark circle { fill: none; }
+  .word {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    line-height: 1;
+  }
+  .crema {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 60px;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+    line-height: 1;
+  }
+  .arena {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 48px;
+    letter-spacing: -0.035em;
+    color: var(--brand);
+    line-height: 1;
+    /* visually align the bricolage baseline with the serif baseline */
+    position: relative;
+    top: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="card" style="justify-content:center;align-items:center;gap:14px;min-height:200px;padding:28px 22px">
+  <div class="lockup">
+    <svg class="ring-mark" viewBox="0 0 56 56" aria-hidden="true">
+      <circle cx="28" cy="28" r="26" fill="none" stroke="var(--fg)" stroke-width="2"/>
+      <circle cx="28" cy="28" r="18" fill="none" stroke="var(--brand)" stroke-width="2"/>
+      <circle cx="28" cy="28" r="10" fill="none" stroke="var(--gold)" stroke-width="2"/>
+      <circle cx="28" cy="28" r="4" fill="var(--fg)"/>
+    </svg>
+    <div class="word">
+      <span class="crema">Crema</span><span class="arena">Arena</span>
+    </div>
+  </div>
+  <div class="caption" style="text-align:center;margin-top:4px">Instrument Serif Italic · Bricolage Grotesque 800</div>
+</div>
+</body></html>

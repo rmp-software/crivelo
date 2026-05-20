@@ -49,6 +49,10 @@ The Crema Arena design system lives in `app/globals.css` as CSS variables + `tai
 
 The full spec — including the canonical pt-BR copy, color tokens, typography rules, badge variants, and the per-surface layout contracts — is committed at `app_spec.txt`. Treat it as the source of truth when something seems wrong.
 
+### Design system bundle (`.design-system/`)
+
+Visual reference for the brand lives at `.design-system/crema-arena-design-system/` — exported from claude.ai/design and selectively committed (fonts/, chats/, uploads/, `*.bak-*/` stay ignored). Contains the brand `README.md` (voice, glossary, visual foundations), `preview/*.html` (standalone component previews), `ui_kits/{live_display,organizer_dashboard,audience_companion}/` (design prototypes), `assets/` (vector source for brand SVGs — same as `public/assets/`), and `colors_and_type.css` / `fonts.css`. **Use these as visual reference only — implement against `app/`.** To refresh from a new handoff URL, invoke the `design-system-sync` skill.
+
 ### Copy and locale rules (often-violated)
 
 - All user-facing text is pt-BR. Address as "você", short imperative verbs.
@@ -78,4 +82,5 @@ Photo uploads (competitor portraits, duel pour photos) go through
 - **Playwright validation artifacts** (screenshots, console logs, snapshots) all live in `.playwright-mcp/` — that directory is gitignored. When taking screenshots with `browser_take_screenshot` or saving any validation asset, save into `.playwright-mcp/` (e.g. `.playwright-mcp/val-livedisplay-1920.png`). Don't drop PNGs at the repo root.
 - Remote `origin` is `git@github.com:rmp-software/crema-arena.git`; `personal` points at the LucasRMP fork.
 - `prisma/migrations` IS committed (don't reintroduce it to `.gitignore`).
-- The brand SVG assets (`trophy.svg`, `stamp-seal.svg`, `rings.svg`, `wordmark.svg`, `monogram.svg`) referenced in `app_spec.txt` are NOT in `public/assets/` yet — current code substitutes Lucide icons (`Crown`, `Trophy`). If a real asset shows up, prefer it over the icon substitute.
+- The brand SVG assets (`trophy.svg`, `stamp-seal.svg`, `rings.svg`, `wordmark.svg`, `monogram.svg`) live in `public/assets/`. Some legacy spots in `app/` still use Lucide substitutes (`Crown`, `Trophy`) — prefer the real asset when touching those.
+- **Design skills:** `.claude/skills/crema-arena-design/` (invoke for any UI/design task; grounded in `app/` and references the bundle for visual reference) and `.claude/skills/design-system-sync/` (refresh / clean / remove the bundle from a new claude.ai/design handoff URL). Both committed.

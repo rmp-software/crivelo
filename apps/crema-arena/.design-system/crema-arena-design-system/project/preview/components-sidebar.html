@@ -1,0 +1,120 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sidebar nav</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Sidebar.tsx — espresso panel with crema text and a
+   * cinnamon-700 fill for the active route. Light-variant wordmark inside.
+   */
+  .frame {
+    display:flex; gap:18px; width:100%; max-width:760px; margin:0 auto;
+    height:480px;
+  }
+  .sb {
+    width:260px; min-height:100%; background:var(--espresso-900);
+    color:var(--crema-50); display:flex; flex-direction:column;
+    border-radius:var(--radius-md); overflow:hidden;
+  }
+  .sb-head {
+    padding:20px; border-bottom:1px solid var(--espresso-700);
+  }
+  .mark {
+    display:inline-flex; align-items:center; gap:10px;
+  }
+  .mark img { width:32px; height:32px; }
+  .mark .label {
+    font-size:22px; line-height:1;
+  }
+  .mark .crema { font-family:var(--font-serif); font-style:italic; color:var(--crema-50); }
+  .mark .arena { font-family:var(--font-display); font-weight:800; color:var(--brand); margin-left:4px; }
+  .role {
+    margin-top:8px; font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--crema-300);
+  }
+
+  .sb-nav { flex:1; padding:14px 10px; display:flex; flex-direction:column; gap:4px; }
+  .sb-item {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 12px; border-radius:var(--radius-sm);
+    color:var(--crema-100); font-size:14px; font-weight:500; text-decoration:none;
+    cursor:pointer; transition: background var(--dur-base) var(--ease-standard), color var(--dur-base) var(--ease-standard);
+    min-height:44px;
+  }
+  .sb-item:hover { background:var(--espresso-700); color:var(--crema-50); }
+  .sb-item.active { background:var(--cinnamon-700); color:var(--crema-50); }
+  .ico { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.75; flex-shrink:0; }
+
+  .sb-foot { padding:14px; border-top:1px solid var(--espresso-700); }
+  .who {
+    display:flex; flex-direction:column; gap:2px; padding:0 8px 12px;
+  }
+  .who .name { font-weight:500; font-size:14px; color:var(--crema-50); }
+  .who .em   { font-size:12px; color:var(--crema-200); }
+  .who .role-tag { font-size:11px; color:var(--brand); margin-top:4px; text-transform:capitalize; }
+  .logout {
+    width:100%; min-height:36px; padding:8px 12px;
+    display:inline-flex; align-items:center; gap:8px;
+    background:transparent; border:none; cursor:pointer;
+    color:var(--crema-100); font-size:14px; font-weight:500; border-radius:var(--radius-sm);
+  }
+  .logout:hover { background:var(--espresso-700); color:var(--crema-50); }
+
+  /* Plate to anchor sidebar on cream surface */
+  .plate {
+    flex:1; background:var(--bg-2); border-radius:var(--radius-md);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--fg-3); font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    padding:24px;
+  }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:520px;padding:24px">
+  <div class="frame">
+    <aside class="sb" role="navigation" aria-label="Menu principal">
+      <div class="sb-head">
+        <div class="mark">
+          <img src="../assets/monogram.svg" alt="" aria-hidden="true">
+          <span class="label"><span class="crema">Crema</span><span class="arena">Arena</span></span>
+        </div>
+        <div class="role">Painel admin</div>
+      </div>
+
+      <nav class="sb-nav">
+        <a class="sb-item">
+          <svg class="ico" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          Dashboard
+        </a>
+        <a class="sb-item">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Competidores
+        </a>
+        <a class="sb-item active">
+          <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Eventos
+        </a>
+        <a class="sb-item">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/></svg>
+          Organizadores
+        </a>
+      </nav>
+
+      <div class="sb-foot">
+        <div class="who">
+          <span class="name">Julia Ramos</span>
+          <span class="em">julia@crema-arena.com</span>
+          <span class="role-tag">admin</span>
+        </div>
+        <button class="logout">
+          <svg class="ico" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sair
+        </button>
+      </div>
+    </aside>
+
+    <div class="plate">[conteúdo da página]</div>
+  </div>
+
+  <div class="caption" style="margin-top:14px;text-align:center">
+    Espresso panel · crema text · cinnamon-700 fill on active route · 44px touch-target floor
+  </div>
+</div>
+</body></html>

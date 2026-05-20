@@ -1,0 +1,217 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Bracket cells</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/BracketView.tsx — vertical mobile-first DuelCard:
+   * status header → competitor slot → "VS" rail → competitor slot.
+   */
+  .col { display:flex; flex-direction:column; gap:18px; min-width:280px; }
+  .col-head {
+    font-family:var(--font-display); font-weight:600; font-size:15px; color:var(--fg);
+    text-align:center;
+  }
+  .col-head .count { font-size:12px; color:var(--fg-3); font-weight:500; font-family:var(--font-body); display:block; margin-top:2px; }
+
+  .duel {
+    background:var(--surface-raised); border:1px solid var(--border);
+    border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--shadow-1);
+  }
+  .duel.active { border:1.5px solid var(--brand); }
+
+  .duel .head {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 12px; background:var(--bg-2); border-bottom:1px solid var(--border);
+    font-size:12px; color:var(--fg-3);
+  }
+  .duel .head .left { display:flex; align-items:center; gap:6px; }
+  .duel .head .dot { width:6px; height:6px; border-radius:999px; background:var(--live); }
+  .duel .head .badges { display:flex; gap:6px; }
+
+  .badge {
+    display:inline-flex; align-items:center; padding:2px 8px; border-radius:var(--radius-full);
+    font-size:11px; font-weight:500; white-space:nowrap;
+  }
+  .badge-default { background:var(--bg-3); color:var(--fg-2); }
+  .badge-success { background:var(--success-soft); color:var(--success); }
+  .badge-warning { background:var(--warning-soft); color:var(--warning); }
+
+  .slot { padding:12px; display:flex; align-items:center; gap:12px; }
+  .slot.winner { background:var(--success-soft); border-left:4px solid var(--success); }
+  .slot-vs {
+    padding:4px 12px; background:var(--bg); text-align:center;
+    font-size:11px; font-weight:600; color:var(--fg-3); letter-spacing:.08em; text-transform:uppercase;
+  }
+
+  .av {
+    width:40px; height:40px; border-radius:999px; overflow:hidden;
+    background:var(--bg-2); border:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; color:var(--fg-3); font-family:var(--font-display); font-weight:700; font-size:14px;
+  }
+  .av.empty { background:transparent; }
+
+  .slot-info { flex:1; min-width:0; }
+  .slot-name { font-weight:600; font-size:14px; color:var(--fg); display:flex; align-items:center; gap:6px; }
+  .slot-shop { font-size:12px; color:var(--fg-3); }
+
+  .votes-pill {
+    flex-shrink:0; padding:4px 10px; border-radius:var(--radius-sm);
+    font-family:var(--font-mono); font-size:14px; font-weight:600; font-feature-settings:"tnum";
+    background:var(--bg-2); color:var(--fg-2);
+  }
+  .votes-pill.win { background:var(--success); color:#fff; }
+
+  .ico { width:14px; height:14px; stroke:currentColor; fill:none; stroke-width:1.75; }
+  .ico-trophy { color:var(--success); }
+
+  /* Mini bracket card (live-display variant) — espresso surface */
+  .mini-strip {
+    background:var(--espresso-900); padding:24px; border-radius:var(--radius-md);
+    display:flex; flex-direction:column; gap:14px; margin-top:6px;
+  }
+  .mini-label {
+    font-family:var(--font-mono); font-size:10px; font-weight:500;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--crema-300);
+    text-align:center;
+  }
+  .mini-row { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .mini {
+    position:relative; display:flex; align-items:center; gap:10px;
+    min-width:240px; max-width:300px;
+    padding:10px 12px; border:1px solid var(--espresso-500);
+    border-radius:var(--radius-md);
+  }
+  .mini.active { border-color:var(--brand); background:rgba(196,90,44,.10); }
+  .mini.done   { border-color:transparent; background:var(--espresso-700); }
+  .mini .tag {
+    position:absolute; top:-8px; left:12px;
+    background:var(--espresso-900); color:var(--crema-300);
+    font-family:var(--font-mono); font-size:10px; padding:0 4px; white-space:nowrap;
+  }
+  .mini .av { width:32px; height:32px; border:1px solid var(--crema-200); font-size:12px; color:var(--crema-100); background:var(--espresso-700); }
+  .mini .av.winner { border-color:var(--marigold-500); }
+  .mini .name-line { display:flex; flex-direction:column; min-width:0; flex:1; }
+  .mini .nm { font-family:var(--font-display); font-weight:600; font-size:13px; color:var(--crema-100); line-height:1.1; }
+  .mini .nm.winner { color:var(--crema-50); }
+  .mini .sh { font-family:var(--font-serif); font-style:italic; font-size:11px; color:var(--crema-300); line-height:1.1; }
+  .mini .x  { font-family:var(--font-mono); font-size:10px; color:var(--crema-300); }
+  .mini .sc { font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--crema-50); }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:520px;gap:14px">
+  <div class="row" style="gap:24px;align-items:stretch;justify-content:center;flex-wrap:wrap">
+
+    <div class="col">
+      <div class="col-head">Rodada 2 <span class="count">4 duelos</span></div>
+
+      <div class="duel active">
+        <div class="head">
+          <span class="left"><span class="dot"></span>Duelo 1</span>
+          <span class="badges"><span class="badge badge-default">Em andamento</span></span>
+        </div>
+        <div class="slot winner">
+          <div class="av">MO</div>
+          <div class="slot-info">
+            <div class="slot-name">Marina Okada
+              <svg class="ico ico-trophy" viewBox="0 0 24 24"><path d="M6 9H4a2 2 0 0 0-2 2v0a4 4 0 0 0 4 4h0M18 9h2a2 2 0 0 1 2 2v0a4 4 0 0 1-4 4h0M6 2h12v7a6 6 0 0 1-12 0Z"/><path d="M9 22h6M12 17v5"/></svg>
+            </div>
+            <div class="slot-shop">Coffee Lab</div>
+          </div>
+          <div class="votes-pill win">2</div>
+        </div>
+        <div class="slot-vs">VS</div>
+        <div class="slot">
+          <div class="av">TL</div>
+          <div class="slot-info">
+            <div class="slot-name">Tom Lemos</div>
+            <div class="slot-shop">Onça Café</div>
+          </div>
+          <div class="votes-pill">1</div>
+        </div>
+      </div>
+
+      <div class="duel">
+        <div class="head">
+          <span class="left">Duelo 2</span>
+          <span class="badges"><span class="badge badge-success">Concluído</span></span>
+        </div>
+        <div class="slot winner">
+          <div class="av">LB</div>
+          <div class="slot-info"><div class="slot-name">Lucas Brandão</div><div class="slot-shop">Suplicy</div></div>
+          <div class="votes-pill win">3</div>
+        </div>
+        <div class="slot-vs">VS</div>
+        <div class="slot">
+          <div class="av">SR</div>
+          <div class="slot-info"><div class="slot-name">Sofia Rocha</div><div class="slot-shop">Coffee Town</div></div>
+          <div class="votes-pill">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="col-head">Semifinal <span class="count">2 duelos</span></div>
+
+      <div class="duel">
+        <div class="head">
+          <span class="left">Duelo 1</span>
+          <span class="badges"><span class="badge badge-default">Pendente</span></span>
+        </div>
+        <div class="slot">
+          <div class="av">MO</div>
+          <div class="slot-info"><div class="slot-name">Marina Okada</div><div class="slot-shop">Coffee Lab</div></div>
+        </div>
+        <div class="slot-vs">VS</div>
+        <div class="slot">
+          <div class="av empty">—</div>
+          <div class="slot-info"><div class="slot-name" style="color:var(--fg-3)">A definir</div></div>
+        </div>
+      </div>
+
+      <div class="duel">
+        <div class="head">
+          <span class="left">Duelo 2</span>
+          <span class="badges"><span class="badge badge-warning">W.O.</span></span>
+        </div>
+        <div class="slot winner">
+          <div class="av">LB</div>
+          <div class="slot-info"><div class="slot-name">Lucas Brandão</div><div class="slot-shop">Suplicy</div></div>
+          <div class="votes-pill win">—</div>
+        </div>
+        <div class="slot-vs">VS</div>
+        <div class="slot">
+          <div class="av empty">—</div>
+          <div class="slot-info"><div class="slot-name" style="color:var(--fg-3)">Sem oponente</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="mini-strip">
+    <div class="mini-label">Duelos da rodada · live display variant</div>
+    <div class="mini-row">
+      <div class="mini active">
+        <span class="tag">#1</span>
+        <div class="av winner">MO</div>
+        <div class="name-line"><span class="nm winner">Marina Okada</span><span class="sh">Coffee Lab</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><span class="x">×</span></div>
+        <div class="name-line"><span class="nm">Tom Lemos</span><span class="sh">Onça Café</span></div>
+        <div class="av">TL</div>
+      </div>
+      <div class="mini done">
+        <span class="tag">#2</span>
+        <div class="av winner">LB</div>
+        <div class="name-line"><span class="nm winner">Lucas Brandão</span><span class="sh">Suplicy</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center"><span class="x">×</span><span class="sc">3–0</span></div>
+        <div class="name-line"><span class="nm">Sofia Rocha</span><span class="sh">Coffee Town</span></div>
+        <div class="av">SR</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="caption" style="margin-top:6px">
+    Light variant lives in the dashboard chave · dark mini variant sits at the bottom of the TV display
+  </div>
+</div>
+</body></html>
