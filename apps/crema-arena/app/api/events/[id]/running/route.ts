@@ -87,9 +87,12 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Find current round (first round with pending or in_progress duels)
-    let currentRound = 1;
+    // Find current round (first round with pending or in_progress duels).
+    // Fallback: when every duel is complete, the "current round" is the final
+    // round — so the panel header reads "Final" and lists the final-round duels
+    // instead of falling back to round 1.
     const totalRounds = event.bracket_size ? Math.log2(event.bracket_size) : 0;
+    let currentRound = totalRounds || 1;
 
     for (let round = 1; round <= totalRounds; round++) {
       const roundDuels = event.duels.filter((d) => d.round === round);

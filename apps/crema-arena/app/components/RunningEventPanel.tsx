@@ -146,8 +146,11 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
               {duels.filter((d) => d.status === 'completed').length} de {duels.length} duelos concluídos
             </p>
           </div>
-          {/* Only allow ending the event once the FINAL round is complete. */}
-          {allDuelsCompleted && currentRound === totalRounds && (
+          {/* Manual fallback — the complete-duel handler auto-finishes the
+              event when every duel is done, but expose the button anyway in
+              case auto-finish ever fails or the event has been manually
+              backfilled into a stuck state. */}
+          {allDuelsCompleted && (
             <Button
               variant="primary"
               onClick={() => setShowFinishModal(true)}
