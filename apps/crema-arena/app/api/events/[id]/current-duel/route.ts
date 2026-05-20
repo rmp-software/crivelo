@@ -110,11 +110,24 @@ export async function GET(
       }
     }
 
+    // In the final round, bronze (3rd-place playoff) plays BEFORE the grand
+    // final per standard tournament convention. Comparator pushes bronze first
+    // when both are in the same round; positional order otherwise.
+    const playOrder = (a: typeof duels[number], b: typeof duels[number]) => {
+      if (a.round !== b.round) return a.round - b.round;
+      if (a.round === totalRounds) {
+        if (a.is_bronze_match && !b.is_bronze_match) return -1;
+        if (!a.is_bronze_match && b.is_bronze_match) return 1;
+      }
+      return a.position - b.position;
+    };
+    const orderedDuels = [...duels].sort(playOrder);
+
     // Find active duel (in_progress)
-    const activeDuel = duels.find((d) => d.status === 'in_progress');
+    const activeDuel = orderedDuels.find((d) => d.status === 'in_progress');
 
     // If no active duel, find next pending duel
-    const nextDuel = activeDuel || duels.find((d) => d.status === 'pending');
+    const nextDuel = activeDuel || orderedDuels.find((d) => d.status === 'pending');
 
     return NextResponse.json({
       event: {
@@ -135,6 +148,7 @@ export async function GET(
             votesB: activeDuel.votes_b,
             pourPhotoUrl: activeDuel.pour_photo_url,
             startedAt: activeDuel.started_at ? activeDuel.started_at.toISOString() : null,
+            isBronzeMatch: activeDuel.is_bronze_match,
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,
@@ -154,6 +168,7 @@ export async function GET(
             id: nextDuel.id,
             round: nextDuel.round,
             position: nextDuel.position,
+            isBronzeMatch: nextDuel.is_bronze_match,
             entryA: nextDuel.entry_a
               ? {
                   id: nextDuel.entry_a.id,

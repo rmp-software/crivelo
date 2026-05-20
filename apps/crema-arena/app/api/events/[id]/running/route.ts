@@ -102,10 +102,20 @@ export async function GET(
       }
     }
 
-    // Get duels for current round
-    const currentRoundDuels = event.duels.filter((d) => d.round === currentRound);
+    // Get duels for current round, ordered for play. In the final round the
+    // bronze (3rd-place) match plays BEFORE the grand final, then positional
+    // order — standard tournament convention.
+    const currentRoundDuels = event.duels
+      .filter((d) => d.round === currentRound)
+      .sort((a, b) => {
+        if (currentRound === totalRounds) {
+          if (a.is_bronze_match && !b.is_bronze_match) return -1;
+          if (!a.is_bronze_match && b.is_bronze_match) return 1;
+        }
+        return a.position - b.position;
+      });
 
-    // Find active duel (first in_progress, or first pending)
+    // Find active duel (first in_progress, or first pending — in play order)
     const activeDuel =
       currentRoundDuels.find((d) => d.status === 'in_progress') ||
       currentRoundDuels.find((d) => d.status === 'pending') ||

@@ -231,35 +231,8 @@ export default function AoVivoTab({
         </div>
       )}
 
-      {/* Compact history: other duels in the current round — exclude walkovers
-          (only show real head-to-head duels with both slots filled). */}
-      {(() => {
-        const others = roundDuels.filter(
-          (d) => (!currentDuel || d.id !== currentDuel.id) && !!d.entryA && !!d.entryB
-        );
-        const completed = others
-          .filter((d) => d.status === 'completed')
-          .sort((a, b) => b.position - a.position); // newest first by position desc
-        const pending = others.filter((d) => d.status === 'pending' || d.status === 'in_progress');
-        if (completed.length === 0 && pending.length === 0) return null;
-        return (
-          <div>
-            <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">
-              Duelos da rodada
-            </h3>
-            <div className="space-y-2">
-              {completed.map((d) => (
-                <CompactDuelRow key={d.id} duel={d} state="completed" />
-              ))}
-              {pending.map((d) => (
-                <CompactDuelRow key={d.id} duel={d} state="pending" />
-              ))}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Next Duel */}
+      {/* Next Duel — surfaced ABOVE the round list so the audience always
+          sees the upcoming matchup at the top of the tab. */}
       {!currentDuel && nextDuel && (
         <div>
           <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">Próximo duelo</h3>
@@ -316,6 +289,34 @@ export default function AoVivoTab({
           </div>
         </div>
       )}
+
+      {/* Compact history: other duels in the current round — excludes walkovers
+          (only shows real head-to-head duels with both slots filled). */}
+      {(() => {
+        const others = roundDuels.filter(
+          (d) => (!currentDuel || d.id !== currentDuel.id) && !!d.entryA && !!d.entryB
+        );
+        const completed = others
+          .filter((d) => d.status === 'completed')
+          .sort((a, b) => b.position - a.position); // newest first by position desc
+        const pending = others.filter((d) => d.status === 'pending' || d.status === 'in_progress');
+        if (completed.length === 0 && pending.length === 0) return null;
+        return (
+          <div>
+            <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">
+              Duelos da rodada
+            </h3>
+            <div className="space-y-2">
+              {completed.map((d) => (
+                <CompactDuelRow key={d.id} duel={d} state="completed" />
+              ))}
+              {pending.map((d) => (
+                <CompactDuelRow key={d.id} duel={d} state="pending" />
+              ))}
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
