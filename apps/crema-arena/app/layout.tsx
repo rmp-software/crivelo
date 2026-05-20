@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { ToastProvider } from "./components/Toast";
+
+// Only emit Vercel Analytics from the production deploy. Vercel sets
+// VERCEL_ENV to 'production' | 'preview' | 'development' automatically; gating
+// here prevents preview deploys and `npm run dev` from polluting the dataset.
+const isProduction = process.env.VERCEL_ENV === "production";
 
 // Crema Arena design system fonts — local files in /public/fonts/
 const bricolageGrotesque = localFont({
@@ -53,6 +59,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${bricolageGrotesque.variable} ${instrumentSerif.variable} ${geistSans.variable} ${geistMono.variable}`}>
         <ToastProvider>{children}</ToastProvider>
+        {isProduction && <Analytics />}
       </body>
     </html>
   );
