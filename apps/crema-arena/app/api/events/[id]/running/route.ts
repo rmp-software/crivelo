@@ -115,10 +115,11 @@ export async function GET(
         return a.position - b.position;
       });
 
-    // Find active duel (first in_progress, or first pending — in play order)
+    // Find active duel (first in_progress, or first pending — in play order).
+    // Skip duels the organizer has deferred (`deferred_at != null`).
     const activeDuel =
-      currentRoundDuels.find((d) => d.status === 'in_progress') ||
-      currentRoundDuels.find((d) => d.status === 'pending') ||
+      currentRoundDuels.find((d) => d.status === 'in_progress' && d.deferred_at == null) ||
+      currentRoundDuels.find((d) => d.status === 'pending' && d.deferred_at == null) ||
       null;
 
     // Check if all duels are completed
@@ -159,6 +160,7 @@ export async function GET(
         votesA: duel.votes_a,
         votesB: duel.votes_b,
         pourPhotoUrl: duel.pour_photo_url,
+        deferredAt: duel.deferred_at?.toISOString() ?? null,
         wildcardType: duel.wildcard_type,
         isBronzeMatch: duel.is_bronze_match,
         entryA: duel.entry_a

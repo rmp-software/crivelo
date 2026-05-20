@@ -123,11 +123,16 @@ export async function GET(
     };
     const orderedDuels = [...duels].sort(playOrder);
 
-    // Find active duel (in_progress)
-    const activeDuel = orderedDuels.find((d) => d.status === 'in_progress');
+    // Skip duels the organizer has explicitly deferred (deferred_at != null).
+    // Status is preserved server-side; deferral just removes them from active
+    // selection until the organizer clicks "Retomar".
+    const notDeferred = (d: typeof duels[number]) => d.deferred_at == null;
 
-    // If no active duel, find next pending duel
-    const nextDuel = activeDuel || orderedDuels.find((d) => d.status === 'pending');
+    // Find active duel (in_progress, not deferred)
+    const activeDuel = orderedDuels.find((d) => d.status === 'in_progress' && notDeferred(d));
+
+    // If no active duel, find next pending duel (not deferred)
+    const nextDuel = activeDuel || orderedDuels.find((d) => d.status === 'pending' && notDeferred(d));
 
     return NextResponse.json({
       event: {
