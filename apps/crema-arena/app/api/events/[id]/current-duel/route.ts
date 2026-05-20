@@ -95,9 +95,10 @@ export async function GET(
       orderBy: [{ round: 'asc' }, { position: 'asc' }],
     });
 
-    // Find current round (first round with pending or in_progress duels)
-    let currentRound = 1;
+    // Find current round (first round with pending or in_progress duels).
+    // Fallback to totalRounds so headers stay sensible once everything is done.
     const totalRounds = event.bracket_size ? Math.log2(event.bracket_size) : 0;
+    let currentRound = totalRounds || 1;
 
     for (let round = 1; round <= totalRounds; round++) {
       const roundDuels = duels.filter((d) => d.round === round);

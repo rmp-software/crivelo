@@ -118,6 +118,22 @@ export async function POST(
           data: updateData,
         });
       }
+
+      // Auto-finish: if this was the last incomplete duel in the event, flip
+      // event.status → 'finished' inside the same transaction so the dashboard
+      // and live surfaces see it within their next polling tick.
+      const incomplete = await tx.duel.count({
+        where: {
+          event_id: duel.event.id,
+          status: { in: ['pending', 'in_progress'] },
+        },
+      });
+      if (incomplete === 0) {
+        await tx.event.update({
+          where: { id: duel.event.id },
+          data: { status: 'finished' },
+        });
+      }
     });
 
     return NextResponse.json({
