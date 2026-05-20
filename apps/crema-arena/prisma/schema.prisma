@@ -139,6 +139,7 @@ model Duel {
   pour_photo_url  String?
   started_at      DateTime?
   completed_at    DateTime?
+  deferred_at     DateTime?
   created_at      DateTime      @default(now())
 
   event           Event         @relation(fields: [event_id], references: [id], onDelete: Cascade)

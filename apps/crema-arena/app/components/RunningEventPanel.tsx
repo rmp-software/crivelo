@@ -32,6 +32,7 @@ interface Duel {
   entryB: Entry | null;
   winner?: Entry | null;
   isBronzeMatch?: boolean;
+  deferredAt?: string | null;
 }
 
 interface RunningEventPanelProps {
@@ -45,8 +46,6 @@ const runningFetcher = (url: string) =>
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
-  // Client-side deferred duels (session-scoped — resets on reload).
-  const [deferredIds, setDeferredIds] = useState<Set<string>>(new Set());
 
   const { data, mutate: fetchRunningData } = useSWR(
     `/api/events/${eventId}/running`,
@@ -57,36 +56,30 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   const currentRound = data?.currentRound ?? 1;
   const totalRounds = data?.totalRounds ?? 1;
   const judgesCount = data?.judgesCount ?? 3;
-  const serverActiveDuel: Duel | null = data?.activeDuel ?? null;
+  const activeDuel: Duel | null = data?.activeDuel ?? null;
   const duels: Duel[] = data?.duels ?? [];
   const allDuelsCompleted: boolean = data?.allDuelsCompleted ?? false;
   const isLoading = !data;
 
-  // Pick the first non-deferred pending/in_progress duel; fall back to server's choice.
-  const activeDuel: Duel | null = (() => {
-    if (!serverActiveDuel) return null;
-    if (!deferredIds.has(serverActiveDuel.id)) return serverActiveDuel;
-    const next = duels.find(
-      (d) =>
-        (d.status === 'pending' || d.status === 'in_progress') &&
-        !deferredIds.has(d.id)
-    );
-    return next ?? serverActiveDuel;
-  })();
-
-  const handleSkipDuel = (id: string) => {
-    setDeferredIds((prev) => {
-      const next = new Set(prev);
-      next.add(id);
-      return next;
-    });
+  // Defer / resume now live on the server (Duel.deferred_at) so the Live Display
+  // and companion follow the organizer's skip decisions in real time.
+  const handleSkipDuel = async (id: string) => {
+    try {
+      const r = await fetch(`/api/duels/${id}/defer`, { method: 'POST' });
+      if (!r.ok) throw new Error((await r.json()).error || 'Falha ao adiar duelo');
+      await fetchRunningData();
+    } catch (err) {
+      console.error(err);
+    }
   };
-  const handleResumeDuel = (id: string) => {
-    setDeferredIds((prev) => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
-    });
+  const handleResumeDuel = async (id: string) => {
+    try {
+      const r = await fetch(`/api/duels/${id}/defer`, { method: 'DELETE' });
+      if (!r.ok) throw new Error((await r.json()).error || 'Falha ao retomar duelo');
+      await fetchRunningData();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleFinishEvent = async () => {
@@ -176,7 +169,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
             (d) =>
               d.id !== activeDuel.id &&
               (d.status === 'pending' || d.status === 'in_progress') &&
-              !deferredIds.has(d.id)
+              !d.deferredAt
           ) && (
             <div className="flex justify-end">
               <Button
@@ -248,25 +241,27 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                   : 'border-[var(--border)] bg-[var(--surface)]'
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between mb-3 gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
                   <span className="font-semibold text-[var(--fg)]">
                     {duel.isBronzeMatch ? 'Disputa de 3º lugar' : `Duelo ${duel.position + 1}`}
                   </span>
                   {getStatusBadge(duel.status)}
-                  {deferredIds.has(duel.id) && (
+                  {duel.deferredAt && (
                     <Badge variant="warning">Adiado</Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  {deferredIds.has(duel.id) && (
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  {duel.deferredAt && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleResumeDuel(duel.id)}
+                      aria-label="Retomar duelo"
                     >
                       <RotateCcw size={14} />
-                      Retomar duelo
+                      <span className="hidden sm:inline">Retomar duelo</span>
+                      <span className="sm:hidden">Retomar</span>
                     </Button>
                   )}
                   {duel.status === 'in_progress' && (
