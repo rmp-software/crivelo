@@ -241,8 +241,8 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                   : 'border-[var(--border)] bg-[var(--surface)]'
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
+              <div className="flex items-start justify-between mb-3 gap-2 flex-wrap">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
                   <span className="font-semibold text-[var(--fg)]">
                     {duel.isBronzeMatch ? 'Disputa de 3º lugar' : `Duelo ${duel.position + 1}`}
                   </span>
@@ -251,15 +251,17 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                     <Badge variant="warning">Adiado</Badge>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-shrink-0">
                   {duel.deferredAt && (
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleResumeDuel(duel.id)}
+                      aria-label="Retomar duelo"
                     >
                       <RotateCcw size={14} />
-                      Retomar duelo
+                      <span className="hidden sm:inline">Retomar duelo</span>
+                      <span className="sm:hidden">Retomar</span>
                     </Button>
                   )}
                   {duel.status === 'in_progress' && (
