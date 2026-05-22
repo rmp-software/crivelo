@@ -7,6 +7,7 @@ import Badge from '@/app/components/Badge';
 import Modal from '@/app/components/Modal';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
+import EventSponsorsSection from '@/app/components/EventSponsorsSection';
 import SeedInput from '@/app/components/SeedInput';
 import RunningTopBar from '@/app/components/RunningTopBar';
 import EventStatStrip from '@/app/components/EventStatStrip';
@@ -14,7 +15,10 @@ import NowPouring from '@/app/components/NowPouring';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { useToast } from '@/app/components/Toast';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
+
+type PoolCompetitor = { id: string; name: string; coffeeShop: string; photoUrl: string };
 
 interface EventData {
   id: string;
@@ -70,6 +74,7 @@ interface Duel {
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { showToast } = useToast();
   const eventId = params.id as string;
 
   const [event, setEvent] = useState<EventData | null>(null);
@@ -84,6 +89,8 @@ export default function EventDetailPage() {
   const [showStartModal, setShowStartModal] = useState(false);
 
   const [addModal, setAddModal] = useState(false);
+  // Picks that failed a partial-failure add — re-selected when the picker reopens.
+  const [retrySelection, setRetrySelection] = useState<PoolCompetitor[]>([]);
   const [removeModal, setRemoveModal] = useState<{ isOpen: boolean; competitor: Competitor | null }>({
     isOpen: false,
     competitor: null,
@@ -126,46 +133,63 @@ export default function EventDetailPage() {
     }
   }, [eventId]);
 
-  const handleAddCompetitor = async (pool: { id: string; name: string; coffeeShop: string; photoUrl: string }) => {
-    // Optimistic insert — show in the inscribed list immediately, keep modal open.
-    const tempEntryId = `temp-${pool.id}-${Date.now()}`;
-    const optimistic: Competitor = {
-      entryId: tempEntryId,
-      id: pool.id,
-      name: pool.name,
-      coffeeShop: pool.coffeeShop,
-      photoUrl: pool.photoUrl,
-      seed: null,
-      status: 'active',
-    };
-    setCompetitors((prev) => [...prev, optimistic]);
+  // Inscribe the picker's whole selection in one bulk request: optimistic insert,
+  // single POST, then reconcile against the canonical entries the server returns.
+  // On failure the entire optimistic batch rolls back and the picks are re-selected.
+  const handleAddCompetitors = async (pool: PoolCompetitor[]) => {
+    const tempIds = new Set(pool.map((p) => `temp-${p.id}`));
+    setCompetitors((prev) => [
+      ...prev,
+      ...pool.map((p) => ({
+        entryId: `temp-${p.id}`,
+        id: p.id,
+        name: p.name,
+        coffeeShop: p.coffeeShop,
+        photoUrl: p.photoUrl,
+        seed: null,
+        status: 'active',
+      })),
+    ]);
 
     try {
-      const response = await fetch(`/api/events/${eventId}/entries`, {
+      const response = await fetch(`/api/events/${eventId}/entries/bulk`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ competitor_id: pool.id }),
+        body: JSON.stringify({ competitor_ids: pool.map((p) => p.id) }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Falha ao inscrever competidores');
+      }
+      const data = await response.json();
+      const returned: Competitor[] = (data.entries ?? []).map((e: any) => ({
+        entryId: e.entryId,
+        id: e.competitorId,
+        name: e.name,
+        coffeeShop: e.coffeeShop,
+        photoUrl: e.photoUrl,
+        seed: e.seed ?? null,
+        status: e.status ?? 'active',
+      }));
+
+      // Swap the optimistic temps for the real entries, de-duping by competitor id.
+      setCompetitors((prev) => {
+        const withoutTemps = prev.filter((c) => !tempIds.has(c.entryId));
+        const present = new Set(withoutTemps.map((c) => c.id));
+        return [...withoutTemps, ...returned.filter((c) => !present.has(c.id))];
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Falha ao inscrever competidor');
-      }
-
-      const entry = await response.json();
-      // Replace the optimistic placeholder with the server-provided entryId.
-      setCompetitors((prev) =>
-        prev.map((c) =>
-          c.entryId === tempEntryId
-            ? { ...c, entryId: entry.entryId, seed: entry.seed ?? null, status: entry.status ?? 'active' }
-            : c
-        )
+      showToast(
+        pool.length === 1 ? '1 competidor inscrito.' : `${pool.length} competidores inscritos.`,
+        'success'
       );
+      setRetrySelection([]);
+      setAddModal(false);
     } catch (err: any) {
-      // Roll back the optimistic insert and surface the error.
-      setCompetitors((prev) => prev.filter((c) => c.entryId !== tempEntryId));
-      alert(err.message || 'Falha ao inscrever competidor');
-      throw err;
+      // Roll back the whole optimistic batch and keep the picks for retry.
+      setCompetitors((prev) => prev.filter((c) => !tempIds.has(c.entryId)));
+      setRetrySelection(pool);
+      showToast(err.message || 'Falha ao inscrever competidores', 'error');
     }
   };
 
@@ -752,7 +776,10 @@ export default function EventDetailPage() {
           {canModify && (
             <Button
               variant="primary"
-              onClick={() => setAddModal(true)}
+              onClick={() => {
+                setRetrySelection([]);
+                setAddModal(true);
+              }}
             >
               <UserPlus size={20} />
               Adicionar
@@ -768,7 +795,13 @@ export default function EventDetailPage() {
               Adicione competidores do seu pool global
             </p>
             {canModify && (
-              <Button variant="primary" onClick={() => setAddModal(true)}>
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setRetrySelection([]);
+                  setAddModal(true);
+                }}
+              >
                 <UserPlus size={20} />
                 Adicionar competidor
               </Button>
@@ -836,15 +869,26 @@ export default function EventDetailPage() {
         )}
       </div>
 
+      {/* Event Sponsors Section */}
+      <EventSponsorsSection eventId={eventId} canModify={canModify} />
+
       {/* Add Competitor Modal */}
       <Modal
         isOpen={addModal}
-        onClose={() => setAddModal(false)}
+        onClose={() => {
+          setRetrySelection([]);
+          setAddModal(false);
+        }}
         title="Adicionar competidores"
       >
         <CompetitorPoolList
           registeredCompetitorIds={registeredCompetitorIds}
-          onAddCompetitor={handleAddCompetitor}
+          initialSelected={retrySelection}
+          onConfirm={handleAddCompetitors}
+          onCancel={() => {
+            setRetrySelection([]);
+            setAddModal(false);
+          }}
         />
       </Modal>
 

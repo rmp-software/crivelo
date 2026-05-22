@@ -10,6 +10,8 @@
  * input emitted, so consumers don't need to change.
  */
 
+import { useState, useEffect } from 'react';
+
 interface DateTime24hProps {
   label: string;
   value: string; // 'YYYY-MM-DDTHH:MM' or '' (empty)
@@ -45,12 +47,27 @@ export default function DateTime24h({
   error,
   required,
 }: DateTime24hProps) {
-  const { date, hour, minute } = split(value);
+  const { date } = split(value);
+
+  // Hour/minute live in local state so a time picked *before* the date sticks.
+  // join() returns '' without a date, so a time-first selection would otherwise
+  // be silently discarded the moment it round-trips through `value`.
+  const [hour, setHour] = useState(() => split(value).hour);
+  const [minute, setMinute] = useState(() => split(value).minute);
+
+  // Re-sync from an externally-changed value (e.g. the edit form hydrating).
+  useEffect(() => {
+    const s = split(value);
+    setHour(s.hour);
+    setMinute(s.minute);
+  }, [value]);
 
   const update = (next: { date?: string; hour?: string; minute?: string }) => {
     const d = next.date ?? date;
     const h = next.hour ?? hour;
     const m = next.minute ?? minute;
+    if (next.hour !== undefined) setHour(next.hour);
+    if (next.minute !== undefined) setMinute(next.minute);
     onChange(join(d, h, m));
   };
 

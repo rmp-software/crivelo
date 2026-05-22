@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: crema-arena-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: crema
+      POSTGRES_PASSWORD: crema_dev
+      POSTGRES_DB: crema_arena
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crema -d crema_arena"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  postgres-data:

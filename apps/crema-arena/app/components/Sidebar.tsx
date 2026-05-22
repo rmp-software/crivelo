@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
-import { Menu, X, Users, Calendar, Building2, LogOut } from 'lucide-react';
+import { Menu, X, Users, Calendar, Building2, Megaphone, LogOut } from 'lucide-react';
 import Button from './Button';
 import Wordmark from './Wordmark';
 
@@ -25,6 +25,7 @@ export default function Sidebar({ user }: SidebarProps) {
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Menu, exact: true },
     { href: '/dashboard/competitors', label: 'Competidores', icon: Users },
+    { href: '/dashboard/sponsors', label: 'Patrocinadores', icon: Megaphone },
     { href: '/dashboard/events', label: 'Eventos', icon: Calendar },
     ...(isAdmin ? [{ href: '/dashboard/organizers', label: 'Organizadores', icon: Building2 }] : []),
   ];

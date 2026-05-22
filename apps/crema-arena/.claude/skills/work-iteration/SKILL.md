@@ -43,7 +43,10 @@ else
   git pull origin feature/<slug> 2>/dev/null || true  # may not exist on remote yet
 fi
 # Create sub-branch off feature
-git checkout -b feature/<slug>/<issue-identifier-lowercase>
+# Use a HYPHEN, not a slash, between <slug> and <issue-id>: git refs can't be both
+# a file and a directory at the same path. `feature/<slug>` as a branch blocks
+# `feature/<slug>/<issue-id>` from being created. Hyphen avoids the collision.
+git checkout -b feature/<slug>-<issue-identifier-lowercase>
 ```
 
 **Never branch directly off main for a sub-issue.** Always off the feature branch.
@@ -84,6 +87,7 @@ Description (includes acceptance criteria and test steps):
    - For UI work: navigate to the page, exercise the new behavior in the UI, take a screenshot. Save to `.playwright-mcp/<issue-id>-<step>.png`.
    - For API work: drive the UI that calls the route (preferred), OR call the route via `fetch()` from the browser console using `mcp__playwright__browser_evaluate` / `mcp__plugin_chrome-devtools-mcp_chrome-devtools__evaluate_script`, OR capture the request via `browser_network_requests` / `list_network_requests`. Always inside a browser context.
    - For server-only changes (migrations, jobs, internal libs with no HTTP surface): exercise the change through a page that triggers it via the browser, OR write a temporary script that the test runner executes. No raw shell HTTP either way.
+   - **Evidence artifact paths (strict):** EVERY artifact you write — screenshots, evidence JSON, network logs — MUST live under `.playwright-mcp/` and be named `<issue-id>-<label>.<ext>` (e.g. `.playwright-mcp/rmp-110-evidence.json`). That directory is gitignored; the repo root is NOT. A bare relative filename (e.g. `evidence.json`) resolves to the repo root and pollutes the working tree — do not do this. When a tool only accepts a filename (some screenshot tools default to their own output dir), still pass a path beginning `.playwright-mcp/`. Before you finish, run `ls .playwright-mcp/<issue-id>-*` to confirm every artifact landed there, and `git status --short` to confirm you left NO new files at the repo root.
 5. Report back with:
    - Files changed (paths only)
    - Evidence artifacts (paths to screenshots, command outputs)
@@ -102,6 +106,7 @@ Before invoking the reviewer, double-check what the coding agent reported:
 - Read each evidence artifact path it cited — confirm the files exist.
 - Run `git diff` and review the actual changes — they must match what the agent claimed to change.
 - Run `npx tsc --noEmit` yourself once more. If it errors, do not proceed.
+- **Sweep stray evidence files.** Run `git status --short` and check for any new files at the repo root (or outside `.playwright-mcp/`) that are clearly evidence artifacts — coding subagents sometimes write `*-evidence.json` / `*.png` to cwd despite instructions. Move them into `.playwright-mcp/` (`mv <file> .playwright-mcp/`) so the working tree stays clean and they don't get committed. Only the actual source changes should remain staged for the sub-PR.
 
 If anything is missing or fabricated, treat it as a retry (go to Step 7 with a coder retry, not a reviewer round).
 
@@ -115,7 +120,7 @@ Reviewer prompt — adversarial framing:
 You are an adversarial code reviewer. Your job is to find problems, NOT to approve.
 
 === Scope of review ===
-Branch: feature/<slug>/<issue-identifier-lowercase>
+Branch: feature/<slug>-<issue-identifier-lowercase>
 Diff against: feature/<slug>
 Run: `git diff feature/<slug>...HEAD`
 
@@ -180,7 +185,7 @@ The conventional prefix follows the project's existing log style (run `git log -
 
 Push the sub-branch:
 ```bash
-git push -u origin feature/<slug>/<issue-identifier-lowercase>
+git push -u origin feature/<slug>-<issue-identifier-lowercase>
 ```
 
 Open a PR from the sub-branch into the **feature branch** (NOT main):
@@ -246,7 +251,7 @@ If any is missing, you cannot proceed to Step 8.
 
 ## Cross-session resumption
 
-If the user invokes this skill on a sub-issue that already has an open PR (check via `gh pr list --head feature/<slug>/<issue-identifier-lowercase>`), do NOT re-implement. Instead, report the PR status and ask whether they want to:
+If the user invokes this skill on a sub-issue that already has an open PR (check via `gh pr list --head feature/<slug>-<issue-identifier-lowercase>`), do NOT re-implement. Instead, report the PR status and ask whether they want to:
 - View the open PR
 - Pick a different sub-issue
 - Force-restart (delete branch + PR — confirm before doing this)

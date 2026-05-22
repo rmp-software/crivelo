@@ -38,6 +38,18 @@ if [ ! -f ".env" ]; then
   exit 1
 fi
 
+# Start local Postgres container (matches DATABASE_URL in .env.example)
+if command -v docker >/dev/null 2>&1; then
+  echo "🐘 Starting local Postgres container..."
+  docker compose up -d --wait 2>/dev/null || docker-compose up -d
+  echo "✓ Postgres container up"
+  echo ""
+else
+  echo "⚠️  Docker not found — skipping local Postgres container."
+  echo "   Make sure your DATABASE_URL in .env points at a reachable dev DB."
+  echo ""
+fi
+
 # Generate Prisma Client
 echo "🔧 Generating Prisma Client..."
 npx prisma generate

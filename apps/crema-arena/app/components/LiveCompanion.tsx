@@ -6,6 +6,7 @@ import AoVivoTab from './tabs/AoVivoTab';
 import ChaveTab from './tabs/ChaveTab';
 import LeaderboardTab from './tabs/LeaderboardTab';
 import Badge from './Badge';
+import SponsorBlock from './SponsorBlock';
 
 interface LiveCompanionProps {
   eventId: string;
@@ -275,6 +276,12 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             />
           )}
         </div>
+
+        {/* Sponsor credit ("Apoio") — rendered once below the active tab content
+            so it appears on every tab. Frozen-tier (15s) poll on its own SWR
+            key; hides itself when there are no sponsors. On finished events the
+            heading relabels to "Patrocinado por". */}
+        <SponsorBlock eventId={eventId} eventStatus={event.status} />
       </main>
     </div>
   );

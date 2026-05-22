@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
+import SponsorStrip from './SponsorStrip';
+import SponsorChip from './SponsorChip';
+import { CADENCE_FROZEN_MS } from '@/lib/data-cadence';
 
 interface Competitor {
   id: string;
@@ -86,12 +89,35 @@ interface LeaderboardData {
   isComplete: boolean;
 }
 
+interface SponsorEntry {
+  id: string;
+  sponsor: {
+    id: string;
+    name: string;
+    logo_url: string | null;
+    website: string | null;
+  };
+  position: number;
+}
+
 interface LiveDisplayProps {
   eventId: string;
 }
 
 const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
 const tolerantFetcher = (url: string) => fetch(url).then((r) => (r.ok ? r.json() : null));
+// Sponsors live on the frozen tier; a failed poll must never break the podium,
+// so resolve to an empty list (credit simply hides) instead of throwing.
+const sponsorsFetcher = async (url: string): Promise<SponsorEntry[]> => {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+};
 
 export default function LiveDisplay({ eventId }: LiveDisplayProps) {
   // Split-cadence polling: the current-duel payload is small and the hottest
@@ -102,6 +128,13 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
   const { data, error } = useSWR<CurrentDuelData>(`/api/events/${eventId}/current-duel`, fetcher, fastOpts);
   const { data: bracketData } = useSWR<BracketData>(`/api/events/${eventId}/bracket`, fetcher, slowOpts);
   const { data: leaderboard } = useSWR<LeaderboardData>(`/api/events/${eventId}/leaderboard`, tolerantFetcher, slowOpts);
+  // Sponsors on the frozen tier (15s). Used only by the finished podium credit;
+  // the running views carry their own strip (RMP-113, separate branch).
+  const { data: sponsorsData } = useSWR<SponsorEntry[]>(
+    `/api/events/${eventId}/sponsors`,
+    sponsorsFetcher,
+    { refreshInterval: CADENCE_FROZEN_MS, revalidateOnFocus: false }
+  );
   const loading = !data && !error;
 
   if (loading) {
@@ -218,6 +251,10 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
             </div>
           </div>
         )}
+
+        {/* Sponsor credit — quiet line under the podium row; cream chips. Hidden
+            entirely when there are no sponsors so the podium isn't obscured. */}
+        <PodiumSponsorCredit sponsors={sponsorsData ?? []} />
       </div>
     );
   }
@@ -279,6 +316,9 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
           )}
         </main>
 
+        {/* Sponsor strip — full-width hairline band at the bottom */}
+        <SponsorStrip eventId={eventId} />
+
         {/* QR — bottom-right (fixed to viewport) */}
         <QrBadge eventId={eventId} />
       </div>
@@ -326,6 +366,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
           )}
         </main>
 
+        <SponsorStrip eventId={eventId} />
         <QrBadge eventId={eventId} />
       </div>
     );
@@ -348,6 +389,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
           Aguardando próximo duelo...
         </p>
       </main>
+      <SponsorStrip eventId={eventId} />
       <QrBadge eventId={eventId} />
     </div>
   );
@@ -662,6 +704,35 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
   );
 }
 
+/**
+ * Podium sponsor credit (TV finished state). Renders a single quiet line
+ * `Patrocinado por` (--font-display, --crema-200) followed by sponsor
+ * logos in cream chips — smaller than the running-view strip (~32px logo). The
+ * chips reuse the cream-card language (`--surface-raised`, `--radius-sm`,
+ * `object-fit: contain`) so any logo normalizes against the dark espresso bg.
+ * No-logo sponsor falls back to its name in --font-display inside the chip.
+ * Hidden entirely when there are no sponsors.
+ */
+function PodiumSponsorCredit({ sponsors }: { sponsors: SponsorEntry[] }) {
+  if (sponsors.length === 0) return null;
+
+  return (
+    <section
+      aria-label="Patrocinadores"
+      className="mt-10 md:mt-14 flex flex-col items-center w-full"
+    >
+      <p className="font-display text-sm md:text-base lg:text-lg text-[var(--crema-200)] text-center">
+        Patrocinado por
+      </p>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-5xl">
+        {sponsors.map((entry) => (
+          <SponsorChip key={entry.id} sponsor={entry.sponsor} size="podium" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function PodiumSlot({
   entry,
   position,
@@ -706,14 +777,6 @@ function PodiumSlot({
           alt={entry.competitor.name}
           className="w-full h-full object-cover"
         />
-        {isFirst && (
-          <img
-            src="/assets/trophy.svg"
-            alt=""
-            aria-hidden
-            className="absolute -bottom-2 -right-2 w-12 h-12 bg-[var(--marigold-500)] rounded-full p-1.5 shadow-[var(--shadow-1)]"
-          />
-        )}
       </div>
       <p
         className={`${isFirst ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-display font-bold text-center text-[var(--crema-50)]`}

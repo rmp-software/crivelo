@@ -96,6 +96,7 @@ model Event {
   organizer     Organizer    @relation(fields: [organizer_id], references: [id], onDelete: Cascade)
   entries       EventEntry[]
   duels         Duel[]
+  sponsors      EventSponsor[]
 
   @@map("events")
 }
@@ -163,4 +164,32 @@ model Vote {
   duel       Duel     @relation(fields: [duel_id], references: [id], onDelete: Cascade)
 
   @@map("votes")
+}
+
+model Sponsor {
+  id         String         @id @default(uuid())
+  name       String
+  logo_url   String?
+  website    String?
+  created_at DateTime       @default(now())
+  updated_at DateTime       @updatedAt
+
+  events     EventSponsor[]
+
+  @@map("sponsors")
+}
+
+model EventSponsor {
+  id         String   @id @default(uuid())
+  event_id   String
+  sponsor_id String
+  position   Int      @default(0)
+  created_at DateTime @default(now())
+
+  event      Event    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  sponsor    Sponsor  @relation(fields: [sponsor_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, sponsor_id])
+  @@index([event_id, position])
+  @@map("event_sponsors")
 }

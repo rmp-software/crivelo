@@ -4,18 +4,23 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
-**Required env (in `.env.local`, gitignored):**
-- `DATABASE_URL` — Neon Postgres
+**Required env (in `.env`, gitignored):**
+- `DATABASE_URL` — local Postgres (see Local database below). **Never put the prod URL in `.env` — Prisma CLI reads `.env`, not `.env.local`, so any migration command targets whatever DB this points at.**
 - `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD` — seeded admin
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob (photo uploads). Without it, every upload fails. Set in Vercel project env vars for dev/preview/production too.
 
+**Local database** — `docker-compose.yml` defines a Postgres 16 container matching the `DATABASE_URL` in `.env.example`. Start it with `docker compose up -d` (or just run `./init.sh`). Production URLs live in Vercel env vars, never in `.env`.
+
 ```bash
+docker compose up -d      # Start local Postgres (port 5432)
+docker compose down       # Stop it; data persists in the postgres-data volume
+docker compose down -v    # Stop AND wipe the volume (fresh DB)
 npm run dev               # Next dev server on :3000 (the team always runs it here)
 npm run build             # Production build
 npm run lint              # next lint
 npx tsc --noEmit          # Type check (used as the de-facto pre-commit gate; lint isn't strict)
-./init.sh                 # First-time setup: nvm use, npm install, prisma generate + migrate + seed
+./init.sh                 # First-time setup: docker compose up, nvm use, npm install, prisma generate + migrate + seed
 npx prisma migrate dev --name <slug>   # New migration; migrations ARE tracked in git
 npx prisma db seed                     # Recreate the seed admin (ADMIN_EMAIL / ADMIN_PASSWORD)
 npx prisma studio                      # Local DB GUI

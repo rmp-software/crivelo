@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import Button from './Button';
 import Input from './Input';
-import { Search, UserPlus, Check } from 'lucide-react';
+import { Search, Check } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -21,8 +21,14 @@ interface PoolResponse {
 
 interface CompetitorPoolListProps {
   registeredCompetitorIds: string[];
-  /** Add a competitor optimistically — caller mutates local state before the server responds. */
-  onAddCompetitor: (competitor: Competitor) => Promise<void>;
+  /**
+   * Competitors to pre-select. Used to re-select the ones that failed after a
+   * partial-failure add so the user can retry without re-picking them.
+   */
+  initialSelected?: Competitor[];
+  /** Called with the selected competitors, in selection order, when the user confirms. */
+  onConfirm: (competitors: Competitor[]) => Promise<void>;
+  onCancel: () => void;
 }
 
 const POOL_LIMIT = 5;
@@ -35,14 +41,27 @@ const fetcher = async (url: string): Promise<PoolResponse> => {
 
 export default function CompetitorPoolList({
   registeredCompetitorIds,
-  onAddCompetitor,
+  initialSelected = [],
+  onConfirm,
+  onCancel,
 }: CompetitorPoolListProps) {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const [addingIds, setAddingIds] = useState<Set<string>>(new Set());
+  // Selected competitors held as full objects (in selection order) so the batch
+  // confirm works even for picks scrolled out of the server-paginated pool view.
+  const [selected, setSelected] = useState<Competitor[]>(initialSelected);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Debounce search input
   useDebounce(search, 250, setDebouncedSearch);
+
+  // Re-sync selection when the parent hands us a new set (e.g. the failed ones
+  // to retry after a partial-failure add). Joined key avoids re-running on identity.
+  const initialSelectedKey = initialSelected.map((c) => c.id).join(',');
+  useEffect(() => {
+    setSelected(initialSelected);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialSelectedKey]);
 
   const params = new URLSearchParams();
   if (debouncedSearch) params.append('search', debouncedSearch);
@@ -57,21 +76,26 @@ export default function CompetitorPoolList({
   const total = data?.total ?? 0;
   const truncated = total > competitors.length;
 
-  const handleAdd = async (competitor: Competitor) => {
-    setAddingIds((prev) => new Set(prev).add(competitor.id));
-    try {
-      await onAddCompetitor(competitor);
-    } finally {
-      setAddingIds((prev) => {
-        const next = new Set(prev);
-        next.delete(competitor.id);
-        return next;
-      });
-    }
+  const registeredSet = new Set(registeredCompetitorIds);
+  const selectedIds = new Set(selected.map((c) => c.id));
+
+  const toggle = (competitor: Competitor) => {
+    setSelected((prev) =>
+      prev.some((c) => c.id === competitor.id)
+        ? prev.filter((c) => c.id !== competitor.id)
+        : [...prev, competitor]
+    );
   };
 
-  const isRegistered = (competitorId: string) =>
-    registeredCompetitorIds.includes(competitorId);
+  const handleConfirm = async () => {
+    if (selected.length === 0) return;
+    setIsSubmitting(true);
+    try {
+      await onConfirm(selected);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -82,7 +106,7 @@ export default function CompetitorPoolList({
       <div className="relative">
         <Input
           type="text"
-          placeholder="Buscar por nome ou cafeteria..."
+          placeholder="Buscar por nome ou cafeteria"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           fullWidth
@@ -116,48 +140,59 @@ export default function CompetitorPoolList({
       )}
 
       {competitors.length > 0 && (
-        <div className="space-y-2">
+        <div className="space-y-2 max-h-[40vh] overflow-y-auto">
           {competitors.map((competitor) => {
-            const registered = isRegistered(competitor.id);
-            const adding = addingIds.has(competitor.id);
+            const registered = registeredSet.has(competitor.id);
+            const isSelected = selectedIds.has(competitor.id);
 
-            return (
-              <div
-                key={competitor.id}
-                className="flex items-center gap-3 p-3 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] hover:border-[var(--brand)] transition-colors"
-              >
-                <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
-                  <img
-                    src={competitor.photoUrl}
-                    alt={competitor.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--fg)] truncate">{competitor.name}</p>
-                  <p className="text-sm text-[var(--fg-2)] truncate">
-                    {competitor.coffeeShop}
-                  </p>
-                </div>
-
-                {registered ? (
+            // Already inscribed in this event → locked, not selectable.
+            if (registered) {
+              return (
+                <div
+                  key={competitor.id}
+                  className="flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] opacity-60"
+                >
+                  <Thumb competitor={competitor} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-[var(--fg)] truncate">{competitor.name}</p>
+                    <p className="text-sm text-[var(--fg-2)] truncate">{competitor.coffeeShop}</p>
+                  </div>
                   <div className="flex items-center gap-2 text-sm text-[var(--live)] font-medium">
                     <Check size={16} />
                     Inscrito
                   </div>
-                ) : (
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => handleAdd(competitor)}
-                    disabled={adding}
-                  >
-                    <UserPlus size={16} />
-                    {adding ? 'Adicionando...' : 'Inscrever'}
-                  </Button>
-                )}
-              </div>
+                </div>
+              );
+            }
+
+            return (
+              <button
+                key={competitor.id}
+                type="button"
+                onClick={() => toggle(competitor)}
+                aria-pressed={isSelected}
+                className={`w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border text-left transition-colors ${
+                  isSelected
+                    ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
+                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)]'
+                }`}
+              >
+                <Thumb competitor={competitor} />
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-[var(--fg)] truncate">{competitor.name}</p>
+                  <p className="text-sm text-[var(--fg-2)] truncate">{competitor.coffeeShop}</p>
+                </div>
+                {/* Selection indicator */}
+                <div
+                  className={`w-6 h-6 flex-shrink-0 rounded-full border flex items-center justify-center ${
+                    isSelected
+                      ? 'bg-[var(--brand)] border-[var(--brand)] text-[var(--fg-inverse)]'
+                      : 'border-[var(--border-strong)] text-transparent'
+                  }`}
+                >
+                  <Check size={14} />
+                </div>
+              </button>
             );
           })}
         </div>
@@ -168,12 +203,37 @@ export default function CompetitorPoolList({
           Mostrando {competitors.length} de {total} · refine a busca
         </p>
       )}
+
+      <div className="flex items-center justify-end gap-3 pt-2">
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+          Cancelar
+        </Button>
+        <Button
+          type="button"
+          variant="primary"
+          onClick={handleConfirm}
+          disabled={isSubmitting || selected.length === 0}
+        >
+          {isSubmitting
+            ? 'Inscrevendo...'
+            : selected.length > 0
+              ? `Inscrever ${selected.length}`
+              : 'Inscrever'}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function Thumb({ competitor }: { competitor: Competitor }) {
+  return (
+    <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+      <img src={competitor.photoUrl} alt={competitor.name} className="w-full h-full object-cover" />
     </div>
   );
 }
 
 // Small inline debounce hook to avoid an extra dependency.
-import { useEffect } from 'react';
 function useDebounce<T>(value: T, delay: number, onChange: (v: T) => void) {
   useEffect(() => {
     const t = setTimeout(() => onChange(value), delay);
