@@ -94,12 +94,12 @@ export default function SponsorStrip({ eventId }: SponsorStripProps) {
     <div
       className="absolute left-0 right-0 bottom-0 z-10 flex items-center"
       style={{
-        // Dark hairline band — never a cream fill (locked treatment).
-        height: '5vh',
-        paddingLeft: '2.9vw',
-        // Right clearance so chips never slide under the fixed bottom-right QR
-        // card (~460px @1080p ≈ 24vw). Scales with the viewport.
-        paddingRight: '24vw',
+        // Dark hairline band — never a cream fill (locked treatment). Sized in
+        // 1080p stage-space px; LiveStage's transform scales it up to 4K.
+        height: 54,
+        paddingLeft: 56,
+        // Right clearance so chips never slide under the bottom-right QR card.
+        paddingRight: 460,
         background: 'linear-gradient(to top, rgba(0,0,0,.35), transparent)',
         borderTop: '1px solid rgba(220,197,158,.14)',
       }}
@@ -108,9 +108,9 @@ export default function SponsorStrip({ eventId }: SponsorStripProps) {
       <span
         className="font-mono uppercase flex-shrink-0 text-[var(--crema-300)]"
         style={{
-          fontSize: '1.05vh',
+          fontSize: 11,
           letterSpacing: '0.28em',
-          marginRight: '2.4vw',
+          marginRight: 46,
           opacity: 0.85,
         }}
       >
@@ -119,7 +119,7 @@ export default function SponsorStrip({ eventId }: SponsorStripProps) {
       <div
         className="flex items-center"
         style={{
-          gap: '2.6vw',
+          gap: 50,
           flex: 1,
           minWidth: 0,
           transition: `opacity ${FADE_MS}ms ease`,

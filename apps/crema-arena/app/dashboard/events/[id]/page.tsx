@@ -215,7 +215,7 @@ export default function EventDetailPage() {
       await fetchEventDetails();
       setRemoveModal({ isOpen: false, competitor: null });
     } catch (err: any) {
-      alert(err.message || 'Failed to remove competitor from event');
+      showToast(err.message || 'Failed to remove competitor from event', 'error');
     } finally {
       setIsRemoving(false);
     }
@@ -235,7 +235,7 @@ export default function EventDetailPage() {
 
       await fetchEventDetails();
     } catch (err: any) {
-      alert(err.message || 'Failed to generate bracket');
+      showToast(err.message || 'Failed to generate bracket', 'error');
     } finally {
       setIsGeneratingBracket(false);
     }
@@ -254,7 +254,7 @@ export default function EventDetailPage() {
       setShowRegenerateModal(false);
       await fetchEventDetails();
     } catch (err: any) {
-      alert(err.message || 'Failed to regenerate bracket');
+      showToast(err.message || 'Failed to regenerate bracket', 'error');
     } finally {
       setIsRegeneratingBracket(false);
     }
@@ -275,7 +275,7 @@ export default function EventDetailPage() {
       setShowStartModal(false);
       await fetchEventDetails();
     } catch (err: any) {
-      alert(err.message || 'Failed to start event');
+      showToast(err.message || 'Failed to start event', 'error');
     } finally {
       setIsStarting(false);
     }
@@ -301,7 +301,7 @@ export default function EventDetailPage() {
       setTimeout(() => setCopied(null), 2000);
     } catch (err) {
       console.error('Failed to copy URL:', err);
-      alert('Falha ao copiar URL');
+      showToast('Falha ao copiar URL', 'error');
     }
   };
 
@@ -322,7 +322,7 @@ export default function EventDetailPage() {
       document.body.removeChild(a);
     } catch (err) {
       console.error('Failed to download QR code:', err);
-      alert('Falha ao baixar QR code');
+      showToast('Falha ao baixar QR code', 'error');
     } finally {
       setQrDownloading(false);
     }

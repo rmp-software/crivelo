@@ -9,6 +9,7 @@ import Input from '@/app/components/Input';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import EmptyState from '@/app/components/EmptyState';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { useToast } from '@/app/components/Toast';
 import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 
 interface Competitor {
@@ -21,6 +22,7 @@ interface Competitor {
 
 export default function CompetitorsPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -85,7 +87,7 @@ export default function CompetitorsPage() {
       await fetchCompetitors();
       setDeleteModal({ isOpen: false, competitor: null });
     } catch (err: any) {
-      alert(err.message || 'Failed to delete competitor');
+      showToast(err.message || 'Failed to delete competitor', 'error');
     } finally {
       setIsDeleting(false);
     }

@@ -69,22 +69,6 @@ export async function GET(
           (duel.votes_a > duel.votes_b ? duel.votes_a : duel.votes_b) : 0);
       }, 0);
 
-      // Get duels where this entry participated (as A or B)
-      const allDuels = prisma.duel.findMany({
-        where: {
-          OR: [
-            { entry_a_id: entry.id },
-            { entry_b_id: entry.id },
-          ],
-          status: 'completed',
-        },
-        select: {
-          votes_a: true,
-          votes_b: true,
-          entry_a_id: true,
-        },
-      });
-
       return {
         entryId: entry.id,
         competitor: toCamelCompetitor(entry.competitor),

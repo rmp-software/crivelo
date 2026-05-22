@@ -139,7 +139,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--espresso-900)]">
+      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)]">
         <div className="text-center" role="status" aria-live="polite">
           <div
             className="w-16 h-16 border-4 border-[var(--crema-50)] border-t-transparent rounded-full animate-spin mx-auto mb-4"
@@ -157,7 +157,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--espresso-900)] p-8">
+      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)] p-8">
         <div className="text-center max-w-2xl" role="alert" aria-live="assertive">
           <h1 className="text-5xl md:text-6xl font-display font-bold text-[var(--cherry-500)] mb-6">
             Erro ao Carregar
@@ -179,7 +179,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
   // Setup state - show event info
   if (event.status === 'setup') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--espresso-900)] p-8">
+      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)] p-8">
         <div className="text-center max-w-4xl">
           <h1 className="text-6xl font-display font-bold text-[var(--crema-50)] mb-6">
             {event.name}
@@ -220,7 +220,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
     const fifth = top5[4];
 
     return (
-      <div className="min-h-screen bg-[var(--bg-inverse)] text-[var(--fg-inverse)] flex flex-col items-center px-6 py-10 md:py-14">
+      <div className="h-full w-full bg-[var(--bg-inverse)] text-[var(--fg-inverse)] flex flex-col items-center px-6 py-10 md:py-14">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-center text-balance">
           {event.name}
         </h1>
@@ -268,7 +268,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
     const hasPour = !!currentDuel.pourPhotoUrl;
 
     return (
-      <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
         {/* Top bar: AO VIVO + title + duel timer */}
         <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
@@ -335,7 +335,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
       : [];
 
     return (
-      <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
         <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
@@ -374,7 +374,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   // Default running state (no active or next duel)
   return (
-    <div className="h-screen bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+    <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
       <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
         <LiveBadge />
         <div className="text-center flex-1 px-4">
@@ -513,7 +513,7 @@ function CentralScore({ a, b }: { a: number; b: number }) {
   return (
     <div
       className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
-      style={{ fontSize: 'clamp(40px, 6vw, 72px)' }}
+      style={{ fontSize: '72px' }}
       aria-label={`Placar atual: ${a} a ${b}`}
     >
       {a} × {b}
@@ -543,7 +543,7 @@ function PourPhotoCenterpiece({
         <img
           src={pourPhotoUrl}
           alt="Foto dos copos servidos"
-          className="block w-auto max-w-full max-h-[44vh] object-contain"
+          className="block w-auto max-w-full max-h-[475px] object-contain"
         />
       </div>
 
@@ -558,7 +558,7 @@ function PourPhotoCenterpiece({
         </div>
         <div
           className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
-          style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}
+          style={{ fontSize: '64px' }}
           aria-label={`Placar atual: ${votesA} a ${votesB}`}
         >
           {votesA} × {votesB}

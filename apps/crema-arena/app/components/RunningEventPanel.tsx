@@ -7,6 +7,7 @@ import Badge from './Badge';
 import Button from './Button';
 import Modal from './Modal';
 import { CheckCircle, Circle, Play, RotateCcw, SkipForward, Trophy } from 'lucide-react';
+import { useToast } from './Toast';
 
 interface Competitor {
   id: string;
@@ -46,6 +47,7 @@ const runningFetcher = (url: string) =>
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const { showToast } = useToast();
 
   const { data, mutate: fetchRunningData } = useSWR(
     `/api/events/${eventId}/running`,
@@ -70,6 +72,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       await fetchRunningData();
     } catch (err) {
       console.error(err);
+      showToast(err instanceof Error ? err.message : 'Falha ao adiar duelo', 'error');
     }
   };
   const handleResumeDuel = async (id: string) => {
@@ -79,6 +82,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       await fetchRunningData();
     } catch (err) {
       console.error(err);
+      showToast(err instanceof Error ? err.message : 'Falha ao retomar duelo', 'error');
     }
   };
 
@@ -100,6 +104,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       }
     } catch (err: any) {
       console.error(err);
+      showToast(err instanceof Error ? err.message : 'Falha ao encerrar o evento', 'error');
     } finally {
       setIsFinishing(false);
     }

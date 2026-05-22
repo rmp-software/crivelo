@@ -223,13 +223,3 @@ export function generateBracket(entries: EventEntry[]): DuelData[] {
 
   return duels;
 }
-
-/**
- * Calculate which round a competitor was eliminated in
- */
-export function calculateEliminationRound(
-  totalRounds: number,
-  roundLost: number
-): number {
-  return roundLost;
-}

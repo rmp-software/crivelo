@@ -56,20 +56,38 @@ export async function POST(
       );
     }
 
-    // Clean up previous pour photo if any (safe no-op for legacy local paths)
-    if (duel.pour_photo_url) {
-      await deleteUploadedFile(duel.pour_photo_url);
+    const photoUrl = result.url;
+    const oldPhotoUrl = duel.pour_photo_url;
+
+    let updatedDuel;
+    try {
+      updatedDuel = await prisma.duel.update({
+        where: { id: params.id },
+        data: { pour_photo_url: photoUrl },
+        select: {
+          id: true,
+          pour_photo_url: true,
+        },
+      });
+    } catch (updateError) {
+      // Compensate: the DB update failed, so the just-uploaded blob is orphaned.
+      // Best-effort cleanup; swallow cleanup errors so we surface the real failure below.
+      try {
+        await deleteUploadedFile(photoUrl);
+      } catch (cleanupError) {
+        console.error('Failed to cleanup orphaned duel pour photo blob:', cleanupError);
+      }
+      throw updateError;
     }
 
-    const photoUrl = result.url;
-    const updatedDuel = await prisma.duel.update({
-      where: { id: params.id },
-      data: { pour_photo_url: photoUrl },
-      select: {
-        id: true,
-        pour_photo_url: true,
-      },
-    });
+    // DB update succeeded: now it's safe to delete the previous pour photo (no-op for legacy paths).
+    if (oldPhotoUrl) {
+      try {
+        await deleteUploadedFile(oldPhotoUrl);
+      } catch (cleanupError) {
+        console.error('Failed to delete previous duel pour photo blob:', cleanupError);
+      }
+    }
 
     return NextResponse.json({
       success: true,

@@ -9,6 +9,7 @@ import Input from '@/app/components/Input';
 import Badge from '@/app/components/Badge';
 import ConfirmationModal from '@/app/components/ConfirmationModal';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { useToast } from '@/app/components/Toast';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 interface Organizer {
@@ -21,6 +22,7 @@ interface Organizer {
 
 export default function OrganizersPage() {
   const router = useRouter();
+  const { showToast } = useToast();
   const [organizers, setOrganizers] = useState<Organizer[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -80,7 +82,7 @@ export default function OrganizersPage() {
       await fetchOrganizers();
       setDeleteModal({ isOpen: false, organizer: null });
     } catch (err: any) {
-      alert(err.message || 'Failed to delete organizer');
+      showToast(err.message || 'Failed to delete organizer', 'error');
     } finally {
       setIsDeleting(false);
     }

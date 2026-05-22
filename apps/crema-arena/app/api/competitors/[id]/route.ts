@@ -117,6 +117,9 @@ export async function PUT(
     }
 
     let photoUrl = existingCompetitor.photo_url;
+    let newPhotoUrl: string | null = null;
+    // Old blob to clean up only after a successful DB update.
+    let oldPhotoUrlToDelete: string | null = null;
 
     // Handle photo update if new photo provided
     if (photo && photo.size > 0) {
@@ -128,28 +131,51 @@ export async function PUT(
         );
       }
 
-      // Delete old blob (safe no-op if it's a legacy /uploads path)
-      await deleteUploadedFile(existingCompetitor.photo_url);
-
-      photoUrl = fileResult.url;
+      newPhotoUrl = fileResult.url;
+      photoUrl = newPhotoUrl;
+      oldPhotoUrlToDelete = existingCompetitor.photo_url;
     }
 
     // Update competitor
-    const competitor = await prisma.competitor.update({
-      where: { id: params.id },
-      data: {
-        name,
-        coffee_shop: coffeeShop,
-        photo_url: photoUrl,
-      },
-      select: {
-        id: true,
-        name: true,
-        photo_url: true,
-        coffee_shop: true,
-        updated_at: true,
-      },
-    });
+    let competitor;
+    try {
+      competitor = await prisma.competitor.update({
+        where: { id: params.id },
+        data: {
+          name,
+          coffee_shop: coffeeShop,
+          photo_url: photoUrl,
+        },
+        select: {
+          id: true,
+          name: true,
+          photo_url: true,
+          coffee_shop: true,
+          updated_at: true,
+        },
+      });
+    } catch (updateError) {
+      // Compensate: the DB update failed, so the just-uploaded blob (if any) is orphaned.
+      // Best-effort cleanup; swallow cleanup errors so we surface the real failure below.
+      if (newPhotoUrl) {
+        try {
+          await deleteUploadedFile(newPhotoUrl);
+        } catch (cleanupError) {
+          console.error('Failed to cleanup orphaned competitor photo blob:', cleanupError);
+        }
+      }
+      throw updateError;
+    }
+
+    // DB update succeeded: now it's safe to delete the previous blob (safe no-op for legacy paths).
+    if (oldPhotoUrlToDelete) {
+      try {
+        await deleteUploadedFile(oldPhotoUrlToDelete);
+      } catch (cleanupError) {
+        // Best-effort: the DB is already updated; the old one becoming an orphan is non-fatal.
+        console.error('Failed to delete previous competitor photo blob:', cleanupError);
+      }
+    }
 
     return NextResponse.json({
       id: competitor.id,
@@ -210,13 +236,18 @@ export async function DELETE(
       );
     }
 
-    // Delete photo from Blob (no-op for legacy local paths)
-    await deleteUploadedFile(competitor.photo_url);
-
-    // Delete competitor (entries will be cascade deleted)
+    // DB-first: delete competitor (entries cascade), then best-effort blob cleanup.
+    // If blob cleanup fails the row is already gone, so we don't leave a dead `photo_url`.
     await prisma.competitor.delete({
       where: { id: params.id },
     });
+
+    // Delete photo from Blob (no-op for legacy local paths or null). Best-effort.
+    try {
+      await deleteUploadedFile(competitor.photo_url);
+    } catch (cleanupError) {
+      console.error('Failed to delete competitor photo blob after row removal:', cleanupError);
+    }
 
     return NextResponse.json({
       success: true,

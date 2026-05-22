@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import LiveDisplay from '@/app/components/LiveDisplay';
+import LiveStage from '@/app/components/LiveStage';
 import { prisma } from '@/lib/prisma';
 
 interface PageProps {
@@ -48,11 +49,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 }
 
-// This is a public page - no authentication required
+// This is a public page - no authentication required.
+// LiveStage locks the display to a 1920×1080 canvas scaled to fit any 16:9
+// viewport (FHD → QHD → 4K) so the layout never re-flows, only grows.
 export default function LiveEventPage({ params }: PageProps) {
   return (
-    <div className="min-h-screen">
+    <LiveStage>
       <LiveDisplay eventId={params.eventId} />
-    </div>
+    </LiveStage>
   );
 }

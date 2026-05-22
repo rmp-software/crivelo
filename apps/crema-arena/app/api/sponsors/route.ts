@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { saveUploadedFile } from '@/lib/file-upload';
+import { saveUploadedFile, deleteUploadedFile } from '@/lib/file-upload';
 
 const ALLOWED_ROLES = ['admin', 'organizer'] as const;
 
@@ -106,19 +106,33 @@ export async function POST(request: NextRequest) {
       logoUrl = fileResult.url;
     }
 
-    const sponsor = await prisma.sponsor.create({
-      data: {
-        name,
-        logo_url: logoUrl,
-        website,
-      },
-      select: {
-        id: true,
-        name: true,
-        logo_url: true,
-        website: true,
-      },
-    });
+    let sponsor;
+    try {
+      sponsor = await prisma.sponsor.create({
+        data: {
+          name,
+          logo_url: logoUrl,
+          website,
+        },
+        select: {
+          id: true,
+          name: true,
+          logo_url: true,
+          website: true,
+        },
+      });
+    } catch (createError) {
+      // Compensate: the DB create failed, so the just-uploaded blob (if any) is orphaned.
+      // Best-effort cleanup; swallow cleanup errors so we surface the real failure below.
+      if (logoUrl) {
+        try {
+          await deleteUploadedFile(logoUrl);
+        } catch (cleanupError) {
+          console.error('Failed to cleanup orphaned sponsor logo blob:', cleanupError);
+        }
+      }
+      throw createError;
+    }
 
     return NextResponse.json(sponsor, { status: 201 });
   } catch (error: any) {

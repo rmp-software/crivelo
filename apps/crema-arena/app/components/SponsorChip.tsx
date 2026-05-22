@@ -8,8 +8,8 @@ import type { CSSProperties } from 'react';
  * its own color / transparency / aspect.
  *
  * Three consumers, three sizings (`size` enum):
- * - `strip`   — TV running strip (~40px logo). Viewport-relative (vh/vw) so it
- *               scales identically from 1920×1080 up to 4K.
+ * - `strip`   — TV running strip (~30px logo). Fixed 1080p stage-space px; the
+ *               LiveStage transform scales it identically from FHD up to 4K.
  * - `podium`  — TV finished podium credit (~32px logo). Tailwind-class sized.
  * - `companion` — audience companion (~56px logo). Tailwind-class sized, and the
  *               only light-surface consumer, so it sets `bordered` for a 1px
@@ -34,18 +34,17 @@ interface SponsorChipProps {
 }
 
 export default function SponsorChip({ sponsor, size, bordered = false }: SponsorChipProps) {
-  // The TV strip is viewport-relative (vh/vw) so it must use inline styles; the
-  // podium and companion are Tailwind-class sized. Each branch reproduces the
-  // exact pre-refactor markup so the look stays identical.
+  // The TV strip is sized in 1080p stage-space px (inline styles) so it scales
+  // with the LiveStage transform; the podium and companion are Tailwind-class
+  // sized. Each branch reproduces the exact pre-refactor look.
   if (size === 'strip') {
     const chipStyle: CSSProperties = {
-      // Chip ~44px tall @1080p (4.1vh), sitting within the ~54px (5vh) band;
-      // padding + max-width scale with the viewport too.
-      height: '4.1vh',
-      paddingLeft: '1vw',
-      paddingRight: '1vw',
-      maxWidth: '12vw',
-      boxShadow: '0 0.2vh 1vh -0.4vh rgba(0,0,0,.5)',
+      // Chip ~44px tall, sitting within the ~54px band; all 1080p stage-space px.
+      height: 44,
+      paddingLeft: 19,
+      paddingRight: 19,
+      maxWidth: 230,
+      boxShadow: '0 2px 11px -4px rgba(0,0,0,.5)',
     };
 
     return (
@@ -58,10 +57,10 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
             src={sponsor.logo_url}
             alt={sponsor.name}
             style={{
-              // Logo ~30px inside the ~44px chip @1080p — shown as-is, no grayscale.
-              height: '2.8vh',
+              // Logo ~30px inside the ~44px chip — shown as-is, no grayscale.
+              height: 30,
               width: 'auto',
-              maxWidth: '10vw',
+              maxWidth: 192,
               objectFit: 'contain',
               display: 'block',
             }}
@@ -69,7 +68,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
         ) : (
           <span
             className="font-display font-semibold text-[var(--espresso-900)] truncate"
-            style={{ fontSize: '1.7vh', maxWidth: '10vw' }}
+            style={{ fontSize: 18, maxWidth: 192 }}
           >
             {sponsor.name}
           </span>

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { saveUploadedFile } from '@/lib/file-upload';
+import { saveUploadedFile, deleteUploadedFile } from '@/lib/file-upload';
 
 // GET /api/competitors - List competitors with search and pagination
 export async function GET(request: NextRequest) {
@@ -130,21 +130,33 @@ export async function POST(request: NextRequest) {
     const photoUrl = fileResult.url;
 
     // Create competitor
-    const competitor = await prisma.competitor.create({
-      data: {
-        name,
-        coffee_shop: coffeeShop,
-        photo_url: photoUrl,
-        created_by: session.user.id,
-      },
-      select: {
-        id: true,
-        name: true,
-        photo_url: true,
-        coffee_shop: true,
-        created_at: true,
-      },
-    });
+    let competitor;
+    try {
+      competitor = await prisma.competitor.create({
+        data: {
+          name,
+          coffee_shop: coffeeShop,
+          photo_url: photoUrl,
+          created_by: session.user.id,
+        },
+        select: {
+          id: true,
+          name: true,
+          photo_url: true,
+          coffee_shop: true,
+          created_at: true,
+        },
+      });
+    } catch (createError) {
+      // Compensate: the DB create failed, so the just-uploaded photo blob is orphaned.
+      // Best-effort cleanup; swallow cleanup errors so we surface the real failure below.
+      try {
+        await deleteUploadedFile(photoUrl);
+      } catch (cleanupError) {
+        console.error('Failed to cleanup orphaned competitor photo blob:', cleanupError);
+      }
+      throw createError;
+    }
 
     return NextResponse.json({
       id: competitor.id,
