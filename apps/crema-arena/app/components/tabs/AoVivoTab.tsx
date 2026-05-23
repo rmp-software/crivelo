@@ -1,6 +1,7 @@
 'use client';
 
 import Badge from '../Badge';
+import CrowdVoteBar from '../CrowdVoteBar';
 
 interface Competitor {
   id: string;
@@ -14,13 +15,16 @@ interface Entry {
   competitor: Competitor;
 }
 
-interface Duel {
+export interface Duel {
   id: string;
   round: number;
   position: number;
   status: string;
   votesA: number;
   votesB: number;
+  crowdVotesA?: number;
+  crowdVotesB?: number;
+  photoLeftSlot?: 'a' | 'b';
   pourPhotoUrl?: string | null;
   entryA: Entry | null;
   entryB: Entry | null;
@@ -33,6 +37,7 @@ interface EventData {
   name: string;
   status: 'setup' | 'running' | 'finished';
   judgesCount: number;
+  crowdVoteEnabled?: boolean;
 }
 
 interface AoVivoTabProps {
@@ -133,7 +138,24 @@ export default function AoVivoTab({
 
           <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-2)] border-2 border-[var(--live)]">
             {/* Pour Photo or Competitor Cards */}
-            {currentDuel.pourPhotoUrl ? (
+            {currentDuel.pourPhotoUrl ? (() => {
+              // The pour photo shows both cups side by side. `photoLeftSlot`
+              // records which entry's cup is on the LEFT. The name captions must
+              // follow the cup positions, not the A/B slot order — left caption
+              // = the left cup's competitor. (The score below keeps A × B order.)
+              // Fall back to the other slot if the assigned one is null (e.g. a
+              // bye/wildcard duel that still carries a photo) so a present
+              // competitor is never hidden behind an empty caption.
+              const rawLeft = currentDuel.photoLeftSlot === 'b' ? currentDuel.entryB : currentDuel.entryA;
+              const rawRight = currentDuel.photoLeftSlot === 'b' ? currentDuel.entryA : currentDuel.entryB;
+              const leftEntry = rawLeft ?? rawRight;
+              const rightEntry = rawRight ?? rawLeft;
+              // When exactly one entry is present, the `??` fallback makes both
+              // sides resolve to the SAME entry. Show it once (on its real side)
+              // instead of duplicating it across both captions.
+              const showLeft = !!leftEntry;
+              const showRight = !!rightEntry && rightEntry !== leftEntry;
+              return (
               <div className="relative">
                 <img
                   src={currentDuel.pourPhotoUrl}
@@ -142,25 +164,26 @@ export default function AoVivoTab({
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
                   <div className="flex justify-between items-end text-white">
-                    {currentDuel.entryA && (
+                    {showLeft && (
                       <div className="flex-1">
-                        <p className="font-semibold text-sm truncate">{currentDuel.entryA.competitor.name}</p>
-                        <p className="text-xs opacity-90 truncate">{currentDuel.entryA.competitor.coffeeShop}</p>
+                        <p className="font-semibold text-sm truncate">{leftEntry!.competitor.name}</p>
+                        <p className="text-xs opacity-90 truncate">{leftEntry!.competitor.coffeeShop}</p>
                       </div>
                     )}
                     <div className="px-3">
                       <span className="text-xs opacity-75">VS</span>
                     </div>
-                    {currentDuel.entryB && (
+                    {showRight && (
                       <div className="flex-1 text-right">
-                        <p className="font-semibold text-sm truncate">{currentDuel.entryB.competitor.name}</p>
-                        <p className="text-xs opacity-90 truncate">{currentDuel.entryB.competitor.coffeeShop}</p>
+                        <p className="font-semibold text-sm truncate">{rightEntry!.competitor.name}</p>
+                        <p className="text-xs opacity-90 truncate">{rightEntry!.competitor.coffeeShop}</p>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            ) : (
+              );
+            })() : (
               <div className="grid grid-cols-2 gap-px bg-[var(--border)]">
                 {/* Competitor A */}
                 {currentDuel.entryA && (
@@ -228,6 +251,15 @@ export default function AoVivoTab({
               </p>
             </div>
           </div>
+
+          {/* Crowd vote ballot — unofficial audience vote. Rendered only when
+              crowd vote is enabled for the event and the duel has two entries.
+              When disabled, the photo + judge score above still render. */}
+          {event.crowdVoteEnabled && currentDuel.entryA && currentDuel.entryB && (
+            <div className="mt-4">
+              <CrowdVoteBar duel={currentDuel} />
+            </div>
+          )}
         </div>
       )}
 

@@ -6,7 +6,7 @@ import Modal from './Modal';
 import ConfirmationModal from './ConfirmationModal';
 import WildcardModal from './WildcardModal';
 import { useToast } from './Toast';
-import { Camera, Trophy, Upload, User } from 'lucide-react';
+import { Camera, RefreshCw, Trophy, Upload, User } from 'lucide-react';
 
 interface Competitor {
   id: string;
@@ -28,6 +28,7 @@ interface Duel {
   votesA: number;
   votesB: number;
   pourPhotoUrl: string | null;
+  photoLeftSlot?: 'a' | 'b' | null;
   entryA: Entry | null;
   entryB: Entry | null;
 }
@@ -35,10 +36,11 @@ interface Duel {
 interface TapToTallyProps {
   duel: Duel;
   judgesCount: number;
+  crowdVoteEnabled: boolean;
   onRefresh: () => void;
 }
 
-export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyProps) {
+export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefresh }: TapToTallyProps) {
   const { showToast } = useToast();
   const [isStarting, setIsStarting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -46,6 +48,18 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
   const [showWildcardModal, setShowWildcardModal] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Photo-orientation capture step. After a file is chosen we hold it here and,
+  // when crowd vote is on, show a confirm screen binding the LEFT cup to a
+  // competitor (`captureLeftSlot`). When crowd vote is off we skip the confirm
+  // and upload immediately with the default "a".
+  const [pendingPhoto, setPendingPhoto] = useState<{ file: File; previewUrl: string } | null>(null);
+  const [captureLeftSlot, setCaptureLeftSlot] = useState<'a' | 'b'>('a');
+  const [isFlippingSides, setIsFlippingSides] = useState(false);
+
+  // The persisted orientation for this duel (defaults to "a"); drives the
+  // current label positions and the "Trocar lados" target after a photo exists.
+  const photoLeftSlot: 'a' | 'b' = duel.photoLeftSlot === 'b' ? 'b' : 'a';
 
   // Local optimistic vote overlay: increments instantly on tap; reconciled when
   // the parent's refresh comes back with the authoritative server state.
@@ -56,6 +70,20 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
     setOptimisticB(duel.votesB);
   }, [duel.id, duel.votesA, duel.votesB]);
 
+  // Drop any in-flight capture preview when the active duel changes, and revoke
+  // the object URL so we don't leak blobs.
+  useEffect(() => {
+    setPendingPhoto((prev) => {
+      if (prev) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+  }, [duel.id]);
+  useEffect(() => {
+    return () => {
+      if (pendingPhoto) URL.revokeObjectURL(pendingPhoto.previewUrl);
+    };
+  }, [pendingPhoto]);
+
   const votesA = optimisticA;
   const votesB = optimisticB;
   const totalVotes = votesA + votesB;
@@ -64,6 +92,14 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
     ? duel.entryA?.competitor.name
     : duel.entryB?.competitor.name;
   const scoreDisplay = `${Math.max(votesA, votesB)} × ${Math.min(votesA, votesB)}`;
+
+  // Competitor names for the orientation step / labels.
+  const entryAName = duel.entryA?.competitor.name ?? 'Competidor A';
+  const entryBName = duel.entryB?.competitor.name ?? 'Competidor B';
+  // Prompt always asks for competitor A's cup, regardless of which side it's on.
+  const captureCupAName = entryAName;
+  // Which competitor is the left cup given the persisted orientation.
+  const leftCupName = photoLeftSlot === 'a' ? entryAName : entryBName;
 
   const handleStartDuel = async () => {
     setIsStarting(true);
@@ -142,14 +178,36 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
     }
   };
 
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  // File chosen from the picker. When crowd vote is on, hold it and show the
+  // orientation confirm (required because votes bind to it). When off, upload
+  // straight away with the default "a" — no friction.
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
     if (!file) return;
 
+    if (crowdVoteEnabled) {
+      // Seed the confirm step with the current orientation so a refotograph
+      // keeps the previously chosen sides as the default.
+      setCaptureLeftSlot(photoLeftSlot);
+      setPendingPhoto((prev) => {
+        if (prev) URL.revokeObjectURL(prev.previewUrl);
+        return { file, previewUrl: URL.createObjectURL(file) };
+      });
+      return;
+    }
+
+    await uploadPhoto(file, 'a');
+  };
+
+  const uploadPhoto = async (file: File, leftSlot: 'a' | 'b') => {
     setIsUploading(true);
     try {
       const formData = new FormData();
       formData.append('photo', file);
+      formData.append('leftSlot', leftSlot);
 
       const response = await fetch(`/api/duels/${duel.id}/photo`, {
         method: 'POST',
@@ -162,14 +220,50 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
       }
 
       showToast('Foto enviada.', 'success');
+      setPendingPhoto((prev) => {
+        if (prev) URL.revokeObjectURL(prev.previewUrl);
+        return null;
+      });
       onRefresh();
     } catch (err: any) {
       showToast(err.message || 'Não foi possível enviar a foto', 'error');
     } finally {
       setIsUploading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+    }
+  };
+
+  const handleConfirmCapture = async () => {
+    if (!pendingPhoto) return;
+    await uploadPhoto(pendingPhoto.file, captureLeftSlot);
+  };
+
+  const handleCancelCapture = () => {
+    setPendingPhoto((prev) => {
+      if (prev) URL.revokeObjectURL(prev.previewUrl);
+      return null;
+    });
+  };
+
+  // "Trocar lados" after a photo already exists: flip orientation in place via
+  // PATCH, no re-upload. Toggles relative to the persisted value.
+  const handleSwapSides = async () => {
+    const nextLeftSlot: 'a' | 'b' = photoLeftSlot === 'a' ? 'b' : 'a';
+    setIsFlippingSides(true);
+    try {
+      const response = await fetch(`/api/duels/${duel.id}/photo`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ leftSlot: nextLeftSlot }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Não foi possível trocar os lados');
       }
+      onRefresh();
+    } catch (err: any) {
+      showToast(err.message || 'Não foi possível trocar os lados', 'error');
+    } finally {
+      setIsFlippingSides(false);
     }
   };
 
@@ -295,36 +389,144 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
             type="file"
             accept="image/*"
             capture="environment"
-            onChange={handlePhotoUpload}
+            onChange={handleFileSelected}
             className="hidden"
           />
 
-          {duel.pourPhotoUrl ? (
-            <div className="relative rounded-[var(--radius-md)] overflow-hidden">
-              <img
-                src={duel.pourPhotoUrl}
-                alt="Pour photo"
-                className="w-full h-64 object-cover"
-              />
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="absolute top-3 right-3"
-              >
-                {isUploading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
-                    Enviando...
-                  </>
-                ) : (
-                  <>
-                    <Upload size={16} />
-                    Refotografar
-                  </>
-                )}
-              </Button>
+          {pendingPhoto ? (
+            /* Orientation capture step (crowd vote on): bind the LEFT cup to a
+               competitor before the photo goes live. Votes will follow this. */
+            <div className="space-y-4">
+              <p className="text-[var(--fg)] font-medium">
+                Toque no copo de {captureCupAName}
+              </p>
+              <div className="relative rounded-[var(--radius-md)] overflow-hidden border border-[var(--border)]">
+                <img
+                  src={pendingPhoto.previewUrl}
+                  alt="Foto dos copos"
+                  className="w-full h-64 object-cover"
+                />
+                {/* Split tap-zones: each cup labelled; the A-side highlights. */}
+                <div className="absolute inset-0 grid grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={() => setCaptureLeftSlot('a')}
+                    aria-pressed={captureLeftSlot === 'a'}
+                    aria-label={`Copo da esquerda é de ${captureLeftSlot === 'a' ? entryAName : entryBName}`}
+                    className={`relative flex flex-col justify-end p-3 text-left transition-colors ${
+                      captureLeftSlot === 'a'
+                        ? 'bg-[var(--brand)]/25 ring-2 ring-inset ring-[var(--brand)]'
+                        : 'hover:bg-[var(--brand)]/10'
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-1.5 self-start rounded-[var(--radius-xs)] bg-[var(--surface-raised)]/90 px-2 py-1 text-sm font-medium text-[var(--fg)]">
+                      {captureLeftSlot === 'a' && (
+                        <span aria-hidden className="text-[var(--brand)]">●</span>
+                      )}
+                      {captureLeftSlot === 'a' ? entryAName : entryBName}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCaptureLeftSlot('b')}
+                    aria-pressed={captureLeftSlot === 'b'}
+                    aria-label={`Copo da direita é de ${captureLeftSlot === 'a' ? entryBName : entryAName}`}
+                    className={`relative flex flex-col justify-end border-l border-[var(--surface-raised)]/60 p-3 text-right transition-colors ${
+                      captureLeftSlot === 'b'
+                        ? 'bg-[var(--brand)]/25 ring-2 ring-inset ring-[var(--brand)]'
+                        : 'hover:bg-[var(--brand)]/10'
+                    }`}
+                  >
+                    <span className="inline-flex items-center gap-1.5 self-end rounded-[var(--radius-xs)] bg-[var(--surface-raised)]/90 px-2 py-1 text-sm font-medium text-[var(--fg)]">
+                      {captureLeftSlot === 'b' && (
+                        <span aria-hidden className="text-[var(--brand)]">●</span>
+                      )}
+                      {captureLeftSlot === 'b' ? entryAName : entryBName}
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button
+                  variant="ghost"
+                  onClick={handleCancelCapture}
+                  disabled={isUploading}
+                  className="sm:flex-none"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  variant="primary"
+                  onClick={handleConfirmCapture}
+                  disabled={isUploading}
+                  className="flex-1"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-[var(--fg-inverse)] border-t-transparent rounded-full animate-spin"></div>
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Camera size={20} />
+                      Confirmar e enviar
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : duel.pourPhotoUrl ? (
+            <div className="space-y-3">
+              <div className="relative rounded-[var(--radius-md)] overflow-hidden">
+                <img
+                  src={duel.pourPhotoUrl}
+                  alt="Foto dos copos"
+                  className="w-full h-64 object-cover"
+                />
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="absolute top-3 right-3"
+                >
+                  {isUploading ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                      Enviando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={16} />
+                      Refotografar
+                    </>
+                  )}
+                </Button>
+              </div>
+              {/* Orientation summary + correction without re-uploading. */}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <p className="text-xs text-[var(--fg-3)]">
+                  Copo da esquerda: {leftCupName}
+                </p>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSwapSides}
+                  disabled={isFlippingSides}
+                >
+                  {isFlippingSides ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                      Trocando...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      Trocar lados
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           ) : (
             <Button
@@ -348,10 +550,14 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
           )}
         </div>
 
-        {/* Vote buttons — competitor name is the primary label */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-          {duel.entryA && (
-            <div className="flex flex-col gap-2">
+        {/* Vote buttons — competitor name is the primary label.
+            Each button is fully wired to its OWN cup ('A' votes credit entry A,
+            'B' votes credit entry B). Only their visual left/right ORDER follows
+            photoLeftSlot so the left-positioned button matches the cup on the
+            left of the pour photo. The onClick→cup mapping never changes. */}
+        {(() => {
+          const buttonA = duel.entryA ? (
+            <div key="vote-a" className="flex flex-col gap-2">
               <VoteButton
                 competitor={duel.entryA.competitor}
                 side="A"
@@ -369,9 +575,9 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
                 <span aria-hidden className="text-base leading-none">−</span> Remover voto
               </button>
             </div>
-          )}
-          {duel.entryB && (
-            <div className="flex flex-col gap-2">
+          ) : null;
+          const buttonB = duel.entryB ? (
+            <div key="vote-b" className="flex flex-col gap-2">
               <VoteButton
                 competitor={duel.entryB.competitor}
                 side="B"
@@ -389,8 +595,15 @@ export default function TapToTally({ duel, judgesCount, onRefresh }: TapToTallyP
                 <span aria-hidden className="text-base leading-none">−</span> Remover voto
               </button>
             </div>
-          )}
-        </div>
+          ) : null;
+          // photoLeftSlot === 'b' → entry B is on the left; otherwise A left (today's order).
+          const ordered = photoLeftSlot === 'b' ? [buttonB, buttonA] : [buttonA, buttonB];
+          return (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
+              {ordered}
+            </div>
+          );
+        })()}
 
         {/* Complete Duel Button */}
         <div className="pt-6 border-t border-[var(--border)]">

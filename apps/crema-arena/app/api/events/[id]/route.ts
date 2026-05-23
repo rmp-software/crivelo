@@ -92,6 +92,7 @@ export async function GET(
         location: event.location,
         description: event.description,
         judgesCount: event.judges_count,
+        crowdVoteEnabled: event.crowd_vote_enabled,
         status: event.status,
         bracketSize: event.bracket_size,
         organizerId: event.organizer_id,
@@ -165,7 +166,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { name, date, location, description, judges_count } = body;
+    const { name, date, location, description, judges_count, crowd_vote_enabled } = body;
 
     // Check if event exists and get its current state
     const existingEvent = await prisma.event.findUnique({
@@ -186,15 +187,54 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Only allow updates in setup status
-    if (existingEvent.status !== 'setup') {
+    // Crowd vote can be flipped in setup AND while the event is running (the
+    // organizer toggles it live from RunningEventPanel). Everything else (name,
+    // date, judges, ...) stays setup-only. A finished event is immutable.
+    if (existingEvent.status === 'finished') {
       return NextResponse.json(
         { error: 'Cannot edit event that is not in setup status' },
         { status: 400 }
       );
     }
 
-    // Validation
+    // Running event: only the crowd-vote toggle is editable. Apply it and return
+    // without touching the setup-only fields (which the panel doesn't send).
+    if (existingEvent.status === 'running') {
+      if (typeof crowd_vote_enabled !== 'boolean') {
+        return NextResponse.json(
+          { error: 'Parâmetro crowd_vote_enabled inválido.' },
+          { status: 400 }
+        );
+      }
+
+      const event = await prisma.event.update({
+        where: { id: params.id },
+        data: { crowd_vote_enabled },
+        select: {
+          id: true,
+          name: true,
+          date: true,
+          location: true,
+          status: true,
+          judges_count: true,
+          crowd_vote_enabled: true,
+          updated_at: true,
+        },
+      });
+
+      return NextResponse.json({
+        id: event.id,
+        name: event.name,
+        date: event.date.toISOString(),
+        location: event.location,
+        status: event.status,
+        judgesCount: event.judges_count,
+        crowdVoteEnabled: event.crowd_vote_enabled,
+        updatedAt: event.updated_at.toISOString(),
+      });
+    }
+
+    // Validation (setup-only full edit)
     if (!name || name.trim().length < 3) {
       return NextResponse.json(
         { error: 'Event name is required and must be at least 3 characters' },
@@ -233,6 +273,10 @@ export async function PUT(
         location: location?.trim() || null,
         description: description?.trim() || null,
         judges_count: parseInt(judges_count, 10),
+        // Only override when supplied so a form that omits it keeps the current value.
+        ...(crowd_vote_enabled === undefined
+          ? {}
+          : { crowd_vote_enabled: Boolean(crowd_vote_enabled) }),
       },
       select: {
         id: true,
@@ -241,6 +285,7 @@ export async function PUT(
         location: true,
         status: true,
         judges_count: true,
+        crowd_vote_enabled: true,
         updated_at: true,
       },
     });
@@ -252,6 +297,7 @@ export async function PUT(
       location: event.location,
       status: event.status,
       judgesCount: event.judges_count,
+      crowdVoteEnabled: event.crowd_vote_enabled,
       updatedAt: event.updated_at.toISOString(),
     });
   } catch (error: any) {

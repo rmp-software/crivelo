@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
-import AoVivoTab from './tabs/AoVivoTab';
+import AoVivoTab, { type Duel } from './tabs/AoVivoTab';
 import ChaveTab from './tabs/ChaveTab';
 import LeaderboardTab from './tabs/LeaderboardTab';
 import Badge from './Badge';
 import SponsorBlock from './SponsorBlock';
+import type { CrowdFavorite } from '@/lib/crowd-vote';
 
 interface LiveCompanionProps {
   eventId: string;
@@ -21,12 +22,13 @@ interface EventData {
   date: string;
   location?: string;
   judgesCount: number;
+  crowdVoteEnabled?: boolean;
 }
 
 interface CurrentDuelData {
   event: EventData;
-  currentDuel: any;
-  nextDuel: any;
+  currentDuel: Duel | null;
+  nextDuel: Duel | null;
   currentRound: number;
   totalRounds: number;
 }
@@ -41,6 +43,7 @@ interface LeaderboardData {
   event: any;
   leaderboard: any[];
   isComplete: boolean;
+  crowdFavorite: CrowdFavorite | null;
 }
 
 const fetcher = (url: string) => fetch(url).then((r) => r.ok ? r.json() : Promise.reject(new Error('Failed to fetch event data')));
@@ -273,6 +276,7 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
               event={leaderboardData.event}
               leaderboard={leaderboardData.leaderboard}
               isComplete={leaderboardData.isComplete}
+              crowdFavorite={leaderboardData.crowdFavorite ?? null}
             />
           )}
         </div>

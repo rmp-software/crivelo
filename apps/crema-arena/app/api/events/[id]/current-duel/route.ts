@@ -27,6 +27,7 @@ export async function GET(
         date: true,
         location: true,
         judges_count: true,
+        crowd_vote_enabled: true,
       },
     });
 
@@ -44,6 +45,7 @@ export async function GET(
           date: event.date.toISOString(),
           location: event.location,
           judgesCount: event.judges_count,
+          crowdVoteEnabled: event.crowd_vote_enabled,
         },
         currentDuel: null,
         currentRound: null,
@@ -143,6 +145,7 @@ export async function GET(
         date: event.date.toISOString(),
         location: event.location,
         judgesCount: event.judges_count,
+        crowdVoteEnabled: event.crowd_vote_enabled,
       },
       currentDuel: activeDuel
         ? {
@@ -152,6 +155,9 @@ export async function GET(
             status: activeDuel.status,
             votesA: activeDuel.votes_a,
             votesB: activeDuel.votes_b,
+            crowdVotesA: activeDuel.crowd_votes_a,
+            crowdVotesB: activeDuel.crowd_votes_b,
+            photoLeftSlot: activeDuel.photo_left_slot,
             pourPhotoUrl: activeDuel.pour_photo_url,
             startedAt: activeDuel.started_at ? activeDuel.started_at.toISOString() : null,
             isBronzeMatch: activeDuel.is_bronze_match,
@@ -174,6 +180,12 @@ export async function GET(
             id: nextDuel.id,
             round: nextDuel.round,
             position: nextDuel.position,
+            status: nextDuel.status,
+            votesA: nextDuel.votes_a,
+            votesB: nextDuel.votes_b,
+            crowdVotesA: nextDuel.crowd_votes_a,
+            crowdVotesB: nextDuel.crowd_votes_b,
+            photoLeftSlot: nextDuel.photo_left_slot,
             isBronzeMatch: nextDuel.is_bronze_match,
             entryA: nextDuel.entry_a
               ? {

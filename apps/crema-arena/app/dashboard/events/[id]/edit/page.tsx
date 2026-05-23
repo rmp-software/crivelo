@@ -13,6 +13,7 @@ interface EventData {
   location: string | null;
   description: string | null;
   judgesCount: number;
+  crowdVoteEnabled: boolean;
   status: string;
 }
 
@@ -101,6 +102,7 @@ export default function EditEventPage() {
             location: event.location || '',
             description: event.description || '',
             judgesCount: event.judgesCount,
+            crowdVoteEnabled: event.crowdVoteEnabled,
           }}
         />
       </div>

@@ -25,6 +25,9 @@ interface Duel {
   status: string;
   votesA: number;
   votesB: number;
+  crowdVotesA?: number;
+  crowdVotesB?: number;
+  photoLeftSlot?: 'a' | 'b';
   pourPhotoUrl: string | null;
   startedAt: string | null;
   isBronzeMatch?: boolean;
@@ -39,6 +42,7 @@ interface Event {
   date: string;
   location: string | null;
   judgesCount: number;
+  crowdVoteEnabled: boolean;
 }
 
 interface CurrentDuelData {
@@ -83,10 +87,19 @@ interface LeaderboardEntry {
   position: number;
 }
 
+interface CrowdFavorite {
+  competitor: Competitor;
+  crowdWins: number;
+  crowdVotes: number;
+}
+
 interface LeaderboardData {
   event: { id: string; name: string; status: string };
   leaderboard: LeaderboardEntry[];
   isComplete: boolean;
+  // Non-null only when the event is finished, crowd vote was enabled, and at
+  // least one crowd vote was cast all event (computed server-side).
+  crowdFavorite: CrowdFavorite | null;
 }
 
 interface SponsorEntry {
@@ -252,6 +265,10 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
           </div>
         )}
 
+        {/* Crowd favorite — tasteful one-line credit under the podium, styled
+            like the sponsor credit. Hidden when null (disabled / no votes). */}
+        <PodiumCrowdFavorite favorite={leaderboard?.crowdFavorite ?? null} />
+
         {/* Sponsor credit — quiet line under the podium row; cream chips. Hidden
             entirely when there are no sponsors so the podium isn't obscured. */}
         <PodiumSponsorCredit sponsors={sponsorsData ?? []} />
@@ -294,6 +311,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               pourPhotoUrl={currentDuel.pourPhotoUrl!}
               entryA={currentDuel.entryA}
               entryB={currentDuel.entryB}
+              photoLeftSlot={currentDuel.photoLeftSlot}
               votesA={currentDuel.votesA}
               votesB={currentDuel.votesB}
             />
@@ -303,6 +321,17 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               entryB={currentDuel.entryB}
               votesA={currentDuel.votesA}
               votesB={currentDuel.votesB}
+            />
+          )}
+
+          {/* Unofficial crowd-lean bar — secondary to the official N × M.
+              Gated on the per-event toggle and hidden when no crowd votes
+              exist (no empty chrome). */}
+          {event.crowdVoteEnabled && (
+            <CrowdLeanBar
+              a={currentDuel.crowdVotesA ?? 0}
+              b={currentDuel.crowdVotesB ?? 0}
+              photoLeftSlot={currentDuel.photoLeftSlot}
             />
           )}
 
@@ -521,22 +550,115 @@ function CentralScore({ a, b }: { a: number; b: number }) {
   );
 }
 
+/**
+ * Unofficial crowd-lean bar (TV active duel). A slim horizontal bar showing the
+ * crowd's A-vs-B share — deliberately SECONDARY to the official `N × M` score.
+ *
+ * Sizing is in 1080p stage-space px (like SponsorStrip): LiveStage's
+ * `transform: scale()` grows it proportionally from 1920×1080 to 4K, so the
+ * spec's "~30vw × ~0.8vh" maps to 576×9 px in stage-space (0.30·1920, 0.008·1080).
+ * Do NOT use vw/vh here — they'd double-scale against the stage transform.
+ *
+ * Hidden entirely when the duel has zero crowd votes (no empty chrome). The
+ * caller already gates the whole bar on `event.crowdVoteEnabled`.
+ */
+function CrowdLeanBar({
+  a,
+  b,
+  photoLeftSlot,
+}: {
+  a: number;
+  b: number;
+  photoLeftSlot?: 'a' | 'b';
+}) {
+  const total = a + b;
+  if (total === 0) return null;
+
+  // Orient the bar to the photo: the left of the bar is the cup physically on
+  // the left in the photo (entry A unless photoLeftSlot === 'b'), so the lean
+  // reads in the same direction as the competitor names shown above it.
+  const leftCount = photoLeftSlot === 'b' ? b : a;
+  const pctLeft = Math.round((leftCount / total) * 100);
+  const pctRight = 100 - pctLeft;
+
+  return (
+    <div
+      className="flex items-center flex-shrink-0"
+      style={{ gap: 14, marginTop: 4 }}
+      aria-label={`Voto do público: ${pctLeft}% à esquerda, ${pctRight}% à direita`}
+    >
+      {/* Mono caps label — muted cream, set like AO VIVO / APOIO */}
+      <span
+        className="font-mono uppercase text-[var(--crema-300)] flex-shrink-0"
+        style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.85 }}
+      >
+        Público
+      </span>
+
+      {/* Left-cup percentage (muted) */}
+      <span
+        className="font-mono tabular-nums text-[var(--crema-300)] flex-shrink-0"
+        style={{ fontSize: 11, opacity: 0.7, minWidth: 30, textAlign: 'right' }}
+      >
+        {pctLeft}%
+      </span>
+
+      {/* The lean bar itself — espresso track, gold left-cup-share fill */}
+      <div
+        className="overflow-hidden flex-shrink-0"
+        style={{
+          width: 576,
+          height: 9,
+          borderRadius: 9,
+          backgroundColor: 'var(--espresso-700)',
+          border: '1px solid rgba(220,197,158,.14)',
+        }}
+      >
+        <div
+          style={{
+            width: `${pctLeft}%`,
+            height: '100%',
+            backgroundColor: 'var(--gold)',
+            transition: 'width 600ms ease',
+          }}
+        />
+      </div>
+
+      {/* Right-cup percentage (muted) */}
+      <span
+        className="font-mono tabular-nums text-[var(--crema-300)] flex-shrink-0"
+        style={{ fontSize: 11, opacity: 0.7, minWidth: 30, textAlign: 'left' }}
+      >
+        {pctRight}%
+      </span>
+    </div>
+  );
+}
+
 function PourPhotoCenterpiece({
   pourPhotoUrl,
   entryA,
   entryB,
+  photoLeftSlot,
   votesA,
   votesB,
 }: {
   pourPhotoUrl: string;
   entryA: Entry;
   entryB: Entry;
+  photoLeftSlot?: 'a' | 'b';
   votesA: number;
   votesB: number;
 }) {
   // No text overlay — sits cleanly above a separate competitor-info row so
   // names stay readable regardless of the photo's exposure. Height capped so
   // the TV viewport never scrolls.
+  //
+  // The name captions follow the cup positions in the photo: `photoLeftSlot`
+  // records which entry's cup is on the LEFT, so the left caption must name that
+  // entry. The central score keeps its A × B order regardless.
+  const leftEntry = photoLeftSlot === 'b' ? entryB : entryA;
+  const rightEntry = photoLeftSlot === 'b' ? entryA : entryB;
   return (
     <div className="flex flex-col items-center w-full max-w-5xl gap-4 md:gap-6">
       <div className="rounded-[var(--radius-lg)] overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)]">
@@ -550,10 +672,10 @@ function PourPhotoCenterpiece({
       <div className="flex items-center justify-center gap-6 md:gap-10 w-full">
         <div className="flex-1 min-w-0 text-right">
           <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
-            {entryA.competitor.name}
+            {leftEntry.competitor.name}
           </p>
           <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-            {entryA.competitor.coffeeShop}
+            {leftEntry.competitor.coffeeShop}
           </p>
         </div>
         <div
@@ -565,10 +687,10 @@ function PourPhotoCenterpiece({
         </div>
         <div className="flex-1 min-w-0 text-left">
           <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
-            {entryB.competitor.name}
+            {rightEntry.competitor.name}
           </p>
           <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
-            {entryB.competitor.coffeeShop}
+            {rightEntry.competitor.coffeeShop}
           </p>
         </div>
       </div>
@@ -713,6 +835,31 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
  * No-logo sponsor falls back to its name in --font-display inside the chip.
  * Hidden entirely when there are no sponsors.
  */
+/**
+ * Crowd favorite credit (TV finished state). One tasteful line —
+ * `Favorito do público` (quiet mono-ish label) + the competitor's name in the
+ * display font — styled like the sponsor `Patrocinado por` credit. Deliberately
+ * just the line, not a full card (the companion carries the rich version).
+ * Hidden entirely when there's no crowd favorite.
+ */
+function PodiumCrowdFavorite({ favorite }: { favorite: CrowdFavorite | null }) {
+  if (!favorite) return null;
+
+  return (
+    <section
+      aria-label="Favorito do público"
+      className="mt-8 md:mt-10 flex flex-col items-center w-full"
+    >
+      <p className="font-display text-sm md:text-base lg:text-lg text-[var(--crema-200)] text-center">
+        Favorito do público
+      </p>
+      <p className="mt-1 font-display font-bold text-2xl md:text-3xl text-[var(--marigold-500)] text-center text-balance">
+        {favorite.competitor.name}
+      </p>
+    </section>
+  );
+}
+
 function PodiumSponsorCredit({ sponsors }: { sponsors: SponsorEntry[] }) {
   if (sponsors.length === 0) return null;
 

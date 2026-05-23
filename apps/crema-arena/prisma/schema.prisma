@@ -90,6 +90,7 @@ model Event {
   judges_count  Int          @default(3)
   status        EventStatus  @default(setup)
   bracket_size  Int?
+  crowd_vote_enabled Boolean  @default(true)
   created_at    DateTime     @default(now())
   updated_at    DateTime     @updatedAt
 
@@ -130,6 +131,9 @@ model Duel {
   entry_b_id      String?
   votes_a         Int           @default(0)
   votes_b         Int           @default(0)
+  crowd_votes_a   Int           @default(0)
+  crowd_votes_b   Int           @default(0)
+  photo_left_slot DuelSlot      @default(a)
   winner_entry_id String?
   status          DuelStatus    @default(pending)
   wildcard_type   WildcardType?
@@ -151,6 +155,7 @@ model Duel {
   previous_duels  Duel[]        @relation("DuelProgression")
 
   votes           Vote[]
+  crowd_votes     CrowdVote[]
 
   @@map("duels")
 }
@@ -164,6 +169,21 @@ model Vote {
   duel       Duel     @relation(fields: [duel_id], references: [id], onDelete: Cascade)
 
   @@map("votes")
+}
+
+model CrowdVote {
+  id         String   @id @default(uuid())
+  duel_id    String
+  device_id  String
+  side       VoteSide
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  duel       Duel     @relation(fields: [duel_id], references: [id], onDelete: Cascade)
+
+  @@unique([duel_id, device_id])
+  @@index([duel_id])
+  @@map("crowd_votes")
 }
 
 model Sponsor {

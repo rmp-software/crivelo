@@ -29,6 +29,7 @@ interface Duel {
   votesA: number;
   votesB: number;
   pourPhotoUrl: string | null;
+  photoLeftSlot?: 'a' | 'b' | null;
   entryA: Entry | null;
   entryB: Entry | null;
   winner?: Entry | null;
@@ -47,6 +48,7 @@ const runningFetcher = (url: string) =>
 export default function RunningEventPanel({ eventId, onEventFinished }: RunningEventPanelProps) {
   const [isFinishing, setIsFinishing] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [isTogglingCrowdVote, setIsTogglingCrowdVote] = useState(false);
   const { showToast } = useToast();
 
   const { data, mutate: fetchRunningData } = useSWR(
@@ -58,6 +60,11 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   const currentRound = data?.currentRound ?? 1;
   const totalRounds = data?.totalRounds ?? 1;
   const judgesCount = data?.judgesCount ?? 3;
+  // Derive the toggle state ONLY from loaded data — no `?? true` fallback, or an
+  // event with crowd_vote_enabled = false would briefly flash ON before the
+  // first fetch resolves. The toggle is rendered only after the isLoading
+  // early-return below, so `data` is always present where it's read.
+  const crowdVoteEnabled: boolean = data?.crowdVoteEnabled === true;
   const activeDuel: Duel | null = data?.activeDuel ?? null;
   const duels: Duel[] = data?.duels ?? [];
   const allDuelsCompleted: boolean = data?.allDuelsCompleted ?? false;
@@ -83,6 +90,46 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
     } catch (err) {
       console.error(err);
       showToast(err instanceof Error ? err.message : 'Falha ao retomar duelo', 'error');
+    }
+  };
+
+  // Crowd vote can be flipped live; the edit API only touches the Event row,
+  // so previously cast crowd votes are never deleted by this.
+  const handleToggleCrowdVote = async (next: boolean) => {
+    setIsTogglingCrowdVote(true);
+    // Optimistic: reflect the new state immediately, reconcile on refetch.
+    await fetchRunningData(
+      (current: any) => (current ? { ...current, crowdVoteEnabled: next } : current),
+      { revalidate: false }
+    );
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ crowd_vote_enabled: next }),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => ({}));
+        throw new Error(body.error || 'Falha ao atualizar o voto do público');
+      }
+      showToast(next ? 'Voto do público ativado.' : 'Voto do público desativado.', 'success');
+      // The write already landed. Do NOT eagerly refetch — that races the 5s
+      // refreshInterval poll and can flicker the toggle. Confirm the value
+      // locally (revalidate:false); the next natural poll reconciles.
+      await fetchRunningData(
+        (current: any) => (current ? { ...current, crowdVoteEnabled: next } : current),
+        { revalidate: false }
+      );
+    } catch (err) {
+      console.error(err);
+      // Roll back the optimistic flip by restoring true server state.
+      await fetchRunningData();
+      showToast(
+        err instanceof Error ? err.message : 'Falha ao atualizar o voto do público',
+        'error'
+      );
+    } finally {
+      setIsTogglingCrowdVote(false);
     }
   };
 
@@ -166,12 +213,41 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
             </Button>
           )}
         </div>
+
+        {/* Crowd vote — live toggle (organizer can flip it during the event) */}
+        <div className="mt-6 pt-6 border-t border-[var(--border)] flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-[var(--fg-2)]">Voto do público</p>
+            <p className="text-sm text-[var(--fg-3)] mt-0.5">
+              O público vota pelo celular, sem afetar o resultado dos jurados.
+            </p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={crowdVoteEnabled}
+            aria-label="Voto do público"
+            disabled={isTogglingCrowdVote}
+            onClick={() => handleToggleCrowdVote(!crowdVoteEnabled)}
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+              crowdVoteEnabled ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
+            }`}
+            style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-[var(--surface-raised)] shadow transition-transform ${
+                crowdVoteEnabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+              style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
+            />
+          </button>
+        </div>
       </div>
 
       {/* Active Duel - Tap-to-Tally */}
       {activeDuel && (
         <>
-          <TapToTally duel={activeDuel} judgesCount={judgesCount} onRefresh={fetchRunningData} />
+          <TapToTally duel={activeDuel} judgesCount={judgesCount} crowdVoteEnabled={crowdVoteEnabled} onRefresh={fetchRunningData} />
           {/* Skip-duel control: only meaningful when another pending duel exists in this round */}
           {duels.some(
             (d) =>

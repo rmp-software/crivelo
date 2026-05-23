@@ -2,6 +2,7 @@
 
 import { Trophy, Medal } from 'lucide-react';
 import Badge from '../Badge';
+import type { CrowdFavorite } from '@/lib/crowd-vote';
 
 interface Competitor {
   id: string;
@@ -31,9 +32,15 @@ interface LeaderboardTabProps {
   event: EventData;
   leaderboard: LeaderboardEntry[];
   isComplete: boolean;
+  crowdFavorite?: CrowdFavorite | null;
 }
 
-export default function LeaderboardTab({ event, leaderboard, isComplete }: LeaderboardTabProps) {
+export default function LeaderboardTab({
+  event,
+  leaderboard,
+  isComplete,
+  crowdFavorite = null,
+}: LeaderboardTabProps) {
   // Event not started yet
   if (event.status === 'setup') {
     return (
@@ -131,6 +138,48 @@ export default function LeaderboardTab({ event, leaderboard, isComplete }: Leade
             : 'Atualizando a cada 5 segundos'}
         </p>
       </div>
+
+      {/* Favorito do público — finished-state award, separate from the champion.
+          Hidden entirely when crowdFavorite is null (disabled, no votes, or not
+          finished — the leaderboard API only returns it when applicable). The
+          isComplete gate mirrors the Champion banner so the component is
+          self-contained (defense-in-depth against a non-finished API payload). */}
+      {isComplete && crowdFavorite && (
+        <div className="mb-4 bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-1)] border-2 border-[var(--gold)]">
+          <div className="px-4 pt-3 pb-2 bg-[var(--gold-soft)] border-b border-[var(--gold)]">
+            <p className="text-xs font-bold text-[var(--gold)] uppercase tracking-wide font-[family-name:var(--font-mono)]">
+              Favorito do público
+            </p>
+          </div>
+          <div className="p-4 flex items-center gap-3">
+            {/* Photo — matches the standings-row avatar treatment */}
+            <div className="rounded-full overflow-hidden bg-[var(--bg-2)] flex-shrink-0 w-14 h-14 border-2 border-[var(--gold)]">
+              <img
+                src={crowdFavorite.competitor.photoUrl}
+                alt={crowdFavorite.competitor.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold truncate text-base text-[var(--gold)]">
+                {crowdFavorite.competitor.name}
+              </p>
+              <p className="text-xs text-[var(--fg-3)] truncate">
+                {crowdFavorite.competitor.coffeeShop}
+              </p>
+              <p className="text-xs text-[var(--fg-2)] mt-1 font-[family-name:var(--font-mono)]">
+                {crowdFavorite.crowdWins === 1
+                  ? '1 duelo'
+                  : `${crowdFavorite.crowdWins} duelos`}
+                {' · '}
+                {crowdFavorite.crowdVotes === 1
+                  ? '1 voto do público'
+                  : `${crowdFavorite.crowdVotes} votos do público`}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="space-y-3">
         {leaderboard.map((entry, index) => {

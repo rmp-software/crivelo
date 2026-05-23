@@ -140,6 +140,7 @@ export async function GET(
             votesA: activeDuel.votes_a,
             votesB: activeDuel.votes_b,
             pourPhotoUrl: activeDuel.pour_photo_url,
+            photoLeftSlot: activeDuel.photo_left_slot,
             entryA: activeDuel.entry_a
               ? {
                   id: activeDuel.entry_a.id,
@@ -155,6 +156,7 @@ export async function GET(
           }
         : null,
       judgesCount: event.judges_count,
+      crowdVoteEnabled: event.crowd_vote_enabled,
       duels: currentRoundDuels.map((duel) => ({
         id: duel.id,
         round: duel.round,

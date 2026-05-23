@@ -14,6 +14,7 @@ interface EventFormProps {
     location?: string;
     description?: string;
     judgesCount: number;
+    crowdVoteEnabled?: boolean;
   };
   mode: 'create' | 'edit';
 }
@@ -29,6 +30,8 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
     location: initialData?.location || '',
     description: initialData?.description || '',
     judges_count: initialData?.judgesCount || 3,
+    // Default on for new events; preserve the saved value when editing.
+    crowd_vote_enabled: initialData?.crowdVoteEnabled ?? true,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -78,6 +81,12 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
     setIsSubmitting(true);
 
     try {
+      // NOTE: this form sends the FULL event payload. In `mode='edit'` it must
+      // only ever be rendered for an event in `setup` (the edit page walls off
+      // non-setup events client-side). Running-event edits — i.e. flipping
+      // crowd_vote_enabled live — are owned by RunningEventPanel, which sends
+      // only the toggle field; the events API also ignores the setup-only fields
+      // when the event is running. Do not reuse this form for running events.
       const url = mode === 'create' ? '/api/events' : `/api/events/${eventId}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
 
@@ -189,6 +198,41 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
         fullWidth
         helperText="Entre 1 e 10 jurados"
       />
+
+      {/* Crowd vote toggle */}
+      <div>
+        <div className="flex items-center justify-between gap-4">
+          <label
+            htmlFor="crowd_vote_enabled"
+            className="block text-sm font-medium text-[var(--fg-2)]"
+          >
+            Voto do público
+          </label>
+          <button
+            type="button"
+            role="switch"
+            id="crowd_vote_enabled"
+            aria-checked={formData.crowd_vote_enabled}
+            onClick={() =>
+              setFormData({ ...formData, crowd_vote_enabled: !formData.crowd_vote_enabled })
+            }
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 ${
+              formData.crowd_vote_enabled ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
+            }`}
+            style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-[var(--surface-raised)] shadow transition-transform ${
+                formData.crowd_vote_enabled ? 'translate-x-6' : 'translate-x-1'
+              }`}
+              style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
+            />
+          </button>
+        </div>
+        <p className="mt-1.5 text-sm text-[var(--fg-3)]">
+          O público vota pelo celular, sem afetar o resultado dos jurados.
+        </p>
+      </div>
 
       {/* Action Buttons */}
       <div className="flex items-center gap-3 pt-4">

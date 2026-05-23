@@ -37,6 +37,7 @@ export async function GET(request: NextRequest) {
           location: true,
           status: true,
           judges_count: true,
+          crowd_vote_enabled: true,
           created_at: true,
           _count: {
             select: { entries: true },
@@ -57,6 +58,7 @@ export async function GET(request: NextRequest) {
         location: event.location,
         status: event.status,
         judgesCount: event.judges_count,
+        crowdVoteEnabled: event.crowd_vote_enabled,
         competitorCount: event._count.entries,
         createdAt: event.created_at.toISOString(),
       })),
@@ -82,7 +84,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, date, location, description, judges_count } = body;
+    const { name, date, location, description, judges_count, crowd_vote_enabled } = body;
 
     // Validation
     if (!name || name.trim().length < 3) {
@@ -130,6 +132,8 @@ export async function POST(request: NextRequest) {
         location: location?.trim() || null,
         description: description?.trim() || null,
         judges_count: parseInt(judges_count, 10),
+        // Default to true when the toggle isn't supplied (headline behavior).
+        crowd_vote_enabled: crowd_vote_enabled === undefined ? true : Boolean(crowd_vote_enabled),
         status: 'setup',
         organizer_id: session.user.id,
       },
@@ -140,6 +144,7 @@ export async function POST(request: NextRequest) {
         location: true,
         status: true,
         judges_count: true,
+        crowd_vote_enabled: true,
         created_at: true,
       },
     });
@@ -152,6 +157,7 @@ export async function POST(request: NextRequest) {
         location: event.location,
         status: event.status,
         judgesCount: event.judges_count,
+        crowdVoteEnabled: event.crowd_vote_enabled,
         createdAt: event.created_at.toISOString(),
       },
       { status: 201 }

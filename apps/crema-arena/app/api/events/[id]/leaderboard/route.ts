@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { computeCrowdFavorite } from '@/lib/crowd-vote';
 
 interface CompetitorDb {
   id: string;
@@ -24,11 +25,61 @@ export async function GET(
         name: true,
         status: true,
         bracket_size: true,
+        crowd_vote_enabled: true,
       },
     });
 
     if (!event) {
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
+    }
+
+    // Crowd favorite ("Favorito do público"): a finished-state award only.
+    // null when crowd vote is disabled, when the event isn't finished yet, or
+    // when no crowd votes were cast at all (computeCrowdFavorite).
+    let crowdFavorite: ReturnType<typeof computeCrowdFavorite> = null;
+    if (event.crowd_vote_enabled && event.status === 'finished') {
+      const crowdDuels = await prisma.duel.findMany({
+        where: { event_id: params.id },
+        // Deterministic iteration order so computeCrowdFavorite's
+        // "stable by first-seen entry order" tiebreak is reproducible
+        // (Postgres row return order is otherwise non-deterministic).
+        orderBy: [{ round: 'asc' }, { position: 'asc' }],
+        select: {
+          status: true,
+          crowd_votes_a: true,
+          crowd_votes_b: true,
+          entry_a: {
+            select: {
+              id: true,
+              competitor: {
+                select: { id: true, name: true, photo_url: true, coffee_shop: true },
+              },
+            },
+          },
+          entry_b: {
+            select: {
+              id: true,
+              competitor: {
+                select: { id: true, name: true, photo_url: true, coffee_shop: true },
+              },
+            },
+          },
+        },
+      });
+
+      crowdFavorite = computeCrowdFavorite(
+        crowdDuels.map((d) => ({
+          status: d.status,
+          crowd_votes_a: d.crowd_votes_a,
+          crowd_votes_b: d.crowd_votes_b,
+          entry_a: d.entry_a
+            ? { id: d.entry_a.id, competitor: toCamelCompetitor(d.entry_a.competitor) }
+            : null,
+          entry_b: d.entry_b
+            ? { id: d.entry_b.id, competitor: toCamelCompetitor(d.entry_b.competitor) }
+            : null,
+        }))
+      );
     }
 
     // Get all entries with their duels data
@@ -175,6 +226,7 @@ export async function GET(
       },
       leaderboard: displayLeaderboard,
       isComplete: isFinished,
+      crowdFavorite,
     });
   } catch (error: any) {
     console.error('Error fetching leaderboard:', error);
