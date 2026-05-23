@@ -110,9 +110,11 @@ Before invoking the reviewer, double-check what the coding agent reported:
 
 If anything is missing or fabricated, treat it as a retry (go to Step 7 with a coder retry, not a reviewer round).
 
-### Step 6 — Dispatch the adversarial reviewer
+### Step 6 — Dispatch the adversarial reviewer(s)
 
-Use the `Agent` tool. Subagent type: `pr-review-toolkit:code-reviewer`. **Pass `model: "sonnet"`** to override the default. The separation (Sonnet reviewing Opus's work) reduces shared blind spots.
+Two review axes run as **separate subagents**: a correctness reviewer (always) and a spec-compliance reviewer (when the diff touches user-facing surfaces). Both must clear before Step 7's APPROVE.
+
+**6a — Correctness reviewer (always).** Use the `Agent` tool. Subagent type: `pr-review-toolkit:code-reviewer`. **Pass `model: "sonnet"`** to override the default. The separation (Sonnet reviewing Opus's work) reduces shared blind spots.
 
 Reviewer prompt — adversarial framing:
 
@@ -153,18 +155,24 @@ Return one of:
 Do NOT return "looks good" or any variant. Approval requires evidence of checking, not absence of obvious bugs.
 ```
 
+**6b — Spec-compliance reviewer (user-facing diffs only).** If `git diff feature/<slug>...HEAD --name-only` includes any `app/**` `.tsx`/UI/copy file, or changes the shape of a live endpoint (`current-duel`, `bracket`, `leaderboard`), ALSO dispatch the project's `spec-compliance-reviewer` agent (Subagent type: `spec-compliance-reviewer`; it pins `model: sonnet` itself). It audits the `app_spec.txt` + CLAUDE.md contracts the correctness reviewer doesn't: pt-BR copy, sentence case, `N × M` formatting, pluralization, design tokens, fonts/SVGs, `useToast`/`ConfirmationModal` (no native `alert`/`confirm`), live-surface reachability, and Blob uploads. Pass it the same branch/diff + the sub-issue's UI/Copy acceptance criteria. Skip it for purely backend sub-issues (schema, internal libs, API logic with no response-shape or copy change).
+
+Treat a `BLOCKER` from the spec-compliance reviewer exactly like a correctness BLOCK (Step 7 retry path). `WARN`/`NIT` are non-blocking but should be reported and, if cheap, folded into the same retry.
+
 ### Step 7 — Handle the verdict
 
-**If BLOCK:**
+**If BLOCK:** (a `BLOCKER` from *either* the correctness or spec-compliance reviewer)
 
-Tell the user what the reviewer found, in a tight summary. Ask whether to:
+Tell the user what either reviewer found, in a tight summary. Ask whether to:
 - (a) Dispatch the coder again to address the feedback (counts as 1 retry)
 - (b) Manually intervene
 - (c) Abandon this sub-issue
 
-If (a), increment the retry counter. **Cap retries at 3.** On the 4th cycle, automatically pick (b) and surface to the user — do not loop further. The retry coder prompt should include the reviewer's full feedback verbatim plus the original prompt.
+If (a), increment the retry counter. **Cap retries at 3.** On the 4th cycle, automatically pick (b) and surface to the user — do not loop further. The retry coder prompt should include both reviewers' full feedback verbatim plus the original prompt.
 
-**If APPROVE:**
+(In **Autonomous mode**, skip the question: a BLOCK auto-selects (a) until the cap; the 3rd consecutive BLOCK on one sub-issue HALTS the loop — see *Autonomous mode*.)
+
+**If APPROVE:** (correctness APPROVE **and**, when run, spec-compliance with no `BLOCKER`)
 
 Proceed to Step 8.
 
@@ -223,9 +231,29 @@ EOF
 - Retries used (if any) and a one-line summary of what changed during retries
 - Next step: another `/work-iteration <slug>` for the next sub-issue, or open the umbrella PR if this was the last
 
+## Autonomous mode (iterate-all)
+
+Triggered when the user asks to run the whole feature unattended (e.g. `/work-iteration <slug> --auto`, "iterate automatically", "run the rest while I sleep"). Instead of one sub-issue, loop the Steps 1–9 workflow over **all** `Todo` sub-issues in dependency order, merging each sub-PR into the **feature branch** as you go. No questions between issues — the decision policy below replaces every "ask the user" prompt.
+
+**Per-issue cycle (unchanged):** coder subagent → correctness reviewer (+ spec-compliance reviewer for user-facing diffs) → on dual-APPROVE: commit, push, sub-PR into `feature/<slug>`, **merge it** (`gh pr merge --squash --delete-branch`), mark Linear Done, next. On BLOCK: auto-retry the coder with verbatim feedback.
+
+**HALT the entire loop and write the morning report when ANY of these fire** (do nothing further — leave it for the human):
+
+1. **3 reviews blocked on one sub-issue.** A sub-issue that reaches its 3-retry cap without a dual-APPROVE. Because sub-issues form a dependency chain, a stuck one blocks everything downstream — so halt, don't skip.
+2. **Critical path / hard stop:** an irreversible or destructive action; a decision the spec does not settle (ambiguity the coder would have to invent); an evidence gate that retries can't satisfy (e.g. dev server won't boot, migration fails); or anything that would **touch `main` or production**.
+3. **Migration safety:** schema/migration sub-issues run **dev-only** (`prisma migrate dev` against the local `DATABASE_URL`; the prisma-guard hook enforces this). NEVER run `migrate deploy` / touch the prod (Neon) DB autonomously.
+
+**Boundaries that always hold in autonomous mode:**
+- **Never open or merge the umbrella `feature/<slug>` → `main` PR.** Stop after the last sub-issue merges into the feature branch and leave that PR for the human — especially when the feature includes a migration (prod isn't auto-migrated).
+- Merging **sub-PRs into the feature branch** is allowed autonomously; merging anything into `main` is not.
+- The dual-review separation and all evidence gates still apply to every issue — autonomy lowers the *interaction* bar, never the *verification* bar.
+
+**Progress + report:** keep a running log (sub-issue → APPROVE/retries/PR URL). Linear `Done` state is the durable record. On halt or completion, post one consolidated report: issues completed (with PR URLs + each reviewer's APPROVE checklist), where it stopped and exactly why, retries used, and the single next action for the human (usually: review the merged feature branch, run the prod migration, then open the umbrella PR).
+
 ## Things to never do
 
 - **Never commit code the reviewer BLOCKED.** No "the issues are small, I'll fix in next PR."
+- **Never open or merge the umbrella PR into `main` in autonomous mode.** The feature→main merge is always a human step.
 - **Never push to main.** Sub-PRs target the feature branch.
 - **Never let the same agent both code and review.** The Sonnet reviewer is non-negotiable structural separation.
 - **Never invent evidence.** If a screenshot path is claimed, you must `ls` it and confirm size > 0.
