@@ -6,13 +6,15 @@ This project requires **Node.js 18 or higher**. The current environment has Node
 
 ### To proceed with setup:
 
-1. **Install Node.js 20 using nvm:**
+1. **Install Node.js 24 using nvm:**
+
    ```bash
-   nvm install 20
-   nvm use 20
+   nvm install 24
+   nvm use 24
    ```
 
 2. **Run the initialization script:**
+
    ```bash
    ./init.sh
    ```
@@ -56,6 +58,7 @@ npm run dev
 ## Project Status
 
 ✅ **Completed:**
+
 - Next.js 14 project structure created
 - TypeScript configured
 - Tailwind CSS configured with Crema Arena design system
@@ -70,6 +73,7 @@ npm run dev
 - Directory structure created (fonts, assets, uploads, screenshots)
 
 ⚠️ **Requires Node.js 18+:**
+
 - Dependencies installation
 - Prisma Client generation
 - Database migrations
@@ -78,6 +82,7 @@ npm run dev
 ## Next Steps After Setup
 
 Once the project is running with Node.js 18+:
+
 1. Verify the homepage loads at http://localhost:3000
 2. Check that CSS variables are applied correctly
 3. Test database connection with Prisma Studio: `npx prisma studio`
