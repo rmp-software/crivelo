@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# turborepo
+.turbo
+
+# next.js / build output
+.next/
+out/
+build/
+dist/
+
+# testing
+coverage/
+
+# misc
+.DS_Store
+*.pem
+
+# local env files — ignore all .env variants except committed examples
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# playwright / validation artifacts
+.playwright-mcp/
