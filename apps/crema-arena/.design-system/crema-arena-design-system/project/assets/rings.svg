@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Concentric crema rings">
+  <g fill="none" stroke-width="2">
+    <circle cx="100" cy="100" r="95" stroke="#1F1410" stroke-opacity="0.08"></circle>
+    <circle cx="100" cy="100" r="78" stroke="#1F1410" stroke-opacity="0.14"></circle>
+    <circle cx="100" cy="100" r="60" stroke="#C45A2C" stroke-opacity="0.5"></circle>
+    <circle cx="100" cy="100" r="42" stroke="#E6A636" stroke-opacity="0.7"></circle>
+    <circle cx="100" cy="100" r="22" stroke="#1F1410" stroke-opacity="0.9"></circle>
+  </g>
+  <circle cx="100" cy="100" r="6" fill="#1F1410"></circle>
+</svg>

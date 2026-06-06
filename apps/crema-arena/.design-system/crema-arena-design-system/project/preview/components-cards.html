@@ -1,0 +1,75 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Cards</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Card.tsx — surface-raised, padding+shadow+border knobs. */
+  .surface {
+    background:var(--surface-raised); border-radius:var(--radius-md);
+    display:flex; flex-direction:column; gap:6px; min-width:0;
+  }
+  .surface.b  { border:1px solid var(--border); }
+  .surface.s1 { box-shadow:var(--shadow-1); }
+  .surface.s2 { box-shadow:var(--shadow-2); }
+  .surface.p-sm { padding:12px; }
+  .surface.p-md { padding:24px; }
+
+  .name { font-family:var(--font-body); font-weight:600; font-size:15px; color:var(--fg); }
+  .meta { font-size:12px; color:var(--fg-3); }
+  .placar { font-family:var(--font-mono); font-size:28px; font-weight:600; color:var(--fg); display:flex; align-items:baseline; gap:6px; font-feature-settings:"tnum"; }
+  .placar em { font-family:var(--font-serif); font-style:italic; font-weight:400; color:var(--fg-3); font-size:18px; }
+
+  /* Highlighted = winner / stamp seal — repo's `surface-highlight` pattern */
+  .surface.highlight { border:1.5px solid var(--brand); position:relative; }
+  .surface.highlight::after {
+    content:""; position:absolute; top:-10px; right:-10px; width:40px; height:40px;
+    background:url('../assets/stamp-seal.svg') center/contain no-repeat;
+  }
+
+  /* Live left-edge accent — never use opacity changes, just mint. */
+  .surface.live { border-left:1.5px solid var(--live); }
+
+  .live-mark {
+    display:inline-flex; align-items:center; gap:6px;
+    color:var(--live); font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .live-mark .dot { width:6px; height:6px; border-radius:999px; background:currentColor; }
+
+  .votes { display:flex; gap:5px; align-items:center; }
+  .vote-dot { width:9px; height:9px; border-radius:999px; border:1.5px solid var(--bg-3); }
+  .vote-dot.on { background:var(--brand); border-color:var(--brand); }
+
+  .props-row { font-family:var(--font-mono); font-size:11px; color:var(--fg-3); margin-top:8px; }
+  .props-row b { color:var(--fg-2); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:280px;gap:16px">
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px">
+    <div class="surface b s1 p-md">
+      <div class="name">Marina Okada</div>
+      <div class="meta">Coffee Lab · Seed #1</div>
+      <div class="placar">2 <em>×</em> 1</div>
+      <div class="votes" title="2 de 3 jurados">
+        <span class="vote-dot on"></span><span class="vote-dot on"></span><span class="vote-dot"></span>
+      </div>
+    </div>
+
+    <div class="surface b s1 p-md highlight">
+      <div class="name">Lucas Brandão</div>
+      <div class="meta">Suplicy · Avança para a final</div>
+      <div class="placar" style="color:var(--brand-hover)">3 <em>×</em> 0</div>
+      <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--warning);text-transform:uppercase;letter-spacing:.08em">Unânime</div>
+    </div>
+
+    <div class="surface b s1 p-md live">
+      <span class="live-mark"><span class="dot"></span>Ao vivo · jurados escolhendo</span>
+      <div class="name">Tom Lemos · Júlia Vasques</div>
+      <div class="placar" style="color:var(--fg-3)">— <em>×</em> —</div>
+    </div>
+  </div>
+
+  <div class="props-row">
+    <b>Card</b> · padding: <b>none / sm:12 / md:24 / lg:32</b> · shadow: <b>none / sm:shadow-1 / md:shadow-2</b> · border on by default (1px <b>var(--border)</b>); highlight uses 1.5px <b>brand</b> + stamp-seal corner mark
+  </div>
+</div>
+</body></html>

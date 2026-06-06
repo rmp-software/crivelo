@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Iconography</title><link rel="stylesheet" href="_card.css">
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style>
+  .icon-row { display:grid; grid-template-columns:repeat(10,1fr); gap:14px; align-items:center; }
+  .icon-row .ic { display:flex; flex-direction:column; align-items:center; gap:6px; color:var(--fg); }
+  .icon-row .ic [data-lucide] { width:24px; height:24px; stroke-width:1.75; }
+  .icon-row .ic span { font-family:var(--font-mono); font-size:9px; color:var(--fg-3); }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:170px;gap:14px">
+  <div class="icon-row">
+    <div class="ic"><i data-lucide="trophy"></i><span>trophy</span></div>
+    <div class="ic"><i data-lucide="coffee"></i><span>coffee</span></div>
+    <div class="ic"><i data-lucide="timer"></i><span>timer</span></div>
+    <div class="ic"><i data-lucide="users"></i><span>users</span></div>
+    <div class="ic"><i data-lucide="calendar"></i><span>calendar</span></div>
+    <div class="ic"><i data-lucide="bar-chart-3"></i><span>chart</span></div>
+    <div class="ic"><i data-lucide="zap"></i><span>zap</span></div>
+    <div class="ic"><i data-lucide="bell"></i><span>bell</span></div>
+    <div class="ic"><i data-lucide="settings"></i><span>settings</span></div>
+    <div class="ic"><i data-lucide="qr-code"></i><span>qr</span></div>
+  </div>
+  <div class="caption">Lucide · outline · 1.75 stroke · 24px chrome · 20px dense</div>
+</div>
+<script>lucide.createIcons();</script>
+</body></html>

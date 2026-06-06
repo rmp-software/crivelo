@@ -1,0 +1,68 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files — ignore all .env variants except the committed example
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# uploads
+/public/uploads
+
+# editor / IDE
+.idea/
+.vscode/
+
+# claude / agent local config — keep skills tracked, ignore only personal/local files
+.claude/settings.local.json
+.claude/projects/
+.claude/statsig/
+.claude/todos/
+.claude_settings.json
+
+# playwright MCP transient session
+.playwright-mcp/
+
+# dev artifacts kept locally but not committed
+/screenshots/
+/playwright-check.png
+/CREMA-*.txt
+/CREMA-*.md
+
+# design system handoff — selectively tracked
+# Drop noisy/local-only pieces; keep README, SKILL.md, tokens, assets, ui_kits, preview, app samples.
+/.design-system/*.bak-*/
+/.design-system/crema-arena-design-system/chats/
+/.design-system/crema-arena-design-system/project/uploads/
+/.design-system/crema-arena-design-system/project/fonts/

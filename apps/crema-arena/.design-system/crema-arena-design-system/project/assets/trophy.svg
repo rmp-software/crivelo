@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Trophy cup">
+  <g fill="none" stroke="#1F1410" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M14 8 h20 v10 a10 10 0 0 1 -20 0 z"></path>
+    <path d="M14 12 h-4 a4 4 0 0 0 4 6"></path>
+    <path d="M34 12 h4 a4 4 0 0 1 -4 6"></path>
+    <path d="M24 28 v6"></path>
+    <path d="M18 38 h12 l-1 -4 h-10 z"></path>
+  </g>
+  <circle cx="24" cy="14" r="3" fill="#E6A636"></circle>
+</svg>

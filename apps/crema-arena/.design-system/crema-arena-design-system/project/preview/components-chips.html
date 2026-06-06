@@ -1,0 +1,63 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Badges</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Badge.tsx — pill-shaped, 4 variants × 2 sizes. */
+  .badge {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    font-family:var(--font-body); font-weight:500; white-space:nowrap;
+    border-radius:var(--radius-full);
+  }
+  .badge-default { background:var(--bg-3); color:var(--fg-2); }
+  .badge-success { background:var(--success-soft); color:var(--success); }
+  .badge-warning { background:var(--warning-soft); color:var(--warning); }
+  .badge-danger  { background:var(--danger-soft);  color:var(--danger); }
+  .badge-sm { font-size:12px; padding:2px 8px; }
+  .badge-md { font-size:14px; padding:4px 10px; }
+
+  .dot { width:6px; height:6px; border-radius:999px; background:currentColor; }
+
+  /* Mono caps label — used outside Badge for "AO VIVO" mark on cards / live display */
+  .live-mark {
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--live-soft); color:var(--live);
+    border-radius:var(--radius-full); padding:4px 10px;
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .live-mark .dot { width:6px; height:6px; }
+
+  .row-label { font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-3); min-width:80px; }
+  .stack-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:200px;gap:14px">
+  <div class="stack-row">
+    <span class="row-label">Status</span>
+    <span class="badge badge-default badge-md">Pendente</span>
+    <span class="badge badge-default badge-md">Em andamento</span>
+    <span class="badge badge-success badge-md">Concluído</span>
+    <span class="badge badge-warning badge-md">W.O.</span>
+    <span class="badge badge-warning badge-md">Wildcard</span>
+    <span class="badge badge-danger badge-md">Fora</span>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Sizes</span>
+    <span class="badge badge-success badge-sm">Concluído</span>
+    <span class="badge badge-success badge-md">Concluído</span>
+    <span class="badge badge-default badge-sm">3 × 0</span>
+    <span class="badge badge-default badge-md">3 × 0 unânime</span>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Live mark</span>
+    <span class="live-mark"><span class="dot"></span>Ao vivo</span>
+    <span class="live-mark">Bateria 3 · Free pour</span>
+  </div>
+
+  <div class="caption" style="margin-top:4px">
+    pill-shaped only · `default / success / warning / danger` · sm 12px / md 14px — never blink, mint is enough
+  </div>
+</div>
+</body></html>

@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Crema Arena — Companion da plateia</title>
+  <link rel="stylesheet" href="../../colors_and_type.css" />
+  <style>
+    html, body { margin: 0; min-height: 100vh; background: var(--bg-2); }
+    body {
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 20px; font-family: var(--font-body);
+      background:
+        radial-gradient(60% 60% at 20% 10%, var(--cinnamon-50) 0%, transparent 60%),
+        radial-gradient(60% 60% at 90% 90%, var(--marigold-100) 0%, transparent 55%),
+        var(--bg);
+    }
+    .wrap { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+    .meta { text-align: center; max-width: 480px; }
+    .meta .eyebrow { font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-3); }
+    .meta h1 { font-family: var(--font-display); font-size: 36px; font-weight: 800;
+      letter-spacing: -0.025em; margin: 6px 0 4px; }
+    .meta h1 em { font-family: var(--font-serif); font-weight: 400; font-style: italic; color: var(--brand); }
+    .meta p { color: var(--fg-2); font-size: 14px; margin: 4px 0 0; }
+  </style>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="meta">
+      <div class="eyebrow">UI kit · Audience companion · /e/[eventId]</div>
+      <h1><em>Crema</em> Arena</h1>
+      <p>O QR no fundo do bar leva pra cá. Mobile-first, três abas, pt-BR.</p>
+    </div>
+    <div id="root"></div>
+  </div>
+  <script type="text/babel" src="ios-frame.jsx"></script>
+  <script type="text/babel" src="components.jsx"></script>
+  <script type="text/babel" src="app.jsx"></script>
+  <script type="text/babel">
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<IOSDevice width={390} height={812}><App /></IOSDevice>);
+  </script>
+</body>
+</html>

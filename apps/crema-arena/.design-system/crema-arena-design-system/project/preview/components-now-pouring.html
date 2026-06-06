@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Now pouring · hero</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/NowPouring.tsx — espresso hero card pinned to the
+   * top of the running event detail screen. Crema rings motif bleeds off the
+   * top-right corner; mono progress dots and N × M score sit below the names.
+   */
+  .hero {
+    position:relative; overflow:hidden;
+    border-radius:var(--radius-lg);
+    background:var(--espresso-900); color:var(--crema-50);
+    padding:32px;
+  }
+  .hero .rings {
+    position:absolute; right:-48px; top:-48px;
+    width:256px; height:256px; opacity:.25; pointer-events:none;
+  }
+  .live {
+    display:inline-flex; align-items:center; gap:8px; margin-bottom:16px;
+    font-family:var(--font-mono); font-size:11px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--mint-100);
+  }
+  .live .dot { width:8px; height:8px; border-radius:999px; background:var(--live); }
+
+  .versus {
+    display:grid; grid-template-columns:1fr auto 1fr; gap:24px; align-items:baseline;
+    position:relative; z-index:1;
+  }
+  .name {
+    font-family:var(--font-display); font-weight:800; font-size:40px;
+    line-height:1.05; color:var(--crema-50); letter-spacing:-0.02em;
+  }
+  .shop {
+    margin-top:6px; font-family:var(--font-serif); font-style:italic; font-size:16px;
+    color:var(--crema-200);
+  }
+  .vs {
+    font-family:var(--font-serif); font-style:italic; font-size:24px;
+    color:var(--marigold-300); align-self:baseline;
+  }
+
+  .row-bottom {
+    margin-top:24px; display:flex; gap:24px; align-items:center; flex-wrap:wrap;
+    position:relative; z-index:1;
+  }
+  .score {
+    font-family:var(--font-mono); font-size:48px; font-weight:600;
+    color:var(--crema-50); line-height:1; font-feature-settings:"tnum";
+    letter-spacing:-0.01em;
+  }
+  .progress { display:flex; align-items:center; gap:6px; }
+  .pdot {
+    width:10px; height:10px; border-radius:999px;
+    border:2px solid var(--espresso-500); background:transparent;
+  }
+  .pdot.on { background:var(--marigold-500); border-color:var(--marigold-500); }
+  .pcount {
+    margin-left:8px; font-family:var(--font-mono); font-size:12px;
+    font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--crema-300); font-feature-settings:"tnum";
+  }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:280px">
+  <section class="hero">
+    <img class="rings" src="../assets/rings.svg" alt="" aria-hidden="true">
+
+    <div class="live"><span class="dot"></span>Duelo ao vivo · Bateria 5</div>
+
+    <div class="versus">
+      <div style="min-width:0">
+        <div class="name">Cléo Trani</div>
+        <div class="shop">Veloso Café</div>
+      </div>
+      <span class="vs">vs</span>
+      <div style="min-width:0;text-align:right">
+        <div class="name">Júlia Vasques</div>
+        <div class="shop">Octavio Café</div>
+      </div>
+    </div>
+
+    <div class="row-bottom">
+      <div class="score">2 × 1</div>
+      <div class="progress">
+        <span class="pdot on"></span>
+        <span class="pdot on"></span>
+        <span class="pdot on"></span>
+        <span class="pcount">3 / 3</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="caption">
+    Espresso surface · marigold "vs" in Instrument Serif italic · marigold dots fill toward judges_count
+  </div>
+</div>
+</body></html>

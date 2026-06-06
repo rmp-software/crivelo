@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Event stat strip</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/EventStatStrip.tsx — 4-card grid above the running event. */
+  .stat {
+    display:flex; flex-direction:column; gap:4px;
+    padding:18px; background:var(--surface-raised);
+    border-radius:var(--radius-md); box-shadow:var(--shadow-1);
+  }
+  .stat .label {
+    font-family:var(--font-mono); font-size:10px; font-weight:600;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--fg-3);
+  }
+  .stat .val {
+    font-family:var(--font-mono); font-size:36px; font-weight:600;
+    color:var(--fg); line-height:1; margin-top:4px; font-feature-settings:"tnum";
+    letter-spacing:-0.01em;
+  }
+  .stat .val .frac { color:var(--fg-3); font-weight:500; }
+  .stat .sub { font-size:13px; color:var(--fg-3); margin-top:4px; }
+  .stat .sub.cinnamon { color:var(--cinnamon-600); }
+  .stat .sub.mint     { color:var(--mint-700); }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:180px">
+  <div class="grid" style="grid-template-columns:repeat(4,1fr);gap:14px">
+    <div class="stat">
+      <div class="label">Na chave</div>
+      <div class="val">32</div>
+      <div class="sub">32 confirmados</div>
+    </div>
+    <div class="stat">
+      <div class="label">Baterias</div>
+      <div class="val">12 <span class="frac">/ 16</span></div>
+      <div class="sub cinnamon">Rodada 2 · 75% concluída</div>
+    </div>
+    <div class="stat">
+      <div class="label">Unânimes</div>
+      <div class="val">4</div>
+      <div class="sub">duelos 3 × 0</div>
+    </div>
+    <div class="stat">
+      <div class="label">Próxima</div>
+      <div class="val" style="font-family:var(--font-display);font-size:30px;font-weight:700">Pronto</div>
+      <div class="sub mint">Bateria 13 · Cléo × Júlia</div>
+    </div>
+  </div>
+
+  <div class="caption" style="margin-top:8px">
+    Caps mono labels · oversized mono numbers · accent color for the sub-line only when state is hot
+  </div>
+</div>
+</body></html>

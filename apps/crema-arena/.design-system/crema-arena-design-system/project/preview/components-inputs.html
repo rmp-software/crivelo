@@ -1,0 +1,89 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Inputs</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Input.tsx — label · field · helper or error. */
+  .field { display:flex; flex-direction:column; gap:6px; min-width:0; }
+  .field label {
+    font-family:var(--font-body); font-size:14px; font-weight:500; color:var(--fg-2);
+    display:flex; gap:4px; align-items:baseline;
+  }
+  .field label .req { color:var(--danger); }
+  .input {
+    height:44px; padding:8px 12px;
+    border-radius:var(--radius-sm); border:1px solid var(--border-strong);
+    background:var(--surface); color:var(--fg);
+    font-family:var(--font-body); font-size:15px;
+    transition:border-color var(--dur-base) var(--ease-standard),
+               box-shadow var(--dur-base) var(--ease-standard);
+  }
+  .input:focus {
+    outline:2px solid var(--focus-ring); outline-offset:2px;
+    border-color:var(--brand);
+  }
+  .input.error { border-color:var(--danger); }
+  .input.error:focus { outline-color:var(--danger); border-color:var(--danger); }
+
+  .help { font-family:var(--font-body); font-size:13px; color:var(--fg-3); }
+  .help.err { color:var(--danger); }
+
+  /* Toggle group — same shape as the radius / btn-secondary system */
+  .seg { display:flex; gap:8px; }
+  .seg span {
+    flex:1; padding:10px 12px; border-radius:var(--radius-sm);
+    border:1px solid var(--border-strong); background:var(--surface-raised);
+    font-size:14px; font-weight:500; color:var(--fg-2); text-align:center; cursor:pointer;
+  }
+  .seg span.on {
+    border-color:var(--brand); background:var(--brand-soft); color:var(--brand-press);
+  }
+
+  /* Search input — Lucide search icon left-inset */
+  .search-wrap { position:relative; }
+  .search-wrap .ico {
+    position:absolute; left:12px; top:50%; transform:translateY(-50%);
+    width:18px; height:18px; stroke:var(--fg-3); fill:none; stroke-width:1.75;
+    pointer-events:none;
+  }
+  .search-wrap .input { padding-left:38px; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:240px;gap:18px">
+  <div class="grid" style="grid-template-columns:1fr 1fr;gap:18px">
+    <div class="field">
+      <label>Nome do competidor <span class="req">*</span></label>
+      <input class="input" value="Marina Okada" />
+      <span class="help">A organização inscreve — aparece na chave e na tela.</span>
+    </div>
+
+    <div class="field">
+      <label>Cafeteria</label>
+      <input class="input" placeholder="ex.: Coffee Lab — Vila Madalena" />
+    </div>
+
+    <div class="field">
+      <label>Formato da bateria</label>
+      <div class="seg">
+        <span class="on">Free pour</span>
+        <span>Designer</span>
+        <span>Macchiato</span>
+      </div>
+      <span class="help">Free pour é o padrão dos TNTs no Brasil.</span>
+    </div>
+
+    <div class="field">
+      <label>Jurados</label>
+      <input class="input error" value="2" />
+      <span class="help err">Precisa ser ímpar — recomendamos 3 ou 5 para evitar empate.</span>
+    </div>
+  </div>
+
+  <div class="field" style="max-width:380px">
+    <label>Buscar competidor</label>
+    <div class="search-wrap">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="input" placeholder="Nome ou cafeteria…" style="width:100%" />
+    </div>
+  </div>
+</div>
+</body></html>
