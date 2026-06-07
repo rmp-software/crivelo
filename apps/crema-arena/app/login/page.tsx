@@ -24,7 +24,7 @@ function LoginShell() {
     <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-[var(--bg)] to-[var(--bg-2)]">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
-          <Wordmark size="lg" className="mb-2" />
+          <Wordmark size="lg" endorsement className="mb-2" />
           <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
             Painel administrativo
           </p>
@@ -72,7 +72,7 @@ function LoginForm() {
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="flex flex-col items-center mb-8">
-          <Wordmark size="lg" className="mb-2" />
+          <Wordmark size="lg" endorsement className="mb-2" />
           <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
             Painel administrativo
           </p>

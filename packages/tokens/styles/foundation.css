@@ -204,14 +204,17 @@
     color: var(--fg);
   }
 
-  a {
+  /* Content-link underline is opt-in via .link (not a global a{} rule): in a
+   * Tailwind app most <a> are nav/logo/card links that rely on the reset, so a
+   * global underline would regress them. Faithful intent, app-correct scope. */
+  .link {
     color: var(--fg);
     text-decoration: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
     text-decoration-color: var(--border-strong);
   }
-  a:hover { text-decoration-color: var(--fg); }
+  .link:hover { text-decoration-color: var(--fg); }
 
   ::selection { background: var(--crema-300); color: var(--espresso-900); }
 
