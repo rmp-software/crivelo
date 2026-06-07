@@ -1,6 +1,6 @@
 'use client';
 
-import PageHeader from '@/app/components/PageHeader';
+import PageHeader from '@crivelo/ui/PageHeader';
 import EventForm from '@/app/components/EventForm';
 
 export default function NewEventPage() {

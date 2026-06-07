@@ -1,0 +1,31 @@
+{
+  "name": "@crivelo/ui",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts",
+    "./Button": "./src/Button.tsx",
+    "./Card": "./src/Card.tsx",
+    "./Input": "./src/Input.tsx",
+    "./Badge": "./src/Badge.tsx",
+    "./LoadingSpinner": "./src/LoadingSpinner.tsx",
+    "./EmptyState": "./src/EmptyState.tsx",
+    "./Modal": "./src/Modal.tsx",
+    "./PageHeader": "./src/PageHeader.tsx",
+    "./ConfirmationModal": "./src/ConfirmationModal.tsx",
+    "./Toast": "./src/Toast.tsx"
+  },
+  "dependencies": {
+    "lucide-react": "^0.363.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0",
+    "@types/react": "^18",
+    "@types/react-dom": "^18"
+  }
+}

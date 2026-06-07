@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
-import Button from './Button';
-import Input from './Input';
+import Button from '@crivelo/ui/Button';
+import Input from '@crivelo/ui/Input';
 import { Search, Check } from 'lucide-react';
 
 interface Competitor {
