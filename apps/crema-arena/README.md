@@ -1,5 +1,7 @@
 # Crema Arena
 
+> Part of the **Crivelo** monorepo. This app lives at `apps/crema-arena`; shared design-system and config packages live under `packages/*`. See the repo root `README.md`.
+
 Specialty Coffee Competition Platform - MVP for organizing and broadcasting latte art TNTs, barista championships, and bar battles in Brazil.
 
 ## Technology Stack
