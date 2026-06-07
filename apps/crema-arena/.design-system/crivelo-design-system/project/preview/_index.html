@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Crivelo — contact sheet</title>
+<link rel="stylesheet" href="../styles.css">
+<style>
+  body { margin:0; padding:32px; background:var(--bg-2); }
+  h1 { font-family:var(--font-display); font-weight:700; letter-spacing:-0.02em; margin:0 0 4px; }
+  .sub { color:var(--fg-3); font-family:var(--font-mono); font-size:12px; margin-bottom:28px; }
+  .grid { display:flex; flex-direction:column; gap:28px; max-width:920px; }
+  .cell { background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-md); overflow:hidden; box-shadow:var(--shadow-1); }
+  .cell .lbl { font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-3); padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-raised); }
+  iframe { width:100%; border:0; display:block; background:var(--bg); }
+</style></head>
+<body>
+<h1>Crivelo</h1>
+<div class="sub">contact sheet · preview cards</div>
+<div class="grid" id="grid"></div>
+<script>
+  const cards = [
+    ["brand-wordmark.html", 200], ["brand-marks.html", 260], ["brand-lockup.html", 460],
+    ["brand-voice.html", 440], ["brand-taglines.html", 420], ["iconography.html", 180],
+    ["color-ink.html", 170], ["color-surfaces.html", 170], ["color-semantic.html", 190],
+    ["type-display.html", 220], ["type-scale.html", 300], ["type-mono.html", 180],
+    ["components-buttons.html", 320], ["components-inputs.html", 320], ["components-chips.html", 220],
+    ["components-cards.html", 320], ["components-feedback.html", 580], ["components-sidebar.html", 580],
+    ["radii.html", 180], ["shadows.html", 180], ["spacing-scale.html", 200], ["motion.html", 200],
+  ];
+  const grid = document.getElementById('grid');
+  for (const [f, h] of cards) {
+    const cell = document.createElement('div'); cell.className = 'cell';
+    cell.innerHTML = `<div class="lbl">${f}</div><iframe src="${f}" style="height:${h}px"></iframe>`;
+    grid.appendChild(cell);
+  }
+</script>
+</body></html>

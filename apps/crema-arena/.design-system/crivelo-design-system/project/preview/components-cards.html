@@ -1,0 +1,63 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Cards" subtitle="Surface + padding/shadow/border knobs + ink highlight" viewport="880x320" -->
+<html><head><meta charset="utf-8"><title>Cards</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Card.tsx — surface-raised, padding+shadow+border knobs. */
+  .surface {
+    background:var(--surface-raised); border-radius:var(--radius-md);
+    display:flex; flex-direction:column; gap:6px; min-width:0;
+  }
+  .surface.b  { border:1px solid var(--border); }
+  .surface.s1 { box-shadow:var(--shadow-1); }
+  .surface.s2 { box-shadow:var(--shadow-2); }
+  .surface.p-sm { padding:12px; }
+  .surface.p-md { padding:24px; }
+
+  .name { font-family:var(--font-body); font-weight:600; font-size:15px; color:var(--fg); }
+  .meta { font-size:12px; color:var(--fg-3); }
+  .kv { font-family:var(--font-mono); font-size:12px; color:var(--fg-2); margin-top:4px; }
+  .kv span { color:var(--fg-3); }
+
+  /* Highlighted = curated / pinned — 1.5px ink border + corner sieve mark (no color). */
+  .surface.highlight { border:1.5px solid var(--border-emphasis); position:relative; }
+  .surface.highlight::after {
+    content:""; position:absolute; top:10px; right:10px; width:16px; height:16px;
+    background-image:
+      radial-gradient(circle, var(--fg) 1.4px, transparent 1.6px);
+    background-size:5.5px 5.5px; opacity:.9;
+  }
+
+  .pin { font-family:var(--font-mono); font-size:10px; font-weight:600; color:var(--fg-3); text-transform:uppercase; letter-spacing:.1em; }
+
+  .props-row { font-family:var(--font-mono); font-size:11px; color:var(--fg-3); margin-top:8px; }
+  .props-row b { color:var(--fg-2); font-weight:600; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:250px;gap:16px">
+  <div class="grid" style="grid-template-columns:repeat(3,1fr);gap:16px">
+    <div class="surface b s1 p-md">
+      <div class="name">Catuaí amarelo</div>
+      <div class="meta">Fazenda Serra Negra · Sul de Minas</div>
+      <div class="kv">crivo <span>17/18</span> · processo <span>natural</span></div>
+    </div>
+
+    <div class="surface b s1 p-md highlight">
+      <div class="pin">fixado</div>
+      <div class="name">Geisha lavado</div>
+      <div class="meta">Daterra · Cerrado Mineiro</div>
+      <div class="kv">crivo <span>18</span> · torra <span>clara</span></div>
+    </div>
+
+    <div class="surface b s2 p-md">
+      <div class="name">Bourbon vermelho</div>
+      <div class="meta">Sítio Capoeirinha · Mantiqueira</div>
+      <div class="kv">crivo <span>16</span> · processo <span>cereja descascado</span></div>
+    </div>
+  </div>
+
+  <div class="props-row">
+    <b>Card</b> · padding: <b>none / sm:12 / md:24 / lg:32</b> · shadow: <b>none / sm:shadow-1 / md:shadow-2</b> · border on by default (1px <b>var(--border)</b>); highlight uses 1.5px <b>var(--border-emphasis)</b> + a corner sieve mark — ink, never color
+  </div>
+</div>
+</body></html>

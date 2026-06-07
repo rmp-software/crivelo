@@ -1,0 +1,207 @@
+/* Crivelo — Color + Type Tokens
+ * The house brand. Neutral by design: Crivelo wears only the crema/espresso
+ * neutrals so each child product (Crema Arena, Mesa, Coa…) can claim its own
+ * accent. There is NO Crivelo brand accent. Emphasis comes from ink + type.
+ *
+ * Mobile-first. All tokens are :root scoped. Pair with fonts.css.
+ */
+
+@import url('./fonts.css');
+
+:root {
+  /* ---------- Color: raw palette ---------- */
+  /* Espresso — near-black brown. Text, ink, deep surfaces, primary actions. */
+  --espresso-950: #140C08;   /* darkest — primary press */
+  --espresso-900: #1F1410;   /* ink / fg */
+  --espresso-800: #2C1D17;
+  --espresso-700: #3E2A22;
+  --espresso-600: #5A3F33;
+  --espresso-500: #7A5A4A;
+
+  /* Crema / cream — primary background family. */
+  --crema-50:  #FBF6EA;   /* default bg */
+  --crema-100: #F5ECD8;   /* bg-2 */
+  --crema-200: #EADBC0;   /* latte / bg-3 */
+  --crema-300: #DCC59E;   /* warm divider */
+  --crema-400: #C7AB7C;   /* muted on-cream */
+
+  /* Sage — success. The one cool green the house allows, semantic only. */
+  --sage-100: #D2E8DC;
+  --sage-500: #4F8C72;
+  --sage-700: #2F6A52;
+
+  /* Clay — danger / destructive. Semantic only. */
+  --clay-100: #F3CFC8;
+  --clay-500: #B83A2E;
+  --clay-700: #8A2620;
+
+  /* ---------- Semantic surface + ink ---------- */
+  --bg:           var(--crema-50);
+  --bg-2:         var(--crema-100);
+  --bg-3:         var(--crema-200);
+  --bg-inverse:   var(--espresso-900);
+
+  --surface:        var(--crema-50);
+  --surface-raised: #FFFCF3; /* slightly lifted card */
+  --surface-sunken: var(--crema-100);
+
+  --fg:           var(--espresso-900);
+  --fg-2:         var(--espresso-700);
+  --fg-3:         var(--espresso-500);
+  --fg-4:         #B8A89E;          /* lightest ink — empty-state placeholders */
+  --fg-muted:     #6B5A4F;
+  --fg-inverse:   var(--crema-50);
+
+  --border:        rgba(31, 20, 16, 0.12);
+  --border-strong: rgba(31, 20, 16, 0.24);
+  --border-emphasis: var(--espresso-900);  /* 1.5px ink border for highlighted surfaces */
+
+  /* ---------- Semantic intent ----------
+   * "brand" here means the house's primary action color = ink. NOT a hue.
+   * Child products override --brand with their own accent. */
+  --brand:        var(--espresso-900);
+  --brand-hover:  var(--espresso-800);
+  --brand-press:  var(--espresso-950);
+  --brand-soft:   var(--crema-100);
+
+  --success:      var(--sage-500);
+  --success-soft: var(--sage-100);
+  --danger:       var(--clay-500);
+  --danger-soft:  var(--clay-100);
+
+  /* ---------- Focus ---------- */
+  --focus-ring:   var(--espresso-900);
+
+  /* ---------- Radii ---------- */
+  --radius-xs:    6px;
+  --radius-sm:    10px;
+  --radius-md:    18px;
+  --radius-lg:    28px;
+  --radius-full:  999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
+  --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+  --shadow-inset: inset 0 1px 0 rgba(255, 252, 243, 0.6);
+
+  /* ---------- Spacing scale (4px base) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---------- Motion ---------- */
+  --ease-standard:  cubic-bezier(.2,.7,.2,1);    /* @kind other */
+  --ease-overshoot: cubic-bezier(.34,1.56,.64,1); /* @kind other */
+  --dur-fast:  120ms;  /* @kind other */
+  --dur-base:  180ms;  /* @kind other */
+  --dur-stage: 320ms;  /* @kind other */
+
+  /* ---------- Type: families ---------- */
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-serif:   'Instrument Serif', 'Times New Roman', serif;
+  --font-body:    'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ---------- Type: scale ---------- */
+  --fs-display:   clamp(40px, 8vw, 64px);  /* @kind font */
+  --fs-h1:        clamp(30px, 5.5vw, 44px); /* @kind font */
+  --fs-h2:        clamp(24px, 4vw, 32px);   /* @kind font */
+  --fs-h3:        20px;  /* @kind font */
+  --fs-h4:        17px;  /* @kind font */
+  --fs-body:      16px;  /* @kind font */
+  --fs-small:     14px;  /* @kind font */
+  --fs-xs:        12px;  /* @kind font */
+  --fs-mono-lg:   28px;  /* @kind font */
+  --fs-mono:      15px;  /* @kind font */
+
+  --lh-tight:     1.05;  /* @kind other */
+  --lh-snug:      1.2;   /* @kind other */
+  --lh-body:      1.5;   /* @kind other */
+  --lh-loose:     1.65;  /* @kind other */
+
+  --tracking-display: -0.02em; /* @kind other */
+  --tracking-caps:    0.08em;  /* @kind other */
+}
+
+/* ---------- Element-level semantic styles ---------- */
+
+html, body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+h1, .h1, h2, .h2, h3, .h3, h4, .h4 {
+  font-family: var(--font-display);
+  color: var(--fg);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.display {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: var(--lh-tight);
+}
+.editorial {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+h1, .h1 { font-size: var(--fs-h1); }
+h2, .h2 { font-size: var(--fs-h2); }
+h3, .h3 { font-size: var(--fs-h3); line-height: var(--lh-snug); letter-spacing: -0.01em; }
+h4, .h4 { font-size: var(--fs-h4); line-height: var(--lh-snug); letter-spacing: -0.005em; font-weight: 600; }
+
+p { margin: 0 0 var(--space-4); text-wrap: pretty; color: var(--fg-2); }
+
+.lead { font-size: 18px; line-height: var(--lh-loose); color: var(--fg-2); }
+.small, small { font-size: var(--fs-small); color: var(--fg-3); }
+.caption {
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-caps);
+  font-weight: 600;
+  color: var(--fg-3);
+}
+
+code, .mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum", "zero";
+  font-size: var(--fs-mono);
+}
+.numeric {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-lg);
+  font-weight: 600;
+  font-feature-settings: "tnum", "zero";
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+
+a { color: var(--fg); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--border-strong); }
+a:hover { text-decoration-color: var(--fg); }
+
+::selection { background: var(--crema-300); color: var(--espresso-900); }
+
+*:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}

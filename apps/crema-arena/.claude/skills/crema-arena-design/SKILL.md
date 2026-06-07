@@ -6,13 +6,13 @@ user-invocable: true
 
 You are an expert designer and engineer for **Crema Arena** — a Brazilian latte-art TNT (throwdown) tournament platform. This skill bridges the brand language (cream/espresso visual world, pt-BR voice, judge-selection model) with the live codebase.
 
-The bundle at `.design-system/crema-arena-design-system/` is *reference*. The codebase is *implementation*. Always implement against the codebase.
+The bundle at `.design-system/crivelo-design-system/` is *reference*. The codebase is *implementation*. Always implement against the codebase.
 
 ## Always start here
 
 1. `/CLAUDE.md` — repo conventions, tournament lifecycle, copy rules, photo upload policy
 2. `/app_spec.txt` — canonical surface spec (TV display, audience companion, organizer console)
-3. `.design-system/crema-arena-design-system/README.md` — brand voice, judging model, glossary, visual foundations, iconography
+3. `.design-system/crivelo-design-system/README.md` — brand voice, judging model, glossary, visual foundations, iconography
 
 ## Source of truth — implementation
 
@@ -44,12 +44,12 @@ Do not reintroduce `@font-face` rules or `next/font/google` for these families.
 
 When you need to *see* how something should look (not how it's coded), use the bundle:
 
-- `.design-system/crema-arena-design-system/preview/*.html` — standalone visual previews of brand components (buttons, cards, chips, bracket, judging, podium, sidebar, now-pouring, feedback, stats, inputs, color/type ramps)
-- `.design-system/crema-arena-design-system/ui_kits/`
+- `.design-system/crivelo-design-system/preview/*.html` — standalone visual previews of brand components (buttons, cards, chips, bracket, judging, podium, sidebar, now-pouring, feedback, stats, inputs, color/type ramps)
+- `.design-system/crivelo-design-system/ui_kits/`
   - `live_display/` — design intent for `/live/[eventId]` (TV / 1920×1080)
   - `organizer_dashboard/` — design intent for `/dashboard/*` (admin console)
   - `audience_companion/` — design intent for `/e/[eventId]` (mobile audience)
-- `.design-system/crema-arena-design-system/assets/` — vector source for brand SVGs (same files as `public/assets/`)
+- `.design-system/crivelo-design-system/assets/` — vector source for brand SVGs (same files as `public/assets/`)
 
 These are HTML/JSX prototypes, not implementation. Don't import them. Use them to make pixel-level decisions, then build for real in `app/`.
 

@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- @dsCard group="Brand" name="Taglines" subtitle="pt-BR · lead + alternativas em estudo" viewport="860x420" -->
+<html><head><meta charset="utf-8"><title>Taglines</title><link rel="stylesheet" href="_card.css">
+<style>
+  .lead {
+    font-family:var(--font-display); font-weight:700; font-size:46px; letter-spacing:-0.025em;
+    line-height:1.02; color:var(--fg); text-wrap:balance; max-width:14ch;
+  }
+  .lead-cap { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--fg-3); margin-bottom:12px; }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:6px; }
+  .h { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-3); margin-bottom:12px; }
+  .list { display:flex; flex-direction:column; gap:12px; }
+  .ln { display:flex; flex-direction:column; gap:3px; }
+  .ln .s { font-family:var(--font-serif); font-style:italic; font-size:22px; color:var(--fg); line-height:1.2; }
+  .ln .why { font-size:12px; color:var(--fg-3); }
+  .block { border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface-raised); padding:20px 22px; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:400px;gap:18px">
+  <div>
+    <div class="lead-cap">tagline principal</div>
+    <div class="lead">Para quem vive café.</div>
+  </div>
+  <div class="cols">
+    <div class="block">
+      <div class="h">de apoio</div>
+      <div class="list">
+        <div class="ln"><span class="s">Sua coleção de café, em um lugar.</span><span class="why">produto / onboarding</span></div>
+        <div class="ln"><span class="s">Do grão à chave.</span><span class="why">craft → software · a ponte da marca</span></div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="h">alternativas em estudo</div>
+      <div class="list">
+        <div class="ln"><span class="s">O que fica na peneira.</span><span class="why">curadoria · puxa o crivo</span></div>
+        <div class="ln"><span class="s">Café merece boa ferramenta.</span><span class="why">direto · centrado no ofício</span></div>
+        <div class="ln"><span class="s">A casa apura. Você faz.</span><span class="why">papel da casa vs. do produto</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="note">sentence case · ponto final permitido em tagline (é frase, não botão) · uma ideia por linha</div>
+</div>
+</body></html>

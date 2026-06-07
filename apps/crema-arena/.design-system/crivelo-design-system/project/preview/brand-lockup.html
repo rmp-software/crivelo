@@ -1,0 +1,93 @@
+<!doctype html>
+<!-- @dsCard group="Brand" name="Endorsement lockup" subtitle="[Product] by Crivelo — the house framing its children" viewport="860x460" -->
+<html><head><meta charset="utf-8"><title>Endorsement lockup</title><link rel="stylesheet" href="_card.css">
+<style>
+  .wrap { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .col { display:flex; flex-direction:column; gap:14px; }
+  .block { border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface-raised); padding:22px; }
+
+  /* anatomy */
+  .anat { display:flex; align-items:center; gap:16px; }
+  .mark { width:52px; height:52px; flex-shrink:0; }
+  .stack { display:flex; flex-direction:column; gap:4px; line-height:1; }
+  .product { font-family:var(--font-display); font-weight:700; font-size:34px; letter-spacing:-0.02em; color:var(--fg); }
+  .by { font-family:var(--font-body); font-size:14px; color:var(--fg-3); letter-spacing:.01em; }
+  .by b { color:var(--fg); font-weight:600; }
+
+  .rule { height:1px; background:var(--border); margin:16px 0; }
+  .anno { display:flex; flex-direction:column; gap:8px; }
+  .anno .r { display:flex; gap:10px; align-items:baseline; font-size:12px; color:var(--fg-2); }
+  .anno .k { font-family:var(--font-mono); font-size:10px; color:var(--fg-3); min-width:108px; text-transform:uppercase; letter-spacing:.06em; }
+
+  /* family list */
+  .fam { display:flex; flex-direction:column; }
+  .fam .item { display:flex; align-items:baseline; justify-content:space-between; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); }
+  .fam .item:last-child { border-bottom:none; }
+  .fam .name { font-family:var(--font-display); font-weight:700; font-size:21px; letter-spacing:-0.02em; color:var(--fg); }
+  .fam .endo { font-family:var(--font-body); font-size:12px; color:var(--fg-3); white-space:nowrap; }
+  .fam .endo b { color:var(--fg-2); font-weight:600; }
+  /* the child carries the accent; the house stays neutral */
+  .dot { display:inline-block; width:9px; height:9px; border-radius:999px; margin-right:8px; vertical-align:middle; }
+  .h { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--fg-3); margin-bottom:2px; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:440px;gap:14px">
+  <div class="wrap">
+    <!-- left: anatomy -->
+    <div class="col">
+      <div class="h">anatomia</div>
+      <div class="block">
+        <div class="anat">
+          <svg class="mark" viewBox="0 0 64 64" fill="var(--fg)" aria-hidden="true">
+            <circle cx="8" cy="8" r="4"/><circle cx="20" cy="8" r="4"/><circle cx="32" cy="8" r="4"/><circle cx="44" cy="8" r="4"/><circle cx="56" cy="8" r="2" fill-opacity=".16"/>
+            <circle cx="8" cy="20" r="4"/><circle cx="20" cy="20" r="2" fill-opacity=".16"/><circle cx="32" cy="20" r="2" fill-opacity=".16"/><circle cx="44" cy="20" r="2" fill-opacity=".16"/><circle cx="56" cy="20" r="2" fill-opacity=".16"/>
+            <circle cx="8" cy="32" r="4"/><circle cx="20" cy="32" r="2" fill-opacity=".16"/><circle cx="32" cy="32" r="2" fill-opacity=".16"/><circle cx="44" cy="32" r="2" fill-opacity=".16"/><circle cx="56" cy="32" r="2" fill-opacity=".16"/>
+            <circle cx="8" cy="44" r="4"/><circle cx="20" cy="44" r="2" fill-opacity=".16"/><circle cx="32" cy="44" r="2" fill-opacity=".16"/><circle cx="44" cy="44" r="2" fill-opacity=".16"/><circle cx="56" cy="44" r="2" fill-opacity=".16"/>
+            <circle cx="8" cy="56" r="4"/><circle cx="20" cy="56" r="4"/><circle cx="32" cy="56" r="4"/><circle cx="44" cy="56" r="4"/><circle cx="56" cy="56" r="2" fill-opacity=".16"/>
+          </svg>
+          <div class="stack">
+            <span class="product">Crema Arena</span>
+            <span class="by">by <b>Crivelo</b></span>
+          </div>
+        </div>
+        <div class="rule"></div>
+        <div class="anno">
+          <div class="r"><span class="k">produto</span><span>Bricolage Grotesque 700 · ink · tamanho do título</span></div>
+          <div class="r"><span class="k">endosso</span><span>“by Crivelo” · Geist · ~40% do produto · fg-3, Crivelo em fg/600</span></div>
+          <div class="r"><span class="k">monograma</span><span>opcional à esquerda · altura = produto + endosso</span></div>
+          <div class="r"><span class="k">“by”</span><span>minúsculo sempre · nunca “por” · nunca caixa alta</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- right: the family -->
+    <div class="col">
+      <div class="h">a família</div>
+      <div class="block fam">
+        <div class="item">
+          <span class="name"><span class="dot" style="background:#C45A2C"></span>Crema Arena</span>
+          <span class="endo">by <b>Crivelo</b></span>
+        </div>
+        <div class="item">
+          <span class="name"><span class="dot" style="background:#3F7DBF"></span>Mesa</span>
+          <span class="endo">by <b>Crivelo</b></span>
+        </div>
+        <div class="item">
+          <span class="name"><span class="dot" style="background:#7A6CC4"></span>Coa</span>
+          <span class="endo">by <b>Crivelo</b></span>
+        </div>
+        <div class="item">
+          <span class="name"><span class="dot" style="background:#3F9E78"></span>Léxico</span>
+          <span class="endo">by <b>Crivelo</b></span>
+        </div>
+        <div class="item">
+          <span class="name"><span class="dot" style="background:#C28A2E"></span>Diário</span>
+          <span class="endo">by <b>Crivelo</b></span>
+        </div>
+      </div>
+      <div class="note">cada produto traz o próprio acento (•). a casa fica neutra — só a tinta — pra esses acentos respirarem.</div>
+    </div>
+  </div>
+</div>
+</body></html>
