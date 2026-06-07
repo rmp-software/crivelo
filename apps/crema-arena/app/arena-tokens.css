@@ -1,0 +1,49 @@
+/*
+ * Crema Arena — app-local design tokens, layered on the neutral @crivelo/tokens
+ * foundation. Two roles:
+ *   1. Tier-2 accent: cinnamon (--brand*, --focus-ring).
+ *   2. Retained palette: colors the Crivelo house foundation does NOT ship —
+ *      gold/marigold (podium + winner accents), the live-green (AO VIVO), the
+ *      warning amber, and the raw mint/cherry steps Arena still references.
+ *      Kept here so Arena stays self-sufficient once the shared foundation drops
+ *      them (RMP-146).
+ *
+ * In @layer base + imported after the foundation (see globals.css) so these win.
+ */
+@layer base {
+  :root {
+    /* --- Tier-2 accent: cinnamon --- */
+    --cinnamon-50:  #FBEEE5;
+    --cinnamon-500: #C45A2C;
+    --cinnamon-600: #A8471E;
+    --cinnamon-700: #823516;
+
+    --brand:       #C45A2C;
+    --brand-hover: #A8471E;
+    --brand-press: #823516;
+    --brand-soft:  #FBEEE5;
+
+    --focus-ring: #C45A2C;
+
+    /* --- Retained palette (not in the Crivelo house foundation) --- */
+    /* Gold / marigold — podium + winner accents, warning amber */
+    --marigold-100: #FAE7B6;
+    --marigold-300: #F0C674; /* was undefined pre-RMP-145; filled to match the ramp */
+    --marigold-500: #E6A636;
+    --gold:         #E6A636;
+    --gold-soft:    #FAE7B6;
+    --warning:      #E6A636;
+    --warning-soft: #FAE7B6;
+
+    /* Live — the AO VIVO green (same hue the house ships as sage) */
+    --mint-100: #D2E8DC;
+    --mint-500: #4F8C72;
+    --mint-700: #2F6A52; /* was undefined pre-RMP-145; filled from the sage ramp */
+    --live:      #4F8C72;
+    --live-soft: #D2E8DC;
+
+    /* Cherry — legacy red step Arena still references (house ships clay) */
+    --cherry-100: #F3CFC8;
+    --cherry-500: #B83A2E;
+  }
+}
