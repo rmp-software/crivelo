@@ -4,10 +4,10 @@ import { Suspense, useState, FormEvent } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import Input from '@/app/components/Input';
+import Input from '@crivelo/ui/Input';
 import Wordmark from '@/app/components/Wordmark';
-import Button from '@/app/components/Button';
-import Card from '@/app/components/Card';
+import Button from '@crivelo/ui/Button';
+import Card from '@crivelo/ui/Card';
 
 // useSearchParams() forces this page out of static prerender — wrap the inner
 // form in a Suspense boundary so the outer page can still be statically shipped.

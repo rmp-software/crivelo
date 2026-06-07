@@ -5,7 +5,7 @@ import useSWR from 'swr';
 import AoVivoTab, { type Duel } from './tabs/AoVivoTab';
 import ChaveTab from './tabs/ChaveTab';
 import LeaderboardTab from './tabs/LeaderboardTab';
-import Badge from './Badge';
+import Badge from '@crivelo/ui/Badge';
 import SponsorBlock from './SponsorBlock';
 import type { CrowdFavorite } from '@/lib/crowd-vote';
 

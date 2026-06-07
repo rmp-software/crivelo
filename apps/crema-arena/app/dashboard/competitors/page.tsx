@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@/app/components/PageHeader';
-import Button from '@/app/components/Button';
-import Input from '@/app/components/Input';
-import ConfirmationModal from '@/app/components/ConfirmationModal';
-import EmptyState from '@/app/components/EmptyState';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
-import { useToast } from '@/app/components/Toast';
+import PageHeader from '@crivelo/ui/PageHeader';
+import Button from '@crivelo/ui/Button';
+import Input from '@crivelo/ui/Input';
+import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
+import EmptyState from '@crivelo/ui/EmptyState';
+import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import { useToast } from '@crivelo/ui/Toast';
 import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 
 interface Competitor {

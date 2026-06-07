@@ -1,7 +1,7 @@
 'use client';
 
 import { Trophy, Medal } from 'lucide-react';
-import Badge from '../Badge';
+import Badge from '@crivelo/ui/Badge';
 import type { CrowdFavorite } from '@/lib/crowd-vote';
 
 interface Competitor {

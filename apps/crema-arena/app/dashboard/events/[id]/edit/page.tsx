@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PageHeader from '@/app/components/PageHeader';
+import PageHeader from '@crivelo/ui/PageHeader';
 import EventForm from '@/app/components/EventForm';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
+import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
 
 interface EventData {
   id: string;

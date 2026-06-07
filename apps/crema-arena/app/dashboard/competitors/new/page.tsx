@@ -1,6 +1,6 @@
 'use client';
 
-import PageHeader from '@/app/components/PageHeader';
+import PageHeader from '@crivelo/ui/PageHeader';
 import CompetitorForm from '@/app/components/CompetitorForm';
 
 export default function NewCompetitorPage() {

@@ -1,0 +1,169 @@
+/*
+ * @crivelo/tokens — Tier 1 foundation (shared across every Crivelo product).
+ * CSS custom properties + base element styles + foundation utilities.
+ * Per-product accent (--brand*, --focus-ring) is overridden by each app on :root;
+ * per-product personality (brackets, podium, etc.) stays inside the app.
+ *
+ * Plain CSS by design (no @apply) so it is independent of the consuming app's
+ * Tailwind pipeline ordering. Wrapped in @tailwind layers for cascade parity.
+ */
+
+@layer base {
+  :root {
+    /* Color Tokens */
+    --espresso-900: #1F1410;
+    --espresso-700: #3E2A22;
+    --espresso-500: #7A5A4A;
+    --crema-50:  #FBF6EA;
+    --crema-100: #F5ECD8;
+    --crema-200: #EADBC0;
+    --crema-300: #DCC59E;
+    --marigold-100: #FAE7B6;
+    --marigold-500: #E6A636;
+    --mint-100: #D2E8DC;
+    --mint-500: #4F8C72;
+    --cherry-100: #F3CFC8;
+    --cherry-500: #B83A2E;
+
+    /* Semantic Colors */
+    --bg:             #FBF6EA;
+    --bg-2:           #F5ECD8;
+    --bg-3:           #EADBC0;
+    --bg-inverse:     #1F1410;
+    --surface:        #FBF6EA;
+    --surface-raised: #FFFCF3;
+
+    --fg:           #1F1410;
+    --fg-2:         #3E2A22;
+    --fg-3:         #7A5A4A;
+    --fg-muted:     #6B5A4F;
+    --fg-inverse:   #FBF6EA;
+
+    --border:        rgba(31,20,16,.12);
+    --border-strong: rgba(31,20,16,.24);
+
+    /* Accent (Tier 2) — neutral-house defaults; each product overrides these
+       on its own :root. Crema Arena overrides them with cinnamon. */
+    --brand:       var(--espresso-700);
+    --brand-hover: var(--espresso-900);
+    --brand-press: var(--espresso-900);
+    --brand-soft:  var(--crema-200);
+
+    --gold:      #E6A636;
+    --gold-soft: #FAE7B6;
+    --live:      #4F8C72;
+    --live-soft: #D2E8DC;
+    --danger:      #B83A2E;
+    --danger-soft: #F3CFC8;
+
+    --success:      #4F8C72;
+    --success-soft: #D2E8DC;
+    --warning:      #E6A636;
+    --warning-soft: #FAE7B6;
+    --fg-4:         #B8A89E;
+
+    --focus-ring: var(--espresso-700);
+
+    /* Border Radii */
+    --radius-xs:   6px;
+    --radius-sm:   10px;
+    --radius-md:   18px;
+    --radius-lg:   28px;
+    --radius-full: 999px;
+
+    /* Shadows */
+    --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
+    --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+
+    /* Animations */
+    --ease-standard:  cubic-bezier(.2,.7,.2,1);
+    --ease-overshoot: cubic-bezier(.34,1.56,.64,1);
+    --dur-fast:  120ms;
+    --dur-base:  180ms;
+    --dur-stage: 320ms;
+
+    /* Font Families — values are overridden at runtime by next/font CSS variables on <body> */
+    --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+    --font-serif:   'Instrument Serif', 'Times New Roman', serif;
+    --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    'Geist Mono', ui-monospace, monospace;
+  }
+
+  /* Base Styles */
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  /* Accessibility: Focus Rings */
+  *:focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    transition: outline-offset var(--dur-fast) var(--ease-standard);
+  }
+
+  /* Remove default focus outline for mouse users */
+  *:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Smooth transitions for interactive elements */
+  a, button, input, select, textarea {
+    transition-property: color, background-color, border-color, transform, box-shadow;
+    transition-duration: var(--dur-base);
+    transition-timing-function: var(--ease-standard);
+  }
+
+  /* Minimum touch target size for accessibility */
+  @media (pointer: coarse) {
+    button, a, input[type="checkbox"], input[type="radio"] {
+      min-height: 48px;
+      min-width: 48px;
+    }
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .tabular-nums {
+    font-feature-settings: "tnum";
+  }
+
+  @keyframes rings-spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes rings-spin-reverse {
+    to { transform: rotate(-360deg); }
+  }
+
+  @keyframes toast-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .toast-enter {
+    animation: toast-enter var(--dur-base) var(--ease-standard);
+  }
+}

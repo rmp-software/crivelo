@@ -2,8 +2,8 @@
 
 import { useState, useRef, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from './Button';
-import Input from './Input';
+import Button from '@crivelo/ui/Button';
+import Input from '@crivelo/ui/Input';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 
 interface CompetitorFormProps {
