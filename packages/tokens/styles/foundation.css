@@ -1,95 +1,140 @@
 /*
- * @crivelo/tokens — Tier 1 foundation (shared across every Crivelo product).
- * CSS custom properties + base element styles + foundation utilities.
- * Per-product accent (--brand*, --focus-ring) is overridden by each app on :root;
- * per-product personality (brackets, podium, etc.) stays inside the app.
+ * @crivelo/tokens — Tier 1 foundation (the Crivelo house, neutral by design).
+ * Source of truth: the Crivelo design handoff (colors_and_type.css). The house
+ * wears only crema/espresso neutrals + sage/clay semantics — NO product accent.
+ * Each product overrides --brand* / --focus-ring (Crema Arena = cinnamon) and
+ * brings any extra palette it needs app-local.
  *
  * Plain CSS by design (no @apply) so it is independent of the consuming app's
  * Tailwind pipeline ordering. Wrapped in @tailwind layers for cascade parity.
+ *
+ * NOTE: the richer element styles + scale application from the handoff
+ * (.display/.editorial/.numeric/.caption, sized headings, link/::selection,
+ * font-feature-settings) are adopted per-app in the re-skin (RMP-147), not here,
+ * so the token swap stays visually neutral for existing apps.
  */
 
 @layer base {
   :root {
-    /* Color Tokens */
+    /* ---------- Color: raw palette ---------- */
+    /* Espresso — near-black brown. Text, ink, deep surfaces, primary actions. */
+    --espresso-950: #140C08;
     --espresso-900: #1F1410;
+    --espresso-800: #2C1D17;
     --espresso-700: #3E2A22;
+    --espresso-600: #5A3F33;
     --espresso-500: #7A5A4A;
+
+    /* Crema / cream — primary background family. */
     --crema-50:  #FBF6EA;
     --crema-100: #F5ECD8;
     --crema-200: #EADBC0;
     --crema-300: #DCC59E;
-    --marigold-100: #FAE7B6;
-    --marigold-500: #E6A636;
-    --mint-100: #D2E8DC;
-    --mint-500: #4F8C72;
-    --cherry-100: #F3CFC8;
-    --cherry-500: #B83A2E;
+    --crema-400: #C7AB7C;
 
-    /* Semantic Colors */
-    --bg:             #FBF6EA;
-    --bg-2:           #F5ECD8;
-    --bg-3:           #EADBC0;
-    --bg-inverse:     #1F1410;
-    --surface:        #FBF6EA;
+    /* Sage — success (the one cool green the house allows, semantic only). */
+    --sage-100: #D2E8DC;
+    --sage-500: #4F8C72;
+    --sage-700: #2F6A52;
+
+    /* Clay — danger / destructive (semantic only). */
+    --clay-100: #F3CFC8;
+    --clay-500: #B83A2E;
+    --clay-700: #8A2620;
+
+    /* ---------- Semantic surface + ink ---------- */
+    --bg:           var(--crema-50);
+    --bg-2:         var(--crema-100);
+    --bg-3:         var(--crema-200);
+    --bg-inverse:   var(--espresso-900);
+
+    --surface:        var(--crema-50);
     --surface-raised: #FFFCF3;
+    --surface-sunken: var(--crema-100);
 
-    --fg:           #1F1410;
-    --fg-2:         #3E2A22;
-    --fg-3:         #7A5A4A;
-    --fg-muted:     #6B5A4F;
-    --fg-inverse:   #FBF6EA;
-
-    --border:        rgba(31,20,16,.12);
-    --border-strong: rgba(31,20,16,.24);
-
-    /* Accent (Tier 2) — neutral-house defaults; each product overrides these
-       on its own :root. Crema Arena overrides them with cinnamon. */
-    --brand:       var(--espresso-700);
-    --brand-hover: var(--espresso-900);
-    --brand-press: var(--espresso-900);
-    --brand-soft:  var(--crema-200);
-
-    --gold:      #E6A636;
-    --gold-soft: #FAE7B6;
-    --live:      #4F8C72;
-    --live-soft: #D2E8DC;
-    --danger:      #B83A2E;
-    --danger-soft: #F3CFC8;
-
-    --success:      #4F8C72;
-    --success-soft: #D2E8DC;
-    --warning:      #E6A636;
-    --warning-soft: #FAE7B6;
+    --fg:           var(--espresso-900);
+    --fg-2:         var(--espresso-700);
+    --fg-3:         var(--espresso-500);
     --fg-4:         #B8A89E;
+    --fg-muted:     #6B5A4F;
+    --fg-inverse:   var(--crema-50);
 
-    --focus-ring: var(--espresso-700);
+    --border:          rgba(31, 20, 16, 0.12);
+    --border-strong:   rgba(31, 20, 16, 0.24);
+    --border-emphasis: var(--espresso-900);
 
-    /* Border Radii */
-    --radius-xs:   6px;
-    --radius-sm:   10px;
-    --radius-md:   18px;
-    --radius-lg:   28px;
-    --radius-full: 999px;
+    /* ---------- Accent (Tier 2) — neutral-house defaults; products override.
+     * "brand" = the house's primary action color = ink, NOT a hue. ---------- */
+    --brand:        var(--espresso-900);
+    --brand-hover:  var(--espresso-800);
+    --brand-press:  var(--espresso-950);
+    --brand-soft:   var(--crema-100);
 
-    /* Shadows */
+    --success:      var(--sage-500);
+    --success-soft: var(--sage-100);
+    --danger:       var(--clay-500);
+    --danger-soft:  var(--clay-100);
+
+    /* ---------- Focus ---------- */
+    --focus-ring:   var(--espresso-900);
+
+    /* ---------- Radii ---------- */
+    --radius-xs:    6px;
+    --radius-sm:    10px;
+    --radius-md:    18px;
+    --radius-lg:    28px;
+    --radius-full:  999px;
+
+    /* ---------- Shadows ---------- */
     --shadow-1: 0 1px 0 rgba(31,20,16,.04), 0 8px 24px -12px rgba(31,20,16,.12);
     --shadow-2: 0 2px 0 rgba(31,20,16,.04), 0 18px 40px -16px rgba(31,20,16,.22);
+    --shadow-inset: inset 0 1px 0 rgba(255, 252, 243, 0.6);
 
-    /* Animations */
+    /* ---------- Spacing scale (4px base) ---------- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* ---------- Motion ---------- */
     --ease-standard:  cubic-bezier(.2,.7,.2,1);
     --ease-overshoot: cubic-bezier(.34,1.56,.64,1);
     --dur-fast:  120ms;
     --dur-base:  180ms;
     --dur-stage: 320ms;
 
-    /* Font Families — values are overridden at runtime by next/font CSS variables on <body> */
+    /* ---------- Type: families ---------- */
     --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
     --font-serif:   'Instrument Serif', 'Times New Roman', serif;
-    --font-body:    'Geist', ui-sans-serif, system-ui, sans-serif;
-    --font-mono:    'Geist Mono', ui-monospace, monospace;
+    --font-body:    'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono:    'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+    /* ---------- Type: scale (available; applied per-app in the re-skin) ---------- */
+    --fs-display:   clamp(40px, 8vw, 64px);
+    --fs-h1:        clamp(30px, 5.5vw, 44px);
+    --fs-h2:        clamp(24px, 4vw, 32px);
+    --fs-h3:        20px;
+    --fs-h4:        17px;
+    --fs-body:      16px;
+    --fs-small:     14px;
+    --fs-xs:        12px;
+    --fs-mono-lg:   28px;
+    --fs-mono:      15px;
+
+    --lh-tight:     1.05;
+    --lh-snug:      1.2;
+    --lh-body:      1.5;
+    --lh-loose:     1.65;
+
+    --tracking-display: -0.02em;
+    --tracking-caps:    0.08em;
   }
 
-  /* Base Styles */
+  /* Base Styles — kept minimal/parity here; refinements land per-app (RMP-147). */
   * {
     border-color: var(--border);
   }
@@ -115,19 +160,16 @@
     transition: outline-offset var(--dur-fast) var(--ease-standard);
   }
 
-  /* Remove default focus outline for mouse users */
   *:focus:not(:focus-visible) {
     outline: none;
   }
 
-  /* Smooth transitions for interactive elements */
   a, button, input, select, textarea {
     transition-property: color, background-color, border-color, transform, box-shadow;
     transition-duration: var(--dur-base);
     transition-timing-function: var(--ease-standard);
   }
 
-  /* Minimum touch target size for accessibility */
   @media (pointer: coarse) {
     button, a, input[type="checkbox"], input[type="radio"] {
       min-height: 48px;
