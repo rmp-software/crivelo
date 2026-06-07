@@ -527,6 +527,54 @@
     </ui_copy_examples>
   </design_system>
 
+  <!--
+    Enforced by the rmp:spec-compliance-reviewer agent. Rules are phrased as checkable
+    assertions; `grep` attributes give the reviewer a pattern to search changed UI for.
+    Follows templates/app_spec.template.txt from rmp-software/claude-kit.
+  -->
+  <compliance_rules>
+
+    <copy_rules>
+      <rule>All user-facing text is pt-BR, addressed as "você", with short imperative verbs.</rule>
+      <rule>Sentence case for headings, buttons, and modal titles. "TNT" is the only ALL CAPS. No Title Case.</rule>
+      <rule grep=" x |\dx\d">Score format is always `N × M` using Unicode × (U+00D7) with spaces around it — never the ASCII letter "x".</rule>
+      <rule>Pluralize: `1 voto` / `N votos`; `1 vitória` / `N vitórias`.</rule>
+      <rule>Max one "!" per screen. No trailing period on button labels.</rule>
+    </copy_rules>
+
+    <copy_examples>
+      <!-- Must appear verbatim where the UI emits them; see <ui_copy_examples> above for the full set. -->
+      <example>Voto registrado. X de Y votos.</example>
+      <example>[Nome] entra como wildcard.</example>
+      <example>Aguardando próximo duelo...</example>
+    </copy_examples>
+
+    <design_tokens>
+      <rule>Colors come only from `app/globals.css` variables / `tailwind.config.ts` aliases.</rule>
+      <rule grep="#[0-9a-fA-F]{3,8}">No raw hex or arbitrary Tailwind values that bypass the tokens, in app code.</rule>
+      <rule>Fonts only via the four variables (--font-display, --font-serif, --font-body, --font-mono). No @font-face, no next/font/google for these families.</rule>
+    </design_tokens>
+
+    <feedback_ui>
+      <rule>Transient feedback uses `useToast()`; destructive confirms use `ConfirmationModal`.</rule>
+      <rule grep="alert\(|confirm\(">No native `alert()` / `confirm()` anywhere.</rule>
+    </feedback_ui>
+
+    <reachability>
+      <rule>Live surfaces (/live/[eventId], /e/[eventId]) derive all state from polling
+            /api/events/:id/current-duel, /bracket, /leaderboard, /sponsors. There is no WebSocket/SSE,
+            so a server-side change meant to reach a live surface must land in one of those endpoints.</rule>
+    </reachability>
+
+    <asset_rules>
+      <rule>Prefer the brand SVGs in public/assets/ (trophy.svg, stamp-seal.svg, rings.svg, wordmark.svg,
+            monogram.svg) over Lucide substitutes (Crown, Trophy) when touching those spots.</rule>
+      <rule grep="/public/uploads/">Uploads go through `lib/file-upload.ts` → @vercel/blob, storing the full
+            HTTPS Blob URL. No new /public/uploads/ writes; no local-filesystem upload paths.</rule>
+    </asset_rules>
+
+  </compliance_rules>
+
   <key_interactions>
     <bracket_generation>
       1. Organizer adds competitors to the event with optional seeds
