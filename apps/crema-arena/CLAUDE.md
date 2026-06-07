@@ -1,5 +1,10 @@
 # CLAUDE.md
 
+> **This app lives in the Crivelo monorepo.** Build/run via pnpm + turbo from the
+> repo root — see `../../CLAUDE.md`. The npm/docker/`./init.sh` commands below are
+> legacy from the standalone era. Design tokens now live in `@crivelo/tokens`
+> (foundation) + `app/arena-tokens.css` (Arena accent/palette), not `app/globals.css`.
+
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Commands
