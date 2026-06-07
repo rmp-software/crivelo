@@ -21,12 +21,6 @@ module.exports = {
           200: "var(--crema-200)",
           300: "var(--crema-300)",
         },
-        cinnamon: {
-          50: "var(--cinnamon-50)",
-          500: "var(--cinnamon-500)",
-          600: "var(--cinnamon-600)",
-          700: "var(--cinnamon-700)",
-        },
         marigold: {
           100: "var(--marigold-100)",
           500: "var(--marigold-500)",

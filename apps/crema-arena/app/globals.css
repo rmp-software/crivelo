@@ -1,4 +1,5 @@
 @import "@crivelo/tokens/styles/foundation.css";
+@import "./accent-cinnamon.css";
 
 @tailwind base;
 @tailwind components;

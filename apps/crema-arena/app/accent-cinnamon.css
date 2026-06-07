@@ -1,0 +1,24 @@
+/*
+ * Crema Arena — Tier-2 accent (cinnamon).
+ * Overrides the neutral accent defaults shipped by @crivelo/tokens foundation.
+ *
+ * Must be in @layer base (like the foundation's :root): Tailwind hoists
+ * @layer base content to the @tailwind base position, so an unlayered :root
+ * here would land BEFORE the foundation defaults and lose. Imported after the
+ * foundation (see globals.css) so within the base layer these win.
+ */
+@layer base {
+  :root {
+    --cinnamon-50:  #FBEEE5;
+    --cinnamon-500: #C45A2C;
+    --cinnamon-600: #A8471E;
+    --cinnamon-700: #823516;
+
+    --brand:       #C45A2C;
+    --brand-hover: #A8471E;
+    --brand-press: #823516;
+    --brand-soft:  #FBEEE5;
+
+    --focus-ring: #C45A2C;
+  }
+}
