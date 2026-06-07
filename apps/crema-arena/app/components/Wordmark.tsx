@@ -4,28 +4,33 @@ interface WordmarkProps {
   className?: string;
   /** Color variant — `dark` (default) for cream backgrounds, `light` for espresso surfaces. */
   variant?: 'dark' | 'light';
+  /** Show the quiet "by Crivelo" endorsement lockup tucked under the wordmark. */
+  endorsement?: boolean;
 }
 
 /**
  * Crema Arena wordmark: Instrument Serif italic "Crema" + Bricolage Grotesque
  * bold "Arena" in cinnamon. Optionally preceded by the concentric-rings
- * monogram.
+ * monogram, and optionally endorsed with a quiet "by Crivelo" lockup — tucked
+ * small and muted at the wordmark's bottom-right (quiet credit, never competing
+ * with the product name). "by" is always lowercase.
  */
 export default function Wordmark({
   size = 'md',
   showMonogram = true,
   className = '',
   variant = 'dark',
+  endorsement = false,
 }: WordmarkProps) {
   const sizes = {
-    sm: { mono: 24, type: 'text-lg' },
-    md: { mono: 32, type: 'text-2xl' },
-    lg: { mono: 44, type: 'text-4xl' },
+    sm: { mono: 24, type: 'text-lg', by: 'text-[10px]' },
+    md: { mono: 32, type: 'text-2xl', by: 'text-xs' },
+    lg: { mono: 44, type: 'text-4xl', by: 'text-sm' },
   } as const;
-  const { mono, type } = sizes[size];
+  const { mono, type, by } = sizes[size];
 
-  const cremaColor =
-    variant === 'light' ? 'var(--crema-50)' : 'var(--fg)';
+  const cremaColor = variant === 'light' ? 'var(--crema-50)' : 'var(--fg)';
+  const byColor = variant === 'light' ? 'var(--crema-300)' : 'var(--fg-3)';
 
   return (
     <div className={`inline-flex items-center gap-3 ${className}`}>
@@ -39,19 +44,31 @@ export default function Wordmark({
           className="flex-shrink-0"
         />
       )}
-      <span className={`leading-none ${type}`}>
-        <span
-          className="font-serif italic"
-          style={{ color: cremaColor }}
-        >
-          Crema
+      <span className="relative inline-flex leading-none">
+        <span className={`leading-none ${type}`}>
+          <span className="font-serif italic" style={{ color: cremaColor }}>
+            Crema
+          </span>
+          <span
+            className="font-display font-extrabold ml-1.5"
+            style={{ color: 'var(--brand)' }}
+          >
+            Arena
+          </span>
         </span>
-        <span
-          className="font-display font-extrabold ml-1.5"
-          style={{ color: 'var(--brand)' }}
-        >
-          Arena
-        </span>
+        {endorsement && (
+          <span
+            className={`absolute right-0 bottom-0 font-body whitespace-nowrap ${by}`}
+            style={{
+              color: byColor,
+              letterSpacing: '0.01em',
+              transform: 'translateY(50%) scale(0.9)',
+              transformOrigin: 'right',
+            }}
+          >
+            by Crivelo
+          </span>
+        )}
       </span>
     </div>
   );

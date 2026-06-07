@@ -46,8 +46,8 @@ export default function Sidebar({ user }: SidebarProps) {
       {/* Logo/Branding */}
       <div className="p-6 border-b border-[var(--espresso-700)]">
         <Link href="/dashboard" className="block" aria-label="Crema Arena — ir para o painel">
-          <Wordmark size="md" variant="light" />
-          <p className="text-xs text-[var(--crema-300)] font-mono uppercase tracking-wider mt-2">
+          <Wordmark size="md" variant="light" endorsement />
+          <p className="text-xs text-[var(--crema-300)] font-mono uppercase tracking-wider mt-3">
             Painel admin
           </p>
         </Link>

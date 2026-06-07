@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- @dsCard group="Brand" name="Monogram & sieve" subtitle="Dot-matrix screen · the kept dots form a C" viewport="760x260" -->
+<html><head><meta charset="utf-8"><title>Monogram</title><link rel="stylesheet" href="_card.css">
+<style>
+  .marks { display:flex; align-items:stretch; gap:18px; }
+  .panel {
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+    padding:20px; border:1px solid var(--border); border-radius:var(--radius-md); background:var(--surface-raised);
+  }
+  .panel.dark { background:var(--espresso-900); border-color:var(--espresso-700); }
+  .panel.dark .cap { color:var(--crema-300); }
+  .mark { width:72px; height:72px; }
+  .cap { font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--fg-3); }
+  /* construction: faint grid lines behind the dots */
+  .grid-lines line { stroke:var(--border-strong); stroke-width:.75; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:240px;gap:14px">
+  <div class="marks">
+    <!-- 1. the full screen -->
+    <div class="panel">
+      <svg class="mark" viewBox="0 0 64 64" fill="var(--fg-3)" aria-hidden="true">
+        <circle cx="8" cy="8" r="3"/><circle cx="20" cy="8" r="3"/><circle cx="32" cy="8" r="3"/><circle cx="44" cy="8" r="3"/><circle cx="56" cy="8" r="3"/>
+        <circle cx="8" cy="20" r="3"/><circle cx="20" cy="20" r="3"/><circle cx="32" cy="20" r="3"/><circle cx="44" cy="20" r="3"/><circle cx="56" cy="20" r="3"/>
+        <circle cx="8" cy="32" r="3"/><circle cx="20" cy="32" r="3"/><circle cx="32" cy="32" r="3"/><circle cx="44" cy="32" r="3"/><circle cx="56" cy="32" r="3"/>
+        <circle cx="8" cy="44" r="3"/><circle cx="20" cy="44" r="3"/><circle cx="32" cy="44" r="3"/><circle cx="44" cy="44" r="3"/><circle cx="56" cy="44" r="3"/>
+        <circle cx="8" cy="56" r="3"/><circle cx="20" cy="56" r="3"/><circle cx="32" cy="56" r="3"/><circle cx="44" cy="56" r="3"/><circle cx="56" cy="56" r="3"/>
+      </svg>
+      <div class="cap">o crivo · 5×5</div>
+    </div>
+    <!-- 2. sorted: C emerges -->
+    <div class="panel">
+      <svg class="mark" viewBox="0 0 64 64" fill="var(--fg)" aria-hidden="true">
+        <circle cx="8" cy="8" r="4"/><circle cx="20" cy="8" r="4"/><circle cx="32" cy="8" r="4"/><circle cx="44" cy="8" r="4"/><circle cx="56" cy="8" r="2" fill-opacity=".16"/>
+        <circle cx="8" cy="20" r="4"/><circle cx="20" cy="20" r="2" fill-opacity=".16"/><circle cx="32" cy="20" r="2" fill-opacity=".16"/><circle cx="44" cy="20" r="2" fill-opacity=".16"/><circle cx="56" cy="20" r="2" fill-opacity=".16"/>
+        <circle cx="8" cy="32" r="4"/><circle cx="20" cy="32" r="2" fill-opacity=".16"/><circle cx="32" cy="32" r="2" fill-opacity=".16"/><circle cx="44" cy="32" r="2" fill-opacity=".16"/><circle cx="56" cy="32" r="2" fill-opacity=".16"/>
+        <circle cx="8" cy="44" r="4"/><circle cx="20" cy="44" r="2" fill-opacity=".16"/><circle cx="32" cy="44" r="2" fill-opacity=".16"/><circle cx="44" cy="44" r="2" fill-opacity=".16"/><circle cx="56" cy="44" r="2" fill-opacity=".16"/>
+        <circle cx="8" cy="56" r="4"/><circle cx="20" cy="56" r="4"/><circle cx="32" cy="56" r="4"/><circle cx="44" cy="56" r="4"/><circle cx="56" cy="56" r="2" fill-opacity=".16"/>
+      </svg>
+      <div class="cap">curado · vira “C”</div>
+    </div>
+    <!-- 3. solid favicon-grade -->
+    <div class="panel">
+      <svg class="mark" viewBox="0 0 64 64" fill="var(--fg)" aria-hidden="true">
+        <circle cx="8" cy="8" r="5"/><circle cx="20" cy="8" r="5"/><circle cx="32" cy="8" r="5"/><circle cx="44" cy="8" r="5"/>
+        <circle cx="8" cy="20" r="5"/>
+        <circle cx="8" cy="32" r="5"/>
+        <circle cx="8" cy="44" r="5"/>
+        <circle cx="8" cy="56" r="5"/><circle cx="20" cy="56" r="5"/><circle cx="32" cy="56" r="5"/><circle cx="44" cy="56" r="5"/>
+      </svg>
+      <div class="cap">app icon · sólido</div>
+    </div>
+    <!-- 4. dark variant -->
+    <div class="panel dark">
+      <svg class="mark" viewBox="0 0 64 64" fill="var(--crema-50)" aria-hidden="true">
+        <circle cx="8" cy="8" r="4"/><circle cx="20" cy="8" r="4"/><circle cx="32" cy="8" r="4"/><circle cx="44" cy="8" r="4"/><circle cx="56" cy="8" r="2" fill-opacity=".22"/>
+        <circle cx="8" cy="20" r="4"/><circle cx="20" cy="20" r="2" fill-opacity=".22"/><circle cx="32" cy="20" r="2" fill-opacity=".22"/><circle cx="44" cy="20" r="2" fill-opacity=".22"/><circle cx="56" cy="20" r="2" fill-opacity=".22"/>
+        <circle cx="8" cy="32" r="4"/><circle cx="20" cy="32" r="2" fill-opacity=".22"/><circle cx="32" cy="32" r="2" fill-opacity=".22"/><circle cx="44" cy="32" r="2" fill-opacity=".22"/><circle cx="56" cy="32" r="2" fill-opacity=".22"/>
+        <circle cx="8" cy="44" r="4"/><circle cx="20" cy="44" r="2" fill-opacity=".22"/><circle cx="32" cy="44" r="2" fill-opacity=".22"/><circle cx="44" cy="44" r="2" fill-opacity=".22"/><circle cx="56" cy="44" r="2" fill-opacity=".22"/>
+        <circle cx="8" cy="56" r="4"/><circle cx="20" cy="56" r="4"/><circle cx="32" cy="56" r="4"/><circle cx="44" cy="56" r="4"/><circle cx="56" cy="56" r="2" fill-opacity=".22"/>
+      </svg>
+      <div class="cap">on espresso</div>
+    </div>
+  </div>
+  <div class="note">crivo = peneira / screen. A house curates: it keeps what matters, screens the rest — and the kept apertures sort into a C.</div>
+</div>
+</body></html>

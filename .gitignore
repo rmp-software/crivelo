@@ -38,3 +38,7 @@ pnpm-debug.log*
 
 # playwright / validation artifacts
 .playwright-mcp/
+
+# design-system bundle — commit design-source only (skip font binaries + backups)
+**/.design-system/**/fonts/
+**/.design-system/**/*.bak-*/

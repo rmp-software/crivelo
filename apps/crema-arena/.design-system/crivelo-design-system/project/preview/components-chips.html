@@ -1,0 +1,45 @@
+<!doctype html>
+<!-- @dsCard group="Components" name="Badges" subtitle="default · success · danger — pill-shaped, sm/md" viewport="820x220" -->
+<html><head><meta charset="utf-8"><title>Badges</title><link rel="stylesheet" href="_card.css">
+<style>
+  /* Mirrors app/components/Badge.tsx — pill-shaped, 3 variants × 2 sizes. */
+  .badge {
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    font-family:var(--font-body); font-weight:500; white-space:nowrap;
+    border-radius:var(--radius-full);
+  }
+  .badge-default { background:var(--bg-3); color:var(--fg-2); }
+  .badge-success { background:var(--success-soft); color:var(--success); }
+  .badge-danger  { background:var(--danger-soft);  color:var(--danger); }
+  .badge-sm { font-size:12px; padding:2px 8px; }
+  .badge-md { font-size:14px; padding:4px 10px; }
+
+  .dot { width:6px; height:6px; border-radius:999px; background:currentColor; }
+
+  .row-label { font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--fg-3); min-width:80px; }
+  .stack-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="card" style="min-height:180px;gap:14px">
+  <div class="stack-row">
+    <span class="row-label">Status</span>
+    <span class="badge badge-default badge-md">Rascunho</span>
+    <span class="badge badge-default badge-md">Sincronizando</span>
+    <span class="badge badge-success badge-md">Salvo</span>
+    <span class="badge badge-danger badge-md">Falhou</span>
+  </div>
+
+  <div class="stack-row">
+    <span class="row-label">Sizes</span>
+    <span class="badge badge-success badge-sm">Salvo</span>
+    <span class="badge badge-success badge-md">Salvo</span>
+    <span class="badge badge-default badge-sm">v2</span>
+    <span class="badge badge-default badge-md">crivo 17/18</span>
+  </div>
+
+  <div class="caption" style="margin-top:4px">
+    pill-shaped only · default / success / danger · sm 12px / md 14px — neutral by default, color only for semantic state
+  </div>
+</div>
+</body></html>
