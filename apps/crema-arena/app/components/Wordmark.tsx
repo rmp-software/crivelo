@@ -4,15 +4,16 @@ interface WordmarkProps {
   className?: string;
   /** Color variant — `dark` (default) for cream backgrounds, `light` for espresso surfaces. */
   variant?: 'dark' | 'light';
-  /** Show the quiet "by Crivelo" endorsement lockup beneath the wordmark. */
+  /** Show the quiet "by Crivelo" endorsement lockup tucked under the wordmark. */
   endorsement?: boolean;
 }
 
 /**
  * Crema Arena wordmark: Instrument Serif italic "Crema" + Bricolage Grotesque
  * bold "Arena" in cinnamon. Optionally preceded by the concentric-rings
- * monogram, and optionally endorsed with a quiet "by Crivelo" lockup (the house
- * framing its product — "by" lowercase, Geist, ~40% of the wordmark).
+ * monogram, and optionally endorsed with a quiet "by Crivelo" lockup — tucked
+ * small and muted at the wordmark's bottom-right (quiet credit, never competing
+ * with the product name). "by" is always lowercase.
  */
 export default function Wordmark({
   size = 'md',
@@ -22,15 +23,14 @@ export default function Wordmark({
   endorsement = false,
 }: WordmarkProps) {
   const sizes = {
-    sm: { mono: 24, type: 'text-lg', by: 'text-[9px]' },
-    md: { mono: 32, type: 'text-2xl', by: 'text-[11px]' },
+    sm: { mono: 24, type: 'text-lg', by: 'text-[10px]' },
+    md: { mono: 32, type: 'text-2xl', by: 'text-xs' },
     lg: { mono: 44, type: 'text-4xl', by: 'text-sm' },
   } as const;
   const { mono, type, by } = sizes[size];
 
   const cremaColor = variant === 'light' ? 'var(--crema-50)' : 'var(--fg)';
-  const byMuted = variant === 'light' ? 'var(--crema-300)' : 'var(--fg-3)';
-  const byStrong = variant === 'light' ? 'var(--crema-50)' : 'var(--fg)';
+  const byColor = variant === 'light' ? 'var(--crema-300)' : 'var(--fg-3)';
 
   return (
     <div className={`inline-flex items-center gap-3 ${className}`}>
@@ -44,7 +44,7 @@ export default function Wordmark({
           className="flex-shrink-0"
         />
       )}
-      <span className="inline-flex flex-col leading-none">
+      <span className="relative inline-flex leading-none">
         <span className={`leading-none ${type}`}>
           <span className="font-serif italic" style={{ color: cremaColor }}>
             Crema
@@ -58,11 +58,15 @@ export default function Wordmark({
         </span>
         {endorsement && (
           <span
-            className={`font-body mt-1.5 ${by}`}
-            style={{ color: byMuted, letterSpacing: '0.01em' }}
+            className={`absolute right-0 bottom-0 font-body whitespace-nowrap ${by}`}
+            style={{
+              color: byColor,
+              letterSpacing: '0.01em',
+              transform: 'translateY(50%) scale(0.9)',
+              transformOrigin: 'right',
+            }}
           >
-            by{' '}
-            <span style={{ color: byStrong, fontWeight: 600 }}>Crivelo</span>
+            by Crivelo
           </span>
         )}
       </span>
