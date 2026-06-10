@@ -2,7 +2,7 @@
  * Crivelo shell (RMP-190) — sticky header, left-sliding family nav sheet, footer,
  * plus the theme (Light/Dark/System) + language (EN/PT) controllers.
  *
- * Ported from docs/design/coa-v60/project/coa-shell.jsx + the theme/lang/menu
+ * Ported from apps/crivelo-web/.design/project/coa-shell.jsx + the theme/lang/menu
  * ownership in coa-home.jsx. Wrap a page in <Shell> (inside the server layout's
  * <body>); the layout supplies the no-FOUC script via NO_FOUC_SCRIPT.
  */

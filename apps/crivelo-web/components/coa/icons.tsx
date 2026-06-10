@@ -1,7 +1,7 @@
 /**
  * Coa calculator icons (RMP-191) — the subset of the prototype's Icon set used
  * by the calculator. Ported verbatim from
- * docs/design/coa-v60/project/coa-shared.jsx (the PATHS map). Stroke icons on a
+ * apps/crivelo-web/.design/project/coa-shared.jsx (the PATHS map). Stroke icons on a
  * 24-grid, currentColor by default.
  */
 import type { CSSProperties, ReactNode } from "react";

@@ -2,7 +2,7 @@
  * Brand marks for crivelo-web (RMP-189).
  *
  * Presentational, server-safe SVG components (no hooks/state) ported from
- * docs/design/coa-v60/project/coa-shared.jsx:
+ * apps/crivelo-web/.design/project/coa-shared.jsx:
  *  - Monogram      — 5×5 sieve, kept dots form a "C" (HOUSE mark, neutral ink)
  *  - CoaMark       — V60 pour-over cone + drip (TOOL mark, teal accent)
  *  - CriveloLockup — Monogram + "Crivelo" wordmark (house, shell chrome)

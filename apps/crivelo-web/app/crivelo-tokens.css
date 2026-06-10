@@ -17,7 +17,7 @@
  *   --coa-halo   -> --accent-halo    (translucent teal glow ring)
  *   --pour-strength-rgb (unchanged)  (rgb triplet for strength overlays)
  *
- * Source of truth: docs/design/coa-v60/project/Coa Homepage.html (the locked
+ * Source of truth: apps/crivelo-web/.design/project/Coa Homepage.html (the locked
  * design's :root + [data-theme="dark"] blocks). Values copied verbatim.
  *
  * In @layer base + imported AFTER the foundation (see globals.css) so these win

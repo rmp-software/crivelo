@@ -2,7 +2,7 @@
 
 /**
  * PourSchedule (RMP-191) — the phase bar + pour list. Ported from `scheduleEl`
- * in docs/design/coa-v60/project/coa-home.jsx.
+ * in apps/crivelo-web/.design/project/coa-home.jsx.
  *
  * Phase bar: each segment is flex-weighted by its pour grams. Flavor pours are
  * teal (first pour = --brand, second = --accent-soft-2); strength pours are

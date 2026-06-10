@@ -2,7 +2,7 @@
 
 /**
  * TastePad (RMP-191) — the 2D taste pad. Ported from `padEl` in
- * docs/design/coa-v60/project/coa-home.jsx.
+ * apps/crivelo-web/.design/project/coa-home.jsx.
  *
  * The puck moves freely in BOTH axes (continuous x and y); the SieveGrid puck
  * neighbourhood follows it. The mapping to recipe inputs:

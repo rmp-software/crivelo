@@ -4,7 +4,7 @@
  * BrewTimer (RMP-192) — the running brew timer. A live dial that guides each
  * pour of the 4:6 schedule and counts real wall-clock time, so a mid-brew
  * refresh (phone propped on the counter) resumes from the right place. Ported
- * faithfully from docs/design/coa-v60/project/coa-timer.jsx — same dial geometry
+ * faithfully from apps/crivelo-web/.design/project/coa-timer.jsx — same dial geometry
  * (SZ=248 / R=110), pour ticks around the rim, liveElapsed/session math, the
  * 200ms tick, the ~12s pour window, progress = elapsed/removeAt, and the ring
  * strokeDashoffset.

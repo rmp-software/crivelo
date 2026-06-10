@@ -5,8 +5,8 @@ created: 2026-06-10
 linear_project_id: 2ac8ab29-150b-4787-b0dc-c75613daa20d
 linear_parent_issue: RMP-185
 feature_branch: feature/coa-v60-calculator
-design_handoff: docs/design/coa-v60/
 design_link: https://api.anthropic.com/v1/design/h/0MqsCZhlmJ-1R1PEgMUW2g?open_file=Coa+Responsive.html
+design_handoff_local: apps/crivelo-web/.design/   # gitignored — NOT committed; pull from design_link
 ---
 
 <feature_specification>
@@ -23,10 +23,11 @@ design_link: https://api.anthropic.com/v1/design/h/0MqsCZhlmJ-1R1PEgMUW2g?open_f
     and `crivelo-design-pull-in`. It consumes the shared design system (`@crivelo/tokens` +
     `@crivelo/ui`) and brings its own teal accent app-local, exactly as `apps/crema-arena`
     brings cinnamon. The visual design is already locked — designed and iterated in Claude
-    Design and exported to `docs/design/coa-v60/` (live source: the `design_link` in the
-    frontmatter). Read `docs/design/coa-v60/chats/chat1.md` (the full design conversation)
-    and the prototype source under `docs/design/coa-v60/project/` before implementing. This spec translates that prototype
-    into production architecture; it does not redesign it.
+    Design. The handoff bundle is **not committed** — pull it from the `design_link` in the
+    frontmatter and it lives locally (gitignored) at `apps/crivelo-web/.design/`. Read its
+    `chats/chat1.md` (the full design conversation) and the prototype source under
+    `project/` before implementing. This spec translates that prototype into production
+    architecture; it does not redesign it.
 
     Language convention differs from Crema Arena (which is pt-BR only): crivelo-web is
     bilingual, English-first (`/` = English) with Portuguese at `/pt`. All code/identifiers
@@ -89,7 +90,7 @@ design_link: https://api.anthropic.com/v1/design/h/0MqsCZhlmJ-1R1PEgMUW2g?open_f
   <ui_copy>
     English-first; Portuguese in `messages/pt.json` follows Crivelo's pt-BR voice (sentence
     case, "você", warm/precise; see the design-system guide in
-    `docs/design/coa-v60/project/_ds/`). Proper nouns are never translated: Coa, Crivelo,
+    `apps/crivelo-web/.design/project/_ds/`). Proper nouns are never translated: Coa, Crivelo,
     Crema Arena, Léxico, Diário.
 
     Key English strings (from the locked design):

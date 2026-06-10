@@ -5,7 +5,7 @@
  * plus a drip below. Carries the site's teal accent (`var(--brand)`) — distinct
  * from the neutral house sieve.
  *
- * Ported faithfully from docs/design/coa-v60/project/coa-shared.jsx (the cone
+ * Ported faithfully from apps/crivelo-web/.design/project/coa-shared.jsx (the cone
  * path "M13 14.5 L51 14.5 L32 47 Z", the two converging ribs at 0.42 opacity,
  * and the drip path). The reference defaulted to `var(--coa)`; in crivelo-web the
  * site accent is named `var(--brand)` (teal), so that is the default here.

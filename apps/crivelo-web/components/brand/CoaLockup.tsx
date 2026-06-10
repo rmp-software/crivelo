@@ -3,7 +3,7 @@ import { CoaMark } from "./CoaMark";
 /**
  * CoaLockup — the "Coa · by Crivelo" endorsement lockup, used in the header.
  *
- * Named `Lockup` in docs/design/coa-v60/project/coa-shared.jsx; renamed CoaLockup
+ * Named `Lockup` in apps/crivelo-web/.design/project/coa-shared.jsx; renamed CoaLockup
  * here. Pairs the Coa V60 mark (teal tool) with the "Coa" wordmark and a muted
  * "by Crivelo" endorsement — the house endorses the tool. Set `mono={false}` to
  * drop the leading mark.

@@ -1,7 +1,7 @@
 /**
  * SieveGrid — a parametric screen of apertures.
  *
- * Two modes (ported faithfully from docs/design/coa-v60/project/coa-shared.jsx):
+ * Two modes (ported faithfully from apps/crivelo-web/.design/project/coa-shared.jsx):
  *  - `puck` {x,y} in 0..1 lights a neighbourhood around the point (taste-pad use):
  *    each cell's `near = max(0, 1 - sqrt(dx² + dy²) * 2.4)` scales its radius and
  *    opacity, drawn in the accent.

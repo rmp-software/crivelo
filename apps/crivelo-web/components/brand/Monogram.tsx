@@ -4,7 +4,7 @@
  * A 5×5 sieve (screen of apertures); the kept/solid dots spell a "C". Neutral
  * ink by default (`var(--fg)`) — the house wears no product accent.
  *
- * Ported faithfully from docs/design/coa-v60/project/coa-shared.jsx (grid array,
+ * Ported faithfully from apps/crivelo-web/.design/project/coa-shared.jsx (grid array,
  * column/row centres c=[8,20,32,44,56], kept r=4 / empty r=2, opacity 1 / 0.16).
  */
 export interface MonogramProps {

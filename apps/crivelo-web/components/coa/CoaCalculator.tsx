@@ -3,7 +3,7 @@
 /**
  * CoaCalculator (RMP-191) — the Coa homepage body: the 4:6 calculator (idle) and
  * the brew-timer view, switched by a `view` state. Ported from the idle layout
- * in docs/design/coa-v60/project/coa-home.jsx (intro / pad / inputs / panel /
+ * in apps/crivelo-web/.design/project/coa-home.jsx (intro / pad / inputs / panel /
  * schedule / CTA), minus the shell chrome (Header / NavSheet / Footer), which the
  * Shell already provides via app/[locale]/layout.tsx.
  *

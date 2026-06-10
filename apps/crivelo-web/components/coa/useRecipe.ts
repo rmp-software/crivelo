@@ -2,7 +2,7 @@
 
 /**
  * useRecipe (RMP-191) — recipe state over the framework-agnostic 4:6 engine
- * (lib/four-six.ts). Ported from docs/design/coa-v60/project/coa-shared.jsx; it
+ * (lib/four-six.ts). Ported from apps/crivelo-web/.design/project/coa-shared.jsx; it
  * owns the four inputs (dose / ratio / acidity / strengthPours) and recomputes
  * the recipe from the engine on every change. The engine is the single source of
  * truth for the schedule — this hook never reimplements the math.

@@ -6,7 +6,7 @@ import { Monogram } from "./Monogram";
  * Used in shell chrome (nav, footer) where the HOUSE is the subject. Neutral ink;
  * the `light` variant swaps to cream ink for dark surfaces.
  *
- * Ported faithfully from docs/design/coa-v60/project/coa-shared.jsx (size table,
+ * Ported faithfully from apps/crivelo-web/.design/project/coa-shared.jsx (size table,
  * gap, wordmark in `var(--font-display)` 700, letter-spacing -0.02em).
  */
 export type LockupSize = "sm" | "md" | "lg";

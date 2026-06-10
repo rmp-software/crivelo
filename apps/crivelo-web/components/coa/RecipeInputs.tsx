@@ -3,7 +3,7 @@
 /**
  * RecipeInputs (RMP-191) — Coffee + Ratio steppers and (mobile only) the live
  * Water total. Ported from `inputsEl` / `MiniStep` in
- * docs/design/coa-v60/project/coa-home.jsx.
+ * apps/crivelo-web/.design/project/coa-home.jsx.
  *
  * Coffee: ±1 g, clamp 8–60. Ratio: 1:n, clamp 12–18. Water = dose × ratio,
  * straight from the engine recipe (never recomputed here). On wide layouts the

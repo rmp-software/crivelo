@@ -1,6 +1,6 @@
 /**
  * Minimal shell icons (RMP-190) — the subset of the prototype's Icon set used by
- * the shell controls. Ported verbatim from docs/design/coa-v60/project/coa-shared.jsx
+ * the shell controls. Ported verbatim from apps/crivelo-web/.design/project/coa-shared.jsx
  * (the PATHS map). Stroke icons on a 24-grid, currentColor by default.
  */
 import type { CSSProperties, ReactNode } from "react";

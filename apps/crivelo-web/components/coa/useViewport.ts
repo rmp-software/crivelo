@@ -2,7 +2,7 @@
 
 /**
  * useViewport (RMP-191) — breakpoint hook. Ported from
- * docs/design/coa-v60/project/coa-shared.jsx: mobile <700, tablet 700–1023,
+ * apps/crivelo-web/.design/project/coa-shared.jsx: mobile <700, tablet 700–1023,
  * desktop ≥1024. Starts at "mobile" on the server / first render to keep
  * hydration deterministic, then syncs to the real width on mount.
  */
