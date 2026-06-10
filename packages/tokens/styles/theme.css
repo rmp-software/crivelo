@@ -1,0 +1,90 @@
+/*
+ * @crivelo/tokens — Tailwind v4 @theme source (Tier 1 foundation, neutral house).
+ *
+ * This is the v4 successor to `tailwind-preset.js`: it re-exports the design-system
+ * scale as Tailwind utility tokens. Apps consume it with:
+ *
+ *   @import "tailwindcss";
+ *   @import "@crivelo/tokens/styles/foundation.css";   (declares the raw --* variables
+ *                                                        + the Crivelo element base styles)
+ *   @import "@crivelo/tokens/styles/theme.css";         (this file — generates utilities)
+ *
+ * PRECONDITION (hard): requires a Tailwind v4 pipeline (@tailwindcss/postcss) and
+ * `@import "tailwindcss"` MUST appear before this file in the consuming CSS. On a v3
+ * pipeline, or imported bare/out-of-order, the `@theme` block is silently ignored and
+ * NO utilities are generated. v3 apps must keep using `@crivelo/tokens/tailwind` instead.
+ *
+ * Every token name below mirrors the v3 preset 1:1 so the SAME utilities keep
+ * generating (`bg-espresso-800`, `text-crema-50`, `rounded-md`, `shadow-1`,
+ * `ease-standard`, `font-display`, …). The v3 preset (`@crivelo/tokens/tailwind`)
+ * is kept intact for apps still on Tailwind v3 (e.g. crivelo-web — migrated later).
+ *
+ * Color tokens reference the foundation CSS variables (`var(--espresso-800)`) so any
+ * app-local override of those variables flows through to the utilities, exactly as the
+ * v3 preset did. The v4 color namespace is `--color-*`, which does NOT collide with the
+ * foundation's raw `--espresso-*` / `--crema-*` variables.
+ *
+ * Font / radius / shadow / ease tokens share their bare names with the foundation's
+ * variables (`--font-display`, `--radius-md`, `--shadow-1`, `--ease-standard`), so they
+ * are given LITERAL values here (a `var(--font-display)` self-reference would be circular).
+ * The values are kept identical to foundation.css; @theme emits them to :root, so the
+ * foundation's element base styles that read `var(--font-body)` etc. still resolve.
+ */
+
+@theme {
+  /* ---------- Colors ---------- */
+  /* Espresso — near-black brown */
+  --color-espresso-950: var(--espresso-950);
+  --color-espresso-900: var(--espresso-900);
+  --color-espresso-800: var(--espresso-800);
+  --color-espresso-700: var(--espresso-700);
+  --color-espresso-600: var(--espresso-600);
+  --color-espresso-500: var(--espresso-500);
+
+  /* Crema / cream — primary background family */
+  --color-crema-50: var(--crema-50);
+  --color-crema-100: var(--crema-100);
+  --color-crema-200: var(--crema-200);
+  --color-crema-300: var(--crema-300);
+  --color-crema-400: var(--crema-400);
+
+  /* Sage — success */
+  --color-sage-100: var(--sage-100);
+  --color-sage-500: var(--sage-500);
+  --color-sage-700: var(--sage-700);
+
+  /* Clay — danger / destructive */
+  --color-clay-100: var(--clay-100);
+  --color-clay-500: var(--clay-500);
+  --color-clay-700: var(--clay-700);
+
+  /* ---------- Fonts (literal — names collide with foundation vars) ---------- */
+  --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', 'Times New Roman', serif;
+  --font-body: 'Geist', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* ---------- Radii (literal) ---------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-full: 999px;
+
+  /* ---------- Shadows (literal) ---------- */
+  --shadow-1: 0 1px 0 rgba(31, 20, 16, 0.04), 0 8px 24px -12px rgba(31, 20, 16, 0.12);
+  --shadow-2: 0 2px 0 rgba(31, 20, 16, 0.04), 0 18px 40px -16px rgba(31, 20, 16, 0.22);
+  --shadow-inset: inset 0 1px 0 rgba(255, 252, 243, 0.6);
+
+  /* ---------- Easing (literal) ---------- */
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---------- Transition durations ---------- */
+  /* Names don't collide with the foundation's --dur-* vars, so reference them
+     directly (like colors) — an app override of --dur-* flows through, matching
+     the v3 preset's `transitionDuration: { fast: var(--dur-fast), … }`. */
+  --transition-duration-fast: var(--dur-fast);
+  --transition-duration-base: var(--dur-base);
+  --transition-duration-stage: var(--dur-stage);
+}

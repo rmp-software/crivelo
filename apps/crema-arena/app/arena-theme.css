@@ -1,0 +1,39 @@
+/*
+ * Crema Arena — Tailwind v4 @theme layer (Tier-2 accent + retained palette).
+ *
+ * v4 successor to the `theme.extend.colors.cinnamon` block that used to live in
+ * tailwind.config.ts. It promotes the Arena-local palette into Tailwind utility
+ * tokens so `bg-cinnamon-500`, `text-gold`, `bg-marigold-700`, `text-live`, … still
+ * generate. The raw `--cinnamon-*` / `--gold` / `--live` / … CSS variables continue
+ * to be declared in arena-tokens.css (imported alongside this file); the color tokens
+ * here reference them so an override there flows through to the utilities.
+ *
+ * Color namespace is `--color-*`; it does not collide with the raw `--cinnamon-*` etc.
+ * variables in arena-tokens.css.
+ */
+
+@theme {
+  /* ---------- Tier-2 accent: cinnamon ---------- */
+  --color-cinnamon-50: var(--cinnamon-50);
+  --color-cinnamon-300: var(--cinnamon-300);
+  --color-cinnamon-500: var(--cinnamon-500);
+  --color-cinnamon-600: var(--cinnamon-600);
+  --color-cinnamon-700: var(--cinnamon-700);
+
+  /* ---------- Retained palette (gold / marigold / live / cherry) ---------- */
+  --color-marigold-100: var(--marigold-100);
+  --color-marigold-300: var(--marigold-300);
+  --color-marigold-500: var(--marigold-500);
+  --color-marigold-700: var(--marigold-700);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+
+  --color-mint-100: var(--mint-100);
+  --color-mint-500: var(--mint-500);
+  --color-mint-700: var(--mint-700);
+  --color-live: var(--live);
+  --color-live-soft: var(--live-soft);
+
+  --color-cherry-100: var(--cherry-100);
+  --color-cherry-500: var(--cherry-500);
+}

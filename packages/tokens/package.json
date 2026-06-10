@@ -8,7 +8,8 @@
   "exports": {
     "./tailwind": "./tailwind-preset.js",
     "./fonts": "./fonts/index.ts",
-    "./styles/foundation.css": "./styles/foundation.css"
+    "./styles/foundation.css": "./styles/foundation.css",
+    "./styles/theme.css": "./styles/theme.css"
   },
   "peerDependencies": {
     "next": ">=14",
