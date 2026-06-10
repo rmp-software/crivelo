@@ -1,9 +1,9 @@
 ---
 slug: coa-v60-calculator
-status: draft
+status: planned
 created: 2026-06-10
-linear_project_id:
-linear_parent_issue:
+linear_project_id: 2ac8ab29-150b-4787-b0dc-c75613daa20d
+linear_parent_issue: RMP-185
 feature_branch: feature/coa-v60-calculator
 design_handoff: docs/design/coa-v60/
 design_link: https://api.anthropic.com/v1/design/h/0MqsCZhlmJ-1R1PEgMUW2g?open_file=Coa+Responsive.html
