@@ -100,6 +100,55 @@ importers:
         specifier: ^5
         version: 5.9.3
 
+  apps/crivelo-web:
+    dependencies:
+      '@crivelo/tokens':
+        specifier: workspace:*
+        version: link:../../packages/tokens
+      '@crivelo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      next:
+        specifier: ^14.2.0
+        version: 14.2.35(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+      react-dom:
+        specifier: ^18.3.0
+        version: 18.3.1(react@18.3.1)
+    devDependencies:
+      '@crivelo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@crivelo/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@types/node':
+        specifier: ^24
+        version: 24.13.1
+      '@types/react':
+        specifier: ^18
+        version: 18.3.31
+      '@types/react-dom':
+        specifier: ^18
+        version: 18.3.7(@types/react@18.3.31)
+      eslint:
+        specifier: ^9.13.0
+        version: 9.39.4(jiti@1.21.7)
+      postcss:
+        specifier: ^8
+        version: 8.5.15
+      postcss-import:
+        specifier: ^16.1.0
+        version: 16.1.1(postcss@8.5.15)
+      tailwindcss:
+        specifier: ^3.4.0
+        version: 3.4.19
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
   packages/eslint-config:
     dependencies:
       '@eslint/js':
