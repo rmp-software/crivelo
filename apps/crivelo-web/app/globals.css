@@ -1,8 +1,10 @@
 /* Foundation first (neutral house tokens + element styles), then app-local
  * overrides. App @layer base rules must be imported AFTER the foundation so they
- * win when Tailwind hoists them to the @tailwind base position. The teal accent
- * (crivelo-tokens.css) is a later sub-issue — RMP intentionally omitted here. */
+ * win when Tailwind hoists them to the @tailwind base position. crivelo-tokens.css
+ * is the site's teal accent (overrides --brand etc.) — same mechanism crema-arena
+ * uses for cinnamon. */
 @import "@crivelo/tokens/styles/foundation.css";
+@import "./crivelo-tokens.css";
 
 @tailwind base;
 @tailwind components;
