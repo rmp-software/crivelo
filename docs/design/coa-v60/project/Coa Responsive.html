@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Coa · responsive</title>
+<link rel="stylesheet" href="_ds/crivelo-design-system-60c5de89-d7be-44b7-8f1f-dda66865d52c/styles.css" />
+<script>
+  // keep the embedded frames on the idle calculator for review (don't touch other keys)
+  try { if (localStorage.getItem('coa-view') === 'brew') localStorage.setItem('coa-view', 'idle'); } catch (e) {}
+</script>
+<style>
+  html, body { margin: 0; padding: 0; background: #E9E6DF; color: #1F1410; font-family: 'Geist', system-ui, sans-serif; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+  .head { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+  .head h1 { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 26px; letter-spacing: -0.02em; margin: 0; white-space: nowrap; }
+  .sub { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; color: #6B5443; margin: 0 0 36px; }
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
+  .col { display: flex; flex-direction: column; gap: 12px; }
+  .label { display: flex; align-items: baseline; gap: 8px; }
+  .label .name { font-weight: 600; font-size: 14px; letter-spacing: 0.01em; }
+  .label .dim { font-family: 'Geist Mono', monospace; font-size: 12px; color: #8A7363; }
+  .device { background: #FBF6EA; border-radius: 16px; box-shadow: 0 1px 0 rgba(31,20,16,.04), 0 24px 50px -24px rgba(31,20,16,.45); overflow: hidden; position: relative; }
+  .device .scalebox { transform-origin: top left; }
+  iframe { border: 0; display: block; background: #FBF6EA; }
+  .hint { font-size: 12px; color: #9A8474; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <svg width="26" height="26" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M13 14.5 L51 14.5 L32 47 Z" stroke="#1C6E68" stroke-width="3" stroke-linejoin="round"/><path d="M24 14.5 L32 47 M40 14.5 L32 47" stroke="#1C6E68" stroke-width="2.2" stroke-linecap="round" opacity="0.42"/><path d="M32 50.5 C 28.6 54, 28.6 58.2, 32 58.2 C 35.4 58.2, 35.4 54, 32 50.5 Z" fill="#1C6E68"/></svg>
+    <h1>Coa — responsive</h1>
+  </div>
+  <p class="sub">One responsive page across mobile, tablet and desktop. Each frame is the live site at that width — scroll inside any frame.</p>
+
+  <!-- Desktop -->
+  <div class="col" style="margin-bottom: 36px;">
+    <div class="label"><span class="name">Desktop</span><span class="dim">1280 × 820 · two columns</span></div>
+    <div class="device" style="width: 845px; height: 541px;">
+      <div class="scalebox" style="width: 1280px; height: 820px; transform: scale(0.66);">
+        <iframe src="Coa Homepage.html" width="1280" height="820" title="Coa desktop" scrolling="yes"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tablet + Mobile -->
+  <div class="row">
+    <div class="col">
+      <div class="label"><span class="name">Tablet</span><span class="dim">834 × 1024 · two columns</span></div>
+      <div class="device" style="width: 517px; height: 635px;">
+        <div class="scalebox" style="width: 834px; height: 1024px; transform: scale(0.62);">
+          <iframe src="Coa Homepage.html" width="834" height="1024" title="Coa tablet" scrolling="yes"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="label"><span class="name">Mobile</span><span class="dim">390 × 780 · single column</span></div>
+      <div class="device" style="width: 332px; height: 663px;">
+        <div class="scalebox" style="width: 390px; height: 780px; transform: scale(0.85);">
+          <iframe src="Coa Homepage.html" width="390" height="780" title="Coa mobile" scrolling="yes"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint" style="margin-top: 28px;">Open <strong>Coa Homepage.html</strong> directly and resize the window to see the layout reflow live.</p>
+</div>
+</body>
+</html>
