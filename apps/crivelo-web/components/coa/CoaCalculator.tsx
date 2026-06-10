@@ -198,7 +198,7 @@ export function CoaCalculator() {
       </button>
       <div style={{ textAlign: "center", marginTop: 16 }}>
         <a
-          href="https://crivelo.coffee/method/four-six"
+          href="https://en.philocoffea.com/blogs/blog/coffee-brewing-method"
           target="_blank"
           rel="noopener noreferrer"
           style={{
