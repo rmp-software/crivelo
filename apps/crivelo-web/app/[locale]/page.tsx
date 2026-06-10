@@ -1,52 +1,9 @@
-// Placeholder homepage. The real Coa 4:6 calculator + Crivelo shell land in
-// later sub-issues; this just proves the scaffold (foundation fonts + tokens).
+// Coa homepage (RMP-191). The Crivelo shell (header / nav / footer) is provided
+// by the [locale] layout; this page renders the calculator body inside it. The
+// CoaCalculator owns the idle ↔ brew view state and the responsive layout. Copy
+// stays English for now; full i18n is RMP-193.
+import { CoaCalculator } from "../../components/coa";
+
 export default function HomePage() {
-  return (
-    <main
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: "0.75rem",
-        padding: "2rem",
-        textAlign: "center",
-        background: "var(--bg)",
-        color: "var(--fg)",
-      }}
-    >
-      <p
-        style={{
-          fontFamily: "var(--font-mono)",
-          fontSize: "0.8125rem",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-          color: "var(--fg-3)",
-        }}
-      >
-        Crivelo
-      </p>
-      <h1
-        style={{
-          fontFamily: "var(--font-display)",
-          fontSize: "clamp(2.5rem, 8vw, 4.5rem)",
-          fontWeight: 700,
-          lineHeight: 1,
-          margin: 0,
-        }}
-      >
-        Coa
-      </h1>
-      <p
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontSize: "1.5rem",
-          color: "var(--fg-2)",
-        }}
-      >
-        Coa — coming soon
-      </p>
-    </main>
-  );
+  return <CoaCalculator />;
 }
