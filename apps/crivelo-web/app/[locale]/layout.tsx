@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { fontVariables } from "@crivelo/tokens/fonts";
+import { Shell, NO_FOUC_SCRIPT, type Lang } from "../../components/shell";
 import "../globals.css";
 
 export const metadata: Metadata = {
@@ -24,9 +25,20 @@ export default function LocaleLayout({
   children: ReactNode;
   params: { locale: string };
 }) {
+  // RMP-193 will own real locale routing; for now seed the EN/PT switcher from
+  // the path locale so the active state matches the URL on first render.
+  const initialLang: Lang = params.locale === "pt" ? "PT" : "EN";
   return (
-    <html lang={params.locale}>
-      <body className={fontVariables}>{children}</body>
+    // suppressHydrationWarning: the no-FOUC script sets data-theme on <html>
+    // before React hydrates, so the server/client attribute can differ by design.
+    <html lang={params.locale} suppressHydrationWarning>
+      <head>
+        {/* No-FOUC: set the theme before first paint to avoid a flash. */}
+        <script dangerouslySetInnerHTML={{ __html: NO_FOUC_SCRIPT }} />
+      </head>
+      <body className={fontVariables}>
+        <Shell initialLang={initialLang}>{children}</Shell>
+      </body>
     </html>
   );
 }
