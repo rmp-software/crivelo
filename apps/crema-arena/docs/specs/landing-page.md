@@ -1,12 +1,12 @@
 ---
 slug: landing-page
-status: draft
+status: planned
 created: 2026-06-10
 design_link: https://api.anthropic.com/v1/design/h/HQq9Xbi7R_Ceo6FlfXfmdw?open_file=Crema+Arena+Landing.html
 design_handoff_local: apps/crema-arena/.design/  # gitignored; bundle pulled from design_link, per root CLAUDE.md
-linear_project_id:
-linear_parent_issue:
-feature_branch:
+linear_project_id: aac21a02-f206-4d19-9284-e852b2c0b43c
+linear_parent_issue: RMP-196
+feature_branch: feature/landing-page
 ---
 
 <feature_specification>
