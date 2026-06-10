@@ -1,0 +1,144 @@
+/*
+ * crivelo-web — site-local design tokens, layered on the neutral @crivelo/tokens
+ * foundation. The Crivelo hub carries a single accent: TEAL ("water"). This is
+ * the whole website's accent (every tool inherits it), NOT Coa-specific — so the
+ * tokens are named at site level (--brand, --accent-*), and the prototype's
+ * --coa* vars map onto them:
+ *
+ *   --coa        -> --brand          (primary action; overrides the foundation's
+ *                                      ink/espresso default to teal site-wide)
+ *   --coa-hover  -> --brand-hover
+ *   --coa-press  -> --brand-press
+ *   --coa-soft   -> --brand-soft / --accent-soft
+ *   --coa-ink    -> --accent-ink     (teal text on light surfaces)
+ *   --coa-soft-2 -> --accent-soft-2  (mid teal — gradients/strokes)
+ *   --coa-glow   -> --accent-glow    (bright teal — highlights/fills)
+ *   --coa-dot    -> --accent-dot     (taste-pad puck / dots)
+ *   --coa-halo   -> --accent-halo    (translucent teal glow ring)
+ *   --pour-strength-rgb (unchanged)  (rgb triplet for strength overlays)
+ *
+ * Source of truth: docs/design/coa-v60/project/Coa Homepage.html (the locked
+ * design's :root + [data-theme="dark"] blocks). Values copied verbatim.
+ *
+ * In @layer base + imported AFTER the foundation (see globals.css) so these win
+ * when Tailwind hoists @layer base to the @tailwind base position.
+ */
+@layer base {
+  /* ---- Light defaults: teal "water" accent on the crema/espresso house ---- */
+  :root {
+    --brand:        #1C6E68;
+    --brand-hover:  #185F5A;
+    --brand-press:  #134B47;
+    --brand-soft:   #E1EEEC;
+
+    --accent-ink:    #155B56;
+    --accent-soft:   #E1EEEC;
+    --accent-soft-2: #6FB3AC;
+    --accent-glow:   #2FB7AC;
+    --accent-dot:    #1C6E68;
+    --accent-halo:   rgba(28, 110, 104, 0.16);
+
+    --pour-strength-rgb: 62, 42, 34;
+
+    /* Primary actions / focus follow the teal accent site-wide. */
+    --focus-ring:   #1C6E68;
+
+    /* --shadow-1/--shadow-2 intentionally fall through to the foundation's
+     * light values here; they are only overridden in dark (below). */
+  }
+
+  /* ---- Dark: espresso ground, cream ink, brighter teal accent ---- */
+  [data-theme="dark"] {
+    --bg:             #1A110D;
+    --bg-2:           #241712;
+    --bg-3:           #2E1E17;
+    --surface:        #1A110D;
+    --surface-raised: #261A14;
+    --surface-sunken: #140C08;
+
+    --fg:             #F5ECD8;
+    --fg-2:           #D9C7B5;
+    --fg-3:           #A88E7D;
+    --fg-4:           #6B5A4F;
+
+    --border:         rgba(245, 236, 216, 0.12);
+    --border-strong:  rgba(245, 236, 216, 0.22);
+
+    --brand:          #1E7A73;
+    /* Dark hover/press: the design source omits these (they'd inherit the light
+     * #185F5A/#134B47 and clash). Derived from the dark --brand #1E7A73 — hover
+     * brighter, press darker — keeping white (#fff) text >= 4.5:1 on each. */
+    --brand-hover:    #218079; /* derived: dark a11y, AA-checked (#fff 4.74:1) */
+    --brand-press:    #1A6A64; /* derived: dark a11y, AA-checked (#fff 6.38:1) */
+    /* Dark accent-soft/brand-soft: source omits these (they'd inherit the light
+     * pale mint #E1EEEC). A dark teal-tinted surface so --accent-ink #4FD0C4
+     * reads as text on it and it sits naturally on the dark bg #1A110D. */
+    --brand-soft:     #14302E; /* derived: dark a11y, AA-checked (accent-ink 7.47:1) */
+    --accent-ink:     #4FD0C4;
+    --accent-soft:    #14302E; /* derived: dark a11y, AA-checked (accent-ink 7.47:1) */
+    --accent-soft-2:  #3E8C85;
+    --accent-glow:    #2FB7AC;
+    --accent-dot:     #2FB7AC;
+    --accent-halo:    rgba(47, 183, 172, 0.20);
+
+    --pour-strength-rgb: 234, 219, 192;
+
+    /* Source omits a dark focus ring (it would inherit #1C6E68 -> too low on
+     * dark surfaces). Use the bright teal already in the palette (--accent-glow
+     * #2FB7AC) so the ring stays visible on every dark surface. */
+    --focus-ring:     #2FB7AC; /* derived: dark a11y, AA-checked (6.85:1 on --surface-raised) */
+
+    --shadow-1: 0 1px 0 rgba(0, 0, 0, .18), 0 8px 24px -12px rgba(0, 0, 0, .5);
+    --shadow-2: 0 2px 0 rgba(0, 0, 0, .2), 0 18px 40px -16px rgba(0, 0, 0, .6);
+  }
+
+  /* System default (no explicit data-theme): mirror the dark overrides so tokens
+   * are ready before the Light/Dark/System shell control (RMP-190) ships. An
+   * explicit [data-theme="light"] still wins (later cascade + same specificity
+   * is overridden by data-theme="dark"; light is the :root default above). */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+      --bg:             #1A110D;
+      --bg-2:           #241712;
+      --bg-3:           #2E1E17;
+      --surface:        #1A110D;
+      --surface-raised: #261A14;
+      --surface-sunken: #140C08;
+
+      --fg:             #F5ECD8;
+      --fg-2:           #D9C7B5;
+      --fg-3:           #A88E7D;
+      --fg-4:           #6B5A4F;
+
+      --border:         rgba(245, 236, 216, 0.12);
+      --border-strong:  rgba(245, 236, 216, 0.22);
+
+      --brand:          #1E7A73;
+      /* Dark hover/press: the design source omits these (they'd inherit the light
+       * #185F5A/#134B47 and clash). Derived from the dark --brand #1E7A73 — hover
+       * brighter, press darker — keeping white (#fff) text >= 4.5:1 on each. */
+      --brand-hover:    #218079; /* derived: dark a11y, AA-checked (#fff 4.74:1) */
+      --brand-press:    #1A6A64; /* derived: dark a11y, AA-checked (#fff 6.38:1) */
+      /* Dark accent-soft/brand-soft: source omits these (they'd inherit the light
+       * pale mint #E1EEEC). A dark teal-tinted surface so --accent-ink #4FD0C4
+       * reads as text on it and it sits naturally on the dark bg #1A110D. */
+      --brand-soft:     #14302E; /* derived: dark a11y, AA-checked (accent-ink 7.47:1) */
+      --accent-ink:     #4FD0C4;
+      --accent-soft:    #14302E; /* derived: dark a11y, AA-checked (accent-ink 7.47:1) */
+      --accent-soft-2:  #3E8C85;
+      --accent-glow:    #2FB7AC;
+      --accent-dot:     #2FB7AC;
+      --accent-halo:    rgba(47, 183, 172, 0.20);
+
+      --pour-strength-rgb: 234, 219, 192;
+
+      /* Source omits a dark focus ring (it would inherit #1C6E68 -> too low on
+       * dark surfaces). Use the bright teal already in the palette (--accent-glow
+       * #2FB7AC) so the ring stays visible on every dark surface. */
+      --focus-ring:     #2FB7AC; /* derived: dark a11y, AA-checked (6.85:1 on --surface-raised) */
+
+      --shadow-1: 0 1px 0 rgba(0, 0, 0, .18), 0 8px 24px -12px rgba(0, 0, 0, .5);
+      --shadow-2: 0 2px 0 rgba(0, 0, 0, .2), 0 18px 40px -16px rgba(0, 0, 0, .6);
+    }
+  }
+}
