@@ -17,6 +17,7 @@
  * so the timer receives the exact same recipe the idle schedule shows.
  */
 import { useState, type CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
@@ -24,7 +25,7 @@ import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
 import { BrewTimer } from "./BrewTimer";
 import { Icon } from "./icons";
-import { tasteLabel } from "../../lib/four-six";
+import { tasteKey } from "../../lib/four-six";
 
 const CAP: CSSProperties = {
   fontSize: 11,
@@ -54,6 +55,8 @@ const CONTAINER_MAX: Record<Breakpoint, number> = {
 };
 
 export function CoaCalculator() {
+  const t = useTranslations("Calculator");
+  const tTaste = useTranslations("Taste");
   const bp = useViewport();
   const wide = bp !== "mobile";
   const containerMax = CONTAINER_MAX[bp];
@@ -77,10 +80,16 @@ export function CoaCalculator() {
     if (typeof window !== "undefined") window.scrollTo(0, 0);
   };
 
+  // Localized "{taste} · {n} pours" readout shared by the panel header.
+  const tasteSummary = t("tasteSummary", {
+    taste: tTaste(tasteKey(acidity)),
+    count: strengthPours,
+  });
+
   // ---------- pieces ----------
   const intro = (
     <div style={{ marginBottom: wide ? 24 : 20 }}>
-      <div style={{ ...CAP, marginBottom: 8 }}>Café coado · the 4:6 method</div>
+      <div style={{ ...CAP, marginBottom: 8 }}>{t("introCaption")}</div>
       <p
         style={{
           fontFamily: "var(--font-serif)",
@@ -92,7 +101,7 @@ export function CoaCalculator() {
           maxWidth: "17em",
         }}
       >
-        Set your taste — Coa works out the pours.
+        {t("introLine")}
       </p>
     </div>
   );
@@ -127,7 +136,7 @@ export function CoaCalculator() {
         marginBottom: 16,
       }}
     >
-      <div style={{ ...CAP, marginBottom: 8 }}>Your recipe</div>
+      <div style={{ ...CAP, marginBottom: 8 }}>{t("yourRecipe")}</div>
       <div style={{ display: "flex", alignItems: "flex-end", gap: 14 }}>
         <span
           style={{
@@ -141,7 +150,7 @@ export function CoaCalculator() {
           }}
         >
           {recipe.waterG}
-          <span style={{ fontSize: 20, color: "var(--fg-3)" }}> g</span>
+          <span style={{ fontSize: 20, color: "var(--fg-3)" }}> {t("grams")}</span>
         </span>
         <span
           style={{
@@ -151,9 +160,9 @@ export function CoaCalculator() {
             lineHeight: 1.4,
           }}
         >
-          {dose} g · 1:{ratio}
+          {t("doseRatioSummary", { dose, ratio })}
           <br />
-          {tasteLabel(acidity)} · {strengthPours} pours
+          {tasteSummary}
         </span>
       </div>
     </div>
@@ -184,7 +193,7 @@ export function CoaCalculator() {
           boxShadow: "var(--shadow-1)",
         }}
       >
-        <Icon name="play" size={18} color="#fff" /> Begin brew{" "}
+        <Icon name="play" size={18} color="#fff" /> {t("beginBrew")}{" "}
         <span style={{ ...MONO, opacity: 0.85 }}>{recipe.totalTime}</span>
       </button>
       <div style={{ textAlign: "center", marginTop: 16 }}>
@@ -209,7 +218,7 @@ export function CoaCalculator() {
               textUnderlineOffset: 3,
             }}
           >
-            How the 4:6 method works
+            {t("methodLink")}
           </span>
           <svg
             width="13"

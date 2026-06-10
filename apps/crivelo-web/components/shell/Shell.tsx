@@ -12,18 +12,11 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./ThemeProvider";
-import { LangProvider, type Lang } from "./LangProvider";
 import { Header } from "./Header";
 import { NavSheet } from "./NavSheet";
 import { Footer } from "./Footer";
 
-export function Shell({
-  initialLang = "EN",
-  children,
-}: {
-  initialLang?: Lang;
-  children: ReactNode;
-}) {
+export function Shell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
   // Shell owns the hamburger ref so it can return focus there when the sheet
   // closes (FIX 3: focus return on close).
@@ -63,24 +56,22 @@ export function Shell({
 
   return (
     <ThemeProvider>
-      <LangProvider initial={initialLang}>
-        <div
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            background: "var(--bg)",
-            color: "var(--fg)",
-            fontFamily: "var(--font-body)",
-            transition: "background var(--dur-stage) var(--ease-standard)",
-          }}
-        >
-          <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />
-          <NavSheet open={menu} onClose={closeMenu} />
-          <div style={{ flex: 1 }}>{children}</div>
-          <Footer />
-        </div>
-      </LangProvider>
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          background: "var(--bg)",
+          color: "var(--fg)",
+          fontFamily: "var(--font-body)",
+          transition: "background var(--dur-stage) var(--ease-standard)",
+        }}
+      >
+        <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />
+        <NavSheet open={menu} onClose={closeMenu} />
+        <div style={{ flex: 1 }}>{children}</div>
+        <Footer />
+      </div>
     </ThemeProvider>
   );
 }

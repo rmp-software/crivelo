@@ -212,6 +212,26 @@ export function tasteLabel(a: number): string {
   return 'Bright, juicy';
 }
 
+/**
+ * Stable i18n key for the taste descriptor (matches `Taste.*` in the message
+ * catalogs). The engine stays language-agnostic; UI resolves the key via
+ * next-intl so the readout localizes. Keep in lockstep with {@link tasteLabel}.
+ */
+export type TasteKey =
+  | 'sweetRound'
+  | 'sweetLeaning'
+  | 'balanced'
+  | 'brightLeaning'
+  | 'brightJuicy';
+
+export function tasteKey(a: number): TasteKey {
+  if (a <= -0.66) return 'sweetRound';
+  if (a < -0.15) return 'sweetLeaning';
+  if (a <= 0.15) return 'balanced';
+  if (a < 0.66) return 'brightLeaning';
+  return 'brightJuicy';
+}
+
 /** Strength descriptor from a pour count (1..4). */
 export function strengthLabel(n: number): string {
   const map: Record<number, string> = {

@@ -11,6 +11,7 @@
  * times come straight from the engine recipe.
  */
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import { Icon } from "./icons";
 import type { Recipe } from "../../lib/four-six";
 
@@ -32,6 +33,8 @@ export interface PourScheduleProps {
 }
 
 export function PourSchedule({ recipe }: PourScheduleProps) {
+  const t = useTranslations("Schedule");
+  const tCalc = useTranslations("Calculator");
   return (
     <>
       <div
@@ -42,7 +45,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
           marginBottom: 12,
         }}
       >
-        <span style={CAP}>Pour schedule</span>
+        <span style={CAP}>{t("pourSchedule")}</span>
         <span
           style={{
             ...MONO,
@@ -63,7 +66,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
         {recipe.steps.map((s) => (
           <div
             key={s.index}
-            title={`Pour ${s.index + 1}`}
+            title={t("pour", { n: s.index + 1 })}
             style={{
               flex: s.pour,
               borderRadius: 4,
@@ -116,7 +119,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
                 whiteSpace: "nowrap",
               }}
             >
-              Pour {s.index + 1}
+              {t("pour", { n: s.index + 1 })}
             </span>
             <span style={{ ...MONO, fontSize: 12, color: "var(--fg-3)" }}>
               +{s.pourG}
@@ -132,7 +135,10 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
               }}
             >
               {s.cumulativeG}
-              <span style={{ fontSize: 11, color: "var(--fg-3)" }}> g</span>
+              <span style={{ fontSize: 11, color: "var(--fg-3)" }}>
+                {" "}
+                {tCalc("grams")}
+              </span>
             </span>
           </div>
         ))}
@@ -156,7 +162,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
             {recipe.removeTime}
           </span>
           <span style={{ flex: 1, fontSize: 14, color: "var(--fg-3)" }}>
-            Remove dripper · drawdown
+            {t("removeDripper")}
           </span>
         </div>
       </div>

@@ -1,43 +1,65 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { NextIntlClientProvider, hasLocale } from "next-intl";
+import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
+import { notFound } from "next/navigation";
 import { fontVariables } from "@crivelo/tokens/fonts";
-import { Shell, NO_FOUC_SCRIPT, type Lang } from "../../components/shell";
+import { Shell, NO_FOUC_SCRIPT } from "../../components/shell";
+import { routing } from "../../i18n/routing";
 import "../globals.css";
 
-export const metadata: Metadata = {
-  title: "Coa — Crivelo",
-  description: "Tools for people who live coffee.",
-};
-
 // All routes live under [locale], so this IS the App Router root layout: it
-// renders the document shell (<html lang>/<body>) + foundation fonts. Prerender
-// both locales without middleware via generateStaticParams; full next-intl
-// wiring (provider, locale validation, theme/shell, default-locale redirect) is
-// a later sub-issue (RMP-193).
+// renders the document shell (<html lang>/<body>) + foundation fonts and wires
+// next-intl (RMP-193) — the per-locale message provider + the no-FOUC theme
+// script + the Crivelo Shell. Prerender both locales statically.
 export function generateStaticParams() {
-  return [{ locale: "en" }, { locale: "pt" }];
+  return routing.locales.map((locale) => ({ locale }));
 }
 
-export default function LocaleLayout({
+// Localized document metadata, resolved from the message catalog.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Meta" });
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
+
+export default async function LocaleLayout({
   children,
   params,
 }: {
   children: ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  // RMP-193 will own real locale routing; for now seed the EN/PT switcher from
-  // the path locale so the active state matches the URL on first render.
-  const initialLang: Lang = params.locale === "pt" ? "PT" : "EN";
+  const { locale } = await params;
+  // Reject unknown locales (e.g. /fr) with a 404 instead of rendering an empty
+  // catalog.
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+  // Enable static rendering for this locale + distribute it to Server Components.
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+
   return (
     // suppressHydrationWarning: the no-FOUC script sets data-theme on <html>
     // before React hydrates, so the server/client attribute can differ by design.
-    <html lang={params.locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         {/* No-FOUC: set the theme before first paint to avoid a flash. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FOUC_SCRIPT }} />
       </head>
       <body className={fontVariables}>
-        <Shell initialLang={initialLang}>{children}</Shell>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Shell>{children}</Shell>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

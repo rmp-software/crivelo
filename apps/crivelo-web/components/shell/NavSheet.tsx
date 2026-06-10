@@ -10,7 +10,9 @@
  * `var(--accent-ink)`. Family links + URLs come from the centralized NAV_ITEMS.
  */
 import { useEffect, useRef, type HTMLAttributes } from "react";
+import { useTranslations } from "next-intl";
 import { CriveloLockup } from "../brand";
+import { Link } from "../../i18n/navigation";
 import { NAV_ITEMS } from "./nav";
 import { LangToggle } from "./LangToggle";
 import { ThemeControl } from "./ThemeControl";
@@ -30,6 +32,8 @@ export function NavSheet({
   open: boolean;
   onClose: () => void;
 }) {
+  const t = useTranslations("Shell");
+  const tNav = useTranslations("Nav");
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // `inert` when closed: hides the subtree from AT *and* removes its children
@@ -76,7 +80,7 @@ export function NavSheet({
       <aside
         role="dialog"
         aria-modal="true"
-        aria-label="Site menu"
+        aria-label={t("siteMenu")}
         style={{
           position: "absolute",
           top: 0,
@@ -108,7 +112,7 @@ export function NavSheet({
             ref={closeRef}
             type="button"
             onClick={onClose}
-            aria-label="Close menu"
+            aria-label={t("closeMenu")}
             style={{
               width: 36,
               height: 36,
@@ -148,10 +152,10 @@ export function NavSheet({
             lineHeight: 1.35,
           }}
         >
-          Tools for people who live coffee.
+          {t("tagline")}
         </p>
 
-        <div style={{ ...CAP, marginBottom: 8 }}>The house</div>
+        <div style={{ ...CAP, marginBottom: 8 }}>{t("theHouse")}</div>
         <nav style={{ display: "flex", flexDirection: "column" }}>
           {NAV_ITEMS.map((it) => {
             const base = {
@@ -196,7 +200,7 @@ export function NavSheet({
                         color: "var(--accent-ink)",
                       }}
                     >
-                      · you are here
+                      · {t("youAreHere")}
                     </span>
                   )}
                 </span>
@@ -209,7 +213,7 @@ export function NavSheet({
                     gap: 5,
                   }}
                 >
-                  {it.tag}
+                  {it.soon ? t("soon") : it.tagKey ? tNav(it.tagKey) : null}
                   {it.external && (
                     <svg
                       width="13"
@@ -228,21 +232,35 @@ export function NavSheet({
                 </span>
               </>
             );
-            return it.soon ? (
-              <div key={it.name} style={base}>
-                {inner}
-              </div>
-            ) : (
+            if (it.soon || !it.href) {
+              return (
+                <div key={it.name} style={base}>
+                  {inner}
+                </div>
+              );
+            }
+            // External links keep a plain anchor (other apps / new tab);
+            // internal links use the locale-aware Link so the active locale
+            // prefix is preserved.
+            return it.external ? (
               <a
                 key={it.name}
                 href={it.href}
-                onClick={it.current ? onClose : undefined}
-                target={it.external ? "_blank" : undefined}
-                rel={it.external ? "noopener noreferrer" : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={base}
               >
                 {inner}
               </a>
+            ) : (
+              <Link
+                key={it.name}
+                href={it.href}
+                onClick={it.current ? onClose : undefined}
+                style={base}
+              >
+                {inner}
+              </Link>
             );
           })}
         </nav>
@@ -257,11 +275,11 @@ export function NavSheet({
           }}
         >
           <div>
-            <div style={{ ...CAP, marginBottom: 10 }}>Language</div>
+            <div style={{ ...CAP, marginBottom: 10 }}>{t("language")}</div>
             <LangToggle size="lg" />
           </div>
           <div>
-            <div style={{ ...CAP, marginBottom: 10 }}>Appearance</div>
+            <div style={{ ...CAP, marginBottom: 10 }}>{t("appearance")}</div>
             <ThemeControl />
           </div>
         </div>

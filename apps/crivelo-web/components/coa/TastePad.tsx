@@ -22,8 +22,9 @@ import {
   type KeyboardEvent,
   type PointerEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 import { SieveGrid } from "../brand";
-import { clamp, tasteLabel } from "../../lib/four-six";
+import { clamp, tasteKey } from "../../lib/four-six";
 
 /** Visually hidden but exposed to assistive tech (aria-live readouts). */
 const SR_ONLY: CSSProperties = {
@@ -75,6 +76,11 @@ export function TastePad({
   dims,
   center = false,
 }: TastePadProps) {
+  const t = useTranslations("Taste");
+  const summary = t("summary", {
+    taste: t(tasteKey(acidity)),
+    count: strengthPours,
+  });
   const padRef = useRef<HTMLDivElement>(null);
   // Free continuous puck position. Seeded from the recipe inputs; vertical drag
   // keeps a free y while strength rounds underneath it.
@@ -159,7 +165,7 @@ export function TastePad({
           marginBottom: 12,
         }}
       >
-        <span style={CAP}>Taste</span>
+        <span style={CAP}>{t("label")}</span>
         <span
           style={{
             ...MONO,
@@ -169,7 +175,7 @@ export function TastePad({
             whiteSpace: "nowrap",
           }}
         >
-          {tasteLabel(acidity)} · {strengthPours} pours
+          {summary}
         </span>
       </div>
       <div
@@ -182,7 +188,7 @@ export function TastePad({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         tabIndex={0}
-        aria-label="Taste and strength pad. Left and right arrows adjust acidity from sweet to bright; up and down arrows adjust strength from lighter to stronger."
+        aria-label={t("padAria")}
         style={{
           position: "relative",
           width: dims.w,
@@ -220,18 +226,18 @@ export function TastePad({
           />
         </div>
         <span style={{ ...edge, top: 10, left: "50%", transform: "translateX(-50%)" }}>
-          Stronger
+          {t("stronger")}
         </span>
         <span
           style={{ ...edge, bottom: 10, left: "50%", transform: "translateX(-50%)" }}
         >
-          Lighter
+          {t("lighter")}
         </span>
         <span style={{ ...edge, left: 12, top: "50%", transform: "translateY(-50%)" }}>
-          Sweet
+          {t("sweet")}
         </span>
         <span style={{ ...edge, right: 12, top: "50%", transform: "translateY(-50%)" }}>
-          Bright
+          {t("bright")}
         </span>
         <div
           style={{
@@ -249,7 +255,7 @@ export function TastePad({
           }}
         />
         <span aria-live="polite" style={SR_ONLY}>
-          {tasteLabel(acidity)} · {strengthPours} pours
+          {summary}
         </span>
       </div>
     </div>

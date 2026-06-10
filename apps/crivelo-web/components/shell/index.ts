@@ -15,8 +15,6 @@ export { LangToggle } from "./LangToggle";
 
 export { ThemeProvider, useTheme, NO_FOUC_SCRIPT } from "./ThemeProvider";
 export type { ThemePref, ResolvedTheme } from "./ThemeProvider";
-export { LangProvider, useLang } from "./LangProvider";
-export type { Lang } from "./LangProvider";
 
 export { NAV_ITEMS, CREMA_ARENA_URL } from "./nav";
 export type { NavItem } from "./nav";

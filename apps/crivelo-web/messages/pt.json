@@ -1,0 +1,90 @@
+{
+  "Meta": {
+    "title": "Coa — Crivelo",
+    "description": "Ferramentas para quem vive café."
+  },
+  "Shell": {
+    "tagline": "Ferramentas para quem vive café.",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
+    "siteMenu": "Menu do site",
+    "homeAria": "Coa by Crivelo — início",
+    "theHouse": "A casa",
+    "theFamily": "A família",
+    "youAreHere": "você está aqui",
+    "soon": "em breve",
+    "language": "Idioma",
+    "appearance": "Aparência",
+    "copyright": "© 2026 Crivelo · Para quem vive café."
+  },
+  "Nav": {
+    "coa": {
+      "tag": "a calculadora 4:6"
+    },
+    "cremaArena": {
+      "tag": "abrir em nova aba"
+    }
+  },
+  "Appearance": {
+    "light": "Claro",
+    "dark": "Escuro",
+    "system": "Sistema"
+  },
+  "Calculator": {
+    "introCaption": "Café coado · o método 4:6",
+    "introLine": "Escolha seu gosto — o Coa calcula os despejos.",
+    "yourRecipe": "Sua receita",
+    "doseRatioSummary": "{dose} g · 1:{ratio}",
+    "tasteSummary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
+    "beginBrew": "Começar preparo",
+    "methodLink": "Como funciona o método 4:6",
+    "grams": "g"
+  },
+  "Taste": {
+    "label": "Gosto",
+    "summary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
+    "padAria": "Painel de gosto e força. As setas para esquerda e direita ajustam a acidez do doce ao brilhante; as setas para cima e para baixo ajustam a força do mais leve ao mais forte.",
+    "stronger": "Mais forte",
+    "lighter": "Mais leve",
+    "sweet": "Doce",
+    "bright": "Brilhante",
+    "sweetRound": "Doce, redondo",
+    "sweetLeaning": "Puxa pro doce",
+    "balanced": "Equilibrado",
+    "brightLeaning": "Puxa pro brilhante",
+    "brightJuicy": "Brilhante, suculento"
+  },
+  "Inputs": {
+    "coffee": "Café",
+    "ratio": "Proporção",
+    "water": "Água",
+    "decrease": "diminuir {label}",
+    "increase": "aumentar {label}"
+  },
+  "Schedule": {
+    "pourSchedule": "Cronograma de despejos",
+    "pour": "Despejo {n}",
+    "removeDripper": "Retire o coador · escorrimento"
+  },
+  "BrewTimer": {
+    "recipe": "Receita",
+    "brewing": "Preparando",
+    "paused": "Pausado",
+    "done": "Pronto",
+    "pourOf": "Despejo {n} de {total}",
+    "brewComplete": "Preparo concluído",
+    "removeThe": "Retire",
+    "theDripper": "o coador",
+    "thisPour": "+{g} g neste despejo",
+    "pourNow": "Despeje agora → {g} g",
+    "letItDrawDown": "Deixe escorrer",
+    "removeIn": "Retire em <time></time>",
+    "nextPourIn": "Próximo despejo em <time></time>",
+    "totalTime": "Tempo total {time}",
+    "brewAgain": "Preparar de novo",
+    "backToRecipe": "Voltar à receita",
+    "pause": "Pausar",
+    "resume": "Retomar",
+    "restartAria": "Reiniciar preparo"
+  }
+}

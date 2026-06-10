@@ -18,9 +18,14 @@ export const CREMA_ARENA_URL = "https://crema-arena.vercel.app";
 const CREMA_ARENA_DOT = "#C0763C";
 
 export interface NavItem {
+  /** Proper-noun product name — NEVER translated (Coa, Crema Arena, …). */
   name: string;
-  /** Short tag shown beside the name in the nav sheet. */
-  tag: string;
+  /**
+   * Translation key (under the `Nav` namespace) for the short tag shown beside
+   * the name in the nav sheet, e.g. "the 4:6 calculator". `soon` items have no
+   * tag (the shell renders the localized "soon" badge instead).
+   */
+  tagKey?: string;
   href?: string;
   /** Opens in a new tab (shows the ↗ glyph). */
   external?: boolean;
@@ -35,18 +40,18 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   {
     name: "Coa",
-    tag: "the 4:6 calculator",
+    tagKey: "coa.tag",
     href: "/",
     current: true,
     dot: "var(--brand)",
   },
   {
     name: "Crema Arena",
-    tag: "open in new tab",
+    tagKey: "cremaArena.tag",
     href: CREMA_ARENA_URL,
     external: true,
     dot: CREMA_ARENA_DOT,
   },
-  { name: "Léxico", tag: "soon", soon: true },
-  { name: "Diário", tag: "soon", soon: true },
+  { name: "Léxico", soon: true },
+  { name: "Diário", soon: true },
 ];
