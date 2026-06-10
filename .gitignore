@@ -39,6 +39,12 @@ pnpm-debug.log*
 # playwright / validation artifacts
 .playwright-mcp/
 
-# design-system bundle — commit design-source only (skip font binaries + backups)
+# Claude Design handoffs — NEVER committed. Live locally per-app, linked from the
+# spec (design_link). See root CLAUDE.md "Claude Design handoffs".
+**/.design/
+**/.design_system/
+
+# legacy crema-arena design-system bundle — commit design-source only (skip binaries)
 **/.design-system/**/fonts/
 **/.design-system/**/*.bak-*/
+.claude/settings.local.json

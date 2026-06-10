@@ -25,6 +25,18 @@ packages in `packages/*`: `@crivelo/tokens` (design foundation), `@crivelo/ui`
   `@layer base` overrides must be imported AFTER the foundation to win (Tailwind
   hoists `@layer base` to the `@tailwind base` position).
 
+## Claude Design handoffs
+- **Never commit a Claude Design output** (the exported bundle: `project/`, `_ds/`
+  design-system, `chats/`, screenshots, etc.) into the repo.
+- It lives **locally only**, gitignored, in a **`.design/`** (or `.design_system/`) folder
+  at the consuming app's root — e.g. `apps/crivelo-web/.design/`. Both names are gitignored
+  repo-wide.
+- The **canonical, retrievable source is the live link** — record it in the feature spec's
+  frontmatter as `design_link:` (the `claude.ai/design` URL), and point `design_handoff_local:`
+  at the gitignored folder. A fresh clone pulls the bundle from the link, not from git.
+- Implement against `app/` (re-create the visuals in real Next/Tailwind); the prototype is
+  reference only. (The legacy `apps/crema-arena/.design-system/` predates this rule.)
+
 ## Deploy / data
 - One Vercel project per app; Crema Arena's has Root Directory `apps/crema-arena` +
   `ENABLE_EXPERIMENTAL_COREPACK=1`. `main` auto-deploys to prod

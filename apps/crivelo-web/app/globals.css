@@ -1,0 +1,24 @@
+/* Foundation first (neutral house tokens + element styles), then app-local
+ * overrides. App @layer base rules must be imported AFTER the foundation so they
+ * win when Tailwind hoists them to the @tailwind base position. crivelo-tokens.css
+ * is the site's teal accent (overrides --brand etc.) — same mechanism crema-arena
+ * uses for cinnamon. */
+@import "@crivelo/tokens/styles/foundation.css";
+@import "./crivelo-tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Pulsing "Brewing" status dot in the COA BrewTimer (RMP-192). Kept here rather
+ * than in component markup — <style> in <body> is invalid HTML5 and duplicates
+ * across remounts. */
+@keyframes coaBrewPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}

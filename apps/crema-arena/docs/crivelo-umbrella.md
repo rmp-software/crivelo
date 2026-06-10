@@ -83,10 +83,13 @@ the foundation + default ramp; each app drops in its own accent override).
 - radii, shadows, motion
 - semantic colors (success / danger)
 
-**Tier 2 — Per-product accent:** each tool overrides ~5 CSS variables on its root —
+**Tier 2 — Per-app accent:** an app overrides ~5 CSS variables on its root —
 `--brand`, `--brand-hover`, `--brand-press`, `--brand-soft`, `--focus-ring`. "Claiming an
-accent" is literally swapping those five. Crema Arena keeps **cinnamon**; siblings choose
-their own (e.g. V60 calmer/more utilitarian).
+accent" is literally swapping those five. Crema Arena keeps **cinnamon**. **The Crivelo hub
+app (`apps/crivelo-web`) carries ONE site accent — teal — shared by every small tool inside
+it (Coa, Léxico, Diário…)**; that accent belongs to the *site*, not the individual tool.
+(This supersedes the earlier "each sibling picks its own / V60 calmer" idea — see the
+**2026-06-10 refinement** in §3.)
 
 **Tier 3 — Per-product personality:** Arena-only motifs (podium, brackets, `AO VIVO` badge,
 trophy SVGs) stay inside Crema Arena. Quieter tools stay calm.
@@ -112,6 +115,25 @@ application logic.
 **Turborepo: now the right call** (YAGNI caution retired — 4–6 planned surfaces sharing one
 brand justify it, where 2 hypothetical apps wouldn't).
 
+### Refinement — hub of small tools vs standalone apps (2026-06-10)
+
+Building the first sibling (**Coa**, the V60/4:6 calculator) clarified that "independent
+apps" splits into **two buckets**, not literally one app per product:
+
+- **The Crivelo hub — `apps/crivelo-web`.** One Next.js app that is the front door **and**
+  hosts the small, mostly client-side tools (Coa now; Léxico, Diário, the portal later),
+  under one nav and **one site-wide accent (teal)**. Stays client-only (no backend/auth/DB)
+  until a tool genuinely needs persistence — at which point that tool is re-evaluated.
+- **Standalone apps.** The heavy products keep their own app, backend, auth, and data:
+  **Crema Arena** (live TNT app) and later **Mesa** (cupping). These keep per-product
+  accents (Crema Arena = cinnamon).
+
+So "one brand, independent apps" still holds for the *heavy* products; the *light*,
+client-side tools consolidate into the hub. This **resolves the open "portal accent"
+question** below — the hub/portal carries its own accent (teal), it does **not** wear the
+neutral foundation. Per-app Vercel projects still apply (one for the hub, one per standalone
+app). First implemented in `docs/specs/coa-v60-calculator.md` (Linear RMP-185).
+
 **Build in layers (foundation first):**
 1. **Foundation (design first):** turborepo monorepo + extracted design-system package +
    umbrella brand layer. Crema Arena migrates in as **`apps/crema-arena`** and keeps working
@@ -134,7 +156,9 @@ Per-app Vercel projects; deploy/domain model is part of the deferred structure p
       shared-package boundaries, Crema Arena migration plan (without breaking live prod at
       `crema-arena.com`), deploy + domain routing model (root → portal? subdomains per
       product? separate apps?), final `@crivelo/*` package scopes.
-- [ ] Whether the Crivelo portal has its own accent or wears the neutral foundation.
+- [x] Whether the Crivelo portal has its own accent or wears the neutral foundation. →
+      **Resolved (2026-06-10):** the hub/portal app (`apps/crivelo-web`) carries one site
+      accent (teal). See the refinement in §3.
 - [ ] Whether Crema Arena's brand SVGs get Crivelo co-branding or stay standalone.
 
 ## Status snapshot
@@ -144,7 +168,8 @@ Per-app Vercel projects; deploy/domain model is part of the deferred structure p
 | Umbrella name (Crivelo) | ✅ Decided (pending sonic test + collision check) |
 | Product naming system | ✅ Decided |
 | Design-system tier model | ✅ Locked |
-| "One brand, independent apps" + turborepo | ✅ Decided in principle |
+| "One brand, independent apps" + turborepo | ✅ Decided — refined 2026-06-10 to **hub (small tools, one accent) vs standalone apps** |
+| First hub tool — Coa (V60/4:6), `apps/crivelo-web` | 🛠️ In build (RMP-185 · `docs/specs/coa-v60-calculator.md`) |
 | Turborepo layout / migration / deploy | ⏳ Deferred to structure pass |
 | Visual identity / Claude Design | ⏳ Not started |
 | Collision / trademark / domains | ⏳ Not started |
