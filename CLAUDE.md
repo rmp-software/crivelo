@@ -5,6 +5,14 @@ packages in `packages/*`: `@crivelo/tokens` (design foundation), `@crivelo/ui`
 (primitives), `@crivelo/tsconfig`, `@crivelo/eslint-config`. The flagship app is
 `apps/crema-arena` (its own CLAUDE.md has app-specific rules).
 
+## Language (hard rule)
+**Portuguese (pt-BR) is ONLY for user-facing UI strings. EVERYTHING else is English** —
+across the whole monorepo, every app and package. That means English for: code,
+identifiers, comments, commit messages, PR descriptions, **specs/docs** (`docs/specs/*`,
+READMEs), config, and test names. The only pt-BR allowed is the literal text a user reads
+in the rendered UI (and its source strings). A spec written in Portuguese is a defect —
+rewrite it. (App-specific UI copy rules live in `apps/crema-arena/CLAUDE.md` / `app_spec.txt`.)
+
 ## Environment (bites every session)
 - Shell defaults to **Node 20**; everything needs **24**. Prefix commands:
   `export NVM_DIR="$HOME/.nvm"; \. "$NVM_DIR/nvm.sh"; nvm use 24` (pnpm 11 needs ≥22.13).

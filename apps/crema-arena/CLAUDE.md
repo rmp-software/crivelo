@@ -71,6 +71,7 @@ Visual reference for the brand lives at `.design-system/crema-arena-design-syste
 
 ### Copy and locale rules (often-violated)
 
+- **pt-BR is ONLY for user-facing UI strings; everything else (code, comments, specs/docs, commits) is English.** See root `CLAUDE.md` → "Language (hard rule)". The rules below govern that pt-BR UI text.
 - All user-facing text is pt-BR. Address as "você", short imperative verbs.
 - **Sentence case** for headings, buttons, modal titles. TNT is the only ALL CAPS. No Title Case.
 - Score format is always `N × M` using Unicode × (U+00D7) with spaces around it, never `x`.
