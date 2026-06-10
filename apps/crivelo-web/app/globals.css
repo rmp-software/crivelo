@@ -9,3 +9,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Pulsing "Brewing" status dot in the COA BrewTimer (RMP-192). Kept here rather
+ * than in component markup — <style> in <body> is invalid HTML5 and duplicates
+ * across remounts. */
+@keyframes coaBrewPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
