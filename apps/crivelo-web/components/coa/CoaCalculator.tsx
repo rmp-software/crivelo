@@ -12,9 +12,9 @@
  * ≥1024 two columns (left: intro + pad + inputs; right: sticky "Your recipe"
  * panel with big water total + schedule + CTA).
  *
- * View state: idle ↔ brew. "Begin brew" → brew (currently the RMP-192
- * placeholder, BrewView); the math (lib/four-six.ts) is computed once here and
- * handed to whichever view renders, so the real BrewTimer slots in cleanly.
+ * View state: idle ↔ brew. "Begin brew" → brew (the RMP-192 BrewTimer); the math
+ * (lib/four-six.ts) is computed once here and handed to whichever view renders,
+ * so the timer receives the exact same recipe the idle schedule shows.
  */
 import { useState, type CSSProperties } from "react";
 import { useRecipe } from "./useRecipe";
@@ -22,7 +22,7 @@ import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
-import { BrewView } from "./BrewView";
+import { BrewTimer } from "./BrewTimer";
 import { Icon } from "./icons";
 import { tasteLabel } from "../../lib/four-six";
 
@@ -231,10 +231,11 @@ export function CoaCalculator() {
 
   if (view === "brew") {
     return (
-      <BrewView
+      <BrewTimer
         recipe={recipe}
         onExit={() => setView("idle")}
-        maxWidth={containerMax}
+        bp={bp}
+        max={containerMax}
       />
     );
   }

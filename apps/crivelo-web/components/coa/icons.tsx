@@ -14,6 +14,7 @@ const PATHS: Record<string, ReactNode> = {
     </>
   ),
   play: <path d="M7 5l11 7-11 7V5z" />,
+  check: <path d="M5 12.5l4.5 4.5L19 6.5" />,
   minus: <path d="M5 12h14" />,
   plus: <path d="M12 5v14M5 12h14" />,
   book: (

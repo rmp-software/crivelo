@@ -6,7 +6,7 @@
  *  - TastePad      — 2D taste pad (free puck, acidity continuous, strength rounds 1–4)
  *  - RecipeInputs  — Coffee / Ratio steppers + (mobile) live Water total
  *  - PourSchedule  — phase bar + pour list + "Remove dripper · drawdown" row
- *  - BrewView      — RMP-192 brew-timer placeholder (slots in cleanly)
+ *  - BrewTimer     — RMP-192 running brew timer (live dial, real-time + localStorage resume)
  *  - useRecipe     — recipe state over the engine
  *  - useViewport   — mobile <700 / tablet 700–1023 / desktop ≥1024
  */
@@ -17,8 +17,8 @@ export { RecipeInputs } from "./RecipeInputs";
 export type { RecipeInputsProps } from "./RecipeInputs";
 export { PourSchedule } from "./PourSchedule";
 export type { PourScheduleProps } from "./PourSchedule";
-export { BrewView } from "./BrewView";
-export type { BrewViewProps } from "./BrewView";
+export { BrewTimer } from "./BrewTimer";
+export type { BrewTimerProps } from "./BrewTimer";
 export { useRecipe } from "./useRecipe";
 export type { UseRecipe, RecipeInit } from "./useRecipe";
 export { useViewport } from "./useViewport";
