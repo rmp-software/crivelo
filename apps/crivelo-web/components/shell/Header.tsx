@@ -8,10 +8,13 @@
  * Client component: it triggers the nav-sheet open state owned by Shell.
  */
 import { forwardRef } from "react";
+import { useTranslations } from "next-intl";
 import { CoaLockup } from "../brand";
+import { Link } from "../../i18n/navigation";
 
 export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
   function Header({ onMenu }, ref) {
+    const t = useTranslations("Shell");
     return (
     <header
       style={{
@@ -38,7 +41,7 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
           ref={ref}
           type="button"
           onClick={onMenu}
-          aria-label="Open menu"
+          aria-label={t("openMenu")}
           style={{
             width: 40,
             height: 40,
@@ -67,13 +70,13 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
             <path d="M4 7h16M4 12h16M4 17h16" />
           </svg>
         </button>
-        <a
+        <Link
           href="/"
-          aria-label="Coa by Crivelo — home"
+          aria-label={t("homeAria")}
           style={{ textDecoration: "none", display: "inline-flex" }}
         >
           <CoaLockup size="sm" />
-        </a>
+        </Link>
       </div>
     </header>
     );

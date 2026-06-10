@@ -19,6 +19,7 @@
  * tick. Exiting (Back to recipe) clears the key.
  */
 import { useEffect, useState, type CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import { clamp, fmtTime, type Recipe } from "../../lib/four-six";
 import { Icon } from "./icons";
 import type { Breakpoint } from "./useViewport";
@@ -69,6 +70,9 @@ export function BrewTimer({
   bp = "mobile",
   max = 390,
 }: BrewTimerProps) {
+  const t = useTranslations("BrewTimer");
+  const tCalc = useTranslations("Calculator");
+  const tSchedule = useTranslations("Schedule");
   const wide = bp !== "mobile";
 
   // Resume any persisted session synchronously (so a mid-brew refresh picks up
@@ -149,10 +153,10 @@ export function BrewTimer({
   };
 
   const centerStatus = done
-    ? "Brew complete"
+    ? t("brewComplete")
     : paused
-      ? "Paused"
-      : "Pour " + (curIdx + 1) + " of " + steps.length;
+      ? t("paused")
+      : t("pourOf", { n: curIdx + 1, total: steps.length });
   const ringColor = done ? "var(--success)" : "var(--brand)";
 
   const ctaStyle = (bg: string, outline?: boolean): CSSProperties => ({
@@ -222,7 +226,7 @@ export function BrewTimer({
           >
             <path d="M15 5l-7 7 7 7" />
           </svg>
-          Recipe
+          {t("recipe")}
         </button>
         <span
           style={{
@@ -249,7 +253,7 @@ export function BrewTimer({
                   : "none",
             }}
           />
-          {done ? "Done" : paused ? "Paused" : "Brewing"}
+          {done ? t("done") : paused ? t("paused") : t("brewing")}
         </span>
       </div>
 
@@ -349,9 +353,9 @@ export function BrewTimer({
                       lineHeight: 1.05,
                     }}
                   >
-                    Remove
+                    {t("removeThe")}
                     <br />
-                    the dripper
+                    {t("theDripper")}
                   </span>
                 ) : (
                   <>
@@ -369,7 +373,7 @@ export function BrewTimer({
                       {cur.cumulativeG}
                       <span style={{ fontSize: 22, color: "var(--fg-3)" }}>
                         {" "}
-                        g
+                        {tCalc("grams")}
                       </span>
                     </span>
                     <span
@@ -382,7 +386,7 @@ export function BrewTimer({
                         whiteSpace: "nowrap",
                       }}
                     >
-                      +{cur.pourG} g this pour
+                      {t("thisPour", { g: cur.pourG })}
                     </span>
                   </>
                 )}
@@ -401,7 +405,7 @@ export function BrewTimer({
                   fontWeight: 600,
                 }}
               >
-                Total time {recipe.totalTime}
+                {t("totalTime", { time: recipe.totalTime })}
               </div>
             ) : (
               <>
@@ -415,8 +419,8 @@ export function BrewTimer({
                   }}
                 >
                   {pouring
-                    ? "Pour now → " + cur.cumulativeG + " g"
-                    : "Let it draw down"}
+                    ? t("pourNow", { g: cur.cumulativeG })
+                    : t("letItDrawDown")}
                 </div>
                 <div
                   style={{
@@ -427,8 +431,16 @@ export function BrewTimer({
                     fontWeight: 600,
                   }}
                 >
-                  {isLastPour ? "Remove in " : "Next pour in "}
-                  <span style={{ color: "var(--fg)" }}>{fmtTime(toNext)}</span>
+                  {t.rich(isLastPour ? "removeIn" : "nextPourIn", {
+                    // Keep the time portion emphasized (--fg) as a sibling span,
+                    // but supply it via interpolation so a whitespace-stripping
+                    // formatter can't collapse "Next pour in" + the time.
+                    time: () => (
+                      <span style={{ color: "var(--fg)" }}>
+                        {fmtTime(toNext)}
+                      </span>
+                    ),
+                  })}
                   <span style={{ color: "var(--fg-4)" }}>
                     {"  ·  "}
                     {fmtTime(Math.floor(elapsed))} / {recipe.totalTime}
@@ -521,7 +533,7 @@ export function BrewTimer({
                       fontWeight: active ? 600 : 400,
                     }}
                   >
-                    Pour {i + 1}
+                    {tSchedule("pour", { n: i + 1 })}
                   </span>
                   <span
                     style={{
@@ -532,7 +544,7 @@ export function BrewTimer({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {s.cumulativeG} g
+                    {s.cumulativeG} {tCalc("grams")}
                   </span>
                 </div>
               );
@@ -549,14 +561,14 @@ export function BrewTimer({
                 onClick={restart}
                 style={ctaStyle("var(--brand)")}
               >
-                Brew again
+                {t("brewAgain")}
               </button>
               <button
                 type="button"
                 onClick={exit}
                 style={ctaStyle("transparent", true)}
               >
-                Back to recipe
+                {t("backToRecipe")}
               </button>
             </div>
           ) : (
@@ -571,16 +583,16 @@ export function BrewTimer({
               >
                 {paused ? (
                   <>
-                    <Icon name="play" size={17} color="#fff" /> Resume
+                    <Icon name="play" size={17} color="#fff" /> {t("resume")}
                   </>
                 ) : (
-                  "Pause"
+                  t("pause")
                 )}
               </button>
               <button
                 type="button"
                 onClick={restart}
-                aria-label="Restart brew"
+                aria-label={t("restartAria")}
                 style={{
                   width: 56,
                   height: 54,

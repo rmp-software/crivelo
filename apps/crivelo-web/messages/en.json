@@ -1,0 +1,90 @@
+{
+  "Meta": {
+    "title": "Coa — Crivelo",
+    "description": "Tools for people who live coffee."
+  },
+  "Shell": {
+    "tagline": "Tools for people who live coffee.",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "siteMenu": "Site menu",
+    "homeAria": "Coa by Crivelo — home",
+    "theHouse": "The house",
+    "theFamily": "The family",
+    "youAreHere": "you are here",
+    "soon": "soon",
+    "language": "Language",
+    "appearance": "Appearance",
+    "copyright": "© 2026 Crivelo · Para quem vive café."
+  },
+  "Nav": {
+    "coa": {
+      "tag": "the 4:6 calculator"
+    },
+    "cremaArena": {
+      "tag": "open in new tab"
+    }
+  },
+  "Appearance": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "Calculator": {
+    "introCaption": "Café coado · the 4:6 method",
+    "introLine": "Set your taste — Coa works out the pours.",
+    "yourRecipe": "Your recipe",
+    "doseRatioSummary": "{dose} g · 1:{ratio}",
+    "tasteSummary": "{taste} · {count, plural, one {# pour} other {# pours}}",
+    "beginBrew": "Begin brew",
+    "methodLink": "How the 4:6 method works",
+    "grams": "g"
+  },
+  "Taste": {
+    "label": "Taste",
+    "summary": "{taste} · {count, plural, one {# pour} other {# pours}}",
+    "padAria": "Taste and strength pad. Left and right arrows adjust acidity from sweet to bright; up and down arrows adjust strength from lighter to stronger.",
+    "stronger": "Stronger",
+    "lighter": "Lighter",
+    "sweet": "Sweet",
+    "bright": "Bright",
+    "sweetRound": "Sweet, round",
+    "sweetLeaning": "Sweet-leaning",
+    "balanced": "Balanced",
+    "brightLeaning": "Bright-leaning",
+    "brightJuicy": "Bright, juicy"
+  },
+  "Inputs": {
+    "coffee": "Coffee",
+    "ratio": "Ratio",
+    "water": "Water",
+    "decrease": "decrease {label}",
+    "increase": "increase {label}"
+  },
+  "Schedule": {
+    "pourSchedule": "Pour schedule",
+    "pour": "Pour {n}",
+    "removeDripper": "Remove dripper · drawdown"
+  },
+  "BrewTimer": {
+    "recipe": "Recipe",
+    "brewing": "Brewing",
+    "paused": "Paused",
+    "done": "Done",
+    "pourOf": "Pour {n} of {total}",
+    "brewComplete": "Brew complete",
+    "removeThe": "Remove",
+    "theDripper": "the dripper",
+    "thisPour": "+{g} g this pour",
+    "pourNow": "Pour now → {g} g",
+    "letItDrawDown": "Let it draw down",
+    "removeIn": "Remove in <time></time>",
+    "nextPourIn": "Next pour in <time></time>",
+    "totalTime": "Total time {time}",
+    "brewAgain": "Brew again",
+    "backToRecipe": "Back to recipe",
+    "pause": "Pause",
+    "resume": "Resume",
+    "restartAria": "Restart brew"
+  }
+}

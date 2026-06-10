@@ -10,6 +10,7 @@
  * Water total moves into the "Your recipe" panel, so it is hidden here.
  */
 import type { CSSProperties } from "react";
+import { useTranslations } from "next-intl";
 import { Icon } from "./icons";
 import { clamp } from "../../lib/four-six";
 
@@ -29,11 +30,15 @@ const MONO: CSSProperties = {
 function MiniStep({
   label,
   value,
+  decLabel,
+  incLabel,
   dec,
   inc,
 }: {
   label: string;
   value: string;
+  decLabel: string;
+  incLabel: string;
   dec: () => void;
   inc: () => void;
 }) {
@@ -53,7 +58,7 @@ function MiniStep({
     <div style={{ textAlign: "center" }}>
       <div style={{ ...CAP, marginBottom: 6 }}>{label}</div>
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <button type="button" style={btn} onClick={dec} aria-label={`decrease ${label}`}>
+        <button type="button" style={btn} onClick={dec} aria-label={decLabel}>
           <Icon name="minus" size={13} />
         </button>
         <span
@@ -67,7 +72,7 @@ function MiniStep({
         >
           {value}
         </span>
-        <button type="button" style={btn} onClick={inc} aria-label={`increase ${label}`}>
+        <button type="button" style={btn} onClick={inc} aria-label={incLabel}>
           <Icon name="plus" size={13} />
         </button>
       </div>
@@ -93,6 +98,10 @@ export function RecipeInputs({
   setRatio,
   wide = false,
 }: RecipeInputsProps) {
+  const t = useTranslations("Inputs");
+  const tCalc = useTranslations("Calculator");
+  const coffee = t("coffee");
+  const ratioLabel = t("ratio");
   const divider: CSSProperties = {
     width: 1,
     height: 34,
@@ -111,15 +120,19 @@ export function RecipeInputs({
       }}
     >
       <MiniStep
-        label="Coffee"
-        value={`${dose} g`}
+        label={coffee}
+        value={`${dose} ${tCalc("grams")}`}
+        decLabel={t("decrease", { label: coffee })}
+        incLabel={t("increase", { label: coffee })}
         dec={() => setDose(clamp(dose - 1, 8, 60))}
         inc={() => setDose(clamp(dose + 1, 8, 60))}
       />
       <div style={divider} />
       <MiniStep
-        label="Ratio"
+        label={ratioLabel}
         value={`1:${ratio}`}
+        decLabel={t("decrease", { label: ratioLabel })}
+        incLabel={t("increase", { label: ratioLabel })}
         dec={() => setRatio(clamp(ratio - 1, 12, 18))}
         inc={() => setRatio(clamp(ratio + 1, 12, 18))}
       />
@@ -127,7 +140,7 @@ export function RecipeInputs({
         <>
           <div style={divider} />
           <div style={{ textAlign: "center" }}>
-            <div style={{ ...CAP, marginBottom: 5 }}>Water</div>
+            <div style={{ ...CAP, marginBottom: 5 }}>{t("water")}</div>
             <div
               style={{
                 ...MONO,
@@ -137,7 +150,7 @@ export function RecipeInputs({
                 whiteSpace: "nowrap",
               }}
             >
-              {waterG} g
+              {waterG} {tCalc("grams")}
             </div>
           </div>
         </>

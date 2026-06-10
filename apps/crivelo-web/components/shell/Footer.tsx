@@ -5,7 +5,9 @@
  * + "The family" list + copyright + language toggle. Ported from coa-shell.jsx;
  * uses the centralized NAV_ITEMS. Client component because it embeds LangToggle.
  */
+import { useTranslations } from "next-intl";
 import { CriveloLockup, SieveGrid } from "../brand";
+import { Link } from "../../i18n/navigation";
 import { NAV_ITEMS } from "./nav";
 import { LangToggle } from "./LangToggle";
 
@@ -18,6 +20,7 @@ const CAP = {
 };
 
 export function Footer() {
+  const t = useTranslations("Shell");
   return (
     <footer
       style={{
@@ -53,7 +56,7 @@ export function Footer() {
                 color: "var(--fg-2)",
               }}
             >
-              Tools for people who live coffee.
+              {t("tagline")}
             </span>
           </div>
           <SieveGrid
@@ -68,7 +71,7 @@ export function Footer() {
           />
         </div>
 
-        <div style={{ ...CAP, marginBottom: 10 }}>The family</div>
+        <div style={{ ...CAP, marginBottom: 10 }}>{t("theFamily")}</div>
         <div
           style={{
             display: "flex",
@@ -104,7 +107,7 @@ export function Footer() {
                 </span>
                 {it.soon && (
                   <span style={{ fontSize: 11.5, color: "var(--fg-4)" }}>
-                    soon
+                    {t("soon")}
                   </span>
                 )}
                 {it.external && (
@@ -124,20 +127,31 @@ export function Footer() {
                 )}
               </span>
             );
-            return it.soon ? (
-              <div key={it.name} style={{ padding: "5px 0" }}>
-                {row}
-              </div>
-            ) : (
+            if (it.soon || !it.href) {
+              return (
+                <div key={it.name} style={{ padding: "5px 0" }}>
+                  {row}
+                </div>
+              );
+            }
+            return it.external ? (
               <a
                 key={it.name}
                 href={it.href}
-                target={it.external ? "_blank" : undefined}
-                rel={it.external ? "noopener noreferrer" : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
                 style={{ padding: "5px 0", textDecoration: "none" }}
               >
                 {row}
               </a>
+            ) : (
+              <Link
+                key={it.name}
+                href={it.href}
+                style={{ padding: "5px 0", textDecoration: "none" }}
+              >
+                {row}
+              </Link>
             );
           })}
         </div>
@@ -156,8 +170,14 @@ export function Footer() {
             justifyContent: "space-between",
           }}
         >
+          {/*
+            The `copyright` message keeps the Portuguese tagline "Para quem vive
+            café" in BOTH locales on purpose: it is Crivelo's primary brand
+            signature, kept in its origin language like a motto. This is NOT a
+            missed translation — do not "translate" it in messages/en.json.
+          */}
           <span style={{ fontSize: 12.5, color: "var(--fg-3)" }}>
-            © 2026 Crivelo · Para quem vive café.
+            {t("copyright")}
           </span>
           <LangToggle />
         </div>
