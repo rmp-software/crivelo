@@ -3,7 +3,7 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Users, Calendar, Building2, TrendingUp } from 'lucide-react';
-import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import { PageHeader } from '@crivelo/ui/page-header';
 import Card from '@/app/components/ui/Card';
 
 export default async function DashboardPage() {

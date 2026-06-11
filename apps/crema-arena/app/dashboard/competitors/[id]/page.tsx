@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import { PageHeader } from '@crivelo/ui/page-header';
 import CompetitorForm from '@/app/components/CompetitorForm';
-import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
+import { Spinner } from '@crivelo/ui/spinner';
 
 interface CompetitorData {
   id: string;
@@ -52,7 +52,7 @@ export default function EditCompetitorPage() {
     return (
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <Spinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando competidor...</p>
         </div>
       </div>
