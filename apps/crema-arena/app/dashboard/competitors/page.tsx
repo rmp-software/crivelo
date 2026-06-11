@@ -9,7 +9,7 @@ import Input from '@/app/components/ui/Input';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { EmptyState } from '@crivelo/ui/empty-state';
 import { Spinner } from '@crivelo/ui/spinner';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 
 interface Competitor {

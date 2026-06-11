@@ -9,7 +9,7 @@ import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { EmptyState } from '@crivelo/ui/empty-state';
 import { Spinner } from '@crivelo/ui/spinner';
 import SponsorForm, { type SponsorFormData } from '@/app/components/SponsorForm';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { Plus, Search, Edit2, Trash2, Handshake } from 'lucide-react';
 
 interface Sponsor {
