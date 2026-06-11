@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from '@crivelo/ui/deprecated/Toast';
 import {
   getOrCreateDeviceId,
   getSelectedSide,

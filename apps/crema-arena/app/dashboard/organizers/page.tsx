@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@crivelo/ui/PageHeader';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
-import Badge from '@crivelo/ui/Badge';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
-import { useToast } from '@crivelo/ui/Toast';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import Button from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Badge from '@/app/components/ui/Badge';
+import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
+import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 interface Organizer {

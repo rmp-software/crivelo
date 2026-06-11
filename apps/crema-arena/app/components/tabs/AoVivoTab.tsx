@@ -1,6 +1,6 @@
 'use client';
 
-import Badge from '@crivelo/ui/Badge';
+import Badge from '../ui/Badge';
 import CrowdVoteBar from '../CrowdVoteBar';
 
 interface Competitor {

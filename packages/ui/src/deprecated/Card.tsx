@@ -7,7 +7,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/card` (Card + CardHeader/
+ * @deprecated Use the shadcn primitive `@crivelo/ui/card` (Card + CardHeader/
  * CardContent/CardFooter/CardTitle/CardDescription) instead. Grandfathered for
  * existing call sites; removed after the shared-primitives migration (RMP-205/206).
  */

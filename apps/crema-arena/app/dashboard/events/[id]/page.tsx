@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Button from '@crivelo/ui/Button';
-import Badge from '@crivelo/ui/Badge';
-import Modal from '@crivelo/ui/Modal';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
+import Button from '@/app/components/ui/Button';
+import Badge from '@/app/components/ui/Badge';
+import Modal from '@crivelo/ui/deprecated/Modal';
+import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
 import EventSponsorsSection from '@/app/components/EventSponsorsSection';
 import SeedInput from '@/app/components/SeedInput';
@@ -14,8 +14,8 @@ import EventStatStrip from '@/app/components/EventStatStrip';
 import NowPouring from '@/app/components/NowPouring';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
-import { useToast } from '@crivelo/ui/Toast';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
+import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
 
 type PoolCompetitor = { id: string; name: string; coffeeShop: string; photoUrl: string };

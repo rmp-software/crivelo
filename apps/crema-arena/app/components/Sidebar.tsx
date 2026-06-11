@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { Menu, X, Users, Calendar, Building2, Megaphone, LogOut } from 'lucide-react';
-import Button from '@crivelo/ui/Button';
+import Button from './ui/Button';
 import Wordmark from './Wordmark';
 
 interface SidebarProps {

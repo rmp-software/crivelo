@@ -9,7 +9,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/button` instead. This
+ * @deprecated Use the shadcn primitive `@crivelo/ui/button` instead. This
  * hand-rolled Button is grandfathered for existing call sites only and will be
  * removed once the shared-primitives migration (RMP-205/206) completes. Variant
  * mapping: primary→default, secondary→secondary, danger→destructive, ghost→ghost.

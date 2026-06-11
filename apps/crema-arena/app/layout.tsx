@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { fontVariables } from "@crivelo/tokens/fonts";
 import "./globals.css";
-import { ToastProvider } from "@crivelo/ui/Toast";
+import { ToastProvider } from "@crivelo/ui/deprecated/Toast";
 
 // Only emit Vercel Analytics from the production deploy. Vercel sets
 // VERCEL_ENV to 'production' | 'preview' | 'development' automatically; gating

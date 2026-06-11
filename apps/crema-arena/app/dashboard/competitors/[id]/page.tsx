@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PageHeader from '@crivelo/ui/PageHeader';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
 import CompetitorForm from '@/app/components/CompetitorForm';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
 
 interface CompetitorData {
   id: string;

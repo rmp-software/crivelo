@@ -3,11 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@crivelo/ui/PageHeader';
-import Button from '@crivelo/ui/Button';
-import Badge from '@crivelo/ui/Badge';
-import EmptyState from '@crivelo/ui/EmptyState';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import Button from '@/app/components/ui/Button';
+import Badge from '@/app/components/ui/Badge';
+import EmptyState from '@crivelo/ui/deprecated/EmptyState';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
 import { Plus, Calendar, MapPin, Users, PartyPopper } from 'lucide-react';
 
 interface Event {

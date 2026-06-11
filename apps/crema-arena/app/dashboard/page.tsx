@@ -3,8 +3,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import { Users, Calendar, Building2, TrendingUp } from 'lucide-react';
-import PageHeader from '@crivelo/ui/PageHeader';
-import Card from '@crivelo/ui/Card';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import Card from '@/app/components/ui/Card';
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

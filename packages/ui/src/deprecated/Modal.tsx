@@ -14,7 +14,7 @@ interface ModalProps {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/dialog` (Dialog +
+ * @deprecated Use the shadcn primitive `@crivelo/ui/dialog` (Dialog +
  * DialogContent/DialogHeader/DialogTitle/DialogFooter) instead. Grandfathered for
  * existing call sites; removed after the shared-primitives migration (RMP-205/206).
  */

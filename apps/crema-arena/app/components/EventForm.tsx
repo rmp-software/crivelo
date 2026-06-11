@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
+import Button from './ui/Button';
+import Input from './ui/Input';
 import DateTime24h from './DateTime24h';
 
 interface EventFormProps {
