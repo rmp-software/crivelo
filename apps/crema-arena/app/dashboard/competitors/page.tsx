@@ -3,12 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import { PageHeader } from '@crivelo/ui/page-header';
 import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
-import EmptyState from '@crivelo/ui/deprecated/EmptyState';
-import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
+import { EmptyState } from '@crivelo/ui/empty-state';
+import { Spinner } from '@crivelo/ui/spinner';
 import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Plus, Search, Edit2, Trash2, Users } from 'lucide-react';
 
@@ -144,7 +144,7 @@ export default function CompetitorsPage() {
       {/* Loading State */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <Spinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando competidores...</p>
         </div>
       )}

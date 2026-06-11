@@ -1,11 +1,19 @@
 /*
- * @crivelo/ui barrel — the HAND-ROLLED primitives.
+ * @crivelo/ui barrel.
  *
- * @deprecated as a set. Every export below is a legacy hand-rolled primitive,
- * superseded by the shadcn commodity primitives under `@crivelo/ui/*` (added in
- * RMP-200). They are grandfathered so existing call sites keep working and are
- * removed once the shared-primitives migration (RMP-205/206) lands. Per-export
- * shadcn targets are noted below; do NOT import these in new code.
+ * This barrel mixes two kinds of export — read each export's note:
+ *
+ * CANONICAL (use freely): Spinner / EmptyState / PageHeader re-export the
+ * canonical composed components under `./ui/*` (added in RMP-205, also at
+ * `@crivelo/ui/spinner` etc.). These have no 1:1 shadcn primitive and are the
+ * supported house components.
+ *
+ * DEPRECATED (legacy hand-rolled): Button / Card / Input / Badge / Modal /
+ * ConfirmationModal / Toast are legacy hand-rolled primitives, superseded by
+ * the shadcn commodity primitives under `@crivelo/ui/*` (added in RMP-200).
+ * They are grandfathered so existing call sites keep working and are removed
+ * once the shared-primitives migration (RMP-205/206) lands. Per-export shadcn
+ * targets are noted below; do NOT import these in new code.
  */
 
 /** @deprecated Use `@crivelo/ui/button` instead (RMP-205/206). */
@@ -18,14 +26,14 @@ export { default as Input } from "./deprecated/Input";
 /** @deprecated Use `@crivelo/ui/badge` instead (RMP-205/206). */
 export { default as Badge } from "./deprecated/Badge";
 export type { BadgeVariant } from "./deprecated/Badge";
-/** @deprecated No 1:1 shadcn primitive — compose a spinner from lucide `Loader2` + `animate-spin` (RMP-205/206). */
-export { default as LoadingSpinner } from "./deprecated/LoadingSpinner";
-/** @deprecated No 1:1 shadcn primitive — compose from `@crivelo/ui/card` + typography utilities (RMP-205/206). */
-export { default as EmptyState } from "./deprecated/EmptyState";
+/** Canonical loader (RMP-205). Also available at `@crivelo/ui/spinner`. */
+export { Spinner } from "./ui/spinner";
+/** Canonical empty-state panel (RMP-205). Also available at `@crivelo/ui/empty-state`. */
+export { EmptyState } from "./ui/empty-state";
 /** @deprecated Use `@crivelo/ui/dialog` instead (RMP-205/206). */
 export { default as Modal } from "./deprecated/Modal";
-/** @deprecated No 1:1 shadcn primitive — compose from typography utilities + `@crivelo/ui/button` (RMP-205/206). */
-export { default as PageHeader } from "./deprecated/PageHeader";
+/** Canonical page header (RMP-205). Also available at `@crivelo/ui/page-header`. */
+export { PageHeader } from "./ui/page-header";
 /** @deprecated Use `@crivelo/ui/alert-dialog` instead (RMP-205/206). */
 export { default as ConfirmationModal } from "./deprecated/ConfirmationModal";
 /** @deprecated Use `@crivelo/ui/sonner` (`Toaster` + `toast()` from `sonner`) instead (RMP-205/206). */

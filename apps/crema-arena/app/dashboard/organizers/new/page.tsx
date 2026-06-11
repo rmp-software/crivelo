@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import PageHeader from '@crivelo/ui/deprecated/PageHeader';
+import { PageHeader } from '@crivelo/ui/page-header';
 import OrganizerForm, { OrganizerFormData } from '@/app/components/OrganizerForm';
 
 export default function NewOrganizerPage() {
