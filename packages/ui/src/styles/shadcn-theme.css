@@ -25,6 +25,15 @@
  * layer, so --brand/--focus-ring are already overridden to the app accent by the
  * time this file aliases them. It only ADDS shadcn's vocabulary — it overrides none
  * of the foundation/app variables, so existing utilities are untouched.
+ *
+ * RMP-200 audit: the commodity primitive set added in packages/ui/src/ui/
+ * (Card, Input, Label, Badge, Separator, Dialog, AlertDialog, Sonner) reference the
+ * shadcn semantic vars listed below — --card/--card-foreground, --popover/
+ * --popover-foreground (Sonner's --normal-* surface), --muted/--muted-foreground,
+ * --accent/--accent-foreground, --secondary/--secondary-foreground,
+ * --destructive/--destructive-foreground, --background, --border, --input, --ring,
+ * --radius. All are already mapped here, so the new primitives inherit the house
+ * tokens with no further per-primitive wiring.
  */
 
 @layer base {

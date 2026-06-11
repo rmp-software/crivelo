@@ -11,6 +11,13 @@ interface EmptyStateProps {
   };
 }
 
+/**
+ * @deprecated No 1:1 shadcn primitive. In the consistency migration (RMP-205/206)
+ * compose from shadcn primitives instead — e.g. `@crivelo/ui/ui/card` (or a plain
+ * container) with the house typography utilities for the title/description and
+ * `@crivelo/ui/ui/button` for the action. Grandfathered for existing call sites
+ * until then.
+ */
 export default function EmptyState({ icon: Icon, title, description, action }: EmptyStateProps) {
   return (
     <div

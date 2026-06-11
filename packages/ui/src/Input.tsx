@@ -7,6 +7,11 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   fullWidth?: boolean;
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/input` (compose the label/
+ * error/helper around it with `@crivelo/ui/ui/label`) instead. Grandfathered for
+ * existing call sites; removed after the shared-primitives migration (RMP-205/206).
+ */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, helperText, fullWidth = false, className = '', id, ...props }, ref) => {
     const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');

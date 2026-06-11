@@ -6,6 +6,11 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   border?: boolean;
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/card` (Card + CardHeader/
+ * CardContent/CardFooter/CardTitle/CardDescription) instead. Grandfathered for
+ * existing call sites; removed after the shared-primitives migration (RMP-205/206).
+ */
 const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ padding = 'md', shadow = 'sm', border = true, className = '', children, ...props }, ref) => {
     const baseStyles = 'bg-[var(--surface-raised)] rounded-[var(--radius-md)]';

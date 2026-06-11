@@ -8,6 +8,12 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/button` instead. This
+ * hand-rolled Button is grandfathered for existing call sites only and will be
+ * removed once the shared-primitives migration (RMP-205/206) completes. Variant
+ * mapping: primary→default, secondary→secondary, danger→destructive, ghost→ghost.
+ */
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', size = 'md', fullWidth = false, className = '', disabled = false, children, ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--focus-ring)] focus-visible:outline-offset-2 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation';

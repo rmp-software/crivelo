@@ -13,6 +13,11 @@ interface ModalProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/dialog` (Dialog +
+ * DialogContent/DialogHeader/DialogTitle/DialogFooter) instead. Grandfathered for
+ * existing call sites; removed after the shared-primitives migration (RMP-205/206).
+ */
 export default function Modal({ isOpen, onClose, title, children, footer, size = 'md' }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {

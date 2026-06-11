@@ -16,6 +16,14 @@
     "./Toast": "./src/Toast.tsx",
     "./lib/utils": "./src/lib/utils.ts",
     "./ui/button": "./src/ui/button.tsx",
+    "./ui/card": "./src/ui/card.tsx",
+    "./ui/input": "./src/ui/input.tsx",
+    "./ui/label": "./src/ui/label.tsx",
+    "./ui/badge": "./src/ui/badge.tsx",
+    "./ui/separator": "./src/ui/separator.tsx",
+    "./ui/dialog": "./src/ui/dialog.tsx",
+    "./ui/alert-dialog": "./src/ui/alert-dialog.tsx",
+    "./ui/sonner": "./src/ui/sonner.tsx",
     "./styles/shadcn-theme.css": "./src/styles/shadcn-theme.css"
   },
   "dependencies": {
@@ -23,6 +31,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.363.0",
     "radix-ui": "^1.4.3",
+    "sonner": "^1.7.4",
     "tailwind-merge": "^3.3.1"
   },
   "peerDependencies": {
