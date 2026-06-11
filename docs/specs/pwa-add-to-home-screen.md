@@ -57,9 +57,16 @@ feature_branch:
       - Wiring Crema Arena (or other apps) — the package is built to enable it,
         but only crivelo-web is implemented here. Crema Arena already has its own
         static `icon.png`/`apple-icon.png`; migrating it is a separate task.
-      - Localised manifest. The manifest is a single file; it uses the default
-        locale (`en`) strings. Product name "Crivelo" is a proper noun, never
-        translated.
+      - Localised manifest. A Web App Manifest is a single file with no
+        per-locale `description` field, so we cannot translate the install-prompt
+        copy without a separate locale-keyed manifest route. We deliberately
+        accept English as the forced default (the app's `defaultLocale` is `en`):
+        the manifest uses `name`/`short_name` "Crivelo" (a proper noun, never
+        translated) and `description` "Tools for people who live coffee." This is
+        a conscious, accepted break with the pt-BR-UI-copy rule for this one OS
+        surface — `pt` visitors will see the English `description` in their
+        install prompt. Revisit with a `/[locale]/manifest.webmanifest` route if
+        that becomes a problem.
     </out_of_scope>
   </scope>
 
