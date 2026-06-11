@@ -40,9 +40,15 @@ The monorepo styles with **Tailwind v4 `@theme`** (tokens are the utility vocabu
 for animation. The principle is **buy commodity UI (modal/drawer/toast/dialog/focus/
 animation), build the domain.** New code follows the styling guide — utility-first, no raw
 hex / no `var(--…)` in `style`, shadcn over hand-rolled (the old `@crivelo/ui` primitives are
-`@deprecated`), motion + `prefers-reduced-motion`. The guide is written and enforced per app
-via `app_spec.txt` (`<styling_conventions>` + grep'd `<compliance_rules>`); the app CLAUDE.md
-has the concise version.
+`@deprecated`, now at `@crivelo/ui/deprecated/*`), motion + `prefers-reduced-motion`. The guide
+is written and enforced per app via `app_spec.txt` (`<styling_conventions>` + grep'd
+`<compliance_rules>`); the app CLAUDE.md has the concise version.
+
+**`@crivelo/ui` is the single source of truth for primitives** (`@crivelo/ui/button`, `/card`,
+`/dialog`, …). Apps **never** import `radix-ui` / shadcn directly — every primitive comes from
+`@crivelo/ui`. A primitive that doesn't exist yet is added **to `@crivelo/ui`**, never kept in an
+app's scope; an app may add a thin local **wrapper** that imports a `@crivelo/ui` primitive and
+extends it (variants, sizes), but a wrapper is an extension, not a new primitive.
 
 ## Claude Design handoffs
 - **Never commit a Claude Design output** (the exported bundle: `project/`, `_ds/`

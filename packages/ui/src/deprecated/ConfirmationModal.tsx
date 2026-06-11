@@ -16,7 +16,7 @@ interface ConfirmationModalProps {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/alert-dialog` (AlertDialog +
+ * @deprecated Use the shadcn primitive `@crivelo/ui/alert-dialog` (AlertDialog +
  * AlertDialogContent/AlertDialogAction/AlertDialogCancel) instead. Grandfathered for
  * existing call sites; removed after the shared-primitives migration (RMP-205/206).
  */

@@ -8,7 +8,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/badge` instead.
+ * @deprecated Use the shadcn primitive `@crivelo/ui/badge` instead.
  * Grandfathered for existing call sites; removed after the shared-primitives
  * migration (RMP-205/206). Variant mapping: default→outline/secondary,
  * danger→destructive; success/warning have no 1:1 shadcn variant — pass the house

@@ -8,8 +8,8 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/input` (compose the label/
- * error/helper around it with `@crivelo/ui/ui/label`) instead. Grandfathered for
+ * @deprecated Use the shadcn primitive `@crivelo/ui/input` (compose the label/
+ * error/helper around it with `@crivelo/ui/label`) instead. Grandfathered for
  * existing call sites; removed after the shared-primitives migration (RMP-205/206).
  */
 const Input = forwardRef<HTMLInputElement, InputProps>(

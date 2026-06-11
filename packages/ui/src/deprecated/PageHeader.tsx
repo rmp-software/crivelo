@@ -10,7 +10,7 @@ interface PageHeaderProps {
 /**
  * @deprecated No 1:1 shadcn primitive. In the consistency migration (RMP-205/206)
  * compose from shadcn primitives + the house typography utilities instead — a plain
- * header layout using the `h1`/`p` foundation styles, `@crivelo/ui/ui/button` for
+ * header layout using the `h1`/`p` foundation styles, `@crivelo/ui/button` for
  * actions, and a simple breadcrumb nav. Grandfathered for existing call sites until
  * then.
  */

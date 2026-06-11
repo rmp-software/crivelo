@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import PageHeader from '@crivelo/ui/PageHeader';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
 import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
-import Modal from '@crivelo/ui/Modal';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
-import EmptyState from '@crivelo/ui/EmptyState';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import Modal from '@crivelo/ui/deprecated/Modal';
+import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
+import EmptyState from '@crivelo/ui/deprecated/EmptyState';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
 import SponsorForm, { type SponsorFormData } from '@/app/components/SponsorForm';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Plus, Search, Edit2, Trash2, Handshake } from 'lucide-react';
 
 interface Sponsor {

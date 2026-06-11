@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes } from 'react';
-import { Button as ShadcnButton } from '@crivelo/ui/ui/button';
+import { Button as ShadcnButton } from '@crivelo/ui/button';
 import { cn } from '@crivelo/ui/lib/utils';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 /**
- * Arena Button — thin wrapper over the shared shadcn Button (`@crivelo/ui/ui/button`).
+ * Arena Button — thin wrapper over the shared shadcn Button (`@crivelo/ui/button`).
  *
  * RMP-205: maps the legacy product API onto the shared primitive so every call site
  * keeps its props while rendering the shadcn Button (cinnamon via the alias layer):

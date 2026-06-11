@@ -1,5 +1,5 @@
 import { InputHTMLAttributes, forwardRef } from 'react';
-import { Input as ShadcnInput } from '@crivelo/ui/ui/input';
+import { Input as ShadcnInput } from '@crivelo/ui/input';
 import { cn } from '@crivelo/ui/lib/utils';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -10,7 +10,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 /**
- * Arena Input — thin wrapper over the shared shadcn Input (`@crivelo/ui/ui/input`).
+ * Arena Input — thin wrapper over the shared shadcn Input (`@crivelo/ui/input`).
  *
  * RMP-205: the product forms compose a label / required-asterisk / error / helper
  * around the field. The shared primitive is the bare <input>, so that surrounding

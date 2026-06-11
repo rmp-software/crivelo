@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageHeader from '@crivelo/ui/PageHeader';
+import PageHeader from '@crivelo/ui/deprecated/PageHeader';
 import OrganizerForm, { OrganizerFormData } from '@/app/components/OrganizerForm';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import LoadingSpinner from '@crivelo/ui/deprecated/LoadingSpinner';
 
 export default function EditOrganizerPage() {
   const router = useRouter();

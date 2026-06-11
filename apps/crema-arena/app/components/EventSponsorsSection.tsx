@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import Button from './ui/Button';
-import Modal from '@crivelo/ui/Modal';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
+import Modal from '@crivelo/ui/deprecated/Modal';
+import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
 import SponsorPicker, { initials } from './SponsorPicker';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Handshake, Plus, Trash2, GripVertical } from 'lucide-react';
 
 interface SponsorRef {

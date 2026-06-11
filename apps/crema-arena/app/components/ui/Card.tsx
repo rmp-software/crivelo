@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import { Card as ShadcnCard } from '@crivelo/ui/ui/card';
+import { Card as ShadcnCard } from '@crivelo/ui/card';
 import { cn } from '@crivelo/ui/lib/utils';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -9,7 +9,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /**
- * Arena Card — thin wrapper over the shared shadcn Card (`@crivelo/ui/ui/card`).
+ * Arena Card — thin wrapper over the shared shadcn Card (`@crivelo/ui/card`).
  *
  * RMP-205: the product uses Card as a single padded surface, so this maps the
  * legacy padding / shadow / border props onto the shared primitive and neutralizes

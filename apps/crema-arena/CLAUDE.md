@@ -73,7 +73,7 @@ Source of truth is `app_spec.txt` (`<styling_conventions>` + the grep'd `<compli
 - **Utility-first.** Tokens are the utility vocabulary via Tailwind v4 `@theme`. Off-scale one-offs use arbitrary values (`min-h-[44px]`); raw ramp steps as `bg-[var(--espresso-800)]`.
 - **No raw hex, no `var(--…)` in `style`.** Hex literals only belong in the token CSS source (`arena-tokens.css` / `@crivelo/tokens`), never in app/component code.
 - **`cn()`** (clsx + tailwind-merge) for conditional/variant classes via className lookups — never an inline `style` ternary. Inline `style` is a last resort (computed dimensions, SVG geometry, state-driven transforms).
-- **shadcn from `@crivelo/ui`** (`@crivelo/ui/ui/*`) for new commodity UI — don't hand-roll a primitive. The old hand-rolled `@crivelo/ui` primitives are `@deprecated`.
+- **Primitives from `@crivelo/ui` only** (`@crivelo/ui/button`, `/card`, `/dialog`, …) for new commodity UI — don't hand-roll a primitive. The old hand-rolled primitives are `@deprecated` (now at `@crivelo/ui/deprecated/*`). **Never import `radix-ui` / shadcn directly in the app** — `@crivelo/ui` is the single source of truth; a primitive that doesn't exist yet gets added *to `@crivelo/ui`*, not the app. An app may add a thin local **wrapper** that imports a `@crivelo/ui` primitive and extends it (variants, bigger sizes — e.g. our larger buttons live in `app/components/ui/`), but a wrapper is an extension, never a new primitive.
 - **Animation via `motion`** (`motion/react`) + `prefers-reduced-motion`; no new manual `setInterval` / `@keyframes`.
 
 ### Design system bundle (`.design-system/`)

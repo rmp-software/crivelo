@@ -30,7 +30,7 @@ const ToastContext = createContext<ToastContextValue | null>(null);
 const DEFAULT_DURATION_MS = 3000;
 
 /**
- * @deprecated Use the shadcn primitive `@crivelo/ui/ui/sonner` instead — mount its
+ * @deprecated Use the shadcn primitive `@crivelo/ui/sonner` instead — mount its
  * `Toaster` once at the app root and call `toast()` from the `sonner` package in
  * place of `useToast().showToast`. Grandfathered for existing call sites; removed
  * after the shared-primitives migration (RMP-205/206).
@@ -117,7 +117,7 @@ function ToastView({
 
 /**
  * @deprecated Use `toast()` from the `sonner` package together with the `Toaster`
- * from `@crivelo/ui/ui/sonner` instead. Grandfathered for existing call sites;
+ * from `@crivelo/ui/sonner` instead. Grandfathered for existing call sites;
  * removed after the shared-primitives migration (RMP-205/206).
  */
 export function useToast(): ToastContextValue {

@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import { Badge as ShadcnBadge } from '@crivelo/ui/ui/badge';
+import { Badge as ShadcnBadge } from '@crivelo/ui/badge';
 import { cn } from '@crivelo/ui/lib/utils';
 
 export type BadgeVariant = 'default' | 'success' | 'warning' | 'danger';
@@ -10,7 +10,7 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 /**
- * Arena Badge — thin wrapper over the shared shadcn Badge (`@crivelo/ui/ui/badge`).
+ * Arena Badge — thin wrapper over the shared shadcn Badge (`@crivelo/ui/badge`).
  *
  * RMP-205: the four product Badge variants (default / success / warning / danger)
  * have no 1:1 shadcn equivalent, so they are reproduced here with the exact house

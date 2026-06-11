@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowRight, Lock, ChevronLeft, ChevronRight, User } from "lucide-react";
-import { Button } from "@crivelo/ui/ui/button";
+import { Button } from "@crivelo/ui/button";
 import { cn } from "@crivelo/ui/lib/utils";
 import { requestAccessMailto } from "./requestAccessMailto";
 import { Reveal } from "./Reveal";
