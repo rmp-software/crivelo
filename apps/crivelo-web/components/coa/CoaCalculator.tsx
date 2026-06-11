@@ -124,7 +124,6 @@ export function CoaCalculator() {
       waterG={recipe.waterG}
       setDose={setDose}
       setRatio={setRatio}
-      wide={wide}
     />
   );
 
