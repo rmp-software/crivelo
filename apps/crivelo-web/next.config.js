@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@crivelo/ui", "@crivelo/tokens"],
+  transpilePackages: ["@crivelo/ui", "@crivelo/tokens", "@crivelo/pwa"],
 }
 
 module.exports = withNextIntl(nextConfig)

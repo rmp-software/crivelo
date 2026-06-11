@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { fontVariables } from "@crivelo/tokens/fonts";
+import { pwaMetadata, pwaViewport } from "@crivelo/pwa";
 import { Shell, NO_FOUC_SCRIPT } from "../../components/shell";
 import { routing } from "../../i18n/routing";
+import { criveloPwa } from "../pwa.config";
 import "../globals.css";
 
 // All routes live under [locale], so this IS the App Router root layout: it
@@ -27,8 +29,14 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("description"),
+    // PWA: manifest link + applicationName + iOS web-app meta (RMP / add-to-home-screen).
+    manifest: "/manifest.webmanifest",
+    ...pwaMetadata(criveloPwa),
   };
 }
+
+// PWA theme colour + mobile viewport defaults (RMP / add-to-home-screen).
+export const viewport: Viewport = pwaViewport(criveloPwa);
 
 export default async function LocaleLayout({
   children,
