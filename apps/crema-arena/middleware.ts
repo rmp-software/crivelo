@@ -5,7 +5,7 @@ import { getToken } from 'next-auth/jwt';
 /**
  * Auth-aware routing for the admin surfaces:
  *
- * - `/`            → /dashboard if signed in, /login otherwise.
+ * - `/`            → /dashboard if signed in, the public landing otherwise.
  * - `/login`       → /dashboard if already signed in; otherwise let the page render.
  * - `/dashboard/*` → /login (with callbackUrl) if not signed in.
  *
@@ -18,9 +18,12 @@ export async function middleware(req: NextRequest) {
   const isAuthed = !!token;
 
   if (pathname === '/') {
-    const url = req.nextUrl.clone();
-    url.pathname = isAuthed ? '/dashboard' : '/login';
-    return NextResponse.redirect(url);
+    if (isAuthed) {
+      const url = req.nextUrl.clone();
+      url.pathname = '/dashboard';
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
   }
 
   if (pathname === '/login' && isAuthed) {
