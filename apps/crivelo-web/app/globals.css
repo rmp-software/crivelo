@@ -11,14 +11,16 @@
  *      accent) turn those variables into Tailwind utility tokens (`bg-espresso-800`,
  *      `bg-brand`, `rounded-md`, `shadow-1`, `ease-standard`, …).
  *
- * crivelo-web consumes ZERO @crivelo/ui primitive classes today (its teal accent is
- * applied via `var(--brand)` in component styles, not generated utilities), so no
- * `@source` for the ui package is needed — v4 auto-detects this app's own files.
- * WHEN crivelo-web adopts the shared @crivelo/ui primitives (RMP-206), add
- * `@source "../../packages/ui/src/**";` here — otherwise v4 will not traverse the
- * workspace symlink and those primitives' utility classes get silently purged.
+ * crivelo-web now consumes shared @crivelo/ui primitives (RMP-206: the NavSheet
+ * drawer rides the shared Sheet). The `@source` below makes v4 traverse the
+ * workspace symlink into the ui package so those primitives' utility classes are
+ * NOT silently purged (v4 won't follow the symlink on its own).
  */
 @import "tailwindcss";
+
+/* Scan the shared @crivelo/ui primitives so their utility classes survive the v4
+ * content purge (RMP-206 — crivelo-web adopted the shared Sheet). */
+@source "../../../packages/ui/src/**/*.{js,ts,jsx,tsx}";
 @import "@crivelo/tokens/styles/foundation.css";
 @import "./crivelo-tokens.css";
 @import "@crivelo/tokens/styles/theme.css";
@@ -28,9 +30,8 @@
  * utilities onto the house/accent tokens. Imported LAST so --brand/--focus-ring are
  * already overridden to the teal "water" accent by the time it aliases them — so the
  * shared shadcn primitives inherit teal with zero per-app shadcn config. It only ADDS
- * shadcn's vocabulary; it overrides no foundation/accent variable. (When crivelo-web
- * adopts the shared @crivelo/ui primitives in RMP-206, add the `@source` for the ui
- * package below so their utility classes survive the v4 content purge.) */
+ * shadcn's vocabulary; it overrides no foundation/accent variable. (The `@source` for
+ * the ui package is declared above, after `@import "tailwindcss"` — RMP-206.) */
 @import "@crivelo/ui/styles/shadcn-theme.css";
 
 /* Pulsing "Brewing" status dot in the COA BrewTimer (RMP-192). Kept here rather

@@ -10,7 +10,7 @@
  * resolved theme onto <html> (set before paint by the no-FOUC script in the
  * layout head), so the document chrome stays a Server Component.
  */
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { ThemeProvider } from "./ThemeProvider";
 import { Header } from "./Header";
 import { NavSheet } from "./NavSheet";
@@ -18,41 +18,15 @@ import { Footer } from "./Footer";
 
 export function Shell({ children }: { children: ReactNode }) {
   const [menu, setMenu] = useState(false);
-  // Shell owns the hamburger ref so it can return focus there when the sheet
-  // closes (FIX 3: focus return on close).
+  // Shell owns the hamburger ref purely so it can be threaded down to the sheet
+  // for focus-return. The drawer MECHANISM (Escape-to-close, body-scroll-lock,
+  // focus-trap, AND focus-return) is owned by Radix Dialog inside NavSheet — see
+  // SheetContent's onCloseAutoFocus, which returns focus here AFTER the close
+  // animation completes (RMP-206a2). No hand-rolled keydown/overflow/focus
+  // effects live here anymore; they duplicated and raced Radix's behaviour.
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const closeMenu = () => setMenu(false);
-
-  // Escape closes the sheet (FIX 3) — document-level listener, active only while
-  // the menu is open; cleaned up on close/unmount.
-  useEffect(() => {
-    if (!menu) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenu(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [menu]);
-
-  // Body scroll lock while the menu is open (FIX 4); restored on close/unmount.
-  useEffect(() => {
-    document.body.style.overflow = menu ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [menu]);
-
-  // Return focus to the hamburger when the sheet finishes closing (FIX 3).
-  // Skip the initial mount (menu starts false) so we don't steal focus on load.
-  const didMount = useRef(false);
-  useEffect(() => {
-    if (!didMount.current) {
-      didMount.current = true;
-      return;
-    }
-    if (!menu) menuButtonRef.current?.focus();
-  }, [menu]);
 
   return (
     <ThemeProvider>
@@ -68,7 +42,7 @@ export function Shell({ children }: { children: ReactNode }) {
         }}
       >
         <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />
-        <NavSheet open={menu} onClose={closeMenu} />
+        <NavSheet open={menu} onClose={closeMenu} returnFocusRef={menuButtonRef} />
         <div style={{ flex: 1 }}>{children}</div>
         <Footer />
       </div>

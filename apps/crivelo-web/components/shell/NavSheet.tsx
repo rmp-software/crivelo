@@ -1,131 +1,98 @@
 "use client";
 
 /**
- * NavSheet (RMP-190) — the family nav, sliding from the LEFT behind a scrim.
+ * NavSheet (RMP-190, migrated to the shared Sheet in RMP-206a) — the family nav,
+ * sliding from the LEFT behind a scrim.
  *
- * Ported faithfully from coa-shell.jsx: CriveloLockup + tagline lead, "The house"
- * lists the family (Coa = you-are-here teal dot, Crema Arena external ↗,
- * Léxico/Diário soon), and the bottom holds the Language + Appearance controls.
- * The reference's `var(--coa-ink)` (teal text) maps to this site's
- * `var(--accent-ink)`. Family links + URLs come from the centralized NAV_ITEMS.
+ * The drawer MECHANISM (left-slide panel, scrim/overlay, focus trap, Escape-to-
+ * close, overlay-click-to-close, body-scroll-lock) now rides the shared
+ * `@crivelo/ui/sheet` primitive (Radix Dialog under the hood) — the hand-rolled
+ * fixed/translateX/inert/role=dialog markup is gone. The CONTENT is unchanged:
+ * CriveloLockup + tagline lead, "The house" lists the family (Coa = you-are-here
+ * teal dot, Crema Arena external ↗, Léxico/Diário soon), and the bottom holds the
+ * Language + Appearance controls. The reference's `var(--coa-ink)` (teal text)
+ * maps to this site's `var(--accent-ink)`. Family links + URLs come from NAV_ITEMS.
+ *
+ * Styling: the foundation's neutral semantic tokens (--fg/--fg-2/3/4, --border,
+ * --font-display/--font-serif, …) are referenced via arbitrary-value utility
+ * classes (`text-[color:var(--fg-2)]`), which are classNames — NOT inline `style`
+ * (the no-`var(--)`-in-`style` rule). The Sheet panel/overlay/close-button are
+ * themed by the shared shadcn alias layer (bg-background/border/…).
  */
-import { useEffect, useRef, type HTMLAttributes } from "react";
+import type { CSSProperties, RefObject } from "react";
 import { useTranslations } from "next-intl";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@crivelo/ui/sheet";
+import { cn } from "@crivelo/ui/lib/utils";
 import { CriveloLockup } from "../brand";
 import { Link } from "../../i18n/navigation";
 import { NAV_ITEMS } from "./nav";
 import { LangToggle } from "./LangToggle";
 import { ThemeControl } from "./ThemeControl";
 
-const CAP = {
-  fontSize: 11,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.08em",
-  fontWeight: 600,
-  color: "var(--fg-3)",
-};
+/** Section caption ("THE HOUSE" / "LANGUAGE" / "APPEARANCE"). */
+const CAP =
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
 
 export function NavSheet({
   open,
   onClose,
+  returnFocusRef,
 }: {
   open: boolean;
   onClose: () => void;
+  /**
+   * The hamburger button focus should return to when the sheet closes. Because
+   * this is a controlled Sheet with NO SheetTrigger, Radix's triggerRef is null
+   * and can't auto-return focus — so we thread the trigger element in and steer
+   * Radix's onCloseAutoFocus to it (fires AFTER the close animation, no race).
+   */
+  returnFocusRef?: RefObject<HTMLButtonElement | null>;
 }) {
   const t = useTranslations("Shell");
   const tNav = useTranslations("Nav");
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  // `inert` when closed: hides the subtree from AT *and* removes its children
-  // from the tab order, and — unlike aria-hidden — never trips the
-  // "Blocked aria-hidden … descendant retained focus" warning. The empty-string
-  // value is what React 18 writes to the DOM cleanly (a boolean `inert` trips
-  // React 18's "non-boolean attribute" warning); absent entirely when open.
-  // Cast localizes the @types/react-18 boolean-typing mismatch to this one prop.
-  const inertProps = (
-    open ? {} : { inert: "" }
-  ) as HTMLAttributes<HTMLDivElement>;
-
-  // On open, move focus to the Close button so keyboard/AT users land inside the
-  // dialog. (Return-of-focus to the hamburger is owned by Shell.)
-  useEffect(() => {
-    if (open) closeRef.current?.focus();
-  }, [open]);
 
   return (
-    // `inert` (not aria-hidden) when closed: it both hides the subtree from AT
-    // and removes its children from the tab order, and — unlike aria-hidden —
-    // never trips the "Blocked aria-hidden … descendant retained focus" warning.
-    <div
-      {...inertProps}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 60,
-        pointerEvents: open ? "auto" : "none",
-      }}
-    >
-      {/* scrim */}
-      <div
-        onClick={onClose}
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "rgba(31,20,16,0.55)",
-          opacity: open ? 1 : 0,
-          transition: "opacity var(--dur-stage) var(--ease-standard)",
+    <Sheet open={open} onOpenChange={(next) => !next && onClose()}>
+      <SheetContent
+        side="left"
+        // The custom circular close button below replaces the primitive's
+        // default top-right X (which mismatched the legacy affordance and could
+        // overlap the lockup), so suppress it.
+        showCloseButton={false}
+        // Return focus to the hamburger AFTER the close animation completes
+        // (Radix fires this on close); preventDefault stops Radix's null-trigger
+        // fallback from focusing the body. Replaces Shell's old state-time
+        // focus() call that raced the 300ms close animation.
+        onCloseAutoFocus={(e) => {
+          e.preventDefault();
+          returnFocusRef?.current?.focus();
         }}
-      />
-      {/* panel */}
-      <aside
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("siteMenu")}
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          bottom: 0,
-          width: "84%",
-          maxWidth: 340,
-          background: "var(--bg)",
-          boxShadow: "var(--shadow-2)",
-          transform: open ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform var(--dur-stage) var(--ease-standard)",
-          display: "flex",
-          flexDirection: "column",
-          padding: "22px 22px 26px",
-          boxSizing: "border-box",
-          overflowY: "auto",
-        }}
+        // The accessible name comes from the sr-only SheetTitle below; the legacy
+        // dialog carried no description, so opt out of Radix's description warning.
+        aria-describedby={undefined}
+        className="z-[60] w-[84%] max-w-[340px] gap-0 overflow-y-auto bg-[color:var(--bg)] px-[22px] pt-[22px] pb-[26px] shadow-[var(--shadow-2)]"
       >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            marginBottom: 22,
-          }}
-        >
+        <SheetHeader className="mb-[22px] flex-row items-start justify-between gap-0 p-0">
           <CriveloLockup size="md" />
-          <button
-            ref={closeRef}
-            type="button"
-            onClick={onClose}
+          <SheetTitle className="sr-only">{t("siteMenu")}</SheetTitle>
+          {/* Custom close: a SheetClose (Radix Close → onOpenChange → onClose)
+              restoring the legacy 36×36 circular X affordance (1px --border ring
+              on --surface-raised). `-mt-1` nudges it up to align with the lockup
+              cap-height without overlapping it. */}
+          <SheetClose
             aria-label={t("closeMenu")}
-            style={{
-              width: 36,
-              height: 36,
-              marginTop: -4,
-              borderRadius: 999,
-              border: "1px solid var(--border)",
-              background: "var(--surface-raised)",
-              color: "var(--fg)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
-            }}
+            className={cn(
+              "-mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
+              "border border-[color:var(--border)] bg-[color:var(--surface-raised)]",
+              "text-[color:var(--fg)] cursor-pointer transition-opacity hover:opacity-80",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+            )}
           >
             <svg
               width="17"
@@ -139,80 +106,51 @@ export function NavSheet({
             >
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
-          </button>
-        </div>
+          </SheetClose>
+        </SheetHeader>
 
-        <p
-          style={{
-            fontFamily: "var(--font-serif)",
-            fontStyle: "italic",
-            fontSize: 17,
-            color: "var(--fg-2)",
-            margin: "0 0 20px",
-            lineHeight: 1.35,
-          }}
-        >
+        <p className="mb-5 font-serif text-[17px] italic leading-[1.35] text-[color:var(--fg-2)]">
           {t("tagline")}
         </p>
 
-        <div style={{ ...CAP, marginBottom: 8 }}>{t("theHouse")}</div>
-        <nav style={{ display: "flex", flexDirection: "column" }}>
+        <div className={cn(CAP, "mb-2")}>{t("theHouse")}</div>
+        <nav className="flex flex-col">
           {NAV_ITEMS.map((it) => {
-            const base = {
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "13px 0",
-              borderBottom: "1px solid var(--border)",
-              textDecoration: "none",
-              color: it.soon ? "var(--fg-4)" : "var(--fg)",
-              cursor: it.soon ? "default" : "pointer",
-            } as const;
+            const rowClass = cn(
+              "flex items-center gap-3 py-[13px] no-underline border-b border-[color:var(--border)]",
+              it.soon
+                ? "text-[color:var(--fg-4)] cursor-default"
+                : "text-[color:var(--fg)] cursor-pointer",
+            );
+            // The family-marker colour is per-item DATA from NAV_ITEMS (Coa's
+            // `var(--brand)` teal, Crema Arena's cinnamon — a non-token external
+            // brand colour, soon items fall back to --fg-4). A runtime data value
+            // can't live in a static utility class, so it travels through a CSS
+            // custom property consumed by the `bg-[var(--dot)]` utility — the dot's
+            // box itself is still styled with utilities, not an inline `style`.
+            const dotVar = {
+              "--dot": it.dot ?? "var(--fg-4)",
+            } as CSSProperties;
             const inner = (
               <>
                 <span
-                  style={{
-                    width: 9,
-                    height: 9,
-                    borderRadius: 999,
-                    flexShrink: 0,
-                    background: it.dot || "var(--fg-4)",
-                    opacity: it.soon ? 0.5 : 1,
-                  }}
+                  className={cn(
+                    "h-[9px] w-[9px] shrink-0 rounded-full bg-[var(--dot)]",
+                    it.soon && "opacity-50",
+                  )}
+                  style={dotVar}
                 />
-                <span style={{ flex: 1 }}>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-display)",
-                      fontWeight: 700,
-                      fontSize: 17,
-                      letterSpacing: "-0.01em",
-                    }}
-                  >
+                <span className="flex-1">
+                  <span className="font-display text-[17px] font-bold tracking-[-0.01em]">
                     {it.name}
                   </span>
                   {it.current && (
-                    <span
-                      style={{
-                        marginLeft: 8,
-                        fontSize: 11,
-                        fontWeight: 600,
-                        color: "var(--accent-ink)",
-                      }}
-                    >
+                    <span className="ml-2 text-[11px] font-semibold text-[color:var(--accent-ink)]">
                       · {t("youAreHere")}
                     </span>
                   )}
                 </span>
-                <span
-                  style={{
-                    fontSize: 12.5,
-                    color: "var(--fg-3)",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
+                <span className="inline-flex items-center gap-[5px] text-[12.5px] text-[color:var(--fg-3)]">
                   {it.soon ? t("soon") : it.tagKey ? tNav(it.tagKey) : null}
                   {it.external && (
                     <svg
@@ -234,7 +172,7 @@ export function NavSheet({
             );
             if (it.soon || !it.href) {
               return (
-                <div key={it.name} style={base}>
+                <div key={it.name} className={rowClass}>
                   {inner}
                 </div>
               );
@@ -248,7 +186,7 @@ export function NavSheet({
                 href={it.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={base}
+                className={rowClass}
               >
                 {inner}
               </a>
@@ -257,7 +195,7 @@ export function NavSheet({
                 key={it.name}
                 href={it.href}
                 onClick={it.current ? onClose : undefined}
-                style={base}
+                className={rowClass}
               >
                 {inner}
               </Link>
@@ -265,25 +203,17 @@ export function NavSheet({
           })}
         </nav>
 
-        <div
-          style={{
-            marginTop: "auto",
-            paddingTop: 26,
-            display: "flex",
-            flexDirection: "column",
-            gap: 18,
-          }}
-        >
+        <div className="mt-auto flex flex-col gap-[18px] pt-[26px]">
           <div>
-            <div style={{ ...CAP, marginBottom: 10 }}>{t("language")}</div>
+            <div className={cn(CAP, "mb-[10px]")}>{t("language")}</div>
             <LangToggle size="lg" />
           </div>
           <div>
-            <div style={{ ...CAP, marginBottom: 10 }}>{t("appearance")}</div>
+            <div className={cn(CAP, "mb-[10px]")}>{t("appearance")}</div>
             <ThemeControl />
           </div>
         </div>
-      </aside>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }
