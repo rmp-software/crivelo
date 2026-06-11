@@ -1,16 +1,22 @@
+"use client";
+
 import Image from "next/image";
 import { Zap, Users } from "lucide-react";
+import { Reveal } from "./Reveal";
 
 // "Does" story-bracket — light section (--bg). Title "Rode seu TNT sem o caos"
 // (caos italic). Two feeder cards (Praticidade, Engajamento) converge through an
 // SVG connector into a "Resultado" card with a cinnamon border (trophy.svg in the
 // kicker, stamp-seal.svg in the corner). Below 960px: vertical stack with a left
 // stub instead of the horizontal connector.
+//
+// RMP-204 motion: header + cards scroll-reveal on enter. Under reduced-motion the
+// Reveal wrapper renders plain elements (always visible — never an opacity-0 trap).
 export function LandingDoes() {
   return (
     <section className="relative bg-[var(--bg)] px-7 py-[88px] text-[var(--fg)] max-[560px]:px-[18px] max-[560px]:py-16">
       <div className="mx-auto max-w-[1200px]">
-        <div className="mx-auto mb-[60px] max-w-[720px] text-center">
+        <Reveal className="mx-auto mb-[60px] max-w-[720px] text-center">
           <div className="mb-[26px] inline-flex items-center justify-center gap-[10px] font-mono text-xs font-medium uppercase tracking-[0.14em] text-[var(--fg-3)]">
             <span className="size-[7px] rounded-full bg-[var(--brand)]" aria-hidden="true" />
             Por que a Crema Arena
@@ -19,11 +25,11 @@ export function LandingDoes() {
             Rode seu TNT sem o{" "}
             <em className="font-serif font-normal italic text-[var(--brand)]">caos</em>
           </h2>
-        </div>
+        </Reveal>
 
         <div className="grid items-center gap-0 [grid-template-columns:minmax(0,1fr)_64px_minmax(0,1.02fr)] max-[960px]:block">
           {/* Feeder cards */}
-          <div className="grid gap-[22px] max-[960px]:gap-4">
+          <Reveal className="grid gap-[22px] max-[960px]:gap-4">
             <FeederCard
               kicker="Praticidade"
               icon={<Zap className="size-[19px] text-[var(--fg-2)]" aria-hidden="true" />}
@@ -36,7 +42,7 @@ export function LandingDoes() {
               title="A plateia no jogo"
               body="Cronômetro na telona, votação dos jurados ao vivo e o público acompanhando pelo celular. Ninguém assiste de fora."
             />
-          </div>
+          </Reveal>
 
           {/* Connector — desktop only */}
           <div className="relative self-stretch max-[960px]:hidden" aria-hidden="true">
@@ -52,7 +58,10 @@ export function LandingDoes() {
           </div>
 
           {/* Resultado / convergence card */}
-          <div className="relative self-center rounded-md border-[1.5px] border-[var(--cinnamon-500)] bg-[var(--surface-raised)] px-[30px] pt-[30px] pb-7 shadow-2 max-[960px]:mt-4 max-[960px]:before:absolute max-[960px]:before:-top-4 max-[960px]:before:left-10 max-[960px]:before:h-4 max-[960px]:before:w-[1.5px] max-[960px]:before:bg-[var(--cinnamon-500)] max-[960px]:before:content-['']">
+          <Reveal
+            delay={0.12}
+            className="relative self-center rounded-md border-[1.5px] border-[var(--cinnamon-500)] bg-[var(--surface-raised)] px-[30px] pt-[30px] pb-7 shadow-2 max-[960px]:mt-4 max-[960px]:before:absolute max-[960px]:before:-top-4 max-[960px]:before:left-10 max-[960px]:before:h-4 max-[960px]:before:w-[1.5px] max-[960px]:before:bg-[var(--cinnamon-500)] max-[960px]:before:content-['']"
+          >
             <Image
               src="/assets/stamp-seal.svg"
               alt=""
@@ -72,7 +81,7 @@ export function LandingDoes() {
               Organização redonda mais plateia ligada dá casa cheia — e aquele evento que todo mundo já quer
               repetir no mês que vem.
             </p>
-          </div>
+          </Reveal>
         </div>
       </div>
     </section>
