@@ -36,6 +36,16 @@
  * tokens with no further per-primitive wiring.
  */
 
+/*
+ * tw-animate-css — Tailwind v4 successor to tailwindcss-animate. Provides the
+ * enter/leave keyframe utilities the shadcn primitives rely on (animate-in/out,
+ * fade-in/out-*, zoom-in/out-*, slide-in/out-from-*). Imported here in the SHARED
+ * layer (this file is already imported by both apps AFTER `@import "tailwindcss"`,
+ * which tw-animate-css requires) so every shadcn Dialog/AlertDialog/Sheet in BOTH
+ * apps animates instead of popping. Without it those utility classes are dead.
+ */
+@import "tw-animate-css";
+
 @layer base {
   :root {
     /* Core surfaces / ink */
