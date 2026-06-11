@@ -1,0 +1,108 @@
+/*
+ * @crivelo/ui — shadcn ↔ Crivelo token alias layer (shared, Tailwind v4).
+ *
+ * shadcn/ui primitives are authored against a fixed vocabulary of semantic CSS
+ * variables (--background, --foreground, --primary, --ring, --border, …) and the
+ * matching Tailwind v4 utility tokens (--color-background → bg-background, etc.).
+ * This monorepo already ships its OWN semantic tokens in @crivelo/tokens
+ * (foundation.css): --bg / --fg / --brand / --border / --focus-ring / … , each
+ * app overriding the Tier-2 accent (cinnamon in crema-arena, teal in crivelo-web).
+ *
+ * This file is the single bridge between the two systems. It lives in the SHARED
+ * package (consumed by both apps) and does TWO things:
+ *
+ *   1. Declares shadcn's semantic variables as ALIASES of the Crivelo semantic
+ *      tokens (the :root block below). Because it maps to the *semantic* layer
+ *      (var(--brand), var(--focus-ring), …) and NOT to a hard-coded accent, each
+ *      app's accent override of --brand / --focus-ring flows straight through:
+ *      the SAME shadcn Button renders cinnamon in arena and teal in crivelo with
+ *      zero per-app shadcn config.
+ *   2. Exposes them to Tailwind v4 via `@theme inline { --color-*: var(--*) }`
+ *      (the v4 shadcn pattern) so bg-primary / text-foreground / border / ring-ring
+ *      utilities generate, resolving at runtime through the alias to the live token.
+ *
+ * Import order (in each app's globals.css): AFTER the foundation AND the app accent
+ * layer, so --brand/--focus-ring are already overridden to the app accent by the
+ * time this file aliases them. It only ADDS shadcn's vocabulary — it overrides none
+ * of the foundation/app variables, so existing utilities are untouched.
+ */
+
+@layer base {
+  :root {
+    /* Core surfaces / ink */
+    --background: var(--bg);
+    --foreground: var(--fg);
+
+    /* Card / popover surfaces → raised surface + base ink */
+    --card: var(--surface-raised);
+    --card-foreground: var(--fg);
+    --popover: var(--surface-raised);
+    --popover-foreground: var(--fg);
+
+    /* Primary action = the app accent (cinnamon / teal), text = inverse ink */
+    --primary: var(--brand);
+    --primary-foreground: var(--fg-inverse);
+
+    /* Secondary = sunken neutral surface + base ink */
+    --secondary: var(--bg-2);
+    --secondary-foreground: var(--fg);
+
+    /* Muted = sunken surface + muted ink */
+    --muted: var(--bg-2);
+    --muted-foreground: var(--fg-muted);
+
+    /* Accent (hover/active neutral fills) = the next neutral step + base ink */
+    --accent: var(--bg-3);
+    --accent-foreground: var(--fg);
+
+    /* Destructive = clay danger */
+    --destructive: var(--danger);
+    --destructive-foreground: var(--fg-inverse);
+
+    /* Inputs / focus ring. NOTE: --border is NOT redeclared — the foundation already
+       defines it and a `--border: var(--border)` self-reference is invalid CSS. The
+       border UTILITY is wired below via --color-border: var(--border). */
+    --input: var(--border);
+    --ring: var(--focus-ring);
+
+    /* Radius — some shadcn primitives read the bare --radius variable. Alias it to
+       the house md radius. The Tailwind radius UTILITIES (rounded-sm/md/lg) are
+       already emitted by @crivelo/tokens/theme.css from the house ramp, so they are
+       intentionally NOT redefined here (that would shift existing rounded-* values). */
+    --radius: var(--radius-md);
+  }
+}
+
+/*
+ * Tailwind v4 mapping: expose the shadcn semantic variables as utility color tokens.
+ * `inline` makes Tailwind resolve `--color-*` to the var() reference at build time
+ * while the var() itself still resolves at runtime — so app accent overrides apply.
+ */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}

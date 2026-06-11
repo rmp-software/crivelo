@@ -24,6 +24,15 @@
 @import "@crivelo/tokens/styles/theme.css";
 @import "./crivelo-theme.css";
 
+/* shadcn ↔ Crivelo alias layer (shared): maps shadcn's semantic vars + --color-*
+ * utilities onto the house/accent tokens. Imported LAST so --brand/--focus-ring are
+ * already overridden to the teal "water" accent by the time it aliases them — so the
+ * shared shadcn primitives inherit teal with zero per-app shadcn config. It only ADDS
+ * shadcn's vocabulary; it overrides no foundation/accent variable. (When crivelo-web
+ * adopts the shared @crivelo/ui primitives in RMP-206, add the `@source` for the ui
+ * package below so their utility classes survive the v4 content purge.) */
+@import "@crivelo/ui/styles/shadcn-theme.css";
+
 /* Pulsing "Brewing" status dot in the COA BrewTimer (RMP-192). Kept here rather
  * than in component markup — <style> in <body> is invalid HTML5 and duplicates
  * across remounts. Grandfathered: pre-existing motion, out of scope for the v4

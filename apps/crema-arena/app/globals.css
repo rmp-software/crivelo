@@ -21,4 +21,11 @@
 @import "@crivelo/tokens/styles/theme.css";
 @import "./arena-theme.css";
 
+/* shadcn ↔ Crivelo alias layer (shared): maps shadcn's semantic vars + --color-*
+ * utilities onto the house/accent tokens. Imported LAST so --brand/--focus-ring are
+ * already overridden to the Arena accent (cinnamon) by the time it aliases them — so
+ * the shared shadcn primitives inherit cinnamon with zero per-app shadcn config. It
+ * only ADDS shadcn's vocabulary; it overrides no foundation/accent variable. */
+@import "@crivelo/ui/styles/shadcn-theme.css";
+
 @source "../../../packages/ui/src/**/*.{js,ts,jsx,tsx}";
