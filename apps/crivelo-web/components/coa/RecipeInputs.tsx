@@ -9,10 +9,11 @@
  * row at every breakpoint as an at-a-glance readout; on wide layouts it is also
  * surfaced big in the "Your recipe" panel (intentional redundancy).
  *
- * Layout: Coffee · Ratio · Water always sit on ONE line, spread edge-to-edge —
- * the row never wraps. On mobile the controls render compact (smaller buttons /
- * text) so the three fit comfortably with slack to spare even on narrow screens
- * and with wider fallback fonts.
+ * Layout: Coffee · Ratio · Water sit on one line, spread edge-to-edge. On mobile
+ * the controls render compact and the two steppers are BONDED into one group so
+ * they can never split apart — if the effective width is too small (e.g. the page
+ * is zoomed), only the Water readout drops cleanly to a second line rather than
+ * being clipped off the right edge. The row never overflows/clips.
  */
 import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
@@ -115,53 +116,79 @@ export function RecipeInputs({
   const ratioLabel = t("ratio");
   const compact = !wide;
 
+  const coffeeStep = (
+    <MiniStep
+      label={coffee}
+      value={`${dose} ${tCalc("grams")}`}
+      decLabel={t("decrease", { label: coffee })}
+      incLabel={t("increase", { label: coffee })}
+      dec={() => setDose(clamp(dose - 1, 8, 60))}
+      inc={() => setDose(clamp(dose + 1, 8, 60))}
+      compact={compact}
+    />
+  );
+
+  const ratioStep = (
+    <MiniStep
+      label={ratioLabel}
+      value={`1:${ratio}`}
+      decLabel={t("decrease", { label: ratioLabel })}
+      incLabel={t("increase", { label: ratioLabel })}
+      dec={() => setRatio(clamp(ratio - 1, 12, 18))}
+      inc={() => setRatio(clamp(ratio + 1, 12, 18))}
+      compact={compact}
+    />
+  );
+
+  const water = (
+    <div style={{ textAlign: "center" }}>
+      <div style={{ ...CAP, marginBottom: 6 }}>{t("water")}</div>
+      <div
+        style={{
+          ...MONO,
+          fontSize: compact ? 17 : 19,
+          fontWeight: 600,
+          color: "var(--accent-ink)",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {waterG} {tCalc("grams")}
+      </div>
+    </div>
+  );
+
   return (
     <div
       style={{
         display: "flex",
         alignItems: "center",
-        // One line, spread edge-to-edge. Never wraps — on mobile the compact
-        // controls leave plenty of slack so all three stay on a single row.
+        // One line at every supported width, spread edge-to-edge. flexWrap is the
+        // release valve: if the effective width is too small (e.g. the page is
+        // zoomed in), Water drops to a second line instead of being clipped — the
+        // row never overflows. The steppers are bonded below so they never split.
+        flexWrap: "wrap",
         justifyContent: "space-between",
-        flexWrap: "nowrap",
-        gap: 10,
+        columnGap: 12,
+        rowGap: 14,
         padding: "16px 4px",
         borderTop: "1px solid var(--border)",
         borderBottom: "1px solid var(--border)",
       }}
     >
-      <MiniStep
-        label={coffee}
-        value={`${dose} ${tCalc("grams")}`}
-        decLabel={t("decrease", { label: coffee })}
-        incLabel={t("increase", { label: coffee })}
-        dec={() => setDose(clamp(dose - 1, 8, 60))}
-        inc={() => setDose(clamp(dose + 1, 8, 60))}
-        compact={compact}
-      />
-      <MiniStep
-        label={ratioLabel}
-        value={`1:${ratio}`}
-        decLabel={t("decrease", { label: ratioLabel })}
-        incLabel={t("increase", { label: ratioLabel })}
-        dec={() => setRatio(clamp(ratio - 1, 12, 18))}
-        inc={() => setRatio(clamp(ratio + 1, 12, 18))}
-        compact={compact}
-      />
-      <div style={{ textAlign: "center" }}>
-        <div style={{ ...CAP, marginBottom: 6 }}>{t("water")}</div>
-        <div
-          style={{
-            ...MONO,
-            fontSize: compact ? 17 : 19,
-            fontWeight: 600,
-            color: "var(--accent-ink)",
-            whiteSpace: "nowrap",
-          }}
-        >
-          {waterG} {tCalc("grams")}
-        </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: compact ? 18 : 28,
+          // The two steppers stay together as one unit; they never split across
+          // lines. Only Water may wrap.
+          flex: "0 1 auto",
+        }}
+      >
+        {coffeeStep}
+        {ratioStep}
       </div>
+      {water}
     </div>
   );
 }
