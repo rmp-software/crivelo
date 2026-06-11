@@ -14,6 +14,7 @@
   :root {
     /* --- Tier-2 accent: cinnamon --- */
     --cinnamon-50:  #FBEEE5;
+    --cinnamon-300: #E1885A; /* landing ramp step (RMP-197) */
     --cinnamon-500: #C45A2C;
     --cinnamon-600: #A8471E;
     --cinnamon-700: #823516;
@@ -30,6 +31,7 @@
     --marigold-100: #FAE7B6;
     --marigold-300: #F0C674; /* was undefined pre-RMP-145; filled to match the ramp */
     --marigold-500: #E6A636;
+    --marigold-700: #B07A1E; /* landing ramp step (RMP-197) */
     --gold:         #E6A636;
     --gold-soft:    #FAE7B6;
     --warning:      #E6A636;
