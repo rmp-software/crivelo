@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import PageHeader from '@crivelo/ui/PageHeader';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
+import Button from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
 import Modal from '@crivelo/ui/Modal';
 import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
 import EmptyState from '@crivelo/ui/EmptyState';

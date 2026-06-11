@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Button from '@crivelo/ui/Button';
+import Button from './ui/Button';
 import Modal from '@crivelo/ui/Modal';
 import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
 import WildcardModal from './WildcardModal';

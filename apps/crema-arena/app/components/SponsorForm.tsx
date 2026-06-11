@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useRef, FormEvent, ChangeEvent } from 'react';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
+import Button from './ui/Button';
+import Input from './ui/Input';
 import { Upload, X } from 'lucide-react';
 
 export interface SponsorFormData {

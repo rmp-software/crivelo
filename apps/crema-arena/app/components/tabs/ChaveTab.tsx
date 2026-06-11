@@ -1,7 +1,7 @@
 'use client';
 
 import { Trophy, Circle } from 'lucide-react';
-import Badge from '@crivelo/ui/Badge';
+import Badge from '../ui/Badge';
 
 interface Competitor {
   id: string;

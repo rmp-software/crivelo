@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Button from '@crivelo/ui/Button';
-import Badge from '@crivelo/ui/Badge';
+import Button from '@/app/components/ui/Button';
+import Badge from '@/app/components/ui/Badge';
 import Modal from '@crivelo/ui/Modal';
 import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
 import CompetitorPoolList from '@/app/components/CompetitorPoolList';
