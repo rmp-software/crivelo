@@ -191,9 +191,12 @@ export function TastePad({
         aria-label={t("padAria")}
         style={{
           position: "relative",
-          width: dims.w,
+          // Fluid: the pad spans the full content/column width at every
+          // breakpoint (the dot field stretches to fill via SieveGrid). Height
+          // stays fixed per breakpoint so the card keeps a sensible aspect.
+          width: "100%",
+          maxWidth: center ? dims.w : undefined,
           height: dims.h,
-          maxWidth: "100%",
           margin: center ? "0 auto" : 0,
           borderRadius: "var(--radius-md)",
           background: "var(--surface-raised)",
@@ -206,15 +209,7 @@ export function TastePad({
           overflow: "hidden",
         }}
       >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <div style={{ position: "absolute", inset: 12 }}>
           <SieveGrid
             cols={9}
             rows={7}
@@ -223,6 +218,7 @@ export function TastePad({
             pad={6}
             puck={{ x: pad.x, y: pad.y }}
             accent="var(--accent-dot)"
+            stretch
           />
         </div>
         <span style={{ ...edge, top: 10, left: "50%", transform: "translateX(-50%)" }}>
@@ -242,8 +238,10 @@ export function TastePad({
         <div
           style={{
             position: "absolute",
-            left: 8 + pad.x * (dims.w - 16),
-            top: 8 + pad.y * (dims.h - 16),
+            // Percentage-based so the puck tracks the fluid pad width and stays
+            // aligned with the stretched dot field (inset 12px, matching the grid).
+            left: `calc(12px + ${pad.x} * (100% - 24px))`,
+            top: `calc(12px + ${pad.y} * (100% - 24px))`,
             transform: "translate(-50%,-50%)",
             width: 30,
             height: 30,

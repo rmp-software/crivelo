@@ -234,13 +234,6 @@
     transition-duration: var(--dur-base);
     transition-timing-function: var(--ease-standard);
   }
-
-  @media (pointer: coarse) {
-    button, a, input[type="checkbox"], input[type="radio"] {
-      min-height: 48px;
-      min-width: 48px;
-    }
-  }
 }
 
 @layer utilities {

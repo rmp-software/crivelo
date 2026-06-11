@@ -27,6 +27,12 @@ export interface SieveGridProps {
   puck?: { x: number; y: number } | null;
   /** Outer padding in px. */
   pad?: number;
+  /**
+   * Stretch the grid to fill its container instead of rendering at its intrinsic
+   * pixel size. Used by the (fluid-width) taste pad so the dot field spans the
+   * full card at every breakpoint; the viewBox still drives cell spacing.
+   */
+  stretch?: boolean;
 }
 
 interface Cell {
@@ -46,6 +52,7 @@ export function SieveGrid({
   fill = null,
   puck = null,
   pad = 10,
+  stretch = false,
 }: SieveGridProps) {
   const w = pad * 2 + (cols - 1) * gap;
   const h = pad * 2 + (rows - 1) * gap;
@@ -71,9 +78,10 @@ export function SieveGrid({
   }
   return (
     <svg
-      width={w}
-      height={h}
+      width={stretch ? "100%" : w}
+      height={stretch ? "100%" : h}
       viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio={stretch ? "none" : "xMidYMid meet"}
       style={{ display: "block" }}
       aria-hidden="true"
     >
