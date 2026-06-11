@@ -40,3 +40,9 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
 (valid JSON, `display: "standalone"`), `/pwa-icon/{192,512,512-maskable}` (200 `image/png`,
 right pixel size), `/pwa-icon/foo` → 404, and `<head>` has the manifest link + `theme-color`.
 Open a tile PNG to confirm the glyph actually rendered (Satori can silently drop unsupported SVG).
+
+**Don't trust a protected Vercel preview for icon verification.** Behind deployment
+protection the manifest + icons return `401` to credential-less fetches; the page nav
+carries your session so the app *name* shows, but Chrome fetches manifest icons without
+credentials → blank icon. This is environmental (prod is unprotected), NOT a code bug.
+Verify locally (`next start`) or on the preview via a `get_access_to_vercel_url` bypass cookie.
