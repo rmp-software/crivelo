@@ -1,0 +1,39 @@
+/*
+ * crivelo-web — Tailwind v4 @theme layer (Tier-2 accent: teal "water").
+ *
+ * v4 successor to the (empty) `theme.extend.colors` block that used to live in
+ * tailwind.config.ts. crivelo-web's teal accent has always been consumed via the
+ * raw `var(--brand)` / `var(--accent-*)` CSS variables (declared in
+ * crivelo-tokens.css), NOT via generated Tailwind color utilities — the v3 config
+ * had an empty `theme.extend`, so it produced ZERO custom utilities. This file
+ * promotes those teal variables into Tailwind utility tokens so `bg-brand`,
+ * `text-accent-ink`, `bg-brand-soft`, … are available going forward, mirroring
+ * how arena-theme.css promotes Arena's cinnamon palette.
+ *
+ * The raw `--brand` / `--accent-*` variables continue to be declared (and
+ * light/dark-overridden) in crivelo-tokens.css; the color tokens here reference
+ * them so an override there flows through to any generated utilities.
+ *
+ * Color namespace is `--color-*`; it does not collide with the raw `--brand` /
+ * `--accent-*` variables in crivelo-tokens.css.
+ */
+
+@theme {
+  /* ---------- Tier-2 accent: teal "water" ---------- */
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-press: var(--brand-press);
+  --color-brand-soft: var(--brand-soft);
+
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-2: var(--accent-soft-2);
+  --color-accent-glow: var(--accent-glow);
+  --color-accent-dot: var(--accent-dot);
+
+  /* Intentionally NOT promoted to utilities: --accent-halo, --focus-ring and
+   * --pour-strength-rgb are raw-var-only — consumed via `var(--…)` in domain
+   * component styles (TastePad, PourSchedule), never as `bg-*`/`ring-*` classes.
+   * They keep resolving from crivelo-tokens.css; mapping them here would emit
+   * dead utility tokens nothing references. */
+}
