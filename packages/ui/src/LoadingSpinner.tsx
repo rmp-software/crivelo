@@ -9,6 +9,12 @@ interface LoadingSpinnerProps {
  * Concentric crema rings loader. Three rings rotating at 1.4s / 2.1s
  * (reversed) / 3.2s in cinnamon / marigold / espresso — the brand motion
  * signature.
+ *
+ * @deprecated No 1:1 shadcn primitive. In the consistency migration (RMP-205/206)
+ * compose from shadcn primitives instead — for a plain spinner use the lucide
+ * `Loader2` icon with `animate-spin`; the brand three-ring loader, if still wanted,
+ * should become a small app-local composition rather than a shared hand-rolled
+ * primitive. Grandfathered for existing call sites until then.
  */
 export default function LoadingSpinner({
   size = 'md',

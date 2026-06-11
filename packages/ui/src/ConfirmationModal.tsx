@@ -15,6 +15,11 @@ interface ConfirmationModalProps {
   isLoading?: boolean;
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/alert-dialog` (AlertDialog +
+ * AlertDialogContent/AlertDialogAction/AlertDialogCancel) instead. Grandfathered for
+ * existing call sites; removed after the shared-primitives migration (RMP-205/206).
+ */
 export default function ConfirmationModal({
   isOpen,
   onClose,

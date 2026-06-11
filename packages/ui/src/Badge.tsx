@@ -7,6 +7,13 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   size?: 'sm' | 'md';
 }
 
+/**
+ * @deprecated Use the shadcn primitive `@crivelo/ui/ui/badge` instead.
+ * Grandfathered for existing call sites; removed after the shared-primitives
+ * migration (RMP-205/206). Variant mapping: default→outline/secondary,
+ * danger→destructive; success/warning have no 1:1 shadcn variant — pass the house
+ * live/gold token classes via `className` when migrating.
+ */
 const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
   ({ variant = 'default', size = 'md', className = '', children, ...props }, ref) => {
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-[var(--radius-full)] whitespace-nowrap';
