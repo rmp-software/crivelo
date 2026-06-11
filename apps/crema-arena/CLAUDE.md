@@ -61,9 +61,20 @@ Sponsors are a **global pool like competitors** (`Sponsor` model: name / logo / 
 
 ## Design system contract
 
-The Crema Arena design system lives in `app/globals.css` as CSS variables + `tailwind.config.ts` aliases that re-export them as Tailwind colors. Fonts are loaded via `next/font/local` from `public/fonts/` in `app/layout.tsx`; the four exposed variables (`--font-display`, `--font-serif`, `--font-body`, `--font-mono`) are the only way to reference them. Don't reintroduce `@font-face` rules or `next/font/google` for these families.
+The Crema Arena design system lives in `@crivelo/tokens` (the neutral foundation + its `@theme` source) plus `app/arena-tokens.css` / `app/arena-theme.css` (the Arena cinnamon accent + retained palette), consumed via Tailwind v4 `@theme`. There is no `tailwind.config.ts`: `app/globals.css` is an `@import` chain — `tailwindcss` → foundation → `arena-tokens.css` → the `@theme` token sources (`theme.css`, `arena-theme.css`) — that turns the raw `--*` variables into Tailwind utility tokens (`bg-espresso-800`, `bg-cinnamon-500`, …). Fonts are loaded via `next/font/local` from `public/fonts/` in `app/layout.tsx`; the four exposed variables (`--font-display`, `--font-serif`, `--font-body`, `--font-mono`) are the only way to reference them. Don't reintroduce `@font-face` rules or `next/font/google` for these families.
 
 The full spec — including the canonical pt-BR copy, color tokens, typography rules, badge variants, and the per-surface layout contracts — is committed at `app_spec.txt`. Treat it as the source of truth when something seems wrong.
+
+### Styling rules (Tailwind v4 · shadcn · motion)
+
+Source of truth is `app_spec.txt` (`<styling_conventions>` + the grep'd `<compliance_rules>`, enforced by `rmp:spec-compliance-reviewer`). The short version for new code:
+
+- **Build-vs-buy: buy commodity UI, build the domain.** Don't re-implement a solved problem (modal / drawer / toast / dialog / focus-trap / animation) — reach for an established library. Domain logic (bracket, duel, wildcard, leaderboard) stays bespoke; that's the product.
+- **Utility-first.** Tokens are the utility vocabulary via Tailwind v4 `@theme`. Off-scale one-offs use arbitrary values (`min-h-[44px]`); raw ramp steps as `bg-[var(--espresso-800)]`.
+- **No raw hex, no `var(--…)` in `style`.** Hex literals only belong in the token CSS source (`arena-tokens.css` / `@crivelo/tokens`), never in app/component code.
+- **`cn()`** (clsx + tailwind-merge) for conditional/variant classes via className lookups — never an inline `style` ternary. Inline `style` is a last resort (computed dimensions, SVG geometry, state-driven transforms).
+- **shadcn from `@crivelo/ui`** (`@crivelo/ui/ui/*`) for new commodity UI — don't hand-roll a primitive. The old hand-rolled `@crivelo/ui` primitives are `@deprecated`.
+- **Animation via `motion`** (`motion/react`) + `prefers-reduced-motion`; no new manual `setInterval` / `@keyframes`.
 
 ### Design system bundle (`.design-system/`)
 

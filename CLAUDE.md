@@ -28,10 +28,21 @@ rewrite it. (App-specific UI copy rules live in `apps/crema-arena/CLAUDE.md` / `
   `tailwind-preset.js` + `next/font` module. No product accent.
 - Each app brings its accent + extra palette app-local. Crema Arena:
   `apps/crema-arena/app/arena-tokens.css` (cinnamon Tier-2 + gold/marigold/live).
-- Tailwind: app `content` must include `../../packages/ui/src/**` (or primitive
-  classes get purged). Foundation CSS is pulled via **postcss-import**; app
-  `@layer base` overrides must be imported AFTER the foundation to win (Tailwind
-  hoists `@layer base` to the `@tailwind base` position).
+- Tailwind v4: no `tailwind.config.ts`. The CSS entry is `@import "tailwindcss"`
+  with `@tailwindcss/postcss`; the app source-scan adds the shared primitives via
+  `@source "../../packages/ui/src/**"` in that entry (or their classes get purged).
+  Foundation + token CSS are pulled via `@import` in the entry, and app `@layer base`
+  overrides must come AFTER the foundation import to win.
+
+## Styling / build-vs-buy
+The monorepo styles with **Tailwind v4 `@theme`** (tokens are the utility vocabulary) +
+**shadcn primitives in `@crivelo/ui`** + **`cn()`** (clsx + tailwind-merge) + **`motion`**
+for animation. The principle is **buy commodity UI (modal/drawer/toast/dialog/focus/
+animation), build the domain.** New code follows the styling guide — utility-first, no raw
+hex / no `var(--…)` in `style`, shadcn over hand-rolled (the old `@crivelo/ui` primitives are
+`@deprecated`), motion + `prefers-reduced-motion`. The guide is written and enforced per app
+via `app_spec.txt` (`<styling_conventions>` + grep'd `<compliance_rules>`); the app CLAUDE.md
+has the concise version.
 
 ## Claude Design handoffs
 - **Never commit a Claude Design output** (the exported bundle: `project/`, `_ds/`
