@@ -5,7 +5,7 @@ import Button from './ui/Button';
 import Modal from './ui/Modal';
 import ConfirmationModal from './ui/ConfirmationModal';
 import SponsorPicker, { initials } from './SponsorPicker';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from './ui/useToast';
 import { Handshake, Plus, Trash2, GripVertical } from 'lucide-react';
 
 interface SponsorRef {

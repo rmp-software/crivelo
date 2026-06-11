@@ -9,7 +9,7 @@ import Input from '@/app/components/ui/Input';
 import Badge from '@/app/components/ui/Badge';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { Spinner } from '@crivelo/ui/spinner';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 interface Organizer {

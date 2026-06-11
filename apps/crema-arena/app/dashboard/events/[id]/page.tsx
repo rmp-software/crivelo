@@ -15,7 +15,7 @@ import NowPouring from '@/app/components/NowPouring';
 import BracketView from '@/app/components/BracketView';
 import RunningEventPanel from '@/app/components/RunningEventPanel';
 import { Spinner } from '@crivelo/ui/spinner';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from '../../../components/ui/useToast';
 import { Calendar, MapPin, Users, Edit2, UserPlus, Trash2, FileText, Play, Copy, Check, Download, Link2 } from 'lucide-react';
 
 type PoolCompetitor = { id: string; name: string; coffeeShop: string; photoUrl: string };

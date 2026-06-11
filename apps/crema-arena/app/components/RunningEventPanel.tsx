@@ -7,7 +7,7 @@ import Badge from './ui/Badge';
 import Button from './ui/Button';
 import Modal from './ui/Modal';
 import { CheckCircle, Circle, Play, RotateCcw, SkipForward, Trophy } from 'lucide-react';
-import { useToast } from '@crivelo/ui/deprecated/Toast';
+import { useToast } from './ui/useToast';
 
 interface Competitor {
   id: string;

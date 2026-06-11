@@ -92,7 +92,7 @@ Visual reference for the brand lives at `.design-system/crema-arena-design-syste
 
 ### Feedback UI
 
-Use `useToast()` from `app/components/Toast.tsx` for transient feedback and `ConfirmationModal` for destructive confirmations. **Do not use native `alert()` / `confirm()`** — every occurrence was deliberately removed. The toast container is portal-mounted by `ToastProvider` in the root layout.
+Use `useToast()` from `app/components/ui/useToast` for transient feedback (a thin hook over Sonner — `@crivelo/ui/sonner`'s `toast.*`, mapped to the `showToast(message, variant)` API) and `ConfirmationModal` (`app/components/ui/ConfirmationModal`, over `@crivelo/ui/alert-dialog`) for destructive confirmations. **Do not use native `alert()` / `confirm()`** — every occurrence was deliberately removed. The Sonner `<Toaster />` is mounted app-wide in the root layout.
 
 ## Photo uploads
 
