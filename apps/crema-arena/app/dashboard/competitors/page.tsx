@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { PageHeader } from '@crivelo/ui/page-header';
 import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
-import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { EmptyState } from '@crivelo/ui/empty-state';
 import { Spinner } from '@crivelo/ui/spinner';
 import { useToast } from '@crivelo/ui/deprecated/Toast';

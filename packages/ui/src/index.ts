@@ -8,8 +8,8 @@
  * `@crivelo/ui/spinner` etc.). These have no 1:1 shadcn primitive and are the
  * supported house components.
  *
- * DEPRECATED (legacy hand-rolled): Button / Card / Input / Badge / Modal /
- * ConfirmationModal / Toast are legacy hand-rolled primitives, superseded by
+ * DEPRECATED (legacy hand-rolled): Button / Card / Input / Badge / Toast are
+ * legacy hand-rolled primitives, superseded by
  * the shadcn commodity primitives under `@crivelo/ui/*` (added in RMP-200).
  * They are grandfathered so existing call sites keep working and are removed
  * once the shared-primitives migration (RMP-205/206) lands. Per-export shadcn
@@ -30,11 +30,7 @@ export type { BadgeVariant } from "./deprecated/Badge";
 export { Spinner } from "./ui/spinner";
 /** Canonical empty-state panel (RMP-205). Also available at `@crivelo/ui/empty-state`. */
 export { EmptyState } from "./ui/empty-state";
-/** @deprecated Use `@crivelo/ui/dialog` instead (RMP-205/206). */
-export { default as Modal } from "./deprecated/Modal";
 /** Canonical page header (RMP-205). Also available at `@crivelo/ui/page-header`. */
 export { PageHeader } from "./ui/page-header";
-/** @deprecated Use `@crivelo/ui/alert-dialog` instead (RMP-205/206). */
-export { default as ConfirmationModal } from "./deprecated/ConfirmationModal";
 /** @deprecated Use `@crivelo/ui/sonner` (`Toaster` + `toast()` from `sonner`) instead (RMP-205/206). */
 export { ToastProvider, useToast } from "./deprecated/Toast";
