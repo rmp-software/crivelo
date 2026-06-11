@@ -7,7 +7,7 @@ import { PageHeader } from '@crivelo/ui/page-header';
 import Button from '@/app/components/ui/Button';
 import Input from '@/app/components/ui/Input';
 import Badge from '@/app/components/ui/Badge';
-import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import { Spinner } from '@crivelo/ui/spinner';
 import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';

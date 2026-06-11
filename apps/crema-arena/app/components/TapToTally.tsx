@@ -2,8 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Button from './ui/Button';
-import Modal from '@crivelo/ui/deprecated/Modal';
-import ConfirmationModal from '@crivelo/ui/deprecated/ConfirmationModal';
+import Modal from './ui/Modal';
 import WildcardModal from './WildcardModal';
 import { useToast } from '@crivelo/ui/deprecated/Toast';
 import { Camera, RefreshCw, Trophy, Upload, User } from 'lucide-react';

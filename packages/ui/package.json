@@ -8,8 +8,6 @@
     "./deprecated/Card": "./src/deprecated/Card.tsx",
     "./deprecated/Input": "./src/deprecated/Input.tsx",
     "./deprecated/Badge": "./src/deprecated/Badge.tsx",
-    "./deprecated/Modal": "./src/deprecated/Modal.tsx",
-    "./deprecated/ConfirmationModal": "./src/deprecated/ConfirmationModal.tsx",
     "./deprecated/Toast": "./src/deprecated/Toast.tsx",
     "./lib/utils": "./src/lib/utils.ts",
     "./button": "./src/ui/button.tsx",
