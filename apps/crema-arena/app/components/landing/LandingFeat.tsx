@@ -1,7 +1,9 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { cn } from "@crivelo/ui/lib/utils";
+import { Reveal } from "./Reveal";
 import {
   BracketMock,
   CaptureMock,
@@ -157,7 +159,9 @@ const PANELS: Panel[] = [
 ];
 
 export function LandingFeat() {
+  const reduce = useReducedMotion();
   const [active, setActive] = useState(PANELS[0].id);
+  const activePanel = PANELS.find((p) => p.id === active) ?? PANELS[0];
   const baseId = useId();
   const tabId = (id: string) => `${baseId}-tab-${id}`;
   const panelId = (id: string) => `${baseId}-panel-${id}`;
@@ -193,7 +197,7 @@ export function LandingFeat() {
   return (
     <section className="relative bg-[var(--bg-inverse)] px-7 py-[90px] text-[var(--fg-inverse)] max-[560px]:px-[18px] max-[560px]:py-16">
       <div className="relative z-[1] mx-auto max-w-[1200px]">
-        <div className="mb-[52px] max-w-[760px]">
+        <Reveal className="mb-[52px] max-w-[760px]">
           <div className="mb-[26px] inline-flex items-center gap-[10px] font-mono text-xs font-medium uppercase tracking-[0.14em] text-[var(--crema-300)]">
             <span className="size-[7px] rounded-full bg-[var(--brand)]" aria-hidden="true" />
             Por dentro da plataforma
@@ -202,7 +206,7 @@ export function LandingFeat() {
             Tudo que roda no dia do{" "}
             <em className="font-serif font-normal italic text-[var(--marigold-300)]">TNT</em>
           </h2>
-        </div>
+        </Reveal>
 
         <div className="grid grid-cols-[282px_1fr] items-start gap-[52px] max-[960px]:grid-cols-1 max-[960px]:gap-7">
           {/* Tabs */}
@@ -252,55 +256,88 @@ export function LandingFeat() {
             })}
           </div>
 
-          {/* Panels */}
+          {/* Panels. Every inactive panel keeps an empty `role="tabpanel"` shell in the
+              DOM (aria-labelledby its tab, hidden) so ARIA + keyboard nav (Arrow/Home/End)
+              stay correct. The ACTIVE panel is a SINGLE, stably-keyed host
+              (key="active-tabpanel") that only swaps its `id` / `aria-labelledby` props
+              as the active tab changes — it never remounts, so the AnimatePresence inside
+              it persists. That single persisted AnimatePresence drives one keyed
+              motion.div (key={active}); on a tab change only the child's key changes, so
+              exit + enter actually play (fade/slide) instead of switching instantly.
+              initial={false} keeps the first page load static while later key changes
+              animate enter + exit. Under reduced-motion the swap is instant. */}
           <div className="relative">
-            {PANELS.map((p) => (
+            <div
+              key="active-tabpanel"
+              id={panelId(active)}
+              role="tabpanel"
+              aria-labelledby={tabId(active)}
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={active}
+                  initial={reduce ? false : { opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={reduce ? { opacity: 1 } : { opacity: 0, x: -16 }}
+                  transition={{ duration: reduce ? 0 : 0.3, ease: "easeOut" }}
+                >
+                  <PanelBody panel={activePanel} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            {PANELS.filter((p) => p.id !== active).map((p) => (
               <div
                 key={p.id}
                 id={panelId(p.id)}
                 role="tabpanel"
                 aria-labelledby={tabId(p.id)}
-                hidden={p.id !== active}
-              >
-                <div className="mb-[30px]">
-                  <h3 className="m-0 mb-[6px] font-display text-[26px] font-bold tracking-[-0.02em] text-[var(--crema-50)]">
-                    {p.introTitle}
-                  </h3>
-                  <p className="m-0 font-serif text-[19px] italic text-[var(--crema-200)]">{p.introText}</p>
-                </div>
-
-                {/* Zig: alternating cards on a center spine (desktop); left-spine ladder (mobile) */}
-                <div className="relative flex flex-col gap-[30px] before:absolute before:left-1/2 before:top-[14px] before:bottom-[14px] before:w-[2px] before:-translate-x-1/2 before:bg-gradient-to-b before:from-[var(--cinnamon-500)] before:to-[var(--cinnamon-300)] before:content-[''] max-[960px]:gap-4 max-[960px]:pl-[38px] max-[960px]:before:left-[11px] max-[960px]:before:top-[22px] max-[960px]:before:bottom-[22px] max-[960px]:before:translate-x-0">
-                  {p.cards.map((c, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        "relative z-[1] w-[66%] rounded-md border border-[var(--crema-50)]/12 bg-[var(--espresso-800)] px-6 py-[22px] shadow-2",
-                        c.side === "left" ? "self-start" : "self-end",
-                        // mobile: full-width ladder rung with node + connector
-                        "max-[960px]:w-full max-[960px]:self-stretch",
-                        "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-[var(--cinnamon-500)] max-[960px]:before:bg-[var(--espresso-900)] max-[960px]:before:shadow-[0_0_0_4px_var(--bg-inverse)] max-[960px]:before:content-['']",
-                        "max-[960px]:after:absolute max-[960px]:after:-left-[17px] max-[960px]:after:top-[29px] max-[960px]:after:h-[2px] max-[960px]:after:w-[17px] max-[960px]:after:bg-[var(--cinnamon-500)] max-[960px]:after:content-['']",
-                      )}
-                    >
-                      <span className="mb-[10px] block font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--cinnamon-300)]">
-                        {c.kicker}
-                      </span>
-                      <h4 className="m-0 mb-2 font-display text-[20px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--crema-50)]">
-                        {c.title}
-                      </h4>
-                      {c.mock ? <div aria-hidden="true">{c.mock}</div> : null}
-                      <p className="m-0 mt-2 font-body text-[14.5px] leading-[1.55] text-[var(--crema-300)]">
-                        {c.body}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+                hidden
+              />
             ))}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function PanelBody({ panel: p }: { panel: Panel }) {
+  return (
+    <>
+      <div className="mb-[30px]">
+        <h3 className="m-0 mb-[6px] font-display text-[26px] font-bold tracking-[-0.02em] text-[var(--crema-50)]">
+          {p.introTitle}
+        </h3>
+        <p className="m-0 font-serif text-[19px] italic text-[var(--crema-200)]">{p.introText}</p>
+      </div>
+
+      {/* Zig: alternating cards on a center spine (desktop); left-spine ladder (mobile) */}
+      <div className="relative flex flex-col gap-[30px] before:absolute before:left-1/2 before:top-[14px] before:bottom-[14px] before:w-[2px] before:-translate-x-1/2 before:bg-gradient-to-b before:from-[var(--cinnamon-500)] before:to-[var(--cinnamon-300)] before:content-[''] max-[960px]:gap-4 max-[960px]:pl-[38px] max-[960px]:before:left-[11px] max-[960px]:before:top-[22px] max-[960px]:before:bottom-[22px] max-[960px]:before:translate-x-0">
+        {p.cards.map((c, i) => (
+          <div
+            key={i}
+            className={cn(
+              "relative z-[1] w-[66%] rounded-md border border-[var(--crema-50)]/12 bg-[var(--espresso-800)] px-6 py-[22px] shadow-2",
+              c.side === "left" ? "self-start" : "self-end",
+              // mobile: full-width ladder rung with node + connector
+              "max-[960px]:w-full max-[960px]:self-stretch",
+              "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-[var(--cinnamon-500)] max-[960px]:before:bg-[var(--espresso-900)] max-[960px]:before:shadow-[0_0_0_4px_var(--bg-inverse)] max-[960px]:before:content-['']",
+              "max-[960px]:after:absolute max-[960px]:after:-left-[17px] max-[960px]:after:top-[29px] max-[960px]:after:h-[2px] max-[960px]:after:w-[17px] max-[960px]:after:bg-[var(--cinnamon-500)] max-[960px]:after:content-['']",
+            )}
+          >
+            <span className="mb-[10px] block font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--cinnamon-300)]">
+              {c.kicker}
+            </span>
+            <h4 className="m-0 mb-2 font-display text-[20px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--crema-50)]">
+              {c.title}
+            </h4>
+            {c.mock ? <div aria-hidden="true">{c.mock}</div> : null}
+            <p className="m-0 mt-2 font-body text-[14.5px] leading-[1.55] text-[var(--crema-300)]">
+              {c.body}
+            </p>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
