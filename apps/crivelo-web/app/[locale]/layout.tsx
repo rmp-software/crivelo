@@ -7,7 +7,7 @@ import { fontVariables } from "@crivelo/tokens/fonts";
 import { pwaMetadata, pwaViewport } from "@crivelo/pwa";
 import { Shell, NO_FOUC_SCRIPT } from "../../components/shell";
 import { routing } from "../../i18n/routing";
-import { coaPwa } from "../pwa.config";
+import { criveloPwa } from "../pwa.config";
 import "../globals.css";
 
 // All routes live under [locale], so this IS the App Router root layout: it
@@ -31,12 +31,12 @@ export async function generateMetadata({
     description: t("description"),
     // PWA: manifest link + applicationName + iOS web-app meta (RMP / add-to-home-screen).
     manifest: "/manifest.webmanifest",
-    ...pwaMetadata(coaPwa),
+    ...pwaMetadata(criveloPwa),
   };
 }
 
 // PWA theme colour + mobile viewport defaults (RMP / add-to-home-screen).
-export const viewport: Viewport = pwaViewport(coaPwa);
+export const viewport: Viewport = pwaViewport(criveloPwa);
 
 export default async function LocaleLayout({
   children,

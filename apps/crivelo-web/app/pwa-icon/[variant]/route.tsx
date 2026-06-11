@@ -1,5 +1,5 @@
 import { renderIcon } from "@crivelo/pwa";
-import { coaPwa } from "../../pwa.config";
+import { criveloPwa } from "../../pwa.config";
 
 // Manifest icon tiles (referenced by app/manifest.ts):
 //   /pwa-icon/192          → rounded 192 tile
@@ -16,11 +16,11 @@ export async function GET(
 
   switch (variant) {
     case "192":
-      return renderIcon(coaPwa, { size: 192, rounded: true });
+      return renderIcon(criveloPwa, { size: 192, rounded: true });
     case "512":
-      return renderIcon(coaPwa, { size: 512, rounded: true });
+      return renderIcon(criveloPwa, { size: 512, rounded: true });
     case "512-maskable":
-      return renderIcon(coaPwa, { size: 512, maskable: true });
+      return renderIcon(criveloPwa, { size: 512, maskable: true });
     default:
       return new Response("Not found", { status: 404 });
   }

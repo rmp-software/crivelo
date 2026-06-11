@@ -18,7 +18,7 @@ feature_branch:
     web-app-manifest construction and on-the-fly icon-tile rendering, so any app
     in the monorepo can wire up installability by supplying only its name,
     colours, and brand glyph; and (2) the first consumer, `apps/crivelo-web`
-    (the Coa hub), wired up with the Coa V60-cone mark.
+    (the Crivelo hub), wired up with the Crivelo Monogram mark (the house sieve-C, not Coa's tool cone).
 
     Modelled directly on the proven setup in `~/dev/molly` (app-local
     `manifest.ts` + `icon.tsx` + `apple-icon.tsx` + `pwa-icon/[variant]` route,
@@ -42,11 +42,11 @@ feature_branch:
       - New package `@crivelo/pwa` (ships raw `.ts`/`.tsx` source, no build step,
         like `@crivelo/tokens`): manifest builder + icon-tile renderer + layout
         metadata/viewport fragment helpers.
-      - crivelo-web wired up as the first consumer using the Coa cone mark
+      - crivelo-web wired up as the first consumer using the Crivelo Monogram (house sieve-C) mark
         (`var(--brand)` teal `#1C6E68` on crema, white glyph on a teal tile).
       - App-local thin files in crivelo-web: `app/manifest.ts`, `app/icon.tsx`,
         `app/apple-icon.tsx`, `app/pwa-icon/[variant]/route.tsx`, and a shared
-        `app/pwa.config.tsx` holding the Coa config + mark.
+        `app/pwa.config.tsx` holding the Crivelo config + Monogram mark.
       - iOS web-app + theme-colour metadata merged into the `[locale]` root layout.
     </in_scope>
     <out_of_scope>
@@ -58,7 +58,7 @@ feature_branch:
         but only crivelo-web is implemented here. Crema Arena already has its own
         static `icon.png`/`apple-icon.png`; migrating it is a separate task.
       - Localised manifest. The manifest is a single file; it uses the default
-        locale (`en`) strings. Product name "Coa" is a proper noun, never
+        locale (`en`) strings. Product name "Crivelo" is a proper noun, never
         translated.
     </out_of_scope>
   </scope>
@@ -70,7 +70,7 @@ feature_branch:
     - `packages/pwa/metadata.ts` — new (`pwaMetadata` / `pwaViewport` fragments)
     - `packages/pwa/index.ts` — new (barrel + shared `PwaConfig` type)
     - `apps/crivelo-web/package.json` — modified (add `@crivelo/pwa: workspace:*`)
-    - `apps/crivelo-web/app/pwa.config.tsx` — new (Coa config object + white cone mark)
+    - `apps/crivelo-web/app/pwa.config.tsx` — new (Crivelo config object + white Monogram mark)
     - `apps/crivelo-web/app/manifest.ts` — new
     - `apps/crivelo-web/app/icon.tsx` — new (32px browser favicon tile)
     - `apps/crivelo-web/app/apple-icon.tsx` — new (180px iOS tile, full-bleed)
@@ -87,7 +87,7 @@ feature_branch:
     import type { ReactElement } from "react";
 
     export interface PwaConfig {
-      name: string;                 // manifest name + applicationName (e.g. "Coa")
+      name: string;                 // manifest name + applicationName (e.g. "Crivelo")
       shortName?: string;           // manifest short_name (defaults to name)
       description: string;          // manifest description (default-locale string)
       lang: string;                 // manifest lang (e.g. "en")
@@ -126,34 +126,35 @@ feature_branch:
   </api_surface>
 
   <ui_copy>
-    Strings live in the manifest (default locale = `en`) and reuse the existing
-    `Meta` namespace values verbatim:
-    - `name` / `short_name`: `Coa` (proper noun — never translated)
-    - `description`: `Tools for people who live coffee.` (matches `Meta.description`, en)
+    Strings live in the manifest (default locale = `en`):
+    - `name` / `short_name`: `Crivelo` — the house brand (this app is the Crivelo
+      hub; Coa is one tool within it). Proper noun, never translated.
+    - `description`: `Tools for people who live coffee.` (matches `Meta.description` / `Shell.tagline`, en)
     - `lang`: `en`
 
-    No new on-page UI. The icon tile is a white Coa V60 cone centred on a teal
-    (`#1C6E68`) square; rounded (radius ≈ 0.29×) for `icon`/192/512, full-bleed
-    for `apple-icon` and `512-maskable`. Splash `background_color` is crema
-    `#FBF6EA`; `theme_color` is teal `#1C6E68`.
+    No new on-page UI. The icon tile is the white Crivelo Monogram (the 5×5
+    sieve whose solid dots spell a "C") centred on a teal (`#1C6E68`) square;
+    rounded (radius ≈ 0.29×) for `icon`/192/512, full-bleed for `apple-icon` and
+    `512-maskable`. Splash `background_color` is crema `#FBF6EA`; `theme_color`
+    is teal `#1C6E68`.
   </ui_copy>
 
   <acceptance_criteria>
     - [ ] Given the monorepo, when I run a build/typecheck from root, then `@crivelo/pwa` resolves as a workspace package and crivelo-web compiles with no type errors.
-    - [ ] Given crivelo-web running, when I GET `/manifest.webmanifest`, then it returns valid JSON with `name: "Coa"`, `display: "standalone"`, `theme_color: "#1C6E68"`, `background_color: "#FBF6EA"`, `lang: "en"`, and three icons (192 any, 512 any, 512 maskable) pointing at `/pwa-icon/*`.
-    - [ ] Given crivelo-web running, when I GET `/pwa-icon/192`, `/pwa-icon/512`, and `/pwa-icon/512-maskable`, then each returns a PNG of the correct pixel size showing the white Coa cone on a teal tile (rounded for 192/512, full-bleed for maskable).
+    - [ ] Given crivelo-web running, when I GET `/manifest.webmanifest`, then it returns valid JSON with `name: "Crivelo"`, `display: "standalone"`, `theme_color: "#1C6E68"`, `background_color: "#FBF6EA"`, `lang: "en"`, and three icons (192 any, 512 any, 512 maskable) pointing at `/pwa-icon/*`.
+    - [ ] Given crivelo-web running, when I GET `/pwa-icon/192`, `/pwa-icon/512`, and `/pwa-icon/512-maskable`, then each returns a PNG of the correct pixel size showing the white Crivelo Monogram on a teal tile (rounded for 192/512, full-bleed for maskable).
     - [ ] Given crivelo-web running, when I GET `/pwa-icon/foo` (unknown variant), then the response is `404`.
-    - [ ] Given crivelo-web running, when I GET `/icon` and `/apple-icon`, then each returns the Coa tile at 32×32 and 180×180 respectively.
-    - [ ] Given the rendered HTML `<head>`, when I inspect it, then it includes `<link rel="manifest">`, `<meta name="theme-color" content="#1C6E68">`, and `<meta name="apple-mobile-web-app-capable" content="yes">` with the app title "Coa".
-    - [ ] Given a phone (or DevTools "Application → Manifest" / Lighthouse PWA installability), when I add crivelo-web to the home screen, then the launcher shows the Coa cone icon and the label "Coa" (not a URL/screenshot).
-    - [ ] Given `@crivelo/pwa`, when a second app supplies its own `PwaConfig` (different name/colour/mark), then `createManifest`/`renderIcon` produce that app's tiles with no crivelo-web-specific values leaking in (no hardcoded Coa strings/colours in the package).
+    - [ ] Given crivelo-web running, when I GET `/icon` and `/apple-icon`, then each returns the Crivelo tile at 32×32 and 180×180 respectively.
+    - [ ] Given the rendered HTML `<head>`, when I inspect it, then it includes `<link rel="manifest">`, `<meta name="theme-color" content="#1C6E68">`, and `<meta name="apple-mobile-web-app-capable" content="yes">` with the app title "Crivelo".
+    - [ ] Given a phone (or DevTools "Application → Manifest" / Lighthouse PWA installability), when I add crivelo-web to the home screen, then the launcher shows the Crivelo Monogram icon and the label "Crivelo" (not a URL/screenshot).
+    - [ ] Given `@crivelo/pwa`, when a second app supplies its own `PwaConfig` (different name/colour/mark), then `createManifest`/`renderIcon` produce that app's tiles with no crivelo-web-specific values leaking in (no hardcoded Crivelo strings/colours in the package).
   </acceptance_criteria>
 
   <risks>
     - Satori (`ImageResponse`) cannot resolve CSS variables or external fonts in
       the glyph — colours must be concrete hex. The `mark` callback takes an
-      explicit `color`; crivelo-web passes a white-stroke cone (not `var(--brand)`).
-      Mitigation: the Coa mark in `pwa.config.tsx` is an inline SVG with literal
+      explicit `color`; crivelo-web passes the white Monogram sieve glyph (not `var(--brand)`).
+      Mitigation: the Crivelo Monogram in `pwa.config.tsx` is an inline SVG with literal
       colours, mirroring Molly's inline-SVG approach.
     - App Router file conventions (`manifest.ts`, `icon.tsx`, `route.tsx`) must
       live in the app's `app/` tree — they can't be exported from a package. The
@@ -161,7 +162,7 @@ feature_branch:
       is intentional, not a limitation to engineer around.
     - The `pwa-icon/[variant]` route should set `runtime = "nodejs"` (as Molly
       does) to keep `ImageResponse` rendering reliable under Next 14.
-    - Manifest is single-locale by design; if Coa later needs a localised
+    - Manifest is single-locale by design; if Crivelo later needs a localised
       description this becomes a follow-up (out of scope here).
   </risks>
 
@@ -169,7 +170,7 @@ feature_branch:
     - Scaffold `@crivelo/pwa` package: `package.json`, `index.ts` + `PwaConfig` type.
     - Implement `createManifest` + `pwaMetadata`/`pwaViewport`.
     - Implement `renderIcon` tile renderer (rounded / maskable / glyph safe-zone).
-    - crivelo-web: add dep, write `app/pwa.config.tsx` with the white Coa cone mark.
+    - crivelo-web: add dep, write `app/pwa.config.tsx` with the white Crivelo Monogram mark.
     - crivelo-web: add `manifest.ts`, `icon.tsx`, `apple-icon.tsx`, `pwa-icon/[variant]/route.tsx`.
     - crivelo-web: merge `pwaMetadata`/`pwaViewport` into `[locale]/layout.tsx`.
     - Verify: manifest JSON, icon endpoints, head tags, Lighthouse/DevTools installability.
