@@ -16,7 +16,7 @@
 import type { ReactElement } from "react";
 
 export interface PwaConfig {
-  /** Manifest `name` + `applicationName` + iOS web-app title (e.g. "Coa"). */
+  /** Manifest `name` + `applicationName` + iOS web-app title (e.g. "Crivelo"). */
   name: string;
   /** Manifest `short_name`. Defaults to `name`. */
   shortName?: string;

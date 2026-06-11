@@ -18,6 +18,11 @@ import type { PwaConfig } from "@crivelo/pwa";
 // The Crivelo house mark: a 5×5 sieve whose solid dots spell a "C". Inlined from
 // components/brand/Monogram.tsx so the glyph carries concrete colours for Satori.
 // Rendered white on the teal tile (solid dots opaque, sieve apertures faint).
+//
+// Note: the full 5×5 grid is centred in the viewBox, but the *solid* "C" sits in
+// columns 0–3 with the faint aperture column on the right — so the bright mark
+// reads slightly left-of-centre. That is the Monogram's intrinsic letterform
+// (the open-right "C"), not a centring bug — don't "fix" it by shifting the grid.
 const SIEVE_GRID = [
   [1, 1, 1, 1, 0],
   [1, 0, 0, 0, 0],

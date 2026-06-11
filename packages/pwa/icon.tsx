@@ -22,7 +22,11 @@ export function renderIcon(cfg: PwaConfig, opts: RenderIconOptions): ImageRespon
   const iconScale = cfg.iconScale ?? 0.54;
   const radiusScale = cfg.radiusScale ?? 0.29;
   const glyphSize = Math.round(size * iconScale);
-  const borderRadius = opts.rounded ? Math.round(size * radiusScale) : 0;
+  // A maskable tile must stay full-bleed (the platform crops it under a circle/
+  // squircle mask), so `maskable` always wins over `rounded` — the corner radius
+  // only applies to plain rounded tiles.
+  const borderRadius =
+    opts.rounded && !opts.maskable ? Math.round(size * radiusScale) : 0;
 
   return new ImageResponse(
     (
