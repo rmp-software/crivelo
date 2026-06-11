@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from './ui/useToast';
 
 interface SeedInputProps {
   entryId: string;

@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import TapToTally from './TapToTally';
-import Badge from '@crivelo/ui/Badge';
-import Button from '@crivelo/ui/Button';
-import Modal from '@crivelo/ui/Modal';
+import Badge from './ui/Badge';
+import Button from './ui/Button';
+import Modal from './ui/Modal';
 import { CheckCircle, Circle, Play, RotateCcw, SkipForward, Trophy } from 'lucide-react';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from './ui/useToast';
 
 interface Competitor {
   id: string;

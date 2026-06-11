@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
+import Button from './ui/Button';
+import Input from './ui/Input';
 import { Search, Check } from 'lucide-react';
 
 interface PoolSponsor {

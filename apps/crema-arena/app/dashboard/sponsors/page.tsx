@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import PageHeader from '@crivelo/ui/PageHeader';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
-import Modal from '@crivelo/ui/Modal';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
-import EmptyState from '@crivelo/ui/EmptyState';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import { PageHeader } from '@crivelo/ui/page-header';
+import Button from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Modal from '../../components/ui/Modal';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { EmptyState } from '@crivelo/ui/empty-state';
+import { Spinner } from '@crivelo/ui/spinner';
 import SponsorForm, { type SponsorFormData } from '@/app/components/SponsorForm';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from '../../components/ui/useToast';
 import { Plus, Search, Edit2, Trash2, Handshake } from 'lucide-react';
 
 interface Sponsor {
@@ -155,7 +155,7 @@ export default function SponsorsPage() {
       {/* Loading State */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <Spinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando patrocinadores...</p>
         </div>
       )}

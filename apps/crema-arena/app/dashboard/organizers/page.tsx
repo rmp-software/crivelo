@@ -3,13 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import PageHeader from '@crivelo/ui/PageHeader';
-import Button from '@crivelo/ui/Button';
-import Input from '@crivelo/ui/Input';
-import Badge from '@crivelo/ui/Badge';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
-import { useToast } from '@crivelo/ui/Toast';
+import { PageHeader } from '@crivelo/ui/page-header';
+import Button from '@/app/components/ui/Button';
+import Input from '@/app/components/ui/Input';
+import Badge from '@/app/components/ui/Badge';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import { Spinner } from '@crivelo/ui/spinner';
+import { useToast } from '../../components/ui/useToast';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 
 interface Organizer {
@@ -139,7 +139,7 @@ export default function OrganizersPage() {
       {/* Loading State */}
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <Spinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando organizadores...</p>
         </div>
       )}

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import PageHeader from '@crivelo/ui/PageHeader';
+import { PageHeader } from '@crivelo/ui/page-header';
 import OrganizerForm, { OrganizerFormData } from '@/app/components/OrganizerForm';
-import LoadingSpinner from '@crivelo/ui/LoadingSpinner';
+import { Spinner } from '@crivelo/ui/spinner';
 
 export default function EditOrganizerPage() {
   const router = useRouter();
@@ -69,7 +69,7 @@ export default function EditOrganizerPage() {
     return (
       <div className="max-w-2xl mx-auto">
         <div className="flex flex-col items-center justify-center py-12">
-          <LoadingSpinner size="lg" />
+          <Spinner size="lg" />
           <p className="mt-4 text-[var(--fg-2)]">Carregando organizador...</p>
         </div>
       </div>

@@ -38,7 +38,7 @@ Do not reintroduce `@font-face` rules or `next/font/google` for these families.
 
 **Spec strings.** All user-facing pt-BR copy lives in `/app_spec.txt` under `<ui_copy_examples>` — `Voto registrado. X de Y votos.`, `[Nome] entra como wildcard.`, `Aguardando próximo duelo...`, etc. Use the exact strings — they're vetted.
 
-**Feedback UI.** Never use native `alert()` / `confirm()`. Use `useToast()` from `app/components/Toast.tsx` for transient feedback and `ConfirmationModal` for destructive confirmations. The toast container is portal-mounted by `ToastProvider` in the root layout.
+**Feedback UI.** Never use native `alert()` / `confirm()`. Use `useToast()` from `app/components/ui/useToast` (a thin hook over Sonner — `@crivelo/ui/sonner`'s `toast.*`, preserving the `showToast(message, variant)` API) for transient feedback and `ConfirmationModal` (`app/components/ui/ConfirmationModal`, over `@crivelo/ui/alert-dialog`) for destructive confirmations. The Sonner `<Toaster />` is mounted app-wide in the root layout.
 
 ## Source of truth — visual reference
 

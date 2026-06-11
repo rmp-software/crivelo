@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { fontVariables } from "@crivelo/tokens/fonts";
 import "./globals.css";
-import { ToastProvider } from "@crivelo/ui/Toast";
+import { Toaster } from "@crivelo/ui/sonner";
 
 // Only emit Vercel Analytics from the production deploy. Vercel sets
 // VERCEL_ENV to 'production' | 'preview' | 'development' automatically; gating
@@ -22,7 +22,8 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={fontVariables}>
-        <ToastProvider>{children}</ToastProvider>
+        {children}
+        <Toaster position="bottom-center" duration={3000} />
         {isProduction && <Analytics />}
       </body>
     </html>

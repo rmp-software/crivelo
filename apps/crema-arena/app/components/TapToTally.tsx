@@ -1,11 +1,10 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Button from '@crivelo/ui/Button';
-import Modal from '@crivelo/ui/Modal';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
+import Button from './ui/Button';
+import Modal from './ui/Modal';
 import WildcardModal from './WildcardModal';
-import { useToast } from '@crivelo/ui/Toast';
+import { useToast } from './ui/useToast';
 import { Camera, RefreshCw, Trophy, Upload, User } from 'lucide-react';
 
 interface Competitor {

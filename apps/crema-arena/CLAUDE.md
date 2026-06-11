@@ -61,9 +61,20 @@ Sponsors are a **global pool like competitors** (`Sponsor` model: name / logo / 
 
 ## Design system contract
 
-The Crema Arena design system lives in `app/globals.css` as CSS variables + `tailwind.config.ts` aliases that re-export them as Tailwind colors. Fonts are loaded via `next/font/local` from `public/fonts/` in `app/layout.tsx`; the four exposed variables (`--font-display`, `--font-serif`, `--font-body`, `--font-mono`) are the only way to reference them. Don't reintroduce `@font-face` rules or `next/font/google` for these families.
+The Crema Arena design system lives in `@crivelo/tokens` (the neutral foundation + its `@theme` source) plus `app/arena-tokens.css` / `app/arena-theme.css` (the Arena cinnamon accent + retained palette), consumed via Tailwind v4 `@theme`. There is no `tailwind.config.ts`: `app/globals.css` is an `@import` chain — `tailwindcss` → foundation → `arena-tokens.css` → the `@theme` token sources (`theme.css`, `arena-theme.css`) — that turns the raw `--*` variables into Tailwind utility tokens (`bg-espresso-800`, `bg-cinnamon-500`, …). Fonts are loaded via `next/font/local` from `public/fonts/` in `app/layout.tsx`; the four exposed variables (`--font-display`, `--font-serif`, `--font-body`, `--font-mono`) are the only way to reference them. Don't reintroduce `@font-face` rules or `next/font/google` for these families.
 
 The full spec — including the canonical pt-BR copy, color tokens, typography rules, badge variants, and the per-surface layout contracts — is committed at `app_spec.txt`. Treat it as the source of truth when something seems wrong.
+
+### Styling rules (Tailwind v4 · shadcn · motion)
+
+Source of truth is `app_spec.txt` (`<styling_conventions>` + the grep'd `<compliance_rules>`, enforced by `rmp:spec-compliance-reviewer`). The short version for new code:
+
+- **Build-vs-buy: buy commodity UI, build the domain.** Don't re-implement a solved problem (modal / drawer / toast / dialog / focus-trap / animation) — reach for an established library. Domain logic (bracket, duel, wildcard, leaderboard) stays bespoke; that's the product.
+- **Utility-first.** Tokens are the utility vocabulary via Tailwind v4 `@theme`. Off-scale one-offs use arbitrary values (`min-h-[44px]`); raw ramp steps as `bg-[var(--espresso-800)]`.
+- **No raw hex, no `var(--…)` in `style`.** Hex literals only belong in the token CSS source (`arena-tokens.css` / `@crivelo/tokens`), never in app/component code.
+- **`cn()`** (clsx + tailwind-merge) for conditional/variant classes via className lookups — never an inline `style` ternary. Inline `style` is a last resort (computed dimensions, SVG geometry, state-driven transforms).
+- **Primitives from `@crivelo/ui` only** (`@crivelo/ui/button`, `/card`, `/dialog`, …) for new commodity UI — don't hand-roll a primitive. The old hand-rolled primitives are `@deprecated` (now at `@crivelo/ui/deprecated/*`). **Never import `radix-ui` / shadcn directly in the app** — `@crivelo/ui` is the single source of truth; a primitive that doesn't exist yet gets added *to `@crivelo/ui`*, not the app. An app may add a thin local **wrapper** that imports a `@crivelo/ui` primitive and extends it (variants, bigger sizes — e.g. our larger buttons live in `app/components/ui/`), but a wrapper is an extension, never a new primitive.
+- **Animation via `motion`** (`motion/react`) + `prefers-reduced-motion`; no new manual `setInterval` / `@keyframes`.
 
 ### Design system bundle (`.design-system/`)
 
@@ -71,6 +82,7 @@ Visual reference for the brand lives at `.design-system/crema-arena-design-syste
 
 ### Copy and locale rules (often-violated)
 
+- **pt-BR is ONLY for user-facing UI strings; everything else (code, comments, specs/docs, commits) is English.** See root `CLAUDE.md` → "Language (hard rule)". The rules below govern that pt-BR UI text.
 - All user-facing text is pt-BR. Address as "você", short imperative verbs.
 - **Sentence case** for headings, buttons, modal titles. TNT is the only ALL CAPS. No Title Case.
 - Score format is always `N × M` using Unicode × (U+00D7) with spaces around it, never `x`.
@@ -80,7 +92,7 @@ Visual reference for the brand lives at `.design-system/crema-arena-design-syste
 
 ### Feedback UI
 
-Use `useToast()` from `app/components/Toast.tsx` for transient feedback and `ConfirmationModal` for destructive confirmations. **Do not use native `alert()` / `confirm()`** — every occurrence was deliberately removed. The toast container is portal-mounted by `ToastProvider` in the root layout.
+Use `useToast()` from `app/components/ui/useToast` for transient feedback (a thin hook over Sonner — `@crivelo/ui/sonner`'s `toast.*`, mapped to the `showToast(message, variant)` API) and `ConfirmationModal` (`app/components/ui/ConfirmationModal`, over `@crivelo/ui/alert-dialog`) for destructive confirmations. **Do not use native `alert()` / `confirm()`** — every occurrence was deliberately removed. The Sonner `<Toaster />` is mounted app-wide in the root layout.
 
 ## Photo uploads
 

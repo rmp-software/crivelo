@@ -1,18 +1,43 @@
-/* Foundation first (neutral house tokens + element styles), then app-local
- * overrides. App @layer base rules must be imported AFTER the foundation so they
- * win when Tailwind hoists them to the @tailwind base position. crivelo-tokens.css
- * is the site's teal accent (overrides --brand etc.) — same mechanism crema-arena
- * uses for cinnamon. */
+/*
+ * crivelo-web — Tailwind v4 entry stylesheet.
+ *
+ * Order is load-bearing:
+ *   1. `@import "tailwindcss"` pulls in the v4 engine (base reset, theme, utilities).
+ *   2. The foundation declares the raw `--*` design variables + the Crivelo element
+ *      base styles (these run in @layer base inside the file).
+ *   3. crivelo-tokens.css overrides the Tier-2 accent variables (teal "water") +
+ *      the dark-theme palette — imported AFTER the foundation so its @layer base wins.
+ *   4. The @theme sources (`theme.css` = house scale, `crivelo-theme.css` = teal
+ *      accent) turn those variables into Tailwind utility tokens (`bg-espresso-800`,
+ *      `bg-brand`, `rounded-md`, `shadow-1`, `ease-standard`, …).
+ *
+ * crivelo-web now consumes shared @crivelo/ui primitives (RMP-206: the NavSheet
+ * drawer rides the shared Sheet). The `@source` below makes v4 traverse the
+ * workspace symlink into the ui package so those primitives' utility classes are
+ * NOT silently purged (v4 won't follow the symlink on its own).
+ */
+@import "tailwindcss";
+
+/* Scan the shared @crivelo/ui primitives so their utility classes survive the v4
+ * content purge (RMP-206 — crivelo-web adopted the shared Sheet). */
+@source "../../../packages/ui/src/**/*.{js,ts,jsx,tsx}";
 @import "@crivelo/tokens/styles/foundation.css";
 @import "./crivelo-tokens.css";
+@import "@crivelo/tokens/styles/theme.css";
+@import "./crivelo-theme.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* shadcn ↔ Crivelo alias layer (shared): maps shadcn's semantic vars + --color-*
+ * utilities onto the house/accent tokens. Imported LAST so --brand/--focus-ring are
+ * already overridden to the teal "water" accent by the time it aliases them — so the
+ * shared shadcn primitives inherit teal with zero per-app shadcn config. It only ADDS
+ * shadcn's vocabulary; it overrides no foundation/accent variable. (The `@source` for
+ * the ui package is declared above, after `@import "tailwindcss"` — RMP-206.) */
+@import "@crivelo/ui/styles/shadcn-theme.css";
 
 /* Pulsing "Brewing" status dot in the COA BrewTimer (RMP-192). Kept here rather
  * than in component markup — <style> in <body> is invalid HTML5 and duplicates
- * across remounts. */
+ * across remounts. Grandfathered: pre-existing motion, out of scope for the v4
+ * migration (RMP-198) — preserved verbatim so the dot keeps pulsing. */
 @keyframes coaBrewPulse {
   0%,
   100% {

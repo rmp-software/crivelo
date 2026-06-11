@@ -1,10 +1,9 @@
 /** @type {import('postcss-load-config').Config} */
 const config = {
   plugins: {
-    // Inline @import (e.g. @crivelo/tokens foundation CSS) BEFORE Tailwind runs,
-    // so @layer blocks in imported files resolve against the @tailwind directives.
-    "postcss-import": {},
-    tailwindcss: {},
+    // Tailwind v4: the PostCSS plugin handles @import resolution itself (including
+    // `@import "@crivelo/tokens/..."`), so postcss-import is no longer needed.
+    "@tailwindcss/postcss": {},
   },
 };
 

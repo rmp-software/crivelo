@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Modal from '@crivelo/ui/Modal';
-import Button from '@crivelo/ui/Button';
-import ConfirmationModal from '@crivelo/ui/ConfirmationModal';
-import { useToast } from '@crivelo/ui/Toast';
+import Modal from './ui/Modal';
+import Button from './ui/Button';
+import ConfirmationModal from './ui/ConfirmationModal';
+import { useToast } from './ui/useToast';
 import { Trophy, User, Shuffle, CheckCircle } from 'lucide-react';
 
 interface EliminatedCompetitor {

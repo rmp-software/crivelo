@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, FormEvent } from 'react';
-import Input from '@crivelo/ui/Input';
-import Button from '@crivelo/ui/Button';
+import Input from './ui/Input';
+import Button from './ui/Button';
 
 export interface OrganizerFormData {
   name: string;
