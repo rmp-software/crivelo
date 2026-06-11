@@ -527,6 +527,47 @@
     </ui_copy_examples>
   </design_system>
 
+  <styling_conventions>
+    <!-- The written, enforceable styling guide (Tailwind v4 @theme + shadcn + cn() + motion).
+         Promoted from docs/specs/landing-page.md; the grep rules below live in <compliance_rules>. -->
+
+    <utility_first>
+      - The design tokens ARE the utility vocabulary, mapped via Tailwind v4 `@theme`. Style with
+        semantic utility classes (`bg-surface`, `text-fg`, `rounded-md`, `shadow-brand`, `ease-standard`).
+      - Off-scale one-offs use arbitrary values (`min-h-[44px]`).
+      - A raw ramp step without a semantic name may be referenced as an arbitrary token:
+        `bg-[var(--espresso-800)]` — not a raw hex.
+    </utility_first>
+
+    <no_raw_color>
+      - No raw hex and no `var(--…)` inside `style`. Style only with semantic utility classes; the
+        token CSS source files (`arena-tokens.css`, `theme.css`, the `@crivelo/tokens` foundation) are
+        the definition layer and are the ONLY place hex literals belong.
+    </no_raw_color>
+
+    <conditional_classes>
+      - Use `cn()` (clsx + tailwind-merge) for conditional/variant classes via className lookups
+        (`Record<status, classes>`), never an inline `style` ternary.
+    </conditional_classes>
+
+    <primitives_own_variants>
+      - Primitives (Button, Card, Input, …) own their variants via className maps / cva; the caller
+        passes props/variants, not ad-hoc styles.
+    </primitives_own_variants>
+
+    <inline_style_last_resort>
+      - Inline `style` is a last resort, only for what cannot be a utility: computed dimensions
+        (progress-bar fill width), SVG geometry, and state-driven transforms. With `motion`,
+        animation rarely needs a manual `style`. Animation keyframes are NOT an inline-`style` case:
+        they belong in a CSS source file (like the grandfathered keyframes already defined in the
+        app/foundation CSS), never in a JSX `style` prop — and new animation should reach for `motion`.
+    </inline_style_last_resort>
+
+    <interactive_targets>
+      - Tap targets ≥ 44px; a visible cinnamon focus ring (`--focus-ring`) on every interactive element.
+    </interactive_targets>
+  </styling_conventions>
+
   <!--
     Enforced by the rmp:spec-compliance-reviewer agent. Rules are phrased as checkable
     assertions; `grep` attributes give the reviewer a pattern to search changed UI for.
@@ -550,10 +591,19 @@
     </copy_examples>
 
     <design_tokens>
-      <rule>Colors come only from `app/globals.css` variables / `tailwind.config.ts` aliases.</rule>
-      <rule grep="#[0-9a-fA-F]{3,8}">No raw hex or arbitrary Tailwind values that bypass the tokens, in app code.</rule>
+      <rule>Colors come only from the Tailwind v4 `@theme` token sources (`arena-tokens.css`, `arena-theme.css`, and the `@crivelo/tokens` foundation + `theme.css`) and their generated utility classes — never app-level raw values. There is no `tailwind.config.ts`.</rule>
+      <rule grep="#[0-9a-fA-F]{3,8}">No raw hex in app/component code — style via semantic utility classes / tokens, never a hex literal or a hex-bearing arbitrary Tailwind value. EXEMPT: the token CSS source files (`arena-tokens.css`, `theme.css`, and the `@crivelo/tokens` foundation) are the definition layer where hex literals legitimately live — do not flag those.</rule>
       <rule>Fonts only via the four variables (--font-display, --font-serif, --font-body, --font-mono). No @font-face, no next/font/google for these families.</rule>
     </design_tokens>
+
+    <styling>
+      <!-- The Tailwind v4 / shadcn / motion styling guide; see <styling_conventions> above for the full guide. -->
+      <rule grep="style=\{\{">No inline `style` in new app/component code, except the documented last-resort cases (computed dimensions, SVG geometry, state-driven transforms). Prefer utility classes and `cn()`.</rule>
+      <rule grep="style=\{[^}]*var\(--">No `var(--…)` inside a JSX `style` prop — style via semantic utility classes / `cn()` (raw ramp steps go through arbitrary values like `bg-[var(--espresso-800)]`, which is a className, not a `style` prop). EXEMPT: the token CSS source files (`arena-tokens.css`, `arena-theme.css`, `theme.css`, the `@crivelo/tokens` foundation) — the definition layer.</rule>
+      <rule>New commodity UI uses the shadcn primitives from `@crivelo/ui` (`@crivelo/ui/ui/*`); do not hand-roll a new primitive. The old hand-rolled `@crivelo/ui` primitives are `@deprecated` — don't reach for them in new code.</rule>
+      <rule grep="setInterval">No new JS-driven animation in new code: animation uses `motion` (`motion/react`) gated on `prefers-reduced-motion`, not a manual `setInterval` timer loop (existing usages are grandfathered). This grep targets the JS timer case; for keyframes, see the next rule.</rule>
+      <rule grep="@keyframes">In `.tsx`/`.ts` only: no new `@keyframes` authored inside component code for animation — use `motion`. EXEMPT (do NOT flag): `.css` source files, where keyframe definitions legitimately live (e.g. the grandfathered `coaBrewPulse` / `rings-spin` / `toast-enter` keyframes in the app and foundation CSS), and any keyframe `motion` cannot express. A `@keyframes` block in a `.css` file is never a violation.</rule>
+    </styling>
 
     <feedback_ui>
       <rule>Transient feedback uses `useToast()`; destructive confirms use `ConfirmationModal`.</rule>
