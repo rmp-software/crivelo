@@ -47,5 +47,10 @@
     /* Cherry — legacy red step Arena still references (house ships clay) */
     --cherry-100: #F3CFC8;
     --cherry-500: #B83A2E;
+
+    /* --- Landing shadow tokens (RMP-203): keep the color channels in the token
+       layer instead of raw rgba() in classNames. --- */
+    --shadow-live-halo: 0 0 0 4px color-mix(in srgb, var(--live) 18%, transparent);
+    --shadow-telona:    0 6px 14px color-mix(in srgb, var(--espresso-900) 45%, transparent);
   }
 }

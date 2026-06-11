@@ -1,14 +1,23 @@
+import { LandingHeader } from "./components/landing/LandingHeader";
+import { LandingHero } from "./components/landing/LandingHero";
+import { LandingDoes } from "./components/landing/LandingDoes";
+import { LandingFeat } from "./components/landing/LandingFeat";
+import { LandingFooter } from "./components/landing/LandingFooter";
+
+// Public landing page at `/` — the first consumer and reference implementation of
+// the new UI foundation (Tailwind v4 @theme + shadcn from @crivelo/ui). Static
+// structure/copy/responsive (RMP-203); motion + the hero duel loop + scroll-reveal
+// layer on in RMP-204.
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="text-center">
-        <h1 className="text-6xl font-display font-bold mb-4" style={{ color: 'var(--brand)' }}>
-          Crema Arena
-        </h1>
-        <p className="text-xl font-serif italic" style={{ color: 'var(--fg-2)' }}>
-          Specialty Coffee Competition Platform
-        </p>
-      </div>
-    </main>
+    <div className="bg-[var(--bg-inverse)] text-[var(--fg-inverse)]">
+      <LandingHeader />
+      <main id="top">
+        <LandingHero />
+        <LandingDoes />
+        <LandingFeat />
+      </main>
+      <LandingFooter />
+    </div>
   );
 }
