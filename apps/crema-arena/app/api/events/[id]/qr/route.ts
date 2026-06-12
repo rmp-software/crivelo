@@ -2,10 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import QRCode from 'qrcode';
 
 // GET /api/events/[id]/qr - Generate QR code for live display URL
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // QR points to the audience companion (/e/:id), per spec.
     const baseUrl = request.nextUrl.origin;

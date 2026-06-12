@@ -4,11 +4,12 @@ import LiveStage from '@/app/components/LiveStage';
 import { prisma } from '@/lib/prisma';
 
 interface PageProps {
-  params: { eventId: string };
+  params: Promise<{ eventId: string }>;
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
   try {
     const event = await prisma.event.findUnique({
       where: { id: params.eventId },
@@ -52,7 +53,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // This is a public page - no authentication required.
 // LiveStage locks the display to a 1920×1080 canvas scaled to fit any 16:9
 // viewport (FHD → QHD → 4K) so the layout never re-flows, only grows.
-export default function LiveEventPage({ params }: PageProps) {
+export default async function LiveEventPage(props: PageProps) {
+  const params = await props.params;
   return (
     <LiveStage>
       <LiveDisplay eventId={params.eventId} />

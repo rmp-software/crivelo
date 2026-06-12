@@ -7,10 +7,8 @@ import { generateBracket } from '@/lib/bracket';
 // POST /api/events/[id]/bracket/regenerate
 // Wipe the bracket and re-build with current entries + seeds.
 // Allowed only while the event is in `setup` status.
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

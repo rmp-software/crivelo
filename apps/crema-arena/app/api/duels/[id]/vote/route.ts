@@ -4,10 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 // POST /api/duels/[id]/vote - Record a vote for cup A or B
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

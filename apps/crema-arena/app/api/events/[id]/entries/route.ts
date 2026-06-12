@@ -4,10 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 // GET /api/events/[id]/entries - List event's registered competitors with pagination
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -77,10 +75,8 @@ export async function GET(
 }
 
 // POST /api/events/[id]/entries - Add competitor to event
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

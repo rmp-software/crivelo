@@ -7,10 +7,8 @@ import { prisma } from '@/lib/prisma';
 // Takes { sponsor_ids: string[] } (in the order to lay them out) and creates all
 // links in a single createMany, assigning sequential positions from the current
 // max. One round trip / one atomic write instead of N sequential POSTs.
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {

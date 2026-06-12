@@ -6,8 +6,9 @@ import { prisma } from '@/lib/prisma';
 // PUT /api/events/[id]/entries/[entry_id] - Update competitor entry (seed assignment)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; entry_id: string } }
+  props: { params: Promise<{ id: string; entry_id: string }> }
 ) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 
@@ -108,8 +109,9 @@ export async function PUT(
 // DELETE /api/events/[id]/entries/[entry_id] - Remove competitor from event
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; entry_id: string } }
+  props: { params: Promise<{ id: string; entry_id: string }> }
 ) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
 

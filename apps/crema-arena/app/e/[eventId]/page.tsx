@@ -3,11 +3,12 @@ import LiveCompanion from '@/app/components/LiveCompanion';
 import { prisma } from '@/lib/prisma';
 
 interface PageProps {
-  params: { eventId: string };
+  params: Promise<{ eventId: string }>;
 }
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata(props: PageProps): Promise<Metadata> {
+  const params = await props.params;
   try {
     const event = await prisma.event.findUnique({
       where: { id: params.eventId },
@@ -51,7 +52,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // This is a public page - no authentication required, mobile-first
-export default function LiveCompanionPage({ params }: PageProps) {
+export default async function LiveCompanionPage(props: PageProps) {
+  const params = await props.params;
   return (
     <div className="min-h-screen bg-bg">
       <LiveCompanion eventId={params.eventId} />

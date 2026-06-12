@@ -7,10 +7,8 @@ import { prisma } from '@/lib/prisma';
 // Takes { competitor_ids: string[] } and creates all entries in a single
 // createMany (skipDuplicates), so adding a full 64-slot field is one round trip
 // and one atomic write instead of N sequential requests.
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
