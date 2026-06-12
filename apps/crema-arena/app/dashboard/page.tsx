@@ -57,7 +57,7 @@ export default async function DashboardPage() {
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
             <div className="p-3 rounded-md bg-brand-soft flex-shrink-0">
-              <TrendingUp size={24} style={{ color: 'var(--brand)' }} />
+              <TrendingUp size={24} className="text-brand" />
             </div>
             <div className="min-w-0">
               <p className="text-sm text-fg-3">Total de Eventos</p>
@@ -69,7 +69,7 @@ export default async function DashboardPage() {
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
             <div className="p-3 rounded-md bg-live-soft flex-shrink-0">
-              <Users size={24} style={{ color: 'var(--live)' }} />
+              <Users size={24} className="text-live" />
             </div>
             <div className="min-w-0">
               <p className="text-sm text-fg-3">Total de Competidores</p>
@@ -81,7 +81,7 @@ export default async function DashboardPage() {
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
             <div className="p-3 rounded-md bg-gold-soft flex-shrink-0">
-              <Calendar size={24} style={{ color: 'var(--gold)' }} />
+              <Calendar size={24} className="text-gold" />
             </div>
             <div className="min-w-0">
               <p className="text-sm text-fg-3">Eventos ao Vivo</p>
