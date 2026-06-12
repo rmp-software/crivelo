@@ -3,7 +3,8 @@
  * the shell controls. Ported verbatim from apps/crivelo-web/.design/project/coa-shared.jsx
  * (the PATHS map). Stroke icons on a 24-grid, currentColor by default.
  */
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
+import { cn } from "@crivelo/ui/lib/utils";
 
 const PATHS: Record<string, ReactNode> = {
   sun: (
@@ -28,13 +29,13 @@ export function Icon({
   size = 20,
   stroke = 1.6,
   color = "currentColor",
-  style,
+  className,
 }: {
   name: IconName;
   size?: number;
   stroke?: number;
   color?: string;
-  style?: CSSProperties;
+  className?: string;
 }) {
   return (
     <svg
@@ -46,7 +47,7 @@ export function Icon({
       strokeWidth={stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ display: "block", flexShrink: 0, ...style }}
+      className={cn("block shrink-0", className)}
       aria-hidden="true"
     >
       {PATHS[name]}

@@ -42,12 +42,12 @@ function Spinner({
   // @crivelo/tokens/styles/foundation.css, so they resolve in every app.
   const middleColor =
     variant === "light"
-      ? "border-t-[var(--crema-200)]"
-      : "border-t-[var(--fg-muted)]"
+      ? "border-t-crema-200"
+      : "border-t-fg-muted"
   const innerColor =
     variant === "light"
-      ? "border-t-[var(--crema-50)]"
-      : "border-t-[var(--fg-3)]"
+      ? "border-t-crema-50"
+      : "border-t-fg-3"
 
   return (
     <div
@@ -58,7 +58,7 @@ function Spinner({
       {...props}
     >
       {/* Outer ring — accent (--brand: cinnamon in crema, teal in crivelo) */}
-      <span className="absolute inset-0 animate-[spin_1.4s_linear_infinite] rounded-full border-2 border-transparent border-t-[var(--brand)]" />
+      <span className="absolute inset-0 animate-[spin_1.4s_linear_infinite] rounded-full border-2 border-transparent border-t-brand" />
       {/* Middle ring — neutral, reversed + slower (the brand cadence) */}
       <span
         className={cn(

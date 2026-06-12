@@ -15,9 +15,18 @@
  * View state: idle ↔ brew. "Begin brew" → brew (the RMP-192 BrewTimer); the math
  * (lib/four-six.ts) is computed once here and handed to whichever view renders,
  * so the timer receives the exact same recipe the idle schedule shows.
+ *
+ * Styling (RMP-214): the foundation's neutral semantic tokens (--fg-2/3, --border,
+ * --surface-raised, --font-serif/mono, …) are referenced via arbitrary-value
+ * utility classes (`text-[color:var(--fg-3)]`), NOT inline `style` (the
+ * no-`var(--)`-in-`style` rule). The teal accent rides the promoted `bg-brand` /
+ * `text-accent-ink` tokens. The only surviving inline `style` is the wide-layout
+ * container/panel sizing, which is driven by the runtime `bp` viewport value.
  */
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@crivelo/ui/lib/utils";
+import { Button } from "../ui/Button";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
@@ -27,18 +36,12 @@ import { BrewTimer } from "./BrewTimer";
 import { Icon } from "./icons";
 import { tasteKey } from "../../lib/four-six";
 
-const CAP: CSSProperties = {
-  fontSize: 11,
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  fontWeight: 600,
-  color: "var(--fg-3)",
-};
+/** Section caption — uppercase micro-label. */
+const CAP =
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
-const MONO: CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontFeatureSettings: '"tnum","zero"',
-};
+/** Tabular mono numerals — keeps values from jittering as digits change. */
+const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 type View = "idle" | "brew";
 
@@ -88,18 +91,17 @@ export function CoaCalculator() {
 
   // ---------- pieces ----------
   const intro = (
-    <div style={{ marginBottom: wide ? 24 : 20 }}>
-      <div style={{ ...CAP, marginBottom: 8 }}>{t("introCaption")}</div>
+    <div className={wide ? "mb-6" : "mb-5"}>
+      <div className={cn(CAP, "mb-2")}>{t("introCaption")}</div>
       <p
-        style={{
-          fontFamily: "var(--font-serif)",
-          fontStyle: "italic",
-          fontSize: bp === "desktop" ? 30 : bp === "tablet" ? 25 : 19,
-          color: "var(--fg-2)",
-          margin: 0,
-          lineHeight: 1.28,
-          maxWidth: "17em",
-        }}
+        className={cn(
+          "m-0 max-w-[17em] font-serif italic leading-[1.28] text-fg-2",
+          bp === "desktop"
+            ? "text-[30px]"
+            : bp === "tablet"
+              ? "text-[25px]"
+              : "text-[19px]",
+        )}
       >
         {t("introLine")}
       </p>
@@ -128,37 +130,22 @@ export function CoaCalculator() {
   );
 
   const panelHeader = wide && (
-    <div
-      style={{
-        paddingBottom: 18,
-        borderBottom: "1px solid var(--border)",
-        marginBottom: 16,
-      }}
-    >
-      <div style={{ ...CAP, marginBottom: 8 }}>{t("yourRecipe")}</div>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: 14 }}>
+    <div className="mb-4 border-b border-border pb-[18px]">
+      <div className={cn(CAP, "mb-2")}>{t("yourRecipe")}</div>
+      <div className="flex items-end gap-3.5">
         <span
-          style={{
-            ...MONO,
-            fontSize: 44,
-            fontWeight: 600,
-            lineHeight: 0.9,
-            letterSpacing: "-0.02em",
-            color: "var(--accent-ink)",
-            whiteSpace: "nowrap",
-          }}
+          className={cn(
+            "text-[44px] font-semibold leading-[0.9] tracking-[-0.02em] whitespace-nowrap text-accent-ink",
+            MONO,
+          )}
         >
           {recipe.waterG}
-          <span style={{ fontSize: 20, color: "var(--fg-3)" }}> {t("grams")}</span>
+          <span className="text-h3 text-fg-3">
+            {" "}
+            {t("grams")}
+          </span>
         </span>
-        <span
-          style={{
-            fontSize: 13.5,
-            color: "var(--fg-2)",
-            paddingBottom: 4,
-            lineHeight: 1.4,
-          }}
-        >
+        <span className="pb-1 text-[13.5px] leading-[1.4] text-fg-2">
           {t("doseRatioSummary", { dose, ratio })}
           <br />
           {tasteSummary}
@@ -171,52 +158,28 @@ export function CoaCalculator() {
 
   const cta = (
     <>
-      <button
+      {/* Routed through the app-local Button wrapper (RMP-217 commodity-UI sweep);
+          the bespoke geometry (56px height, brand fill, mono time tail, 18px play
+          icon) rides in className via tailwind-merge so the primitive's
+          buttonVariants defaults (rounded-md, h-9/px, bg-primary, text-sm,
+          font-medium, gap-2, hover, the 16px svg rule) are neutralised — pixel
+          identical to the prior hand-rolled <button>. */}
+      <Button
         onClick={startBrew}
-        style={{
-          width: "100%",
-          height: 56,
-          marginTop: 24,
-          borderRadius: "var(--radius-md)",
-          border: "none",
-          cursor: "pointer",
-          background: "var(--brand)",
-          color: "#fff",
-          fontWeight: 600,
-          fontSize: 16,
-          fontFamily: "var(--font-body)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
-          boxShadow: "var(--shadow-1)",
-        }}
+        className="mt-6 flex h-14 w-full gap-[10px] rounded-md border-none bg-brand p-0 font-body text-body font-semibold whitespace-normal text-white shadow-1 hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[18px]"
       >
-        <Icon name="play" size={18} color="#fff" /> {t("beginBrew")}{" "}
-        <span style={{ ...MONO, opacity: 0.85 }}>{recipe.totalTime}</span>
-      </button>
-      <div style={{ textAlign: "center", marginTop: 16 }}>
+        <Icon name="play" size={18} /> {t("beginBrew")}{" "}
+        <span className={cn("opacity-[0.85]", MONO)}>{recipe.totalTime}</span>
+      </Button>
+      <div className="mt-4 text-center">
         <a
           href="https://en.philocoffea.com/blogs/blog/coffee-brewing-method"
           target="_blank"
           rel="noopener noreferrer"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 7,
-            fontSize: 14,
-            color: "var(--fg-2)",
-            textDecoration: "none",
-          }}
+          className="inline-flex items-center gap-[7px] text-small text-fg-2 no-underline"
         >
           <Icon name="book" size={15} color="var(--fg-3)" />
-          <span
-            style={{
-              textDecoration: "underline",
-              textDecorationColor: "var(--border-strong)",
-              textUnderlineOffset: 3,
-            }}
-          >
+          <span className="underline decoration-border-strong underline-offset-[3px]">
             {t("methodLink")}
           </span>
           <svg
@@ -224,11 +187,12 @@ export function CoaCalculator() {
             height="13"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--fg-3)"
+            stroke="currentColor"
             strokeWidth="1.9"
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
+            className="text-fg-3"
           >
             <path d="M7 17L17 7M9 7h8v8" />
           </svg>
@@ -248,43 +212,38 @@ export function CoaCalculator() {
     );
   }
 
-  const panelStyle: CSSProperties = {
-    background: "var(--surface-raised)",
-    borderRadius: "var(--radius-md)",
-    boxShadow: "var(--shadow-1)",
-    border: "1px solid var(--border)",
-    padding: bp === "desktop" ? 28 : 24,
-  };
+  const panelClass = cn(
+    "rounded-md border border-border bg-surface-raised shadow-1",
+    bp === "desktop" ? "p-7" : "p-6",
+  );
 
   if (wide) {
     return (
+      // last-resort: container max-width is the runtime per-breakpoint
+      // CONTAINER_MAX value (desktop 1060 / tablet 680).
       <main
-        style={{
-          maxWidth: containerMax,
-          margin: "0 auto",
-          boxSizing: "border-box",
-          padding: bp === "desktop" ? "40px 24px 8px" : "28px 24px 8px",
-        }}
+        className={cn(
+          "mx-auto box-border",
+          bp === "desktop" ? "px-6 pt-10 pb-2" : "px-6 pt-7 pb-2",
+        )}
+        style={{ maxWidth: containerMax }}
       >
         <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: bp === "desktop" ? 56 : 36,
-            alignItems: "start",
-          }}
+          className={cn(
+            "grid grid-cols-2 items-start",
+            bp === "desktop" ? "gap-14" : "gap-9",
+          )}
         >
-          <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
+          <div className="flex flex-col gap-[22px]">
             {intro}
             {pad}
             {inputs}
           </div>
           <div
-            style={{
-              ...panelStyle,
-              position: bp === "desktop" ? "sticky" : "static",
-              top: 90,
-            }}
+            className={cn(
+              panelClass,
+              bp === "desktop" ? "sticky top-[90px]" : "static",
+            )}
           >
             {panelHeader}
             {schedule}
@@ -296,17 +255,10 @@ export function CoaCalculator() {
   }
 
   return (
-    <main
-      style={{
-        maxWidth: 390,
-        margin: "0 auto",
-        boxSizing: "border-box",
-        padding: "20px 20px 8px",
-      }}
-    >
+    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-2">
       {intro}
-      <div style={{ marginBottom: 12 }}>{pad}</div>
-      <div style={{ marginBottom: 22 }}>{inputs}</div>
+      <div className="mb-3">{pad}</div>
+      <div className="mb-[22px]">{inputs}</div>
       {schedule}
       {cta}
     </main>

@@ -5,17 +5,18 @@
  * Cross-app URLs are temporary until the domain cutover (crivelo.coffee) — they
  * live here so the later DNS task is a one-file change (see the spec's risks).
  *
- * `dot` is a CSS colour for the family marker: Coa uses the site teal accent
- * (`var(--brand)`); Crema Arena carries its own cinnamon brand colour, which is
- * not a token in this app, so it lives here as the canonical brand hex (data, not
- * a styling decision).
+ * Family-marker colours: token-backed dots set `markerClass` (a static Tailwind
+ * utility, e.g. `"bg-brand"`). The lone external rgb (Crema Arena cinnamon — not
+ * a crivelo-web token) uses the `dot` field, rendered as inline
+ * `style={{ background }}` in NavSheet/Footer (documented OQ2 exception). Items
+ * with neither field fall back to `bg-fg-4` at the render site.
  */
 
 /** The current Crema Arena URL — centralized for the later domain cutover. */
 export const CREMA_ARENA_URL = "https://crema-arena.vercel.app";
 
 /** Crema Arena's cinnamon brand colour (its accent, not a crivelo-web token). */
-const CREMA_ARENA_DOT = "#C0763C";
+const CREMA_ARENA_DOT = "rgb(192 118 60)";
 
 export interface NavItem {
   /** Proper-noun product name — NEVER translated (Coa, Crema Arena, …). */
@@ -33,8 +34,17 @@ export interface NavItem {
   current?: boolean;
   /** Not yet shipped — rendered dimmed, non-interactive. */
   soon?: boolean;
-  /** Family marker colour (CSS). */
+  /**
+   * External rgb dot colour (CSS string). Use ONLY for non-token external brand
+   * colours (e.g. Crema Arena cinnamon). Token-backed dots use `markerClass`.
+   */
   dot?: string;
+  /**
+   * Tailwind utility class for the family-marker dot when the colour is a
+   * registered token (e.g. `"bg-brand"`, `"bg-fg-4"`). Rendered directly as a
+   * className; takes precedence over the `bg-fg-4` fallback.
+   */
+  markerClass?: string;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -43,7 +53,7 @@ export const NAV_ITEMS: NavItem[] = [
     tagKey: "coa.tag",
     href: "/",
     current: true,
-    dot: "var(--brand)",
+    markerClass: "bg-brand",
   },
   {
     name: "Crema Arena",

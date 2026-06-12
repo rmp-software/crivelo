@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Monogram } from "./Monogram";
 
 /**
@@ -30,25 +31,21 @@ export function CriveloLockup({
   variant = "dark",
 }: CriveloLockupProps) {
   const [mono, font] = SIZES[size];
-  const ink = variant === "light" ? "var(--crema-50)" : "var(--fg)";
+  const inkColor = variant === "light" ? "var(--crema-50)" : "var(--fg)";
+  // last-resort: runtime font sizes only
+  const vars = {
+    "--wordmark-size": `${font}px`,
+  } as CSSProperties;
   return (
     <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 10,
-        color: ink,
-      }}
+      style={vars}
+      className={
+        "inline-flex items-center gap-2.5 " +
+        (variant === "light" ? "text-crema-50" : "text-fg")
+      }
     >
-      <Monogram px={mono} color={ink} />
-      <span
-        style={{
-          fontFamily: "var(--font-display)",
-          fontWeight: 700,
-          fontSize: font,
-          letterSpacing: "-0.02em",
-        }}
-      >
+      <Monogram px={mono} color={inkColor} />
+      <span className="font-display text-[length:var(--wordmark-size)] font-bold tracking-[-0.02em]">
         Crivelo
       </span>
     </div>

@@ -14,6 +14,8 @@
     "./empty-state": "./src/ui/empty-state.tsx",
     "./spinner": "./src/ui/spinner.tsx",
     "./separator": "./src/ui/separator.tsx",
+    "./toggle": "./src/ui/toggle.tsx",
+    "./toggle-group": "./src/ui/toggle-group.tsx",
     "./dialog": "./src/ui/dialog.tsx",
     "./sheet": "./src/ui/sheet.tsx",
     "./alert-dialog": "./src/ui/alert-dialog.tsx",

@@ -13,3 +13,12 @@ export { Spinner } from "./ui/spinner";
 export { EmptyState } from "./ui/empty-state";
 /** Canonical page header (RMP-205). Also available at `@crivelo/ui/page-header`. */
 export { PageHeader } from "./ui/page-header";
+
+/*
+ * COMMODITY PRIMITIVES (shadcn). Prefer the per-primitive subpath
+ * (`@crivelo/ui/toggle-group`, `@crivelo/ui/toggle`); these barrel re-exports
+ * exist so the segmented-control primitive (RMP-209) is reachable from the root
+ * entry too. Themed via ./styles/shadcn-theme.css.
+ */
+export { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
+export { Toggle, toggleVariants } from "./ui/toggle";

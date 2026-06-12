@@ -61,6 +61,7 @@ export const criveloPwa: PwaConfig = {
   name: "Crivelo",
   description: "Tools for people who live coffee.",
   lang: "en",
+  // last-resort: PWA manifest requires literal color values (OS-consumed; no CSS-var/utility resolution)
   themeColor: "#1C6E68",
   backgroundColor: "#FBF6EA",
   // The sieve grid spans the full viewBox, so give it a touch more room than the

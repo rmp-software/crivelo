@@ -5,6 +5,7 @@
  * 24-grid, currentColor by default.
  */
 import type { CSSProperties, ReactNode } from "react";
+import { cn } from "@crivelo/ui/lib/utils";
 
 const PATHS: Record<string, ReactNode> = {
   clock: (
@@ -32,12 +33,14 @@ export function Icon({
   size = 20,
   stroke = 1.6,
   color = "currentColor",
+  className,
   style,
 }: {
   name: CoaIconName;
   size?: number;
   stroke?: number;
   color?: string;
+  className?: string;
   style?: CSSProperties;
 }) {
   return (
@@ -50,7 +53,8 @@ export function Icon({
       strokeWidth={stroke}
       strokeLinecap="round"
       strokeLinejoin="round"
-      style={{ display: "block", flexShrink: 0, ...style }}
+      className={cn("block shrink-0", className)}
+      style={style}
       aria-hidden="true"
     >
       {PATHS[name]}

@@ -30,7 +30,7 @@ export function Monogram({ px = 26, color = "var(--fg)" }: MonogramProps) {
       width={px}
       height={px}
       viewBox="0 0 64 64"
-      style={{ display: "block", flexShrink: 0 }}
+      className="block shrink-0"
       aria-hidden="true"
     >
       {GRID.flatMap((row, r) =>

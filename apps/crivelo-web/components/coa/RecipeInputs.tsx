@@ -16,17 +16,16 @@
  */
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { Button } from "../ui/Button";
+import { cn } from "@crivelo/ui/lib/utils";
 import { Icon } from "./icons";
 import { clamp } from "../../lib/four-six";
 
 /** Tabular mono numerals — keeps the values from jittering as digits change. */
-const MONO = {
-  fontFamily: "var(--font-mono)",
-  fontFeatureSettings: '"tnum","zero"',
-} as const;
+const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 const LABEL =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 function StepButton({
   onClick,
@@ -37,15 +36,21 @@ function StepButton({
   label: string;
   children: ReactNode;
 }) {
+  // Routed through the app-local Button wrapper (RMP-217 commodity-UI sweep). The
+  // 24px circular stepper geometry rides in className via tailwind-merge so the
+  // primitive's buttonVariants defaults (h-9/px, rounded-md, bg-primary, gap-2,
+  // transition-all, the 16px svg rule) are neutralised — pixel identical to the
+  // prior hand-rolled <button>. Hover recolours the border only, so the default
+  // hover:bg-primary/90 is cancelled with hover:bg-[color:var(--surface)].
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-[color:var(--fg)] transition-colors hover:border-[color:var(--brand)]"
+      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 
@@ -72,8 +77,7 @@ function Stepper({
           <Icon name="minus" size={12} />
         </StepButton>
         <span
-          className="text-[15px] font-semibold tabular-nums whitespace-nowrap"
-          style={MONO}
+          className={cn("text-mono font-semibold whitespace-nowrap", MONO)}
         >
           {value}
         </span>
@@ -106,7 +110,7 @@ export function RecipeInputs({
   const ratioLabel = t("ratio");
 
   return (
-    <div className="grid grid-cols-3 items-end gap-1 border-y border-[color:var(--border)] px-1 py-4">
+    <div className="grid grid-cols-3 items-end gap-1 border-y border-border px-1 py-4">
       <Stepper
         label={coffee}
         value={`${dose} ${tCalc("grams")}`}
@@ -126,8 +130,10 @@ export function RecipeInputs({
       <div className="flex min-w-0 flex-col items-center gap-1.5">
         <span className={LABEL}>{t("water")}</span>
         <span
-          className="text-[17px] font-semibold tabular-nums whitespace-nowrap text-[color:var(--accent-ink)]"
-          style={MONO}
+          className={cn(
+            "text-h4 font-semibold whitespace-nowrap text-accent-ink",
+            MONO,
+          )}
         >
           {waterG} {tCalc("grams")}
         </span>
