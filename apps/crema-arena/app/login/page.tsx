@@ -21,11 +21,11 @@ export default function LoginPage() {
 
 function LoginShell() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-[var(--bg)] to-[var(--bg-2)]">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-bg to-bg-2">
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <Wordmark size="lg" endorsement className="mb-2" />
-          <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
+          <p className="text-sm font-mono uppercase tracking-wider text-fg-3">
             Painel administrativo
           </p>
         </div>
@@ -68,12 +68,12 @@ function LoginForm() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-[var(--bg)] to-[var(--bg-2)]">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 md:p-24 bg-gradient-to-br from-bg to-bg-2">
       <div className="w-full max-w-md">
         {/* Logo/Branding */}
         <div className="flex flex-col items-center mb-8">
           <Wordmark size="lg" endorsement className="mb-2" />
-          <p className="text-sm font-mono uppercase tracking-wider text-[var(--fg-3)]">
+          <p className="text-sm font-mono uppercase tracking-wider text-fg-3">
             Painel administrativo
           </p>
         </div>
@@ -81,14 +81,14 @@ function LoginForm() {
         {/* Login Card */}
         <Card shadow="md">
           <form onSubmit={handleSubmit} className="space-y-5" aria-label="Formulário de login">
-            <h2 className="text-2xl font-display font-bold text-[var(--fg)] mb-6">
+            <h2 className="text-2xl font-display font-bold text-fg mb-6">
               Entrar
             </h2>
 
             {/* Error Message */}
             {error && (
               <div
-                className="p-3 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)] text-sm"
+                className="p-3 rounded-sm bg-danger-soft border border-danger text-danger text-sm"
                 role="alert"
                 aria-live="assertive"
               >
@@ -142,8 +142,7 @@ function LoginForm() {
         <div className="text-center mt-6">
           <Link
             href="/"
-            className="text-sm text-[var(--fg-3)] hover:text-[var(--brand)] transition-colors"
-            style={{ transitionDuration: 'var(--dur-base)' }}
+            className="text-sm text-fg-3 hover:text-brand transition-colors duration-base"
             aria-label="Voltar para a página inicial"
           >
             Voltar para home

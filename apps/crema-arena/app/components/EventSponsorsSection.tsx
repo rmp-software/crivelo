@@ -177,13 +177,13 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
   };
 
   return (
-    <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mt-6">
+    <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mt-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+          <h3 className="text-xl font-semibold text-fg font-display">
             Patrocinadores deste evento
           </h3>
-          <p className="text-sm text-[var(--fg-3)] mt-1">
+          <p className="text-sm text-fg-3 mt-1">
             {sponsors.length} {sponsors.length === 1 ? 'patrocinador' : 'patrocinadores'}
           </p>
         </div>
@@ -203,19 +203,19 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
       </div>
 
       {error && (
-        <div className="p-4 mb-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
 
       {isLoading ? (
         <div className="text-center py-8">
-          <div className="inline-block w-6 h-6 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+          <div className="inline-block w-6 h-6 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
         </div>
       ) : sponsors.length === 0 ? (
-        <div className="text-center py-12 bg-[var(--bg)] rounded-[var(--radius-md)] border border-[var(--border)]">
-          <Handshake size={32} className="mx-auto text-[var(--fg-3)] mb-3" aria-hidden="true" />
-          <p className="text-[var(--fg-2)]">Nenhum patrocinador adicionado.</p>
+        <div className="text-center py-12 bg-bg rounded-md border border-border">
+          <Handshake size={32} className="mx-auto text-fg-3 mb-3" aria-hidden="true" />
+          <p className="text-fg-2">Nenhum patrocinador adicionado.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -257,7 +257,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
                 const pos = e.clientY > rect.top + rect.height / 2 ? 'after' : 'before';
                 handleDrop(es.id, pos, e.dataTransfer.getData('text/plain') || undefined);
               }}
-              className={`relative flex items-center gap-4 p-4 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)] transition-colors ${
+              className={`relative flex items-center gap-4 p-4 bg-surface rounded-md border border-border transition-colors ${
                 draggingId === es.id ? 'opacity-50' : ''
               }`}
             >
@@ -265,7 +265,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
               {canModify && dragOverId === es.id && draggingId !== es.id && (
                 <span
                   aria-hidden
-                  className={`pointer-events-none absolute left-0 right-0 h-[2px] rounded-full bg-[var(--brand)] ${
+                  className={`pointer-events-none absolute left-0 right-0 h-[2px] rounded-full bg-brand ${
                     dragOverPos === 'after' ? '-bottom-[7px]' : '-top-[7px]'
                   }`}
                 />
@@ -274,7 +274,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
               {/* Drag handle (setup only) */}
               {canModify && (
                 <span
-                  className="flex-shrink-0 text-[var(--fg-3)] cursor-grab active:cursor-grabbing touch-none"
+                  className="flex-shrink-0 text-fg-3 cursor-grab active:cursor-grabbing touch-none"
                   aria-label="Arrastar para reordenar"
                   title="Arrastar para reordenar"
                 >
@@ -283,7 +283,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
               )}
 
               {/* Logo thumb with initials fallback */}
-              <div className="w-12 h-12 flex-shrink-0 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex items-center justify-center">
+              <div className="w-12 h-12 flex-shrink-0 rounded-sm overflow-hidden bg-bg-2 border border-border flex items-center justify-center">
                 {es.sponsor.logo_url ? (
                   <img
                     src={es.sponsor.logo_url}
@@ -291,7 +291,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
                     className="w-full h-full object-contain"
                   />
                 ) : (
-                  <span className="font-display text-base font-bold text-[var(--fg-3)]" aria-hidden="true">
+                  <span className="font-display text-base font-bold text-fg-3" aria-hidden="true">
                     {initials(es.sponsor.name) || '—'}
                   </span>
                 )}
@@ -299,7 +299,7 @@ export default function EventSponsorsSection({ eventId, canModify }: EventSponso
 
               {/* Name */}
               <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-[var(--fg)] truncate">{es.sponsor.name}</h4>
+                <h4 className="font-semibold text-fg truncate">{es.sponsor.name}</h4>
               </div>
 
               {/* Remove (setup only) */}

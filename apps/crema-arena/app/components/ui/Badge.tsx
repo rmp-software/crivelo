@@ -28,10 +28,10 @@ interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
  * there, so this app-level attribute is the honest one for any future selectors).
  */
 const variantClasses: Record<BadgeVariant, string> = {
-  default: 'bg-[var(--bg-3)] text-[var(--fg-2)]',
-  success: 'bg-[var(--live-soft)] text-[var(--live)]',
-  warning: 'bg-[var(--gold-soft)] text-[var(--gold)]',
-  danger: 'bg-[var(--danger-soft)] text-[var(--danger)]',
+  default: 'bg-bg-3 text-fg-2',
+  success: 'bg-live-soft text-live',
+  warning: 'bg-gold-soft text-gold',
+  danger: 'bg-danger-soft text-danger',
 };
 
 // shadcn base per semantic variant — closest match, purely for border/structure;

@@ -29,8 +29,8 @@ export default function Wordmark({
   } as const;
   const { mono, type, by } = sizes[size];
 
-  const cremaColor = variant === 'light' ? 'var(--crema-50)' : 'var(--fg)';
-  const byColor = variant === 'light' ? 'var(--crema-300)' : 'var(--fg-3)';
+  const cremaColorCls = variant === 'light' ? 'text-crema-50' : 'text-fg';
+  const byColorCls = variant === 'light' ? 'text-crema-300' : 'text-fg-3';
 
   return (
     <div className={`inline-flex items-center gap-3 ${className}`}>
@@ -46,21 +46,17 @@ export default function Wordmark({
       )}
       <span className="relative inline-flex leading-none">
         <span className={`leading-none ${type}`}>
-          <span className="font-serif italic" style={{ color: cremaColor }}>
+          <span className={`font-serif italic ${cremaColorCls}`}>
             Crema
           </span>
-          <span
-            className="font-display font-extrabold ml-1.5"
-            style={{ color: 'var(--brand)' }}
-          >
+          <span className={`font-display font-extrabold ml-1.5 text-brand`}>
             Arena
           </span>
         </span>
         {endorsement && (
           <span
-            className={`absolute right-0 bottom-0 font-body whitespace-nowrap ${by}`}
+            className={`absolute right-0 bottom-0 font-body whitespace-nowrap ${by} ${byColorCls}`}
             style={{
-              color: byColor,
               letterSpacing: '0.01em',
               transform: 'translateY(50%) scale(0.9)',
               transformOrigin: 'right',

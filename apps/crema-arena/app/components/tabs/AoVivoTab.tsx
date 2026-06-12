@@ -62,13 +62,13 @@ export default function AoVivoTab({
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
         <div className="text-center max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--bg-2)] mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg-2 mb-4">
             <span className="text-3xl">⏱️</span>
           </div>
-          <h2 className="text-xl font-bold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
+          <h2 className="text-xl font-bold text-fg mb-2 font-display">
             O evento ainda não começou
           </h2>
-          <p className="text-[var(--fg-3)] text-sm">
+          <p className="text-fg-3 text-sm">
             Aguarde o início das competições
           </p>
         </div>
@@ -81,13 +81,13 @@ export default function AoVivoTab({
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
         <div className="text-center max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--gold-soft)] mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gold-soft mb-4">
             <span className="text-3xl">🏆</span>
           </div>
-          <h2 className="text-xl font-bold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
+          <h2 className="text-xl font-bold text-fg mb-2 font-display">
             Evento encerrado
           </h2>
-          <p className="text-[var(--fg-3)] text-sm">
+          <p className="text-fg-3 text-sm">
             Confira o leaderboard para ver os resultados finais
           </p>
         </div>
@@ -100,11 +100,11 @@ export default function AoVivoTab({
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
         <div className="text-center max-w-md">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--brand)] mb-4"></div>
-          <h2 className="text-lg font-semibold text-[var(--fg)] mb-2">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-brand mb-4"></div>
+          <h2 className="text-lg font-semibold text-fg mb-2">
             Aguardando próximo duelo...
           </h2>
-          <p className="text-[var(--fg-3)] text-sm">
+          <p className="text-fg-3 text-sm">
             Os organizadores estão preparando a próxima rodada
           </p>
         </div>
@@ -125,18 +125,18 @@ export default function AoVivoTab({
         <div>
           <div className="flex items-center gap-2 mb-3">
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[var(--live)] animate-pulse"></div>
-              <span className="text-xs font-semibold text-[var(--live)] uppercase tracking-wide font-[family-name:var(--font-mono)]">
+              <div className="w-2 h-2 rounded-full bg-live animate-pulse"></div>
+              <span className="text-xs font-semibold text-live uppercase tracking-wide font-mono">
                 AO VIVO
               </span>
             </div>
-            <span className="text-xs text-[var(--fg-3)]">•</span>
-            <span className="text-xs text-[var(--fg-3)]">
+            <span className="text-xs text-fg-3">•</span>
+            <span className="text-xs text-fg-3">
               {getRoundLabel(currentDuel.round)} · Duelo {currentDuel.position + 1}
             </span>
           </div>
 
-          <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-2)] border-2 border-[var(--live)]">
+          <div className="bg-surface-raised rounded-md overflow-hidden shadow-2 border-2 border-live">
             {/* Pour Photo or Competitor Cards */}
             {currentDuel.pourPhotoUrl ? (() => {
               // The pour photo shows both cups side by side. `photoLeftSlot`
@@ -184,22 +184,22 @@ export default function AoVivoTab({
               </div>
               );
             })() : (
-              <div className="grid grid-cols-2 gap-px bg-[var(--border)]">
+              <div className="grid grid-cols-2 gap-px bg-border">
                 {/* Competitor A */}
                 {currentDuel.entryA && (
-                  <div className="bg-[var(--surface)] p-4">
+                  <div className="bg-surface p-4">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] mb-3">
+                      <div className="w-20 h-20 rounded-full overflow-hidden bg-bg-2 border-2 border-border mb-3">
                         <img
                           src={currentDuel.entryA.competitor.photoUrl}
                           alt={currentDuel.entryA.competitor.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="font-semibold text-sm text-[var(--fg)] mb-1 line-clamp-2">
+                      <p className="font-semibold text-sm text-fg mb-1 line-clamp-2">
                         {currentDuel.entryA.competitor.name}
                       </p>
-                      <p className="text-xs text-[var(--fg-3)] line-clamp-1">
+                      <p className="text-xs text-fg-3 line-clamp-1">
                         {currentDuel.entryA.competitor.coffeeShop}
                       </p>
                     </div>
@@ -208,19 +208,19 @@ export default function AoVivoTab({
 
                 {/* Competitor B */}
                 {currentDuel.entryB && (
-                  <div className="bg-[var(--surface)] p-4">
+                  <div className="bg-surface p-4">
                     <div className="flex flex-col items-center text-center">
-                      <div className="w-20 h-20 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] mb-3">
+                      <div className="w-20 h-20 rounded-full overflow-hidden bg-bg-2 border-2 border-border mb-3">
                         <img
                           src={currentDuel.entryB.competitor.photoUrl}
                           alt={currentDuel.entryB.competitor.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <p className="font-semibold text-sm text-[var(--fg)] mb-1 line-clamp-2">
+                      <p className="font-semibold text-sm text-fg mb-1 line-clamp-2">
                         {currentDuel.entryB.competitor.name}
                       </p>
-                      <p className="text-xs text-[var(--fg-3)] line-clamp-1">
+                      <p className="text-xs text-fg-3 line-clamp-1">
                         {currentDuel.entryB.competitor.coffeeShop}
                       </p>
                     </div>
@@ -230,23 +230,23 @@ export default function AoVivoTab({
             )}
 
             {/* Score */}
-            <div className="p-4 bg-[var(--bg-2)] border-t border-[var(--border)]">
+            <div className="p-4 bg-bg-2 border-t border-border">
               <div className="flex items-center justify-center gap-4">
                 <div className="flex items-center gap-2">
-                  <div className="w-12 h-12 rounded-[var(--radius-sm)] bg-[var(--surface-raised)] flex items-center justify-center border border-[var(--border)]">
-                    <span className="text-2xl font-bold text-[var(--fg)] font-[family-name:var(--font-mono)]">
+                  <div className="w-12 h-12 rounded-sm bg-surface-raised flex items-center justify-center border border-border">
+                    <span className="text-2xl font-bold text-fg font-mono">
                       {currentDuel.votesA}
                     </span>
                   </div>
-                  <span className="text-[var(--fg-3)] text-lg font-[family-name:var(--font-mono)]">×</span>
-                  <div className="w-12 h-12 rounded-[var(--radius-sm)] bg-[var(--surface-raised)] flex items-center justify-center border border-[var(--border)]">
-                    <span className="text-2xl font-bold text-[var(--fg)] font-[family-name:var(--font-mono)]">
+                  <span className="text-fg-3 text-lg font-mono">×</span>
+                  <div className="w-12 h-12 rounded-sm bg-surface-raised flex items-center justify-center border border-border">
+                    <span className="text-2xl font-bold text-fg font-mono">
                       {currentDuel.votesB}
                     </span>
                   </div>
                 </div>
               </div>
-              <p className="text-center text-xs text-[var(--fg-3)] mt-2">
+              <p className="text-center text-xs text-fg-3 mt-2">
                 {currentDuel.votesA + currentDuel.votesB} de {event.judgesCount} votos
               </p>
             </div>
@@ -267,18 +267,18 @@ export default function AoVivoTab({
           sees the upcoming matchup at the top of the tab. */}
       {!currentDuel && nextDuel && (
         <div>
-          <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">Próximo duelo</h3>
-          <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-1)] border border-[var(--border)]">
-            <div className="p-3 bg-[var(--bg-2)] border-b border-[var(--border)]">
-              <p className="text-xs text-[var(--fg-3)]">
+          <h3 className="text-sm font-semibold text-fg-2 mb-3">Próximo duelo</h3>
+          <div className="bg-surface-raised rounded-md overflow-hidden shadow-1 border border-border">
+            <div className="p-3 bg-bg-2 border-b border-border">
+              <p className="text-xs text-fg-3">
                 {getRoundLabel(nextDuel.round)} · Duelo {nextDuel.position + 1}
               </p>
             </div>
-            <div className="grid grid-cols-2 gap-px bg-[var(--border)]">
+            <div className="grid grid-cols-2 gap-px bg-border">
               {nextDuel.entryA && (
-                <div className="bg-[var(--surface)] p-3">
+                <div className="bg-surface p-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-bg-2 border border-border flex-shrink-0">
                       <img
                         src={nextDuel.entryA.competitor.photoUrl}
                         alt={nextDuel.entryA.competitor.name}
@@ -286,10 +286,10 @@ export default function AoVivoTab({
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-xs text-[var(--fg)] truncate">
+                      <p className="font-semibold text-xs text-fg truncate">
                         {nextDuel.entryA.competitor.name}
                       </p>
-                      <p className="text-xs text-[var(--fg-3)] truncate">
+                      <p className="text-xs text-fg-3 truncate">
                         {nextDuel.entryA.competitor.coffeeShop}
                       </p>
                     </div>
@@ -297,9 +297,9 @@ export default function AoVivoTab({
                 </div>
               )}
               {nextDuel.entryB && (
-                <div className="bg-[var(--surface)] p-3">
+                <div className="bg-surface p-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                    <div className="w-10 h-10 rounded-full overflow-hidden bg-bg-2 border border-border flex-shrink-0">
                       <img
                         src={nextDuel.entryB.competitor.photoUrl}
                         alt={nextDuel.entryB.competitor.name}
@@ -307,10 +307,10 @@ export default function AoVivoTab({
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold text-xs text-[var(--fg)] truncate">
+                      <p className="font-semibold text-xs text-fg truncate">
                         {nextDuel.entryB.competitor.name}
                       </p>
-                      <p className="text-xs text-[var(--fg-3)] truncate">
+                      <p className="text-xs text-fg-3 truncate">
                         {nextDuel.entryB.competitor.coffeeShop}
                       </p>
                     </div>
@@ -335,7 +335,7 @@ export default function AoVivoTab({
         if (completed.length === 0 && pending.length === 0) return null;
         return (
           <div>
-            <h3 className="text-sm font-semibold text-[var(--fg-2)] mb-3">
+            <h3 className="text-sm font-semibold text-fg-2 mb-3">
               Duelos da rodada
             </h3>
             <div className="space-y-2">
@@ -361,18 +361,18 @@ function CompactDuelRow({ duel, state }: { duel: Duel; state: 'completed' | 'pen
     : `Duelo ${duel.position + 1}`;
   return (
     <div
-      className={`rounded-[var(--radius-sm)] border p-3 ${
+      className={`rounded-sm border p-3 ${
         state === 'completed'
-          ? 'border-[var(--border)] bg-[var(--surface)]'
-          : 'border-[var(--border)] bg-[var(--bg-2)] opacity-80'
+          ? 'border-border bg-surface'
+          : 'border-border bg-bg-2 opacity-80'
       }`}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-3)]">
+        <span className="font-mono text-[10px] uppercase tracking-wider text-fg-3">
           {subtitle} · {state === 'completed' ? (isWalkover ? 'W.O.' : 'Concluído') : 'Pendente'}
         </span>
         {state === 'completed' && (
-          <span className="font-mono text-sm font-semibold tabular-nums text-[var(--fg)]">
+          <span className="font-mono text-sm font-semibold tabular-nums text-fg">
             {duel.votesA} × {duel.votesB}
           </span>
         )}
@@ -388,8 +388,8 @@ function CompactDuelRow({ duel, state }: { duel: Duel; state: 'completed' | 'pen
 function CompactCompetitor({ entry, isWinner }: { entry: Entry | null; isWinner: boolean }) {
   if (!entry) {
     return (
-      <div className="flex items-center gap-2 text-xs text-[var(--fg-3)]" aria-label="Sem oponente">
-        <div className="w-8 h-8 rounded-full bg-[var(--bg-2)] border border-[var(--border)]" />
+      <div className="flex items-center gap-2 text-xs text-fg-3" aria-label="Sem oponente">
+        <div className="w-8 h-8 rounded-full bg-bg-2 border border-border" />
         —
       </div>
     );
@@ -404,12 +404,12 @@ function CompactCompetitor({ entry, isWinner }: { entry: Entry | null; isWinner:
         src={entry.competitor.photoUrl}
         alt={entry.competitor.name}
         className={`w-8 h-8 rounded-full object-cover border ${
-          isWinner ? 'border-[var(--gold)]' : 'border-[var(--border)]'
+          isWinner ? 'border-gold' : 'border-border'
         }`}
       />
       <div className="min-w-0 flex-1">
-        <p className="text-xs text-[var(--fg)] truncate leading-tight">{entry.competitor.name}</p>
-        <p className="text-[10px] text-[var(--fg-3)] truncate leading-tight">{entry.competitor.coffeeShop}</p>
+        <p className="text-xs text-fg truncate leading-tight">{entry.competitor.name}</p>
+        <p className="text-[10px] text-fg-3 truncate leading-tight">{entry.competitor.coffeeShop}</p>
       </div>
     </div>
   );

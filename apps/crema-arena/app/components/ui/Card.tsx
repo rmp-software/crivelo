@@ -33,8 +33,8 @@ const paddingClasses = {
 
 const shadowClasses = {
   none: 'shadow-none',
-  sm: 'shadow-[var(--shadow-1)]',
-  md: 'shadow-[var(--shadow-2)]',
+  sm: 'shadow-1',
+  md: 'shadow-2',
 } as const;
 
 export default function Card({
@@ -48,7 +48,7 @@ export default function Card({
   return (
     <ShadcnCard
       className={cn(
-        'block gap-0 rounded-[var(--radius-md)] py-0',
+        'block gap-0 rounded-md py-0',
         paddingClasses[padding],
         shadowClasses[shadow],
         !border && 'border-0',

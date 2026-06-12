@@ -197,8 +197,8 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Wildcard">
         <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-[var(--fg-2)]">Carregando opções...</p>
+          <div className="inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
+          <p className="mt-4 text-fg-2">Carregando opções...</p>
         </div>
       </Modal>
     );
@@ -208,7 +208,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Substituir competidor">
         <div className="space-y-4">
-          <p className="text-[var(--fg-2)]">
+          <p className="text-fg-2">
             Qual competidor você deseja substituir?
           </p>
 
@@ -223,10 +223,10 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                   setTargetSlot(slot);
                   setStep('select-type');
                 }}
-                className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] transition-colors text-left"
+                className="w-full p-4 rounded-md border-2 border-border bg-surface hover:border-brand hover:bg-brand-soft transition-colors text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
                     <img
                       src={entry.competitor.photoUrl}
                       alt={entry.competitor.name}
@@ -234,8 +234,8 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                     />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-[var(--fg)]">{entry.competitor.name}</p>
-                    <p className="text-sm text-[var(--fg-2)]">{entry.competitor.coffeeShop}</p>
+                    <p className="font-semibold text-fg">{entry.competitor.name}</p>
+                    <p className="text-sm text-fg-2">{entry.competitor.coffeeShop}</p>
                   </div>
                 </div>
               </button>
@@ -267,7 +267,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
       />
       <Modal isOpen={isOpen} onClose={onClose} title="Selecione tipo de wildcard">
         <div className="space-y-4">
-          <p className="text-[var(--fg-2)]">
+          <p className="text-fg-2">
             {bothFilled
               ? 'Escolha como substituir o competidor selecionado:'
               : 'Escolha como deseja preencher a vaga vazia neste duelo:'}
@@ -279,15 +279,15 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
               <button
                 onClick={() => setShowWalkoverConfirm(true)}
                 disabled={isSubmitting}
-                className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--warning)] hover:bg-[var(--warning-soft)] transition-colors text-left"
+                className="w-full p-4 rounded-md border-2 border-border bg-surface hover:border-warning hover:bg-warning-soft transition-colors text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-[var(--warning-soft)] border-2 border-[var(--warning)] flex items-center justify-center flex-shrink-0">
-                    <Trophy size={24} className="text-[var(--warning)]" />
+                  <div className="w-12 h-12 rounded-full bg-warning-soft border-2 border-warning flex items-center justify-center flex-shrink-0">
+                    <Trophy size={24} className="text-warning" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-[var(--fg)]">Walkover (W.O.)</p>
-                    <p className="text-sm text-[var(--fg-2)]">
+                    <p className="font-semibold text-fg">Walkover (W.O.)</p>
+                    <p className="text-sm text-fg-2">
                       Oponente avança automaticamente sem competidor adversário
                     </p>
                   </div>
@@ -299,15 +299,15 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
             <button
               onClick={() => setStep('manual-pick')}
               disabled={eliminatedCompetitors.length === 0}
-              className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full p-4 rounded-md border-2 border-border bg-surface hover:border-brand hover:bg-brand-soft transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[var(--brand-soft)] border-2 border-[var(--brand)] flex items-center justify-center flex-shrink-0">
-                  <User size={24} className="text-[var(--brand)]" />
+                <div className="w-12 h-12 rounded-full bg-brand-soft border-2 border-brand flex items-center justify-center flex-shrink-0">
+                  <User size={24} className="text-brand" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-[var(--fg)]">Escolha manual</p>
-                  <p className="text-sm text-[var(--fg-2)]">
+                  <p className="font-semibold text-fg">Escolha manual</p>
+                  <p className="text-sm text-fg-2">
                     Selecione um competidor eliminado para retornar
                     {eliminatedCompetitors.length === 0 && ' (nenhum disponível)'}
                   </p>
@@ -319,15 +319,15 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
             <button
               onClick={handleRandomPick}
               disabled={eliminatedCompetitors.length === 0}
-              className="w-full p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)] bg-[var(--surface)] hover:border-[var(--success)] hover:bg-[var(--success-soft)] transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full p-4 rounded-md border-2 border-border bg-surface hover:border-success hover:bg-success-soft transition-colors text-left disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-[var(--success-soft)] border-2 border-[var(--success)] flex items-center justify-center flex-shrink-0">
-                  <Shuffle size={24} className="text-[var(--success)]" />
+                <div className="w-12 h-12 rounded-full bg-success-soft border-2 border-success flex items-center justify-center flex-shrink-0">
+                  <Shuffle size={24} className="text-success" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-semibold text-[var(--fg)]">Sorteio aleatório</p>
-                  <p className="text-sm text-[var(--fg-2)]">
+                  <p className="font-semibold text-fg">Sorteio aleatório</p>
+                  <p className="text-sm text-fg-2">
                     Sistema sorteia um competidor eliminado
                     {eliminatedCompetitors.length === 0 && ' (nenhum disponível)'}
                   </p>
@@ -346,7 +346,7 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
       <Modal isOpen={isOpen} onClose={onClose} title="Selecione um competidor">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-[var(--fg-2)]">
+            <p className="text-fg-2">
               Escolha um competidor eliminado para retornar como wildcard:
             </p>
             <Button
@@ -364,14 +364,14 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
               <button
                 key={competitor.entryId}
                 onClick={() => handleManualPick(competitor)}
-                className={`w-full p-3 rounded-[var(--radius-md)] border-2 transition-colors ${
+                className={`w-full p-3 rounded-md border-2 transition-colors ${
                   selectedCompetitor?.entryId === competitor.entryId
-                    ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--fg-4)]'
+                    ? 'border-brand bg-brand-soft'
+                    : 'border-border bg-surface hover:border-fg-4'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
                     <img
                       src={competitor.photoUrl}
                       alt={competitor.name}
@@ -379,14 +379,14 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                     />
                   </div>
                   <div className="flex-1 text-left">
-                    <p className="font-semibold text-[var(--fg)]">{competitor.name}</p>
-                    <p className="text-sm text-[var(--fg-2)]">{competitor.coffeeShop}</p>
-                    <p className="text-xs text-[var(--fg-3)]">
+                    <p className="font-semibold text-fg">{competitor.name}</p>
+                    <p className="text-sm text-fg-2">{competitor.coffeeShop}</p>
+                    <p className="text-xs text-fg-3">
                       Eliminado na Rodada {competitor.eliminatedAtRound}
                     </p>
                   </div>
                   {selectedCompetitor?.entryId === competitor.entryId && (
-                    <CheckCircle size={20} className="text-[var(--brand)] flex-shrink-0" />
+                    <CheckCircle size={20} className="text-brand flex-shrink-0" />
                   )}
                 </div>
               </button>
@@ -427,14 +427,14 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
     return (
       <Modal isOpen={isOpen} onClose={onClose} title="Competidor sorteado">
         <div className="space-y-4">
-          <p className="text-[var(--fg-2)]">
+          <p className="text-fg-2">
             O sistema sorteou o seguinte competidor:
           </p>
 
           {/* Selected Competitor Card */}
-          <div className="p-4 rounded-[var(--radius-md)] border-2 border-[var(--success)] bg-[var(--success-soft)]">
+          <div className="p-4 rounded-md border-2 border-success bg-success-soft">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
                 <img
                   src={randomCompetitor.photoUrl}
                   alt={randomCompetitor.name}
@@ -442,19 +442,19 @@ export default function WildcardModal({ isOpen, onClose, duelId, onSuccess, entr
                 />
               </div>
               <div className="flex-1">
-                <p className="text-lg font-semibold text-[var(--fg)]">
+                <p className="text-lg font-semibold text-fg">
                   {randomCompetitor.name}
                 </p>
-                <p className="text-sm text-[var(--fg-2)]">{randomCompetitor.coffeeShop}</p>
-                <p className="text-xs text-[var(--fg-3)] mt-1">
+                <p className="text-sm text-fg-2">{randomCompetitor.coffeeShop}</p>
+                <p className="text-xs text-fg-3 mt-1">
                   Eliminado na Rodada {randomCompetitor.eliminatedAtRound}
                 </p>
               </div>
-              <Shuffle size={32} className="text-[var(--success)] flex-shrink-0" />
+              <Shuffle size={32} className="text-success flex-shrink-0" />
             </div>
           </div>
 
-          <p className="text-sm text-[var(--fg-3)] text-center">
+          <p className="text-sm text-fg-3 text-center">
             Confirme para adicionar este competidor como wildcard
           </p>
 

@@ -36,4 +36,25 @@
 
   --color-cherry-100: var(--cherry-100);
   --color-cherry-500: var(--cherry-500);
+
+  /* ---------- Semantic warning (amber) ----------
+   * Defined in arena-tokens.css; promoted so bg-warning / text-warning /
+   * bg-warning-soft generate — the idiomatic replacement for [var(--warning)]. */
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+
+  /* ---------- Arena signature shadows ----------
+   * Literal values (the shadow namespace name collides with the raw --shadow-*
+   * variable, so a var() self-reference would be circular — same pattern as the
+   * foundation's --shadow-1/-2). The color-mix() still reads the runtime --live /
+   * --espresso-900, so accent overrides flow through. Generates shadow-live-halo /
+   * shadow-telona. Values mirror arena-tokens.css exactly. */
+  --shadow-live-halo: 0 0 0 4px color-mix(in srgb, var(--live) 18%, transparent);
+  --shadow-telona: 0 6px 14px color-mix(in srgb, var(--espresso-900) 45%, transparent);
+
+  /* Landing feature accents (composite shadows with a token color stop — literal,
+   * same circular-name reason as the shadows above; the var() reads the runtime
+   * cinnamon/bg-inverse). Generates shadow-feat-active / shadow-timeline-dot. */
+  --shadow-feat-active: inset 3px 0 0 var(--cinnamon-500);
+  --shadow-timeline-dot: 0 0 0 4px var(--bg-inverse);
 }

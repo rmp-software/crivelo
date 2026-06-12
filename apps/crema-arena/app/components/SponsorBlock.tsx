@@ -67,13 +67,13 @@ export default function SponsorBlock({ eventId, eventStatus }: SponsorBlockProps
   // Finished → sentence-case credit mirroring the TV podium's font-display line
   // (CLAUDE.md: sentence case for headings; only the running label is mono caps).
   const headingClassName = isFinished
-    ? 'text-center text-sm font-[family-name:var(--font-display)] text-[var(--fg-3)] mb-4'
-    : 'text-center text-[10px] tracking-[0.22em] uppercase font-[family-name:var(--font-mono)] text-[var(--fg-3)] mb-4';
+    ? 'text-center text-sm font-display text-fg-3 mb-4'
+    : 'text-center text-[10px] tracking-[0.22em] uppercase font-mono text-fg-3 mb-4';
 
   return (
     <section
       aria-label="Patrocinadores"
-      className="border-t border-[var(--border)] px-4 py-6 mt-2"
+      className="border-t border-border px-4 py-6 mt-2"
     >
       <h2 className={headingClassName}>
         {heading}

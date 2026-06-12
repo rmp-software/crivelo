@@ -33,8 +33,7 @@ export default function NowPouring({
 
   return (
     <section
-      className="relative overflow-hidden rounded-[var(--radius-lg)] mb-6"
-      style={{ background: 'var(--espresso-900)', color: 'var(--crema-50)' }}
+      className="relative overflow-hidden rounded-lg mb-6 bg-espresso-900 text-crema-50"
     >
       {/* Brand rings motif bleeding off the corner */}
       <img
@@ -45,29 +44,29 @@ export default function NowPouring({
       />
       <div className="relative p-6 md:p-8">
         <div className="flex items-center gap-2 mb-4">
-          <span className="w-2 h-2 rounded-full bg-[var(--live)]" aria-hidden />
-          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--mint-100)] font-semibold">
+          <span className="w-2 h-2 rounded-full bg-live" aria-hidden />
+          <span className="font-mono text-[10px] uppercase tracking-wider text-mint-100 font-semibold">
             Duelo ao vivo · Bateria {duelPosition + 1}
           </span>
         </div>
 
         <div className="grid grid-cols-[1fr_auto_1fr] items-baseline gap-3 md:gap-6">
           <div className="min-w-0">
-            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
+            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-crema-50 leading-tight truncate">
               {entryA?.name ?? '—'}
             </h2>
-            <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
+            <p className="mt-1 text-sm md:text-base font-serif italic text-crema-200 truncate">
               {entryA?.coffeeShop || '—'}
             </p>
           </div>
-          <span className="font-serif italic text-xl md:text-2xl text-[var(--marigold-300)] self-baseline">
+          <span className="font-serif italic text-xl md:text-2xl text-marigold-300 self-baseline">
             vs
           </span>
           <div className="min-w-0 text-right">
-            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-[var(--crema-50)] leading-tight truncate">
+            <h2 className="text-2xl md:text-4xl font-display font-extrabold text-crema-50 leading-tight truncate">
               {entryB?.name ?? '—'}
             </h2>
-            <p className="mt-1 text-sm md:text-base font-serif italic text-[var(--crema-200)] truncate">
+            <p className="mt-1 text-sm md:text-base font-serif italic text-crema-200 truncate">
               {entryB?.coffeeShop || '—'}
             </p>
           </div>
@@ -76,7 +75,7 @@ export default function NowPouring({
         <div className="mt-5 flex items-center gap-4 flex-wrap">
           {/* Live score */}
           <div
-            className="font-mono font-semibold tabular-nums leading-none text-[var(--crema-50)]"
+            className="font-mono font-semibold tabular-nums leading-none text-crema-50"
             style={{ fontSize: 'clamp(32px, 4.5vw, 48px)' }}
             aria-label={`Placar atual: ${votesA} a ${votesB}`}
           >
@@ -88,18 +87,15 @@ export default function NowPouring({
             {Array.from({ length: judgesCount }).map((_, i) => (
               <span
                 key={i}
-                className="w-2.5 h-2.5 rounded-full transition-colors"
-                style={{
-                  backgroundColor:
-                    i < cast ? 'var(--marigold-500)' : 'transparent',
-                  border: `2px solid ${
-                    i < cast ? 'var(--marigold-500)' : 'var(--espresso-500)'
-                  }`,
-                }}
+                className={`w-2.5 h-2.5 rounded-full transition-colors border-2 ${
+                  i < cast
+                    ? 'bg-marigold-500 border-marigold-500'
+                    : 'bg-transparent border-espresso-500'
+                }`}
                 aria-hidden
               />
             ))}
-            <span className="font-mono text-xs uppercase tracking-wider text-[var(--crema-300)] ml-2 tabular-nums">
+            <span className="font-mono text-xs uppercase tracking-wider text-crema-300 ml-2 tabular-nums">
               {cast} / {judgesCount}
             </span>
           </div>

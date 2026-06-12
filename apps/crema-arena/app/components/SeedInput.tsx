@@ -63,7 +63,7 @@ export default function SeedInput({ entryId, eventId, seed, onSaved }: SeedInput
 
   return (
     <label className="flex flex-col items-center gap-0.5">
-      <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--fg-3)]">
+      <span className="font-mono text-[10px] uppercase tracking-wider text-fg-3">
         Seed
       </span>
       <input
@@ -82,7 +82,7 @@ export default function SeedInput({ entryId, eventId, seed, onSaved }: SeedInput
           }
         }}
         disabled={saving}
-        className="w-14 text-center px-2 py-1 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-[var(--brand)] disabled:opacity-50"
+        className="w-14 text-center px-2 py-1 rounded-sm border border-border-strong bg-surface text-fg font-mono text-sm tabular-nums focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-brand disabled:opacity-50"
       />
     </label>
   );

@@ -53,7 +53,7 @@ export default function EditCompetitorPage() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando competidor...</p>
+          <p className="mt-4 text-fg-2">Carregando competidor...</p>
         </div>
       </div>
     );
@@ -62,7 +62,7 @@ export default function EditCompetitorPage() {
   if (error || !competitor) {
     return (
       <div className="max-w-7xl mx-auto">
-        <div className="p-4 mb-6 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-6 rounded-sm bg-danger-soft border border-danger text-danger">
           {error || 'Competitor not found'}
         </div>
       </div>

@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-[var(--bg)] overflow-x-hidden">
+    <div className="flex min-h-screen bg-bg overflow-x-hidden">
       <Sidebar user={session.user} />
 
       {/* Main Content Area — `min-w-0` lets the flex item shrink below the

@@ -11,7 +11,7 @@ export default function NewEventPage() {
         description="Crie um novo evento de competição"
       />
 
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
         <EventForm mode="create" />
       </div>
     </div>

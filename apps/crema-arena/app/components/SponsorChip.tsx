@@ -49,7 +49,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
 
     return (
       <div
-        className="flex items-center justify-center flex-shrink-0 bg-[var(--surface-raised)] rounded-[var(--radius-sm)]"
+        className="flex items-center justify-center flex-shrink-0 bg-surface-raised rounded-sm"
         style={chipStyle}
       >
         {sponsor.logo_url ? (
@@ -67,7 +67,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
           />
         ) : (
           <span
-            className="font-display font-semibold text-[var(--espresso-900)] truncate"
+            className="font-display font-semibold text-espresso-900 truncate"
             style={{ fontSize: 18, maxWidth: 192 }}
           >
             {sponsor.name}
@@ -79,7 +79,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
 
   if (size === 'podium') {
     return (
-      <div className="flex items-center justify-center h-12 md:h-14 px-3 md:px-4 bg-[var(--surface-raised)] rounded-[var(--radius-sm)] shadow-[var(--shadow-1)]">
+      <div className="flex items-center justify-center h-12 md:h-14 px-3 md:px-4 bg-surface-raised rounded-sm shadow-1">
         {sponsor.logo_url ? (
           <img
             src={sponsor.logo_url}
@@ -87,7 +87,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
             className="max-h-[28px] md:max-h-[32px] w-auto max-w-[140px] object-contain"
           />
         ) : (
-          <span className="font-display font-bold text-sm md:text-base text-[var(--espresso-900)] whitespace-nowrap">
+          <span className="font-display font-bold text-sm md:text-base text-espresso-900 whitespace-nowrap">
             {sponsor.name}
           </span>
         )}
@@ -98,8 +98,8 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
   // companion
   return (
     <div
-      className={`flex items-center justify-center h-14 px-4 bg-[var(--surface-raised)] rounded-[var(--radius-sm)] ${
-        bordered ? 'border border-[var(--border)]' : ''
+      className={`flex items-center justify-center h-14 px-4 bg-surface-raised rounded-sm ${
+        bordered ? 'border border-border' : ''
       }`}
     >
       {sponsor.logo_url ? (
@@ -109,7 +109,7 @@ export default function SponsorChip({ sponsor, size, bordered = false }: Sponsor
           className="max-h-[56px] w-auto max-w-[160px] object-contain"
         />
       ) : (
-        <span className="font-[family-name:var(--font-display)] font-bold text-sm text-[var(--fg-2)] whitespace-nowrap">
+        <span className="font-display font-bold text-sm text-fg-2 whitespace-nowrap">
           {sponsor.name}
         </span>
       )}

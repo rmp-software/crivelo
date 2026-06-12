@@ -179,8 +179,8 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   if (isLoading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block w-8 h-8 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-4 text-[var(--fg-2)]">Carregando dados do evento...</p>
+        <div className="inline-block w-8 h-8 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-fg-2">Carregando dados do evento...</p>
       </div>
     );
   }
@@ -188,13 +188,13 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
   return (
     <div className="space-y-6">
       {/* Round Header */}
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 border border-border shadow-1">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)]">
+            <h2 className="text-2xl font-bold text-fg font-display">
               {getRoundName(currentRound, totalRounds)}
             </h2>
-            <p className="text-sm text-[var(--fg-3)] mt-1">
+            <p className="text-sm text-fg-3 mt-1">
               {duels.filter((d) => d.status === 'completed').length} de {duels.length} duelos concluídos
             </p>
           </div>
@@ -215,10 +215,10 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
         </div>
 
         {/* Crowd vote — live toggle (organizer can flip it during the event) */}
-        <div className="mt-6 pt-6 border-t border-[var(--border)] flex items-center justify-between gap-4">
+        <div className="mt-6 pt-6 border-t border-border flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-[var(--fg-2)]">Voto do público</p>
-            <p className="text-sm text-[var(--fg-3)] mt-0.5">
+            <p className="text-sm font-medium text-fg-2">Voto do público</p>
+            <p className="text-sm text-fg-3 mt-0.5">
               O público vota pelo celular, sem afetar o resultado dos jurados.
             </p>
           </div>
@@ -229,16 +229,14 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
             aria-label="Voto do público"
             disabled={isTogglingCrowdVote}
             onClick={() => handleToggleCrowdVote(!crowdVoteEnabled)}
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed ${
-              crowdVoteEnabled ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-base ease-standard focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed ${
+              crowdVoteEnabled ? 'bg-brand' : 'bg-border-strong'
             }`}
-            style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-[var(--surface-raised)] shadow transition-transform ${
+              className={`inline-block h-4 w-4 transform rounded-full bg-surface-raised shadow transition-transform duration-base ease-standard ${
                 crowdVoteEnabled ? 'translate-x-6' : 'translate-x-1'
               }`}
-              style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
             />
           </button>
         </div>
@@ -276,7 +274,7 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
         title="Encerrar evento"
       >
         <div className="space-y-4">
-          <p className="text-[var(--fg-2)]">
+          <p className="text-fg-2">
             Tem certeza que deseja encerrar o evento? Esta ação não pode ser desfeita.
           </p>
           <div className="flex gap-3 pt-2">
@@ -310,8 +308,8 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
       </Modal>
 
       {/* Duel List */}
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
-        <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] mb-4">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
+        <h3 className="text-xl font-semibold text-fg font-display mb-4">
           Todos os duelos - {getRoundName(currentRound, totalRounds)}
         </h3>
 
@@ -319,15 +317,15 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
           {duels.map((duel) => (
             <div
               key={duel.id}
-              className={`p-4 rounded-[var(--radius-md)] border transition-colors ${
+              className={`p-4 rounded-md border transition-colors ${
                 activeDuel?.id === duel.id
-                  ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
-                  : 'border-[var(--border)] bg-[var(--surface)]'
+                  ? 'border-brand bg-brand-soft'
+                  : 'border-border bg-surface'
               }`}
             >
               <div className="flex items-start justify-between mb-3 gap-2 flex-wrap">
                 <div className="flex items-center gap-2 flex-wrap min-w-0">
-                  <span className="font-semibold text-[var(--fg)]">
+                  <span className="font-semibold text-fg">
                     {duel.isBronzeMatch ? 'Disputa de 3º lugar' : `Duelo ${duel.position + 1}`}
                   </span>
                   {getStatusBadge(duel.status)}
@@ -349,10 +347,10 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                     </Button>
                   )}
                   {duel.status === 'in_progress' && (
-                    <Play size={16} className="text-[var(--brand)] animate-pulse" />
+                    <Play size={16} className="text-brand animate-pulse" />
                   )}
                   {duel.status === 'completed' && (
-                    <CheckCircle size={16} className="text-[var(--success)]" />
+                    <CheckCircle size={16} className="text-success" />
                   )}
                 </div>
               </div>
@@ -361,13 +359,13 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                 {/* Competitor A */}
                 {duel.entryA ? (
                   <div
-                    className={`flex items-center gap-2 p-2 rounded-[var(--radius-sm)] ${
+                    className={`flex items-center gap-2 p-2 rounded-sm ${
                       duel.winner?.id === duel.entryA.id
-                        ? 'bg-[var(--success-soft)] border-2 border-[var(--success)]'
-                        : 'bg-[var(--bg)]'
+                        ? 'bg-success-soft border-2 border-success'
+                        : 'bg-bg'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-2 border border-border flex-shrink-0">
                       <img
                         src={duel.entryA.competitor.photoUrl}
                         alt={duel.entryA.competitor.name}
@@ -375,36 +373,36 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[var(--fg)] truncate">
+                      <p className="text-sm font-semibold text-fg truncate">
                         {duel.entryA.competitor.name}
                       </p>
                       {duel.status !== 'pending' && (
-                        <p className="text-xs text-[var(--fg-3)]">
+                        <p className="text-xs text-fg-3">
                           {duel.votesA} {duel.votesA === 1 ? 'voto' : 'votos'}
                         </p>
                       )}
                     </div>
                     {duel.winner?.id === duel.entryA.id && (
-                      <Trophy size={14} className="text-[var(--success)] flex-shrink-0" />
+                      <Trophy size={14} className="text-success flex-shrink-0" />
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
-                    <Circle size={20} className="text-[var(--fg-4)]" />
-                    <span className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</span>
+                  <div className="flex items-center gap-2 p-2 rounded-sm bg-bg">
+                    <Circle size={20} className="text-fg-4" />
+                    <span className="text-sm text-fg-3" aria-label="Sem oponente">—</span>
                   </div>
                 )}
 
                 {/* Competitor B */}
                 {duel.entryB ? (
                   <div
-                    className={`flex items-center gap-2 p-2 rounded-[var(--radius-sm)] ${
+                    className={`flex items-center gap-2 p-2 rounded-sm ${
                       duel.winner?.id === duel.entryB.id
-                        ? 'bg-[var(--success-soft)] border-2 border-[var(--success)]'
-                        : 'bg-[var(--bg)]'
+                        ? 'bg-success-soft border-2 border-success'
+                        : 'bg-bg'
                     }`}
                   >
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-bg-2 border border-border flex-shrink-0">
                       <img
                         src={duel.entryB.competitor.photoUrl}
                         alt={duel.entryB.competitor.name}
@@ -412,23 +410,23 @@ export default function RunningEventPanel({ eventId, onEventFinished }: RunningE
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-[var(--fg)] truncate">
+                      <p className="text-sm font-semibold text-fg truncate">
                         {duel.entryB.competitor.name}
                       </p>
                       {duel.status !== 'pending' && (
-                        <p className="text-xs text-[var(--fg-3)]">
+                        <p className="text-xs text-fg-3">
                           {duel.votesB} {duel.votesB === 1 ? 'voto' : 'votos'}
                         </p>
                       )}
                     </div>
                     {duel.winner?.id === duel.entryB.id && (
-                      <Trophy size={14} className="text-[var(--success)] flex-shrink-0" />
+                      <Trophy size={14} className="text-success flex-shrink-0" />
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 p-2 rounded-[var(--radius-sm)] bg-[var(--bg)]">
-                    <Circle size={20} className="text-[var(--fg-4)]" />
-                    <span className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</span>
+                  <div className="flex items-center gap-2 p-2 rounded-sm bg-bg">
+                    <Circle size={20} className="text-fg-4" />
+                    <span className="text-sm text-fg-3" aria-label="Sem oponente">—</span>
                   </div>
                 )}
               </div>

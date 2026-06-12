@@ -72,13 +72,13 @@ export default function DateTime24h({
   };
 
   const selectClass =
-    'px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-[var(--brand)] disabled:opacity-50';
+    'px-3 py-2 rounded-sm border border-border-strong bg-surface text-fg focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-brand disabled:opacity-50';
 
   return (
     <div>
-      <label className="block text-sm font-medium text-[var(--fg-2)] mb-1.5">
+      <label className="block text-sm font-medium text-fg-2 mb-1.5">
         {label}
-        {required && <span className="text-[var(--danger)] ml-1">*</span>}
+        {required && <span className="text-danger ml-1">*</span>}
       </label>
       <div className="flex flex-wrap items-center gap-2">
         <input
@@ -86,10 +86,10 @@ export default function DateTime24h({
           value={date}
           onChange={(e) => update({ date: e.target.value })}
           required={required}
-          className="flex-1 min-w-[160px] px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-[var(--brand)]"
+          className="flex-1 min-w-[160px] px-3 py-2 rounded-sm border border-border-strong bg-surface text-fg font-mono tabular-nums focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:border-brand"
           lang="pt-BR"
         />
-        <span className="font-mono text-[var(--fg-3)]">·</span>
+        <span className="font-mono text-fg-3">·</span>
         <select
           aria-label="Hora"
           value={hour}
@@ -102,7 +102,7 @@ export default function DateTime24h({
             </option>
           ))}
         </select>
-        <span className="font-mono text-[var(--fg-3)]">:</span>
+        <span className="font-mono text-fg-3">:</span>
         <select
           aria-label="Minuto"
           value={minute}
@@ -115,9 +115,9 @@ export default function DateTime24h({
             </option>
           ))}
         </select>
-        <span className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">24h</span>
+        <span className="font-mono text-xs uppercase tracking-wider text-fg-3">24h</span>
       </div>
-      {error && <p className="mt-1.5 text-sm text-[var(--danger)]">{error}</p>}
+      {error && <p className="mt-1.5 text-sm text-danger">{error}</p>}
     </div>
   );
 }

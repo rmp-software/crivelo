@@ -45,18 +45,18 @@ export default function RunningTopBar({
   primaryAction,
 }: RunningTopBarProps) {
   return (
-    <header className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+    <header className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mb-6">
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-full)] bg-[var(--live-soft)] text-[var(--live)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--live)]" aria-hidden />
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-live-soft text-live">
+              <span className="w-1.5 h-1.5 rounded-full bg-live" aria-hidden />
               <span className="font-mono text-[10px] font-semibold tracking-wider uppercase">
                 Ao vivo
               </span>
             </span>
             {currentRound != null && (
-              <span className="text-sm text-[var(--fg-3)]">
+              <span className="text-sm text-fg-3">
                 {roundLabel(currentRound, totalRounds)} ·{' '}
                 <span className="font-mono tabular-nums">
                   {completedInRound} de {totalInRound}
@@ -65,10 +65,10 @@ export default function RunningTopBar({
               </span>
             )}
           </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-[var(--fg)] leading-tight">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-fg leading-tight">
             {eventName}
           </h1>
-          <p className="mt-1 text-sm text-[var(--fg-3)] flex items-center gap-3 flex-wrap">
+          <p className="mt-1 text-sm text-fg-3 flex items-center gap-3 flex-wrap">
             <span className="inline-flex items-center gap-1.5">
               <Calendar size={14} aria-hidden /> {formatDate(date)}
             </span>

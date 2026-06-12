@@ -95,7 +95,7 @@ export default function EventsPage() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 mb-6 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-6 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
@@ -104,7 +104,7 @@ export default function EventsPage() {
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando eventos...</p>
+          <p className="mt-4 text-fg-2">Carregando eventos...</p>
         </div>
       )}
 
@@ -132,43 +132,39 @@ export default function EventsPage() {
               aria-label={`Ver detalhes do evento ${event.name}`}
             >
               <div
-                className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] p-4 md:p-6 border border-[var(--border)] hover:border-[var(--brand)] hover:shadow-[var(--shadow-2)] transition-all cursor-pointer group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-[var(--focus-ring)] group-focus-visible:outline-offset-2"
-                style={{
-                  transitionDuration: 'var(--dur-base)',
-                  transitionTimingFunction: 'var(--ease-standard)',
-                }}
+                className="bg-surface-raised rounded-md p-4 md:p-6 border border-border hover:border-brand hover:shadow-2 transition-all duration-base ease-standard cursor-pointer group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-[color:var(--focus-ring)] group-focus-visible:outline-offset-2"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4 gap-2">
-                  <h3 className="text-base md:text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] leading-tight flex-1">
+                  <h3 className="text-base md:text-lg font-semibold text-fg font-display leading-tight flex-1">
                     {event.name}
                   </h3>
                   {getStatusBadge(event.status)}
                 </div>
 
                 {/* Date */}
-                <div className="flex items-center gap-2 text-sm text-[var(--fg-2)] mb-2">
-                  <Calendar size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
+                <div className="flex items-center gap-2 text-sm text-fg-2 mb-2">
+                  <Calendar size={16} className="text-fg-3" aria-hidden="true" />
                   <time dateTime={event.date}>{formatDate(event.date)}</time>
                 </div>
 
                 {/* Location */}
                 {event.location && (
-                  <div className="flex items-center gap-2 text-sm text-[var(--fg-2)] mb-4">
-                    <MapPin size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
+                  <div className="flex items-center gap-2 text-sm text-fg-2 mb-4">
+                    <MapPin size={16} className="text-fg-3" aria-hidden="true" />
                     {event.location}
                   </div>
                 )}
 
                 {/* Stats */}
-                <div className="flex items-center gap-4 pt-4 border-t border-[var(--border)]">
+                <div className="flex items-center gap-4 pt-4 border-t border-border">
                   <div className="flex items-center gap-2 text-sm">
-                    <Users size={16} className="text-[var(--fg-3)]" aria-hidden="true" />
-                    <span className="text-[var(--fg-2)]">
+                    <Users size={16} className="text-fg-3" aria-hidden="true" />
+                    <span className="text-fg-2">
                       {event.competitorCount} {event.competitorCount === 1 ? 'competidor' : 'competidores'}
                     </span>
                   </div>
-                  <div className="text-sm text-[var(--fg-3)]">
+                  <div className="text-sm text-fg-3">
                     {event.judgesCount} {event.judgesCount === 1 ? 'juiz' : 'juízes'}
                   </div>
                 </div>

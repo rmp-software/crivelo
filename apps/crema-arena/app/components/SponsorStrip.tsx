@@ -106,7 +106,7 @@ export default function SponsorStrip({ eventId }: SponsorStripProps) {
       aria-label="Patrocinadores"
     >
       <span
-        className="font-mono uppercase flex-shrink-0 text-[var(--crema-300)]"
+        className="font-mono uppercase flex-shrink-0 text-crema-300"
         style={{
           fontSize: 11,
           letterSpacing: '0.28em',

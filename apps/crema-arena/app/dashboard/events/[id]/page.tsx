@@ -345,7 +345,7 @@ export default function EventDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Spinner size="lg" />
-        <p className="mt-4 text-[var(--fg-2)]">Carregando evento...</p>
+        <p className="mt-4 text-fg-2">Carregando evento...</p>
       </div>
     );
   }
@@ -353,7 +353,7 @@ export default function EventDetailPage() {
   if (error || !event) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="p-6 rounded-[var(--radius-lg)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-6 rounded-lg bg-danger-soft border border-danger text-danger">
           <h3 className="font-semibold mb-2">Erro</h3>
           <p>{error || 'Event not found'}</p>
         </div>
@@ -438,10 +438,10 @@ export default function EventDetailPage() {
 
       {event.status !== 'running' && (
       /* Event Info Card — primary header for setup/finished */
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mb-6">
         <div className="flex items-start justify-between mb-6 gap-4">
           <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)] mb-2">
+            <h1 className="text-3xl font-bold text-fg font-display mb-2">
               {event.name}
             </h1>
             {getStatusBadge(event.status)}
@@ -458,34 +458,34 @@ export default function EventDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <div className="flex items-center gap-3 text-[var(--fg-2)]">
-            <Calendar size={20} className="text-[var(--fg-3)]" />
+          <div className="flex items-center gap-3 text-fg-2">
+            <Calendar size={20} className="text-fg-3" />
             <span>{formatDate(event.date)}</span>
           </div>
 
           {event.location && (
-            <div className="flex items-center gap-3 text-[var(--fg-2)]">
-              <MapPin size={20} className="text-[var(--fg-3)]" />
+            <div className="flex items-center gap-3 text-fg-2">
+              <MapPin size={20} className="text-fg-3" />
               <span>{event.location}</span>
             </div>
           )}
 
-          <div className="flex items-center gap-3 text-[var(--fg-2)]">
-            <Users size={20} className="text-[var(--fg-3)]" />
+          <div className="flex items-center gap-3 text-fg-2">
+            <Users size={20} className="text-fg-3" />
             <span>{event.judgesCount} {event.judgesCount === 1 ? 'juiz' : 'juízes'}</span>
           </div>
 
-          <div className="flex items-center gap-3 text-[var(--fg-2)]">
-            <Users size={20} className="text-[var(--fg-3)]" />
+          <div className="flex items-center gap-3 text-fg-2">
+            <Users size={20} className="text-fg-3" />
             <span>{competitors.length} {competitors.length === 1 ? 'competidor inscrito' : 'competidores inscritos'}</span>
           </div>
         </div>
 
         {event.description && (
-          <div className="pt-4 border-t border-[var(--border)]">
+          <div className="pt-4 border-t border-border">
             <div className="flex items-start gap-3">
-              <FileText size={20} className="text-[var(--fg-3)] mt-0.5" />
-              <p className="text-[var(--fg-2)] whitespace-pre-wrap">{event.description}</p>
+              <FileText size={20} className="text-fg-3 mt-0.5" />
+              <p className="text-fg-2 whitespace-pre-wrap">{event.description}</p>
             </div>
           </div>
         )}
@@ -494,13 +494,13 @@ export default function EventDetailPage() {
 
       {/* Step 1: Generate Bracket */}
       {event.status === 'setup' && competitors.length >= 2 && duels.length === 0 && (
-        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+        <div className="bg-surface-raised rounded-lg p-6 border border-border shadow-1 mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+              <h3 className="text-lg font-semibold text-fg font-display">
                 Gerar chave
               </h3>
-              <p className="text-sm text-[var(--fg-3)] mt-1">
+              <p className="text-sm text-fg-3 mt-1">
                 Monte a chave de eliminação com {competitors.length} competidores
               </p>
             </div>
@@ -511,7 +511,7 @@ export default function EventDetailPage() {
             >
               {isGeneratingBracket ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-fg border-t-transparent rounded-full animate-spin"></div>
                   Gerando...
                 </>
               ) : (
@@ -528,9 +528,9 @@ export default function EventDetailPage() {
       {/* Step 2: Review Bracket & Start */}
       {event.status === 'setup' && duels.length > 0 && (
         <>
-          <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+          <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mb-6">
             <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
-              <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+              <h3 className="text-xl font-semibold text-fg font-display">
                 Chave gerada
               </h3>
               <div className="flex items-center gap-2">
@@ -560,7 +560,7 @@ export default function EventDetailPage() {
             title="Re-gerar chave"
           >
             <div className="space-y-4">
-              <p className="text-[var(--fg-2)]">
+              <p className="text-fg-2">
                 Re-gerar chave? Esta ação substitui a chave atual.
               </p>
               <div className="flex gap-3 pt-2">
@@ -585,7 +585,7 @@ export default function EventDetailPage() {
             title="Iniciar evento"
           >
             <div className="space-y-4">
-              <p className="text-[var(--fg-2)]">
+              <p className="text-fg-2">
                 Tem certeza? Após iniciar o evento, não será possível alterar as inscrições.
               </p>
               <div className="flex gap-3 pt-2">
@@ -623,13 +623,13 @@ export default function EventDetailPage() {
 
       {/* Links Section - Show when event is running or finished */}
       {(event.status === 'running' || event.status === 'finished') && (
-        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+        <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mb-6">
           <div className="mb-6">
-            <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)] flex items-center gap-2">
+            <h3 className="text-xl font-semibold text-fg font-display flex items-center gap-2">
               <Link2 size={24} />
               Links
             </h3>
-            <p className="text-sm text-[var(--fg-3)] mt-1">
+            <p className="text-sm text-fg-3 mt-1">
               Compartilhe o display ao vivo e o QR code com o público
             </p>
           </div>
@@ -637,7 +637,7 @@ export default function EventDetailPage() {
           <div className="space-y-6">
             {/* Live Display URL */}
             <div>
-              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+              <label className="block text-sm font-medium text-fg-2 mb-2">
                 Display ao vivo
               </label>
               <div className="flex gap-2">
@@ -645,7 +645,7 @@ export default function EventDetailPage() {
                   type="text"
                   readOnly
                   value={`${typeof window !== 'undefined' ? window.location.origin : ''}/live/${eventId}`}
-                  className="flex-1 min-w-0 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm truncate"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-sm border border-border-strong bg-surface text-fg font-mono text-sm truncate"
                 />
                 <Button
                   variant="secondary"
@@ -665,14 +665,14 @@ export default function EventDetailPage() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-[var(--fg-3)] mt-2">
+              <p className="text-xs text-fg-3 mt-2">
                 URL para exibir ao vivo em telas grandes ou projetores
               </p>
             </div>
 
             {/* Audience URL */}
             <div>
-              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+              <label className="block text-sm font-medium text-fg-2 mb-2">
                 Link da plateia
               </label>
               <div className="flex gap-2">
@@ -680,7 +680,7 @@ export default function EventDetailPage() {
                   type="text"
                   readOnly
                   value={`${typeof window !== 'undefined' ? window.location.origin : ''}/e/${eventId}`}
-                  className="flex-1 min-w-0 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] font-mono text-sm truncate"
+                  className="flex-1 min-w-0 px-3 py-2 rounded-sm border border-border-strong bg-surface text-fg font-mono text-sm truncate"
                 />
                 <Button
                   variant="secondary"
@@ -700,18 +700,18 @@ export default function EventDetailPage() {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-[var(--fg-3)] mt-2">
+              <p className="text-xs text-fg-3 mt-2">
                 URL mobile-first para a plateia acompanhar pelo celular
               </p>
             </div>
 
             {/* QR Code Section */}
             <div>
-              <label className="block text-sm font-medium text-[var(--fg-2)] mb-2">
+              <label className="block text-sm font-medium text-fg-2 mb-2">
                 QR para audiência
               </label>
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <div className="bg-white p-4 rounded-[var(--radius-md)] border-2 border-[var(--border)]">
+                <div className="bg-white p-4 rounded-md border-2 border-border">
                   <img
                     src={`/api/events/${eventId}/qr`}
                     alt="QR Code para acesso ao vivo"
@@ -719,7 +719,7 @@ export default function EventDetailPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-[var(--fg-2)] mb-3">
+                  <p className="text-sm text-fg-2 mb-3">
                     Escaneie este QR code para acessar o display ao vivo no celular
                   </p>
                   <Button
@@ -748,12 +748,12 @@ export default function EventDetailPage() {
 
       {/* Bracket View — running + finished (was previously inlined in a 2-col layout, reverted). */}
       {(event.status === 'running' || event.status === 'finished') && duels.length > 0 && (
-        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)] mb-6">
+        <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1 mb-6">
           <div className="mb-6">
-            <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+            <h3 className="text-xl font-semibold text-fg font-display">
               Chaveamento
             </h3>
-            <p className="text-sm text-[var(--fg-3)] mt-1">
+            <p className="text-sm text-fg-3 mt-1">
               {event.bracketSize} posições • {Math.log2(event.bracketSize!)} rodadas
             </p>
           </div>
@@ -762,13 +762,13 @@ export default function EventDetailPage() {
       )}
 
       {/* Registered Competitors Section */}
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+            <h3 className="text-xl font-semibold text-fg font-display">
               Competidores inscritos
             </h3>
-            <p className="text-sm text-[var(--fg-3)] mt-1">
+            <p className="text-sm text-fg-3 mt-1">
               {competitors.length} {competitors.length === 1 ? 'competidor' : 'competidores'}
             </p>
           </div>
@@ -789,9 +789,9 @@ export default function EventDetailPage() {
 
         {/* Competitors List */}
         {competitors.length === 0 ? (
-          <div className="text-center py-12 bg-[var(--bg)] rounded-[var(--radius-md)] border border-[var(--border)]">
-            <p className="text-[var(--fg-2)] mb-2">Nenhum competidor inscrito ainda</p>
-            <p className="text-sm text-[var(--fg-3)] mb-6">
+          <div className="text-center py-12 bg-bg rounded-md border border-border">
+            <p className="text-fg-2 mb-2">Nenhum competidor inscrito ainda</p>
+            <p className="text-sm text-fg-3 mb-6">
               Adicione competidores do seu pool global
             </p>
             {canModify && (
@@ -812,10 +812,10 @@ export default function EventDetailPage() {
             {competitors.map((competitor) => (
               <div
                 key={competitor.entryId}
-                className="flex items-center gap-4 p-4 bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border)]"
+                className="flex items-center gap-4 p-4 bg-surface rounded-md border border-border"
               >
                 {/* Photo */}
-                <div className="w-14 h-14 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+                <div className="w-14 h-14 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
                   <img
                     src={competitor.photoUrl}
                     alt={competitor.name}
@@ -825,10 +825,10 @@ export default function EventDetailPage() {
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-[var(--fg)] truncate">
+                  <h4 className="font-semibold text-fg truncate">
                     {competitor.name}
                   </h4>
-                  <p className="text-sm text-[var(--fg-2)] truncate">
+                  <p className="text-sm text-fg-2 truncate">
                     {competitor.coffeeShop}
                   </p>
                 </div>
@@ -847,7 +847,7 @@ export default function EventDetailPage() {
                   />
                 )}
                 {!canModify && competitor.seed != null && (
-                  <span className="font-mono text-xs uppercase tracking-wider text-[var(--fg-3)]">
+                  <span className="font-mono text-xs uppercase tracking-wider text-fg-3">
                     Seed {competitor.seed}
                   </span>
                 )}

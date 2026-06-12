@@ -5,21 +5,21 @@ import Image from "next/image";
 // (Entrar → /login). Right: "Crema Arena · 2026" in mono.
 export function LandingFooter() {
   return (
-    <footer className="border-t border-[var(--crema-50)]/10 bg-[var(--bg-inverse)] px-7 pt-10 pb-12 max-[560px]:px-[18px]">
+    <footer className="border-t border-crema-50/10 bg-bg-inverse px-7 pt-10 pb-12 max-[560px]:px-[18px]">
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-5">
         <div className="flex items-center gap-[13px]">
           <Image src="/assets/monogram.svg" alt="" aria-hidden="true" width={28} height={28} />
-          <span className="font-body text-sm text-[var(--crema-200)]">
-            <b className="font-semibold text-[var(--crema-50)]">Acesso sob convite.</b> Já tem conta?{" "}
+          <span className="font-body text-sm text-crema-200">
+            <b className="font-semibold text-crema-50">Acesso sob convite.</b> Já tem conta?{" "}
             <Link
               href="/login"
-              className="rounded-sm font-semibold text-[var(--cinnamon-300)] no-underline hover:underline hover:underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
+              className="rounded-sm font-semibold text-cinnamon-300 no-underline hover:underline hover:underline-offset-[3px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus-ring)]"
             >
               Entrar
             </Link>
           </span>
         </div>
-        <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--espresso-500)]">
+        <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-espresso-500">
           Crema Arena · 2026
         </div>
       </div>

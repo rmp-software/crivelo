@@ -108,7 +108,7 @@ export default function SponsorPicker({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[var(--fg-2)]">
+      <p className="text-sm text-fg-2">
         Busque e selecione patrocinadores do seu pool global.
       </p>
 
@@ -122,25 +122,25 @@ export default function SponsorPicker({
         />
         <Search
           size={20}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-3)] pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none"
         />
       </div>
 
       {error && (
-        <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)] text-sm">
+        <div className="p-3 rounded-sm bg-danger-soft border border-danger text-danger text-sm">
           {error}
         </div>
       )}
 
       {isLoading && (
         <div className="text-center py-8">
-          <div className="inline-block w-6 h-6 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+          <div className="inline-block w-6 h-6 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
       {!isLoading && !error && available.length === 0 && (
-        <div className="text-center py-8 bg-[var(--bg-2)] rounded-[var(--radius-md)] border border-[var(--border)]">
-          <p className="text-sm text-[var(--fg-2)]">
+        <div className="text-center py-8 bg-bg-2 rounded-md border border-border">
+          <p className="text-sm text-fg-2">
             {search.trim()
               ? 'Nenhum patrocinador corresponde à busca.'
               : 'Nenhum patrocinador disponível no pool global.'}
@@ -158,14 +158,14 @@ export default function SponsorPicker({
                 type="button"
                 onClick={() => toggle(sponsor.id)}
                 aria-pressed={isSelected}
-                className={`w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border text-left transition-colors ${
+                className={`w-full flex items-center gap-3 p-3 rounded-md border text-left transition-colors ${
                   isSelected
-                    ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)]'
+                    ? 'border-brand bg-brand-soft'
+                    : 'border-border bg-surface hover:border-brand'
                 }`}
               >
                 {/* Logo thumb with initials fallback */}
-                <div className="w-10 h-10 flex-shrink-0 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex items-center justify-center">
+                <div className="w-10 h-10 flex-shrink-0 rounded-sm overflow-hidden bg-bg-2 border border-border flex items-center justify-center">
                   {sponsor.logo_url ? (
                     <img
                       src={sponsor.logo_url}
@@ -173,22 +173,22 @@ export default function SponsorPicker({
                       className="w-full h-full object-contain"
                     />
                   ) : (
-                    <span className="font-display text-sm font-bold text-[var(--fg-3)]" aria-hidden="true">
+                    <span className="font-display text-sm font-bold text-fg-3" aria-hidden="true">
                       {initials(sponsor.name) || '—'}
                     </span>
                   )}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--fg)] truncate">{sponsor.name}</p>
+                  <p className="font-medium text-fg truncate">{sponsor.name}</p>
                 </div>
 
                 {/* Selection indicator */}
                 <div
                   className={`w-6 h-6 flex-shrink-0 rounded-full border flex items-center justify-center ${
                     isSelected
-                      ? 'bg-[var(--brand)] border-[var(--brand)] text-[var(--fg-inverse)]'
-                      : 'border-[var(--border-strong)] text-transparent'
+                      ? 'bg-brand border-brand text-fg-inverse'
+                      : 'border-border-strong text-transparent'
                   }`}
                 >
                   <Check size={14} />

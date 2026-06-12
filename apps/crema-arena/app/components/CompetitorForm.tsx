@@ -134,7 +134,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
     <form onSubmit={handleSubmit} className="max-w-2xl">
       {/* General Error */}
       {generalError && (
-        <div className="mb-6 p-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="mb-6 p-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {generalError}
         </div>
       )}
@@ -169,14 +169,14 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
 
       {/* Photo Upload */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-[var(--fg-2)] mb-1.5">
+        <label className="block text-sm font-medium text-fg-2 mb-1.5">
           Foto
-          {mode === 'create' && <span className="text-[var(--danger)] ml-1">*</span>}
+          {mode === 'create' && <span className="text-danger ml-1">*</span>}
         </label>
 
         {/* Photo Preview */}
         {photoPreview && (
-          <div className="relative w-48 h-48 mb-4 rounded-[var(--radius-md)] overflow-hidden border-2 border-[var(--border)] bg-[var(--bg-2)]">
+          <div className="relative w-48 h-48 mb-4 rounded-md overflow-hidden border-2 border-border bg-bg-2">
             <img
               src={photoPreview}
               alt="Preview"
@@ -185,7 +185,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
             <button
               type="button"
               onClick={handleRemovePhoto}
-              className="absolute top-2 right-2 p-1.5 bg-[var(--danger)] text-white rounded-full hover:bg-[#9E2F24] transition-colors"
+              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-danger-hover transition-colors"
             >
               <X size={16} />
             </button>
@@ -196,17 +196,17 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
         {!photoPreview && (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="w-full p-8 border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] cursor-pointer transition-colors text-center"
+            className="w-full p-8 border-2 border-dashed border-border rounded-md bg-bg-2 hover:bg-bg-3 cursor-pointer transition-colors text-center"
           >
             <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[var(--surface)] flex items-center justify-center">
-                <Upload size={24} className="text-[var(--fg-3)]" />
+              <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center">
+                <Upload size={24} className="text-fg-3" />
               </div>
               <div>
-                <p className="text-sm font-medium text-[var(--fg)]">
+                <p className="text-sm font-medium text-fg">
                   Toque para enviar foto
                 </p>
-                <p className="text-xs text-[var(--fg-3)] mt-1">
+                <p className="text-xs text-fg-3 mt-1">
                   JPG ou PNG, máx. 4MB
                 </p>
               </div>
@@ -237,7 +237,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
         />
 
         {errors.photo && (
-          <p className="mt-1.5 text-sm text-[var(--danger)]">{errors.photo}</p>
+          <p className="mt-1.5 text-sm text-danger">{errors.photo}</p>
         )}
       </div>
 

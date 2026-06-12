@@ -140,14 +140,14 @@ export default function SponsorsPage() {
           />
           <Search
             size={20}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-3)] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none"
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="p-4 mb-6 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-6 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
@@ -156,7 +156,7 @@ export default function SponsorsPage() {
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando patrocinadores...</p>
+          <p className="mt-4 text-fg-2">Carregando patrocinadores...</p>
         </div>
       )}
 
@@ -171,19 +171,15 @@ export default function SponsorsPage() {
 
       {/* Sponsors List */}
       {!isLoading && !error && filteredSponsors.length > 0 && (
-        <div className="bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
-          <ul className="divide-y divide-[var(--border)]">
+        <div className="bg-surface rounded-lg border border-border overflow-hidden">
+          <ul className="divide-y divide-border">
             {filteredSponsors.map((sponsor) => (
               <li
                 key={sponsor.id}
-                className="flex items-center gap-4 px-4 py-4 md:px-6 hover:bg-[var(--bg-2)] transition-colors"
-                style={{
-                  transitionDuration: 'var(--dur-base)',
-                  transitionTimingFunction: 'var(--ease-standard)',
-                }}
+                className="flex items-center gap-4 px-4 py-4 md:px-6 hover:bg-bg-2 transition-colors duration-base ease-standard"
               >
                 {/* Logo thumbnail (40×40, rounded) with initials fallback */}
-                <div className="w-10 h-10 flex-shrink-0 rounded-[var(--radius-sm)] overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex items-center justify-center">
+                <div className="w-10 h-10 flex-shrink-0 rounded-sm overflow-hidden bg-bg-2 border border-border flex items-center justify-center">
                   {sponsor.logo_url ? (
                     <img
                       src={sponsor.logo_url}
@@ -191,7 +187,7 @@ export default function SponsorsPage() {
                       className="w-full h-full object-contain"
                     />
                   ) : (
-                    <span className="font-display text-sm font-bold text-[var(--fg-3)]" aria-hidden="true">
+                    <span className="font-display text-sm font-bold text-fg-3" aria-hidden="true">
                       {initials(sponsor.name) || '—'}
                     </span>
                   )}
@@ -199,8 +195,8 @@ export default function SponsorsPage() {
 
                 {/* Name + events count */}
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-[var(--fg)] truncate">{sponsor.name}</div>
-                  <div className="text-sm text-[var(--fg-3)]">{eventsLabel(sponsor.events_count)}</div>
+                  <div className="font-medium text-fg truncate">{sponsor.name}</div>
+                  <div className="text-sm text-fg-3">{eventsLabel(sponsor.events_count)}</div>
                 </div>
 
                 {/* Actions */}

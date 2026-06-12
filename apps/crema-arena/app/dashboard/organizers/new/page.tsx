@@ -41,7 +41,7 @@ export default function NewOrganizerPage() {
         ]}
       />
 
-      <div className="bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] p-6">
+      <div className="bg-surface rounded-lg border border-border p-6">
         <OrganizerForm onSubmit={handleSubmit} onCancel={handleCancel} />
       </div>
     </div>

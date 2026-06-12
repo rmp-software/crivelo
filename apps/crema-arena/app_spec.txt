@@ -533,16 +533,26 @@
 
     <utility_first>
       - The design tokens ARE the utility vocabulary, mapped via Tailwind v4 `@theme`. Style with
-        semantic utility classes (`bg-surface`, `text-fg`, `rounded-md`, `shadow-brand`, `ease-standard`).
-      - Off-scale one-offs use arbitrary values (`min-h-[44px]`).
-      - A raw ramp step without a semantic name may be referenced as an arbitrary token:
-        `bg-[var(--espresso-800)]` — not a raw hex.
+        semantic utility classes (`bg-surface`, `text-fg`, `rounded-md`, `shadow-live-halo`, `ease-standard`).
+      - A token is a utility, NOT a `var()`. Every registered token (house neutrals + type scale from
+        `@crivelo/tokens`; Arena accent/palette/warning/signature-shadows from `arena-theme.css`, including
+        every raw ramp step) has a bare utility: write `bg-espresso-800` / `text-fg-3` / `bg-surface-raised`
+        / `text-warning`, NEVER `bg-[var(--espresso-800)]` / `text-[color:var(--fg-3)]`. A token missing a
+        utility is a gap to add to `@theme`, not a reason to reach for `[var(--…)]`.
+      - Spacing/size follows the scale (`gap-2.5`, `p-4`); snap a `[NNpx]` to a step ONLY on an exact match.
+        Genuinely off-scale one-offs stay arbitrary (`min-h-[44px]`, `max-w-[1060px]`, odd font sizes).
+      - `--focus-ring` is intentionally NOT promoted to a utility: keep `outline-[color:var(--focus-ring)]`
+        / `ring-[var(--focus-ring)]` as documented arbitraries.
     </utility_first>
 
     <no_raw_color>
-      - No raw hex and no `var(--…)` inside `style`. Style only with semantic utility classes; the
-        token CSS source files (`arena-tokens.css`, `theme.css`, the `@crivelo/tokens` foundation) are
-        the definition layer and are the ONLY place hex literals belong.
+      - No raw hex; no `var(--…)` inside `style`; and no design-token `var(--…)` inside a className
+        arbitrary (`[var(--…)]` / `[color:var(--…)]`) where a registered utility exists. Style only with
+        semantic utility classes; the token CSS source files (`arena-tokens.css`, `theme.css`, the
+        `@crivelo/tokens` foundation) are the definition layer and are the ONLY place hex literals belong.
+      - The ONLY className `[var(--…)]` allowed is a true runtime bridge — a value computed per render from
+        JS (`width:${pct}%`, measured/`clamp()` dims, animation offset, alpha-blended `rgba()`) — plus the
+        intentional `--focus-ring`. A finite enumerable set maps to a static className lookup, not a var.
     </no_raw_color>
 
     <conditional_classes>
@@ -599,7 +609,8 @@
     <styling>
       <!-- The Tailwind v4 / shadcn / motion styling guide; see <styling_conventions> above for the full guide. -->
       <rule grep="style=\{\{">No inline `style` in new app/component code, except the documented last-resort cases (computed dimensions, SVG geometry, state-driven transforms). Prefer utility classes and `cn()`.</rule>
-      <rule grep="style=\{[^}]*var\(--">No `var(--…)` inside a JSX `style` prop — style via semantic utility classes / `cn()` (raw ramp steps go through arbitrary values like `bg-[var(--espresso-800)]`, which is a className, not a `style` prop). EXEMPT: the token CSS source files (`arena-tokens.css`, `arena-theme.css`, `theme.css`, the `@crivelo/tokens` foundation) — the definition layer.</rule>
+      <rule grep="style=\{[^}]*var\(--">No `var(--…)` inside a JSX `style` prop — style via semantic utility classes / `cn()`. EXEMPT: a true runtime bridge (a CSS custom property carrying a per-render JS value, e.g. `style={{ "--bar": rgba, width: pct }}`) and the token CSS source files (`arena-tokens.css`, `arena-theme.css`, `theme.css`, the `@crivelo/tokens` foundation) — the definition layer.</rule>
+      <rule grep="\[(color:)?var\(--">No design-token `var(--…)` inside a className arbitrary — a token is a utility, so write `bg-espresso-800` / `text-fg-3` / `bg-surface-raised` / `text-warning`, never `bg-[var(--espresso-800)]` / `text-[color:var(--fg-3)]`. EXEMPT (do NOT flag): (1) a genuine runtime bridge consuming a per-render JS value (`flex-[var(--flex)]`, `bg-[var(--bar)]`, `left-[var(--puck-x)]`, `max-w-[var(--mw)]`, `text-[length:var(--title-size)]`); (2) the intentional `outline-[color:var(--focus-ring)]` / `ring-[var(--focus-ring)]`; (3) the token CSS source files (`arena-tokens.css`, `arena-theme.css`, `theme.css`, the `@crivelo/tokens` foundation). Everything else with a registered utility is a violation.</rule>
       <rule>New commodity UI uses the primitives from `@crivelo/ui` (`@crivelo/ui/<name>`, e.g. `@crivelo/ui/button`); do not hand-roll a new primitive. The old hand-rolled primitives are `@deprecated` (now at `@crivelo/ui/deprecated/*`) — don't reach for them in new code.</rule>
       <rule grep="from ['\"]@?radix-ui">`@crivelo/ui` is the single source of truth for UI primitives. Apps NEVER import `radix-ui` / `@radix-ui/*` (or otherwise use shadcn) directly — every primitive is imported from `@crivelo/ui`. If an app needs a primitive that doesn't exist yet, ADD it to `@crivelo/ui` (it must LIVE there) and import it — never define or keep a primitive in an app's own scope. EXEMPT (do NOT flag): `packages/ui` itself, which is where the primitives wrap radix.</rule>
       <rule>An app MAY add an app-local wrapper that imports a `@crivelo/ui` primitive and extends it (restyle, add variants/props, bigger sizes — e.g. crema-arena's larger buttons). The wrapper MUST import the `@crivelo/ui` base; it is an extension, not a new primitive. Case-by-case: decide whether a change belongs in the shared `@crivelo/ui` primitive (generally useful — e.g. an `icon` prop) or an app-local wrapper (app-specific look).</rule>

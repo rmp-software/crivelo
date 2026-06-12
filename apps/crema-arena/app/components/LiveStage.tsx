@@ -31,7 +31,7 @@ export default function LiveStage({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[var(--espresso-900)] flex items-center justify-center">
+    <div className="fixed inset-0 overflow-hidden bg-espresso-900 flex items-center justify-center">
       <div
         style={{
           width: STAGE_WIDTH,

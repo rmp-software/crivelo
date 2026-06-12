@@ -58,7 +58,7 @@ export default function EditEventPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <Spinner size="lg" />
-        <p className="mt-4 text-[var(--fg-2)]">Carregando evento...</p>
+        <p className="mt-4 text-fg-2">Carregando evento...</p>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function EditEventPage() {
   if (error || !event) {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="p-6 rounded-[var(--radius-lg)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-6 rounded-lg bg-danger-soft border border-danger text-danger">
           <h3 className="font-semibold mb-2">Erro</h3>
           <p>{error || 'Event not found'}</p>
         </div>
@@ -77,7 +77,7 @@ export default function EditEventPage() {
   if (event.status !== 'setup') {
     return (
       <div className="max-w-3xl mx-auto">
-        <div className="p-6 rounded-[var(--radius-lg)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-6 rounded-lg bg-danger-soft border border-danger text-danger">
           <h3 className="font-semibold mb-2">Não permitido</h3>
           <p>Este evento não pode ser editado porque não está em modo de configuração.</p>
         </div>
@@ -92,7 +92,7 @@ export default function EditEventPage() {
         description={`Editar detalhes de ${event.name}`}
       />
 
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
         <EventForm
           mode="edit"
           eventId={eventId}

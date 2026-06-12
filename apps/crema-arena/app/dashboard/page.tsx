@@ -56,36 +56,36 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8">
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--brand-soft)] flex-shrink-0">
-              <TrendingUp size={24} style={{ color: 'var(--brand)' }} />
+            <div className="p-3 rounded-md bg-brand-soft flex-shrink-0">
+              <TrendingUp size={24} className="text-brand" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-[var(--fg-3)]">Total de Eventos</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalEvents}</p>
+              <p className="text-sm text-fg-3">Total de Eventos</p>
+              <p className="text-2xl font-display font-bold text-fg">{totalEvents}</p>
             </div>
           </div>
         </Card>
 
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--live-soft)] flex-shrink-0">
-              <Users size={24} style={{ color: 'var(--live)' }} />
+            <div className="p-3 rounded-md bg-live-soft flex-shrink-0">
+              <Users size={24} className="text-live" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-[var(--fg-3)]">Total de Competidores</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">{totalCompetitors}</p>
+              <p className="text-sm text-fg-3">Total de Competidores</p>
+              <p className="text-2xl font-display font-bold text-fg">{totalCompetitors}</p>
             </div>
           </div>
         </Card>
 
         <Card padding="md" shadow="sm">
           <div className="flex md:flex-col lg:flex-row items-start md:items-start lg:items-center gap-3 min-w-0">
-            <div className="p-3 rounded-[var(--radius-md)] bg-[var(--gold-soft)] flex-shrink-0">
-              <Calendar size={24} style={{ color: 'var(--gold)' }} />
+            <div className="p-3 rounded-md bg-gold-soft flex-shrink-0">
+              <Calendar size={24} className="text-gold" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm text-[var(--fg-3)]">Eventos ao Vivo</p>
-              <p className="text-2xl font-display font-bold text-[var(--fg)]">{activeEvents}</p>
+              <p className="text-sm text-fg-3">Eventos ao Vivo</p>
+              <p className="text-2xl font-display font-bold text-fg">{activeEvents}</p>
             </div>
           </div>
         </Card>
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
 
       {/* Quick Links */}
       <div>
-        <h2 className="text-xl font-display font-bold text-[var(--fg)] mb-4">
+        <h2 className="text-xl font-display font-bold text-fg mb-4">
           Acesso rápido
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
@@ -104,27 +104,22 @@ export default async function DashboardPage() {
                 <Card
                   padding="lg"
                   shadow="sm"
-                  className="hover:shadow-[var(--shadow-2)] transition-all cursor-pointer group"
-                  style={{
-                    transitionDuration: 'var(--dur-base)',
-                    transitionTimingFunction: 'var(--ease-standard)',
-                  }}
+                  className="hover:shadow-2 transition-all duration-base ease-standard cursor-pointer group"
                 >
                   <div className="flex items-start gap-4">
                     <div
-                      className="p-3 rounded-[var(--radius-md)] transition-transform group-hover:scale-110"
+                      className="p-3 rounded-md transition-transform duration-base group-hover:scale-110"
                       style={{
                         backgroundColor: `${link.color}15`,
-                        transitionDuration: 'var(--dur-base)',
                       }}
                     >
                       <Icon size={28} style={{ color: link.color }} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-display font-bold text-[var(--fg)] mb-1">
+                      <h3 className="text-lg font-display font-bold text-fg mb-1">
                         {link.label}
                       </h3>
-                      <p className="text-sm text-[var(--fg-3)]">{link.description}</p>
+                      <p className="text-sm text-fg-3">{link.description}</p>
                     </div>
                   </div>
                 </Card>

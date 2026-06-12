@@ -70,7 +70,7 @@ export default function EditOrganizerPage() {
       <div className="max-w-2xl mx-auto">
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando organizador...</p>
+          <p className="mt-4 text-fg-2">Carregando organizador...</p>
         </div>
       </div>
     );
@@ -79,7 +79,7 @@ export default function EditOrganizerPage() {
   if (error) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="p-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function EditOrganizerPage() {
         ]}
       />
 
-      <div className="bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] p-6">
+      <div className="bg-surface rounded-lg border border-border p-6">
         {initialData && (
           <OrganizerForm
             initialData={initialData}
