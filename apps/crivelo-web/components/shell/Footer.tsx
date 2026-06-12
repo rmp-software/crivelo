@@ -4,58 +4,35 @@
  * Footer (RMP-190) — CriveloLockup + tagline + sieve motif (SieveGrid fill mode)
  * + "The family" list + copyright + language toggle. Ported from coa-shell.jsx;
  * uses the centralized NAV_ITEMS. Client component because it embeds LangToggle.
+ *
+ * Styling (RMP-212): the foundation's neutral semantic tokens (--bg-2/--fg/--fg-2/3/4,
+ * --border, --font-serif, …) are referenced via arbitrary-value utility classes
+ * (`text-[color:var(--fg-3)]`), which are classNames — NOT inline `style` (the
+ * no-`var(--)`-in-`style` rule). Per-item DATA colours from NAV_ITEMS (`it.dot`)
+ * travel through a CSS custom property consumed by a `bg-[var(--dot)]` utility, so
+ * the dot box itself is still styled with utilities, not an inline `style`.
  */
+import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@crivelo/ui/lib/utils";
 import { CriveloLockup, SieveGrid } from "../brand";
 import { Link } from "../../i18n/navigation";
 import { NAV_ITEMS } from "./nav";
 import { LangToggle } from "./LangToggle";
 
-const CAP = {
-  fontSize: 11,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.08em",
-  fontWeight: 600,
-  color: "var(--fg-3)",
-};
+/** Section caption ("THE FAMILY"). */
+const CAP =
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
 
 export function Footer() {
   const t = useTranslations("Shell");
   return (
-    <footer
-      style={{
-        background: "var(--bg-2)",
-        borderTop: "1px solid var(--border)",
-        marginTop: 40,
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 1060,
-          margin: "0 auto",
-          boxSizing: "border-box",
-          padding: "40px 24px 32px",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-end",
-            justifyContent: "space-between",
-            marginBottom: 22,
-            gap: 16,
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+    <footer className="mt-10 border-t border-[color:var(--border)] bg-[color:var(--bg-2)]">
+      <div className="mx-auto box-border max-w-[1060px] px-6 pt-10 pb-8">
+        <div className="mb-[22px] flex items-end justify-between gap-4">
+          <div className="flex flex-col gap-[10px]">
             <CriveloLockup size="lg" />
-            <span
-              style={{
-                fontFamily: "var(--font-serif)",
-                fontStyle: "italic",
-                fontSize: 18,
-                color: "var(--fg-2)",
-              }}
-            >
+            <span className="font-serif text-[18px] italic text-[color:var(--fg-2)]">
               {t("tagline")}
             </span>
           </div>
@@ -71,42 +48,34 @@ export function Footer() {
           />
         </div>
 
-        <div style={{ ...CAP, marginBottom: 10 }}>{t("theFamily")}</div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            flexWrap: "wrap",
-            gap: 28,
-            marginBottom: 24,
-          }}
-        >
+        <div className={cn(CAP, "mb-[10px]")}>{t("theFamily")}</div>
+        <div className="mb-6 flex flex-row flex-wrap gap-7">
           {NAV_ITEMS.map((it) => {
+            const dotVar = {
+              "--dot": it.dot ?? "var(--fg-4)",
+            } as CSSProperties;
             const row = (
-              <span
-                style={{ display: "flex", alignItems: "center", gap: 9 }}
-              >
+              <span className="flex items-center gap-[9px]">
+                {/* last-resort: data-driven dot colour passed as a CSS custom property (--dot) */}
                 <span
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: 999,
-                    background: it.dot || "var(--fg-4)",
-                    opacity: it.soon ? 0.5 : 1,
-                    flexShrink: 0,
-                  }}
+                  className={cn(
+                    "h-[7px] w-[7px] shrink-0 rounded-full bg-[var(--dot)]",
+                    it.soon && "opacity-50",
+                  )}
+                  style={dotVar}
                 />
                 <span
-                  style={{
-                    fontWeight: 600,
-                    fontSize: 14.5,
-                    color: it.soon ? "var(--fg-4)" : "var(--fg)",
-                  }}
+                  className={cn(
+                    "text-[14.5px] font-semibold",
+                    it.soon
+                      ? "text-[color:var(--fg-4)]"
+                      : "text-[color:var(--fg)]",
+                  )}
                 >
                   {it.name}
                 </span>
                 {it.soon && (
-                  <span style={{ fontSize: 11.5, color: "var(--fg-4)" }}>
+                  <span className="text-[11.5px] text-[color:var(--fg-4)]">
                     {t("soon")}
                   </span>
                 )}
@@ -116,11 +85,12 @@ export function Footer() {
                     height="12"
                     viewBox="0 0 24 24"
                     fill="none"
-                    stroke="var(--fg-3)"
+                    stroke="currentColor"
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
+                    className="text-[color:var(--fg-3)]"
                   >
                     <path d="M7 17L17 7M9 7h8v8" />
                   </svg>
@@ -129,7 +99,7 @@ export function Footer() {
             );
             if (it.soon || !it.href) {
               return (
-                <div key={it.name} style={{ padding: "5px 0" }}>
+                <div key={it.name} className="py-[5px]">
                   {row}
                 </div>
               );
@@ -140,7 +110,7 @@ export function Footer() {
                 href={it.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ padding: "5px 0", textDecoration: "none" }}
+                className="py-[5px] no-underline"
               >
                 {row}
               </a>
@@ -148,7 +118,7 @@ export function Footer() {
               <Link
                 key={it.name}
                 href={it.href}
-                style={{ padding: "5px 0", textDecoration: "none" }}
+                className="py-[5px] no-underline"
               >
                 {row}
               </Link>
@@ -156,27 +126,15 @@ export function Footer() {
           })}
         </div>
 
-        <div
-          style={{
-            height: 1,
-            background: "var(--border)",
-            marginBottom: 18,
-          }}
-        />
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
+        <div className="mb-[18px] h-px bg-[color:var(--border)]" />
+        <div className="flex items-center justify-between">
           {/*
             The `copyright` message keeps the Portuguese tagline "Para quem vive
             café" in BOTH locales on purpose: it is Crivelo's primary brand
             signature, kept in its origin language like a motto. This is NOT a
             missed translation — do not "translate" it in messages/en.json.
           */}
-          <span style={{ fontSize: 12.5, color: "var(--fg-3)" }}>
+          <span className="text-[12.5px] text-[color:var(--fg-3)]">
             {t("copyright")}
           </span>
           <LangToggle />
