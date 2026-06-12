@@ -49,6 +49,13 @@ ONLY for genuinely continuous runtime values. End-state: **no design-token `var(
 - Component PROPS that take a CSS color string (`Icon color="var(--fg-3)"` → SVG stroke, `Monogram inkColor`
   → SVG fill): out of scope for the className sweep. Converting needs an Icon/Monogram `className` API change
   (tracked follow-up), not a `[var(--…)]`→utility swap.
+- **Composite arbitrary CSS with an embedded token color-stop** — a `var(--token)` nested inside a multi-part
+  arbitrary value where no single-token utility exists: `[background:repeating-conic-gradient(var(--crema-50)…var(--espresso-900)…)]`,
+  `shadow-[inset_3px_0_0_var(--cinnamon-500)]`, `before:shadow-[0_0_0_4px_var(--bg-inverse)]`. Converting would
+  need a raw hex (forbidden) or a bespoke composite `@theme` token; with single uses, they stay documented arbitraries.
+- **CSS `animation-*` properties** that reference a token (`style={{ animationDuration: 'var(--dur-stage)' }}` on
+  spinners): Tailwind v4 has no `animation-duration` utility (`duration-*` is transition-duration), so the inline
+  style stays. Pre-existing; not introduced by the sweep.
 
 ## Token registry (P0 — DONE, committed)
 `packages/tokens/styles/theme.css` now promotes (additive):
@@ -149,3 +156,20 @@ grep -rnE 'from "@?radix-ui"' apps --include=*.tsx   # must stay 0 in app code
 - 2026-06-12: Root CLAUDE.md updated with the monorepo-wide "no design-token var() in a className" rule
   (committed with P2 docs). crivelo-web has no app_spec.txt/CLAUDE.md. crema-arena CLAUDE.md + app_spec.txt
   doc updates deferred to the P3 branch (where its code changes). Next: P3 (crema-arena, own branch + PR).
+- 2026-06-12: **P3 COMPLETE** on branch `mux/crivelo-ui-rework-crema-arena` (off the P2 branch) → **PR #33**
+  (base = P2 branch for a crema-arena-only diff; retarget to main after #32 merges). Commits: 4eafa5e token prep
+  (warning + signature shadows), 941f2e5 docs inversion (CLAUDE.md + app_spec.txt + grep compliance rule),
+  d5da6ad wave1 (Live/running/landing, 16 files), c8d30a1 wave2 (dashboard/bracket, 19 files), e556797 wave3
+  (sponsors/forms/shell-ui, 16 files), 21614ca cleanup (Wordmark + dashboard stat icons inline-style→className).
+  **781 className var-arbitraries → 12** (all intentional `--focus-ring`). Irreducible documented exceptions:
+  quickLinks alpha-composite, `animation-duration` (no Tailwind utility), composite gradient/inset-shadow with
+  embedded token stops. 3 waves of ≤3 parallel coders; per-wave tsc 0 + build green + adversarial review APPROVE
+  (caught/fixed: focus-ring dead-class, font-family + exact-match misses, EventStatStrip caller). Playwright
+  before/after **pixel-identical** on landing (heaviest) + login (light/dark × mobile/desktop/wide); preview
+  token pipeline confirmed resolving. **Open verification gap (environmental, not code):** authenticated
+  dashboard pixel-check needs the QA password (preview login is credentials-only) and data-populated live/podium
+  screens need a seeded event (dev Neon branch is empty) — both are value-preserving swaps already source-verified
+  by the wave reviews (podium gold/crema/cinnamon, EventStatStrip, Wordmark, stat icons).
+- Follow-ups (out of this sweep's var-scope): (1) `hover:bg-[#9E2F24]` raw hex in CompetitorForm + SponsorForm →
+  needs a `--danger-hover` token. (2) `Icon color="var(--…)"` / `Monogram inkColor` PROPS (crivelo-web) → need a
+  className API to drop the last prop-level vars.
