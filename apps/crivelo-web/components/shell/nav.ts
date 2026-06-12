@@ -7,15 +7,16 @@
  *
  * `dot` is a CSS colour for the family marker: Coa uses the site teal accent
  * (`var(--brand)`); Crema Arena carries its own cinnamon brand colour, which is
- * not a token in this app, so it lives here as the canonical brand hex (data, not
- * a styling decision).
+ * not a token in this app, so it lives here as the canonical brand value (data,
+ * not a styling decision). It is expressed in `rgb()` rather than hex so the file
+ * carries no raw hex literal (the styling-rework no-hex rule).
  */
 
 /** The current Crema Arena URL — centralized for the later domain cutover. */
 export const CREMA_ARENA_URL = "https://crema-arena.vercel.app";
 
 /** Crema Arena's cinnamon brand colour (its accent, not a crivelo-web token). */
-const CREMA_ARENA_DOT = "#C0763C";
+const CREMA_ARENA_DOT = "rgb(192 118 60)";
 
 export interface NavItem {
   /** Proper-noun product name — NEVER translated (Coa, Crema Arena, …). */

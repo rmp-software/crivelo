@@ -9,6 +9,7 @@
  */
 import { forwardRef } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@crivelo/ui/lib/utils";
 import { CoaLockup } from "../brand";
 import { Button } from "../ui/Button";
 import { Link } from "../../i18n/navigation";
@@ -18,25 +19,15 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
     const t = useTranslations("Shell");
     return (
     <header
-      style={{
-        position: "sticky",
-        top: 0,
-        zIndex: 40,
-        background: "var(--bg)",
-        borderBottom: "1px solid var(--border)",
-      }}
+      className={cn(
+        "sticky top-0 z-40 bg-[color:var(--bg)]",
+        "border-b border-[color:var(--border)]",
+      )}
     >
       <div
-        style={{
-          maxWidth: 1060,
-          margin: "0 auto",
-          boxSizing: "border-box",
-          padding: "0 16px",
-          height: 66,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }}
+        className={cn(
+          "mx-auto box-border flex h-[66px] max-w-[1060px] items-center gap-3 px-4",
+        )}
       >
         <Button
           ref={ref}
@@ -62,7 +53,7 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
         <Link
           href="/"
           aria-label={t("homeAria")}
-          style={{ textDecoration: "none", display: "inline-flex" }}
+          className="inline-flex no-underline"
         >
           <CoaLockup size="sm" />
         </Link>

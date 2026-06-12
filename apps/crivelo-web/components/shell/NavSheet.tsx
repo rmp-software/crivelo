@@ -133,6 +133,7 @@ export function NavSheet({
             } as CSSProperties;
             const inner = (
               <>
+                {/* last-resort: runtime-positioned active-nav dot (data-driven) */}
                 <span
                   className={cn(
                     "h-[9px] w-[9px] shrink-0 rounded-full bg-[var(--dot)]",

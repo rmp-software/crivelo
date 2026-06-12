@@ -11,6 +11,7 @@
  * layout head), so the document chrome stays a Server Component.
  */
 import { useRef, useState, type ReactNode } from "react";
+import { cn } from "@crivelo/ui/lib/utils";
 import { ThemeProvider } from "./ThemeProvider";
 import { Header } from "./Header";
 import { NavSheet } from "./NavSheet";
@@ -31,19 +32,15 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <ThemeProvider>
       <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          background: "var(--bg)",
-          color: "var(--fg)",
-          fontFamily: "var(--font-body)",
-          transition: "background var(--dur-stage) var(--ease-standard)",
-        }}
+        className={cn(
+          "flex min-h-screen flex-col font-body",
+          "bg-[color:var(--bg)] text-[color:var(--fg)]",
+          "transition-[background] duration-[var(--dur-stage)] ease-[var(--ease-standard)]",
+        )}
       >
         <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />
         <NavSheet open={menu} onClose={closeMenu} returnFocusRef={menuButtonRef} />
-        <div style={{ flex: 1 }}>{children}</div>
+        <div className="flex-1">{children}</div>
         <Footer />
       </div>
     </ThemeProvider>
