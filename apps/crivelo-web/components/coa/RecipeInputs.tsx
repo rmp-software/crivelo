@@ -16,14 +16,12 @@
  */
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@crivelo/ui/lib/utils";
 import { Icon } from "./icons";
 import { clamp } from "../../lib/four-six";
 
 /** Tabular mono numerals — keeps the values from jittering as digits change. */
-const MONO = {
-  fontFamily: "var(--font-mono)",
-  fontFeatureSettings: '"tnum","zero"',
-} as const;
+const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 const LABEL =
   "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
@@ -72,8 +70,7 @@ function Stepper({
           <Icon name="minus" size={12} />
         </StepButton>
         <span
-          className="text-[15px] font-semibold tabular-nums whitespace-nowrap"
-          style={MONO}
+          className={cn("text-[15px] font-semibold whitespace-nowrap", MONO)}
         >
           {value}
         </span>
@@ -126,8 +123,10 @@ export function RecipeInputs({
       <div className="flex min-w-0 flex-col items-center gap-1.5">
         <span className={LABEL}>{t("water")}</span>
         <span
-          className="text-[17px] font-semibold tabular-nums whitespace-nowrap text-[color:var(--accent-ink)]"
-          style={MONO}
+          className={cn(
+            "text-[17px] font-semibold whitespace-nowrap text-accent-ink",
+            MONO,
+          )}
         >
           {waterG} {tCalc("grams")}
         </span>
