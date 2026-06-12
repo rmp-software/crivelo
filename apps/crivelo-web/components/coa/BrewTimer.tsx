@@ -427,7 +427,7 @@ export function BrewTimer({
                       <Icon
                         name="check"
                         size={11}
-                        color="var(--success)"
+                        className="text-success"
                         stroke={2.4}
                       />
                     )}

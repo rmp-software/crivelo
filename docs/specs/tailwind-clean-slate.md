@@ -180,5 +180,12 @@ grep -rnE 'from "@?radix-ui"' apps --include=*.tsx   # must stay 0 in app code
   `shadow-feat-active` / `shadow-timeline-dot` in arena-theme.css. All emit in built CSS; tsc 0, build green.
   Remaining className arbitraries: focus-ring (intentional) + ONE LandingHero conic-gradient QR mock (documented
   composite exception — no clean Tailwind gradient-token path; spec-compliance reviewer did not flag it).
-- Follow-up (out of this sweep's var-scope): `Icon color="var(--…)"` / `Monogram inkColor` PROPS (crivelo-web) → need a
-  className API to drop the last prop-level vars.
+- 2026-06-12: **Follow-up RESOLVED** (separate PR, branch `mux/crivelo-icon-classname-api`). The single-colour brand
+  SVGs — `Icon` (already supported it), `Monogram`, `CoaMark` — now render in `currentColor` + take a `className`;
+  call sites pass `text-fg-3` / `text-success` / `text-brand` instead of `color="var(--…)"`. CriveloLockup's Monogram
+  drops its explicit `inkColor` and inherits the wrapper's `currentColor`. tsc 0, build green, Playwright before/after
+  visually transparent. **SieveGrid keeps its `color`/`accent` props by design** — it draws TWO independent colours
+  per render (ink + accent) that one `currentColor` can't express; forcing the second onto a className would create a
+  `[--accent:var(--…)]` arbitrary (the exact var-in-className this sweep eliminated), so typed colour props are the
+  correct API there (a data API, like a chart's colours). Documented in SieveGrid.tsx. Net: crivelo-web prop-level
+  vars reduced to the 3 intentional SieveGrid call sites.

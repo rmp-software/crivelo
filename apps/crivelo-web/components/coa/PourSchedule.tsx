@@ -45,7 +45,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
         <span
           className={cn(MONO, "inline-flex items-center gap-1.5 text-[13px] font-semibold")}
         >
-          <Icon name="clock" size={14} color="var(--fg-3)" />
+          <Icon name="clock" size={14} className="text-fg-3" />
           {recipe.totalTime}
         </span>
       </div>
