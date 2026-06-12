@@ -185,7 +185,7 @@ export default function CompetitorForm({ mode, initialData }: CompetitorFormProp
             <button
               type="button"
               onClick={handleRemovePhoto}
-              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-[#9E2F24] transition-colors"
+              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-danger-hover transition-colors"
             >
               <X size={16} />
             </button>

@@ -74,6 +74,7 @@
     --success-soft: var(--sage-100);
     --danger:       var(--clay-500);
     --danger-soft:  var(--clay-100);
+    --danger-hover: #9E2F24; /* clay-500 darkened — destructive-button hover */
 
     /* ---------- Focus ---------- */
     --focus-ring:   var(--espresso-900);

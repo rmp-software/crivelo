@@ -236,7 +236,7 @@ export function LandingFeat() {
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus-ring)]",
                     "max-[960px]:w-auto max-[960px]:min-w-[170px] max-[960px]:flex-[0_0_auto]",
                     on
-                      ? "border-cinnamon-500 bg-espresso-800 shadow-[inset_3px_0_0_var(--cinnamon-500)]"
+                      ? "border-cinnamon-500 bg-espresso-800 shadow-feat-active"
                       : "border-crema-50/10 bg-transparent hover:bg-espresso-800",
                   )}
                 >
@@ -321,7 +321,7 @@ function PanelBody({ panel: p }: { panel: Panel }) {
               c.side === "left" ? "self-start" : "self-end",
               // mobile: full-width ladder rung with node + connector
               "max-[960px]:w-full max-[960px]:self-stretch",
-              "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-cinnamon-500 max-[960px]:before:bg-espresso-900 max-[960px]:before:shadow-[0_0_0_4px_var(--bg-inverse)] max-[960px]:before:content-['']",
+              "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-cinnamon-500 max-[960px]:before:bg-espresso-900 max-[960px]:before:shadow-timeline-dot max-[960px]:before:content-['']",
               "max-[960px]:after:absolute max-[960px]:after:-left-[17px] max-[960px]:after:top-[29px] max-[960px]:after:h-0.5 max-[960px]:after:w-[17px] max-[960px]:after:bg-cinnamon-500 max-[960px]:after:content-['']",
             )}
           >

@@ -132,7 +132,7 @@ export default function EventsPage() {
               aria-label={`Ver detalhes do evento ${event.name}`}
             >
               <div
-                className="bg-surface-raised rounded-md p-4 md:p-6 border border-border hover:border-brand hover:shadow-2 transition-all duration-base ease-standard cursor-pointer group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-[var(--focus-ring)] group-focus-visible:outline-offset-2"
+                className="bg-surface-raised rounded-md p-4 md:p-6 border border-border hover:border-brand hover:shadow-2 transition-all duration-base ease-standard cursor-pointer group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-[color:var(--focus-ring)] group-focus-visible:outline-offset-2"
               >
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4 gap-2">

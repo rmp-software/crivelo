@@ -51,4 +51,10 @@
    * shadow-telona. Values mirror arena-tokens.css exactly. */
   --shadow-live-halo: 0 0 0 4px color-mix(in srgb, var(--live) 18%, transparent);
   --shadow-telona: 0 6px 14px color-mix(in srgb, var(--espresso-900) 45%, transparent);
+
+  /* Landing feature accents (composite shadows with a token color stop — literal,
+   * same circular-name reason as the shadows above; the var() reads the runtime
+   * cinnamon/bg-inverse). Generates shadow-feat-active / shadow-timeline-dot. */
+  --shadow-feat-active: inset 3px 0 0 var(--cinnamon-500);
+  --shadow-timeline-dot: 0 0 0 4px var(--bg-inverse);
 }

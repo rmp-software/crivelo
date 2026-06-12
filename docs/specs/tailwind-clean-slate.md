@@ -170,6 +170,15 @@ grep -rnE 'from "@?radix-ui"' apps --include=*.tsx   # must stay 0 in app code
   dashboard pixel-check needs the QA password (preview login is credentials-only) and data-populated live/podium
   screens need a seeded event (dev Neon branch is empty) — both are value-preserving swaps already source-verified
   by the wave reviews (podium gold/crema/cinnamon, EventStatStrip, Wordmark, stat icons).
-- Follow-ups (out of this sweep's var-scope): (1) `hover:bg-[#9E2F24]` raw hex in CompetitorForm + SponsorForm →
-  needs a `--danger-hover` token. (2) `Icon color="var(--…)"` / `Monogram inkColor` PROPS (crivelo-web) → need a
+- 2026-06-12: **Final-gate fixes** (3 independent gates run with the admin login + full-diff reviews). Authenticated
+  visual PASS (dashboard Wordmark/stat-icons, EventStatStrip accents, bracket, live TV podium, companion — all
+  correct). Adversarial correctness APPROVE. Spec-compliance found + I fixed: (1) **BLOCKER** `outline-[var(--focus-ring)]`
+  → `outline-[color:var(--focus-ring)]` in events/page.tsx (without the `color:` hint v4 treats it as the `outline`
+  shorthand, so the focus-ring color never applied — a latent bug fix). (2) raw hex `hover:bg-[#9E2F24]` → registered
+  house `--danger-hover` (foundation.css + theme.css) → `bg-danger-hover`. (3) composite shadows
+  `shadow-[inset_3px_0_0_var(--cinnamon-500)]` / `before:shadow-[0_0_0_4px_var(--bg-inverse)]` → registered
+  `shadow-feat-active` / `shadow-timeline-dot` in arena-theme.css. All emit in built CSS; tsc 0, build green.
+  Remaining className arbitraries: focus-ring (intentional) + ONE LandingHero conic-gradient QR mock (documented
+  composite exception — no clean Tailwind gradient-token path; spec-compliance reviewer did not flag it).
+- Follow-up (out of this sweep's var-scope): `Icon color="var(--…)"` / `Monogram inkColor` PROPS (crivelo-web) → need a
   className API to drop the last prop-level vars.

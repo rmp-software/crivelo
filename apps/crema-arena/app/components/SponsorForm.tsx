@@ -168,7 +168,7 @@ export default function SponsorForm({ mode, initialData, onSuccess, onCancel }: 
             <button
               type="button"
               onClick={handleRemoveLogo}
-              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-[#9E2F24] transition-colors"
+              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-danger-hover transition-colors"
               aria-label="Remover logo"
             >
               <X size={16} />
