@@ -14,6 +14,15 @@
  * scrolling on touch. The puck position is derived from acidity/strengthPours so
  * external changes (e.g. a reset) stay in sync, but a local free-y override keeps
  * the vertical drag smooth between the discrete strength rounds.
+ *
+ * Styling (RMP-216): inline `style`/style-constants migrated to Tailwind utility
+ * classes (the no-`var(--)`-in-`style` / no-inline-theming rule). Neutral tokens
+ * ride arbitrary `text-[color:var(--fg-3)]` utilities; the accent summary uses the
+ * promoted `text-accent-ink`. The focus ring is a conditional className driven by
+ * the `focused` state. The two surviving inline `style`s are genuinely
+ * data-driven: the pad's runtime dims (center/dims props) and the puck's
+ * continuous left/top, both threaded through CSS custom properties consumed by
+ * static utilities.
  */
 import {
   useRef,
@@ -23,34 +32,19 @@ import {
   type PointerEvent,
 } from "react";
 import { useTranslations } from "next-intl";
+import { cn } from "@crivelo/ui/lib/utils";
 import { SieveGrid } from "../brand";
 import { clamp, tasteKey } from "../../lib/four-six";
 
-/** Visually hidden but exposed to assistive tech (aria-live readouts). */
-const SR_ONLY: CSSProperties = {
-  position: "absolute",
-  width: 1,
-  height: 1,
-  padding: 0,
-  margin: -1,
-  overflow: "hidden",
-  clip: "rect(0,0,0,0)",
-  whiteSpace: "nowrap",
-  border: 0,
-};
+/** Section caption ("TASTE"). */
+const CAP =
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
 
-const CAP: CSSProperties = {
-  fontSize: 11,
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  fontWeight: 600,
-  color: "var(--fg-3)",
-};
+/** Tabular mono numerals — keeps the summary from jittering as digits change. */
+const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
-const MONO: CSSProperties = {
-  fontFamily: "var(--font-mono)",
-  fontFeatureSettings: '"tnum","zero"',
-};
+/** Edge label (absolute, slightly smaller than the section caption). */
+const EDGE = cn(CAP, "absolute text-[10px]");
 
 export interface PadDims {
   w: number;
@@ -88,7 +82,8 @@ export function TastePad({
     x: (acidity + 1) / 2,
     y: (4 - strengthPours) / 3,
   }));
-  // Focus state drives the visible focus ring (inline styles can't do :focus).
+  // Focus state drives the visible focus ring (a conditional className — utility
+  // classes can't express :focus on this drag surface directly here).
   const [focused, setFocused] = useState(false);
 
   const setFromXY = (clientX: number, clientY: number) => {
@@ -153,27 +148,36 @@ export function TastePad({
     setPad({ x: (nextAcidity + 1) / 2, y: (4 - nextStrength) / 3 });
   };
 
-  const edge: CSSProperties = { ...CAP, fontSize: 10, position: "absolute" };
+  // last-resort: the pad's box is sized from runtime props — `center` toggles a
+  // max-width cap + horizontal auto-centring (mobile single column), and the
+  // height is the per-breakpoint `dims.h`. These runtime values travel through
+  // CSS custom properties consumed by the static `max-w-[var(--pad-maxw)]` /
+  // `h-[var(--pad-h)]` / `mx-[var(--pad-mx)]` utilities below.
+  const padBoxVar = {
+    "--pad-maxw": center ? `${dims.w}px` : "none",
+    "--pad-h": `${dims.h}px`,
+    "--pad-mx": center ? "auto" : "0",
+  } as CSSProperties;
+
+  // last-resort: the puck is positioned from the continuous drag state (pad.x /
+  // pad.y). Percentage-based so it tracks the fluid pad width and stays aligned
+  // with the stretched dot field (inset 12px, matching the grid). The computed
+  // left/top travel through CSS custom properties consumed by the static
+  // `left-[var(--puck-x)]` / `top-[var(--puck-y)]` utilities.
+  const puckVar = {
+    "--puck-x": `calc(12px + ${pad.x} * (100% - 24px))`,
+    "--puck-y": `calc(12px + ${pad.y} * (100% - 24px))`,
+  } as CSSProperties;
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "baseline",
-          marginBottom: 12,
-        }}
-      >
-        <span style={CAP}>{t("label")}</span>
+      <div className="mb-3 flex items-baseline justify-between">
+        <span className={CAP}>{t("label")}</span>
         <span
-          style={{
-            ...MONO,
-            fontSize: 13,
-            fontWeight: 600,
-            color: "var(--accent-ink)",
-            whiteSpace: "nowrap",
-          }}
+          className={cn(
+            MONO,
+            "text-[13px] font-semibold whitespace-nowrap text-accent-ink",
+          )}
         >
           {summary}
         </span>
@@ -189,27 +193,21 @@ export function TastePad({
         onBlur={() => setFocused(false)}
         tabIndex={0}
         aria-label={t("padAria")}
-        style={{
-          position: "relative",
-          // Fluid: the pad spans the full content/column width at every
-          // breakpoint (the dot field stretches to fill via SieveGrid). Height
-          // stays fixed per breakpoint so the card keeps a sensible aspect.
-          width: "100%",
-          maxWidth: center ? dims.w : undefined,
-          height: dims.h,
-          margin: center ? "0 auto" : 0,
-          borderRadius: "var(--radius-md)",
-          background: "var(--surface-raised)",
-          boxShadow: "var(--shadow-1)",
-          border: "1px solid var(--border)",
-          outline: focused ? "2px solid var(--focus-ring)" : "none",
-          outlineOffset: 2,
-          cursor: "crosshair",
-          touchAction: "none",
-          overflow: "hidden",
-        }}
+        // Fluid: the pad spans the full content/column width at every breakpoint
+        // (the dot field stretches to fill via SieveGrid). Height stays fixed per
+        // breakpoint (--pad-h) so the card keeps a sensible aspect.
+        className={cn(
+          "relative w-full max-w-[var(--pad-maxw)] mx-[var(--pad-mx)] h-[var(--pad-h)]",
+          "rounded-[var(--radius-md)] bg-[color:var(--surface-raised)] shadow-[var(--shadow-1)]",
+          "border border-[color:var(--border)] cursor-crosshair touch-none overflow-hidden",
+          "outline-offset-2",
+          focused
+            ? "outline outline-2 outline-[color:var(--focus-ring)]"
+            : "outline-none",
+        )}
+        style={padBoxVar}
       >
-        <div style={{ position: "absolute", inset: 12 }}>
+        <div className="absolute inset-3">
           <SieveGrid
             cols={9}
             rows={7}
@@ -221,38 +219,28 @@ export function TastePad({
             stretch
           />
         </div>
-        <span style={{ ...edge, top: 10, left: "50%", transform: "translateX(-50%)" }}>
+        <span className={cn(EDGE, "top-[10px] left-1/2 -translate-x-1/2")}>
           {t("stronger")}
         </span>
-        <span
-          style={{ ...edge, bottom: 10, left: "50%", transform: "translateX(-50%)" }}
-        >
+        <span className={cn(EDGE, "bottom-[10px] left-1/2 -translate-x-1/2")}>
           {t("lighter")}
         </span>
-        <span style={{ ...edge, left: 12, top: "50%", transform: "translateY(-50%)" }}>
+        <span className={cn(EDGE, "left-3 top-1/2 -translate-y-1/2")}>
           {t("sweet")}
         </span>
-        <span style={{ ...edge, right: 12, top: "50%", transform: "translateY(-50%)" }}>
+        <span className={cn(EDGE, "right-3 top-1/2 -translate-y-1/2")}>
           {t("bright")}
         </span>
         <div
-          style={{
-            position: "absolute",
-            // Percentage-based so the puck tracks the fluid pad width and stays
-            // aligned with the stretched dot field (inset 12px, matching the grid).
-            left: `calc(12px + ${pad.x} * (100% - 24px))`,
-            top: `calc(12px + ${pad.y} * (100% - 24px))`,
-            transform: "translate(-50%,-50%)",
-            width: 30,
-            height: 30,
-            borderRadius: 999,
-            background: "var(--brand)",
-            boxShadow: "0 0 0 6px var(--accent-halo), var(--shadow-1)",
-            border: "2px solid var(--surface-raised)",
-            pointerEvents: "none",
-          }}
+          className={cn(
+            "absolute left-[var(--puck-x)] top-[var(--puck-y)] -translate-x-1/2 -translate-y-1/2",
+            "h-[30px] w-[30px] rounded-full bg-brand",
+            "shadow-[0_0_0_6px_var(--accent-halo),var(--shadow-1)]",
+            "border-2 border-[color:var(--surface-raised)] pointer-events-none",
+          )}
+          style={puckVar}
         />
-        <span aria-live="polite" style={SR_ONLY}>
+        <span aria-live="polite" className="sr-only">
           {summary}
         </span>
       </div>
