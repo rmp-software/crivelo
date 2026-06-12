@@ -58,6 +58,61 @@
   --color-clay-500: var(--clay-500);
   --color-clay-700: var(--clay-700);
 
+  /* ---------- Semantic house neutrals ----------
+   * Promote the semantic neutral tokens so they generate bare utilities
+   * (bg-bg-2, text-fg-3, bg-surface-raised, border-border-strong, …) for every
+   * app — the idiomatic-Tailwind replacement for `[color:var(--…)]` arbitraries.
+   * They reference the runtime foundation vars (not literals) so each app's
+   * light/dark overrides in *-tokens.css flow through, exactly like the palette
+   * tokens above. NOTE: bare `--color-border` is intentionally NOT declared here
+   * — it is owned by @crivelo/ui's shadcn-theme.css (identical `var(--border)`);
+   * only the strong/emphasis steps are added. */
+  --color-bg:             var(--bg);
+  --color-bg-2:           var(--bg-2);
+  --color-bg-3:           var(--bg-3);
+  --color-bg-inverse:     var(--bg-inverse);
+  --color-surface:        var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+
+  --color-fg:         var(--fg);
+  --color-fg-2:       var(--fg-2);
+  --color-fg-3:       var(--fg-3);
+  --color-fg-4:       var(--fg-4);
+  --color-fg-muted:   var(--fg-muted);
+  --color-fg-inverse: var(--fg-inverse);
+
+  --color-border-strong:   var(--border-strong);
+  --color-border-emphasis: var(--border-emphasis);
+
+  /* Semantic accents the neutral house ships. brand defaults to ink here; each
+   * app overrides --brand in its own tokens.css, so bg-brand renders teal
+   * (crivelo) / cinnamon (arena) with no per-app utility duplication. */
+  --color-brand:        var(--brand);
+  --color-brand-hover:  var(--brand-hover);
+  --color-brand-press:  var(--brand-press);
+  --color-brand-soft:   var(--brand-soft);
+  --color-success:      var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger:       var(--danger);
+  --color-danger-soft:  var(--danger-soft);
+
+  /* ---------- Type scale ----------
+   * Register the named design font sizes so they become bare `text-*` utilities
+   * (text-body, text-h3, text-caption, …). Off-scale one-off sizes that match no
+   * token stay as documented `text-[NNpx]` arbitraries by design. Names are
+   * chosen to not collide with Tailwind's built-in text-xs..text-9xl. */
+  --text-display: var(--fs-display);
+  --text-h1:      var(--fs-h1);
+  --text-h2:      var(--fs-h2);
+  --text-h3:      var(--fs-h3);
+  --text-h4:      var(--fs-h4);
+  --text-body:    var(--fs-body);
+  --text-small:   var(--fs-small);
+  --text-caption: var(--fs-xs);
+  --text-mono-lg: var(--fs-mono-lg);
+  --text-mono:    var(--fs-mono);
+
   /* ---------- Fonts (literal — names collide with foundation vars) ---------- */
   --font-display: 'Bricolage Grotesque', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'Instrument Serif', 'Times New Roman', serif;
