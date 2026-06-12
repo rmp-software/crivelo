@@ -42,6 +42,13 @@ ONLY for genuinely continuous runtime values. End-state: **no design-token `var(
 - Container / max-width layout one-offs: `max-w-[1200px]`, `max-[960px]`, etc. — continuous layout values.
 - Off-scale font sizes (see Decision 4).
 - PWA manifest hex (`apps/crivelo-web/app/pwa.config.tsx`) — OS-consumed literal.
+- `--focus-ring` and `--accent-halo` (crivelo-web): raw-var-only tokens, **intentionally NOT promoted** to
+  utilities (documented in `crivelo-theme.css`). Keep `outline-[color:var(--focus-ring)]` arbitrary —
+  `outline-focus-ring` is a DEAD class (silently drops the outline). Verify a token is in `@theme` before
+  converting; if a `*-theme.css` says "intentionally not promoted", it stays arbitrary.
+- Component PROPS that take a CSS color string (`Icon color="var(--fg-3)"` → SVG stroke, `Monogram inkColor`
+  → SVG fill): out of scope for the className sweep. Converting needs an Icon/Monogram `className` API change
+  (tracked follow-up), not a `[var(--…)]`→utility swap.
 
 ## Token registry (P0 — DONE, committed)
 `packages/tokens/styles/theme.css` now promotes (additive):
@@ -127,3 +134,18 @@ grep -rnE 'from "@?radix-ui"' apps --include=*.tsx   # must stay 0 in app code
 
 ## Status log
 - 2026-06-12: P0 done (foundation @theme token + type-scale promotion); crivelo-web build green. Next: P1 (packages/ui).
+- 2026-06-12: P1 done + committed (`c8856f3`). 3 @crivelo/ui primitives (empty-state, page-header, spinner)
+  swept to bare house utilities; intentional arbitraries (`ring-[3px]`, `animate-[spin_…]`, dialog layout) kept.
+  tsc 0, crivelo-web build green, diff value-equivalent (inline review, no merge leakage).
+- 2026-06-12: P2 done + committed (`d7d4ea3`). All 14 crivelo-web components (shell/coa/brand) swept in 3 parallel
+  batches. Nav family dots: `--dot` bridge → `markerClass` (bg-brand / bg-fg-4); Crema Arena cinnamon rgb kept as
+  documented inline exception. Adversarial review found 1 BLOCKER (`outline-focus-ring` was a dead class —
+  `--focus-ring` is intentionally NOT a utility; reverted to arbitrary) + 3 exact-match misses (text-14→small,
+  text-17→h4, gap-10→2.5) — all fixed. Playwright before/after = pixel-identical (light/dark × mobile/desktop),
+  dots correct, focus ring visible, toggles symmetric. **NEW arbitrary-by-design: `--focus-ring`** (and
+  `--accent-halo`) — raw-var-only crivelo tokens, intentionally not promoted; keep `[color:var(--focus-ring)]`.
+  Out-of-scope deferred: `Icon color="var(--…)"` + `Monogram inkColor` pass token vars as component PROPS
+  (→ SVG stroke/fill), not classNames — converting needs an Icon/Monogram `className` API change (follow-up).
+- 2026-06-12: Root CLAUDE.md updated with the monorepo-wide "no design-token var() in a className" rule
+  (committed with P2 docs). crivelo-web has no app_spec.txt/CLAUDE.md. crema-arena CLAUDE.md + app_spec.txt
+  doc updates deferred to the P3 branch (where its code changes). Next: P3 (crema-arena, own branch + PR).

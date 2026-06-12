@@ -44,6 +44,21 @@ hex / no `var(--…)` in `style`, shadcn over hand-rolled (the old `@crivelo/ui`
 is written and enforced per app via `app_spec.txt` (`<styling_conventions>` + grep'd
 `<compliance_rules>`); the app CLAUDE.md has the concise version.
 
+**No design-token `var()` in a className.** A token is a utility, not an arbitrary value:
+write `text-fg-3` / `bg-surface` / `border-border` / `bg-espresso-800` / `text-h4`, **never**
+`text-[color:var(--fg-3)]` / `bg-[var(--surface)]` / `bg-[var(--espresso-800)]`. The semantic
+house neutrals, accents, and the named type scale are registered in `@theme`
+(`packages/tokens/styles/theme.css`); each app adds its accent/palette in its own
+`*-theme.css`. A token missing a utility is a gap to fix in the `@theme`, not a reason to reach
+for `[var(--…)]`. Spacing/size follows the **scale** (`gap-2.5`, `p-4`) — snap a `[NNpx]` to a
+scale step **only on an exact match** (no nearest-step rounding); genuinely off-scale values
+(`gap-[18px]`, `max-w-[1060px]`, odd font sizes) stay documented arbitraries. **Arbitrary
+`[var(--…)]` / inline-style vars are reserved for runtime bridges only** — a value computed
+per render from JS (drag coords, measured/`%`/`clamp()` dims, animation offset, alpha-blended
+`rgba()`). A finite enumerable set is **not** a runtime bridge: map it to a static className
+lookup. The shadcn alias utilities (`bg-background`, `text-muted-foreground`, …) stay **internal
+to `@crivelo/ui/src/ui/**`**; app/component code uses the house neutrals.
+
 **`@crivelo/ui` is the single source of truth for primitives** (`@crivelo/ui/button`, `/card`,
 `/dialog`, …). Apps **never** import `radix-ui` / shadcn directly — every primitive comes from
 `@crivelo/ui`. A primitive that doesn't exist yet is added **to `@crivelo/ui`**, never kept in an
