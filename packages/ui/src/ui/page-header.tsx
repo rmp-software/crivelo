@@ -33,19 +33,19 @@ function PageHeader({
     >
       {breadcrumbs && breadcrumbs.length > 0 && (
         <nav className="mb-3" aria-label="Breadcrumb">
-          <ol className="flex items-center gap-2 text-sm text-[var(--fg-3)]">
+          <ol className="flex items-center gap-2 text-sm text-fg-3">
             {breadcrumbs.map((crumb, index) => (
               <li key={index} className="flex items-center gap-2">
                 {index > 0 && <span>/</span>}
                 {crumb.href ? (
                   <a
                     href={crumb.href}
-                    className="transition-colors hover:text-[var(--brand)]"
+                    className="transition-colors hover:text-brand"
                   >
                     {crumb.label}
                   </a>
                 ) : (
-                  <span className="font-medium text-[var(--fg-2)]">
+                  <span className="font-medium text-fg-2">
                     {crumb.label}
                   </span>
                 )}
@@ -57,11 +57,11 @@ function PageHeader({
 
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="flex-1">
-          <h1 className="mb-2 font-display text-3xl font-bold text-[var(--fg)] md:text-4xl">
+          <h1 className="mb-2 font-display text-3xl font-bold text-fg md:text-4xl">
             {title}
           </h1>
           {description && (
-            <p className="max-w-2xl text-base text-[var(--fg-2)] md:text-lg">
+            <p className="max-w-2xl text-base text-fg-2 md:text-lg">
               {description}
             </p>
           )}

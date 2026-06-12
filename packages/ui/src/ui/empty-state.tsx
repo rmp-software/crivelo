@@ -31,21 +31,21 @@ function EmptyState({
       role="status"
       aria-live="polite"
       className={cn(
-        "flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface)] px-4 py-12 text-center",
+        "flex flex-col items-center justify-center rounded-lg border border-border bg-surface px-4 py-12 text-center",
         className
       )}
       {...props}
     >
       {Icon && (
-        <div className="mb-4 rounded-full bg-[var(--bg-2)] p-4" aria-hidden="true">
-          <Icon size={48} className="text-[var(--fg-3)]" />
+        <div className="mb-4 rounded-full bg-bg-2 p-4" aria-hidden="true">
+          <Icon size={48} className="text-fg-3" />
         </div>
       )}
-      <h3 className="mb-2 font-display text-xl font-semibold text-[var(--fg-2)]">
+      <h3 className="mb-2 font-display text-xl font-semibold text-fg-2">
         {title}
       </h3>
       {description && (
-        <p className="mb-6 max-w-md text-[var(--fg-3)]">{description}</p>
+        <p className="mb-6 max-w-md text-fg-3">{description}</p>
       )}
       {action && (
         // `default` is the canonical primary — equivalent to the deprecated
