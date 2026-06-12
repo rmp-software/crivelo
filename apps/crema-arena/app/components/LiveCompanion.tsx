@@ -95,14 +95,14 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="text-center" role="status" aria-live="polite">
           <div
-            className="inline-block animate-spin rounded-full h-8 w-8 border-3 border-[var(--brand)] border-t-transparent"
+            className="inline-block animate-spin rounded-full h-8 w-8 border-3 border-brand border-t-transparent"
             style={{
               animationDuration: 'var(--dur-stage)',
               animationTimingFunction: 'linear',
             }}
             aria-hidden="true"
           ></div>
-          <p className="mt-4 text-[var(--fg-3)]">Carregando...</p>
+          <p className="mt-4 text-fg-3">Carregando...</p>
         </div>
       </div>
     );
@@ -112,10 +112,10 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
     return (
       <div className="flex items-center justify-center min-h-screen p-4">
         <div className="text-center max-w-md" role="alert" aria-live="assertive">
-          <p className="text-[var(--fg-2)] text-lg font-semibold mb-2">
+          <p className="text-fg-2 text-lg font-semibold mb-2">
             Erro ao carregar evento
           </p>
-          <p className="text-[var(--fg-3)] text-sm">
+          <p className="text-fg-3 text-sm">
             {error instanceof Error ? error.message : typeof error === 'string' ? error : 'Evento não encontrado'}
           </p>
         </div>
@@ -146,20 +146,15 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
     <div className="min-h-screen flex flex-col">
       {/* Sticky Header */}
       <header
-        className="sticky top-0 z-50 bg-[var(--surface-raised)] border-b border-[var(--border)] shadow-[var(--shadow-1)]"
-        style={{
-          transitionProperty: 'box-shadow',
-          transitionDuration: 'var(--dur-base)',
-          transitionTimingFunction: 'var(--ease-standard)',
-        }}
+        className="sticky top-0 z-50 bg-surface-raised border-b border-border shadow-1 transition-shadow duration-base ease-standard"
       >
         <div className="px-4 py-4 max-w-screen-sm mx-auto">
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-lg sm:text-xl font-bold text-[var(--fg)] font-[family-name:var(--font-display)] leading-tight">
+              <h1 className="text-lg sm:text-xl font-bold text-fg font-display leading-tight">
                 {event.name}
               </h1>
-              <p className="text-xs text-[var(--fg-3)] mt-1 truncate">
+              <p className="text-xs text-fg-3 mt-1 truncate">
                 {eventDate}
                 {event.location && ` • ${event.location}`}
               </p>
@@ -171,19 +166,15 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
               setup: [Chave]
               running: [Ao vivo, Chave]
               finished: [Chave, Classificação] */}
-          <nav className="flex gap-1 bg-[var(--bg-2)] rounded-[var(--radius-sm)] p-1" role="tablist">
+          <nav className="flex gap-1 bg-bg-2 rounded-sm p-1" role="tablist">
             {event.status === 'running' && (
               <button
                 onClick={() => pickTab('ao-vivo')}
-                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
+                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-xs transition-all duration-base ease-standard min-h-[44px] touch-manipulation ${
                   activeTab === 'ao-vivo'
-                    ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
-                    : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
+                    ? 'bg-surface-raised text-fg shadow-1'
+                    : 'text-fg-3 hover:text-fg-2'
                 }`}
-                style={{
-                  transitionDuration: 'var(--dur-base)',
-                  transitionTimingFunction: 'var(--ease-standard)',
-                }}
                 role="tab"
                 aria-selected={activeTab === 'ao-vivo'}
                 aria-controls="ao-vivo-panel"
@@ -193,15 +184,11 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             )}
             <button
               onClick={() => pickTab('chave')}
-              className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
+              className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-xs transition-all duration-base ease-standard min-h-[44px] touch-manipulation ${
                 activeTab === 'chave'
-                  ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
-                  : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
+                  ? 'bg-surface-raised text-fg shadow-1'
+                  : 'text-fg-3 hover:text-fg-2'
               }`}
-              style={{
-                transitionDuration: 'var(--dur-base)',
-                transitionTimingFunction: 'var(--ease-standard)',
-              }}
               role="tab"
               aria-selected={activeTab === 'chave'}
               aria-controls="chave-panel"
@@ -211,15 +198,11 @@ export default function LiveCompanion({ eventId }: LiveCompanionProps) {
             {event.status === 'finished' && (
               <button
                 onClick={() => pickTab('leaderboard')}
-                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-[var(--radius-xs)] transition-all min-h-[44px] touch-manipulation ${
+                className={`flex-1 px-2 sm:px-3 py-2 text-xs sm:text-sm font-semibold rounded-xs transition-all duration-base ease-standard min-h-[44px] touch-manipulation ${
                   activeTab === 'leaderboard'
-                    ? 'bg-[var(--surface-raised)] text-[var(--fg)] shadow-[var(--shadow-1)]'
-                    : 'text-[var(--fg-3)] hover:text-[var(--fg-2)]'
+                    ? 'bg-surface-raised text-fg shadow-1'
+                    : 'text-fg-3 hover:text-fg-2'
                 }`}
-                style={{
-                  transitionDuration: 'var(--dur-base)',
-                  transitionTimingFunction: 'var(--ease-standard)',
-                }}
                 role="tab"
                 aria-selected={activeTab === 'leaderboard'}
                 aria-controls="leaderboard-panel"

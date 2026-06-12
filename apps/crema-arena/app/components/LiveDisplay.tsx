@@ -152,17 +152,17 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   if (loading) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)]">
+      <div className="h-full w-full flex items-center justify-center bg-espresso-900">
         <div className="text-center" role="status" aria-live="polite">
           <div
-            className="w-16 h-16 border-4 border-[var(--crema-50)] border-t-transparent rounded-full animate-spin mx-auto mb-4"
+            className="w-16 h-16 border-4 border-crema-50 border-t-transparent rounded-full animate-spin mx-auto mb-4"
             style={{
               animationDuration: 'var(--dur-stage)',
               animationTimingFunction: 'linear',
             }}
             aria-hidden="true"
           ></div>
-          <p className="text-2xl font-display text-[var(--crema-50)]">Carregando...</p>
+          <p className="text-2xl font-display text-crema-50">Carregando...</p>
         </div>
       </div>
     );
@@ -170,12 +170,12 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   if (error || !data) {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)] p-8">
+      <div className="h-full w-full flex items-center justify-center bg-espresso-900 p-8">
         <div className="text-center max-w-2xl" role="alert" aria-live="assertive">
-          <h1 className="text-5xl md:text-6xl font-display font-bold text-[var(--cherry-500)] mb-6">
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-cherry-500 mb-6">
             Erro ao Carregar
           </h1>
-          <p className="text-2xl md:text-3xl text-[var(--crema-50)]">
+          <p className="text-2xl md:text-3xl text-crema-50">
             {error instanceof Error
               ? error.message
               : typeof error === 'string'
@@ -192,12 +192,12 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
   // Setup state - show event info
   if (event.status === 'setup') {
     return (
-      <div className="h-full w-full flex items-center justify-center bg-[var(--espresso-900)] p-8">
+      <div className="h-full w-full flex items-center justify-center bg-espresso-900 p-8">
         <div className="text-center max-w-4xl">
-          <h1 className="text-6xl font-display font-bold text-[var(--crema-50)] mb-6">
+          <h1 className="text-6xl font-display font-bold text-crema-50 mb-6">
             {event.name}
           </h1>
-          <div className="space-y-4 text-[var(--crema-100)]">
+          <div className="space-y-4 text-crema-100">
             <p className="text-3xl font-serif italic">
               {new Date(event.date).toLocaleDateString('pt-BR', {
                 weekday: 'long',
@@ -213,8 +213,8 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
               Juízes: {event.judgesCount}
             </p>
           </div>
-          <div className="mt-12 p-8 bg-[var(--espresso-700)] rounded-[var(--radius-lg)]">
-            <p className="text-2xl font-display text-[var(--crema-50)]">
+          <div className="mt-12 p-8 bg-espresso-700 rounded-lg">
+            <p className="text-2xl font-display text-crema-50">
               O evento ainda não começou
             </p>
           </div>
@@ -233,14 +233,14 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
     const fifth = top5[4];
 
     return (
-      <div className="h-full w-full bg-[var(--bg-inverse)] text-[var(--fg-inverse)] flex flex-col items-center px-6 py-10 md:py-14">
+      <div className="h-full w-full bg-bg-inverse text-fg-inverse flex flex-col items-center px-6 py-10 md:py-14">
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-center text-balance">
           {event.name}
         </h1>
-        <p className="text-2xl md:text-3xl font-serif italic text-[var(--marigold-500)] mt-2">
+        <p className="text-2xl md:text-3xl font-serif italic text-marigold-500 mt-2">
           Resultado final
         </p>
-        <p className="text-sm md:text-base text-[var(--crema-300)] mt-2">
+        <p className="text-sm md:text-base text-crema-300 mt-2">
           {new Date(event.date).toLocaleDateString('pt-BR', {
             year: 'numeric',
             month: 'long',
@@ -249,7 +249,7 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
         </p>
 
         {top5.length === 0 ? (
-          <p className="mt-16 text-xl font-serif italic text-[var(--crema-200)]">
+          <p className="mt-16 text-xl font-serif italic text-crema-200">
             Aguardando resultados...
           </p>
         ) : (
@@ -285,15 +285,15 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
     const hasPour = !!currentDuel.pourPhotoUrl;
 
     return (
-      <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <div className="h-full w-full bg-espresso-900 flex flex-col relative overflow-hidden">
         {/* Top bar: AO VIVO + title + duel timer */}
         <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-crema-50 leading-tight">
               {event.name}
             </h1>
-            <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
+            <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-crema-200 mt-1">
               {roundLabel}
             </p>
           </div>
@@ -364,14 +364,14 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
       : [];
 
     return (
-      <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+      <div className="h-full w-full bg-espresso-900 flex flex-col relative overflow-hidden">
         <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
           <LiveBadge />
           <div className="text-center flex-1 px-4">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-crema-50 leading-tight">
               {event.name}
             </h1>
-            <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-[var(--crema-200)] mt-1">
+            <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-crema-200 mt-1">
               {roundLabel}
             </p>
           </div>
@@ -403,18 +403,18 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
   // Default running state (no active or next duel)
   return (
-    <div className="h-full w-full bg-[var(--espresso-900)] flex flex-col relative overflow-hidden">
+    <div className="h-full w-full bg-espresso-900 flex flex-col relative overflow-hidden">
       <header className="flex items-start justify-between p-6 md:p-8 lg:p-10 flex-shrink-0">
         <LiveBadge />
         <div className="text-center flex-1 px-4">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-crema-50 leading-tight">
             {event.name}
           </h1>
         </div>
         <div className="w-[88px] md:w-[110px]" aria-hidden />
       </header>
       <main className="flex-1 flex items-center justify-center px-8 pb-40">
-        <p className="text-2xl font-serif italic text-[var(--crema-200)]">
+        <p className="text-2xl font-serif italic text-crema-200">
           Aguardando próximo duelo...
         </p>
       </main>
@@ -426,8 +426,8 @@ export default function LiveDisplay({ eventId }: LiveDisplayProps) {
 
 function LiveBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-full)] bg-[var(--live-soft)] text-[var(--live)] flex-shrink-0">
-      <span className="w-2 h-2 rounded-full bg-[var(--live)] animate-pulse" aria-hidden />
+    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-live-soft text-live flex-shrink-0">
+      <span className="w-2 h-2 rounded-full bg-live animate-pulse" aria-hidden />
       <span className="font-mono text-xs md:text-sm font-semibold tracking-wider uppercase">
         Ao vivo
       </span>
@@ -453,10 +453,10 @@ function DuelTimer({ startedAt }: { startedAt: string }) {
       className="inline-flex flex-col items-end flex-shrink-0"
       aria-label={elapsedMs == null ? undefined : `Tempo do duelo ${display}`}
     >
-      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-[var(--crema-300)]">
+      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-crema-300">
         Tempo
       </span>
-      <span className="font-mono text-2xl md:text-3xl lg:text-4xl font-semibold tabular-nums text-[var(--crema-50)] leading-none mt-1">
+      <span className="font-mono text-2xl md:text-3xl lg:text-4xl font-semibold tabular-nums text-crema-50 leading-none mt-1">
         {display}
       </span>
     </div>
@@ -466,10 +466,10 @@ function DuelTimer({ startedAt }: { startedAt: string }) {
 function NextDuelLabel() {
   return (
     <div className="inline-flex flex-col items-end flex-shrink-0">
-      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-[var(--crema-300)]">
+      <span className="font-mono text-[10px] md:text-xs uppercase tracking-wider text-crema-300">
         A seguir
       </span>
-      <span className="font-display text-lg md:text-xl font-semibold text-[var(--marigold-500)] leading-none mt-1">
+      <span className="font-display text-lg md:text-xl font-semibold text-marigold-500 leading-none mt-1">
         Próximo duelo
       </span>
     </div>
@@ -489,13 +489,13 @@ function formatElapsed(ms: number): string {
 
 function QrBadge({ eventId }: { eventId: string }) {
   return (
-    <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center gap-3 bg-[var(--crema-50)] rounded-[var(--radius-md)] p-3 md:p-4 shadow-[var(--shadow-2)]">
+    <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 flex items-center gap-3 bg-crema-50 rounded-md p-3 md:p-4 shadow-2">
       <img
         src={`/api/events/${eventId}/qr`}
         alt="QR code para acompanhar pelo celular"
         className="w-20 h-20 md:w-28 md:h-28"
       />
-      <p className="text-xs md:text-sm font-display font-semibold text-[var(--espresso-900)] max-w-[120px] leading-tight">
+      <p className="text-xs md:text-sm font-display font-semibold text-espresso-900 max-w-[120px] leading-tight">
         Acompanhe pelo celular
       </p>
     </div>
@@ -525,13 +525,13 @@ function ProfileCardsCenterpiece({
 function CompetitorBlock({ competitor }: { competitor: Competitor; side: 'A' | 'B' }) {
   return (
     <div className="flex flex-col items-center text-center max-w-md flex-1">
-      <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)] mb-5">
+      <div className="w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 rounded-full overflow-hidden border-4 border-crema-200 shadow-2 mb-5">
         <img src={competitor.photoUrl} alt={competitor.name} className="w-full h-full object-cover" />
       </div>
-      <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-[var(--crema-50)] leading-tight">
+      <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-crema-50 leading-tight">
         {competitor.name}
       </h2>
-      <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-[var(--crema-200)] mt-2">
+      <p className="text-lg md:text-xl lg:text-2xl font-serif italic text-crema-200 mt-2">
         {competitor.coffeeShop}
       </p>
     </div>
@@ -541,7 +541,7 @@ function CompetitorBlock({ competitor }: { competitor: Competitor; side: 'A' | '
 function CentralScore({ a, b }: { a: number; b: number }) {
   return (
     <div
-      className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
+      className="font-mono font-semibold text-crema-50 tabular-nums flex-shrink-0 leading-none"
       style={{ fontSize: '72px' }}
       aria-label={`Placar atual: ${a} a ${b}`}
     >
@@ -583,13 +583,12 @@ function CrowdLeanBar({
 
   return (
     <div
-      className="flex items-center flex-shrink-0"
-      style={{ gap: 14, marginTop: 4 }}
+      className="flex items-center flex-shrink-0 gap-3.5 mt-1"
       aria-label={`Voto do público: ${pctLeft}% à esquerda, ${pctRight}% à direita`}
     >
       {/* Mono caps label — muted cream, set like AO VIVO / APOIO */}
       <span
-        className="font-mono uppercase text-[var(--crema-300)] flex-shrink-0"
+        className="font-mono uppercase text-crema-300 flex-shrink-0"
         style={{ fontSize: 11, letterSpacing: '0.28em', opacity: 0.85 }}
       >
         Público
@@ -597,7 +596,7 @@ function CrowdLeanBar({
 
       {/* Left-cup percentage (muted) */}
       <span
-        className="font-mono tabular-nums text-[var(--crema-300)] flex-shrink-0"
+        className="font-mono tabular-nums text-crema-300 flex-shrink-0"
         style={{ fontSize: 11, opacity: 0.7, minWidth: 30, textAlign: 'right' }}
       >
         {pctLeft}%
@@ -605,20 +604,18 @@ function CrowdLeanBar({
 
       {/* The lean bar itself — espresso track, gold left-cup-share fill */}
       <div
-        className="overflow-hidden flex-shrink-0"
+        className="overflow-hidden flex-shrink-0 bg-espresso-700"
         style={{
           width: 576,
           height: 9,
           borderRadius: 9,
-          backgroundColor: 'var(--espresso-700)',
           border: '1px solid rgba(220,197,158,.14)',
         }}
       >
         <div
+          className="h-full bg-gold"
           style={{
             width: `${pctLeft}%`,
-            height: '100%',
-            backgroundColor: 'var(--gold)',
             transition: 'width 600ms ease',
           }}
         />
@@ -626,7 +623,7 @@ function CrowdLeanBar({
 
       {/* Right-cup percentage (muted) */}
       <span
-        className="font-mono tabular-nums text-[var(--crema-300)] flex-shrink-0"
+        className="font-mono tabular-nums text-crema-300 flex-shrink-0"
         style={{ fontSize: 11, opacity: 0.7, minWidth: 30, textAlign: 'left' }}
       >
         {pctRight}%
@@ -661,7 +658,7 @@ function PourPhotoCenterpiece({
   const rightEntry = photoLeftSlot === 'b' ? entryA : entryB;
   return (
     <div className="flex flex-col items-center w-full max-w-5xl gap-4 md:gap-6">
-      <div className="rounded-[var(--radius-lg)] overflow-hidden border-4 border-[var(--crema-200)] shadow-[var(--shadow-2)]">
+      <div className="rounded-lg overflow-hidden border-4 border-crema-200 shadow-2">
         <img
           src={pourPhotoUrl}
           alt="Foto dos copos servidos"
@@ -671,25 +668,25 @@ function PourPhotoCenterpiece({
 
       <div className="flex items-center justify-center gap-6 md:gap-10 w-full">
         <div className="flex-1 min-w-0 text-right">
-          <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
+          <p className="text-2xl md:text-4xl font-display font-bold text-crema-50 truncate">
             {leftEntry.competitor.name}
           </p>
-          <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
+          <p className="text-base md:text-xl font-serif italic text-crema-200 truncate">
             {leftEntry.competitor.coffeeShop}
           </p>
         </div>
         <div
-          className="font-mono font-semibold text-[var(--crema-50)] tabular-nums flex-shrink-0 leading-none"
+          className="font-mono font-semibold text-crema-50 tabular-nums flex-shrink-0 leading-none"
           style={{ fontSize: '64px' }}
           aria-label={`Placar atual: ${votesA} a ${votesB}`}
         >
           {votesA} × {votesB}
         </div>
         <div className="flex-1 min-w-0 text-left">
-          <p className="text-2xl md:text-4xl font-display font-bold text-[var(--crema-50)] truncate">
+          <p className="text-2xl md:text-4xl font-display font-bold text-crema-50 truncate">
             {rightEntry.competitor.name}
           </p>
-          <p className="text-base md:text-xl font-serif italic text-[var(--crema-200)] truncate">
+          <p className="text-base md:text-xl font-serif italic text-crema-200 truncate">
             {rightEntry.competitor.coffeeShop}
           </p>
         </div>
@@ -745,7 +742,7 @@ function MiniBracketStrip({
   });
   return (
     <div className="mt-12 w-full max-w-6xl">
-      <p className="font-mono text-xs uppercase tracking-wider text-[var(--crema-300)] text-center mb-3">
+      <p className="font-mono text-xs uppercase tracking-wider text-crema-300 text-center mb-3">
         Duelos da rodada
       </p>
       <div className="flex flex-wrap items-stretch justify-center gap-3">
@@ -767,24 +764,24 @@ function MiniBracketCard({ duel, isActive, label }: { duel: BracketDuel; isActiv
   const winnerId = duel.winner?.id ?? null;
 
   const containerCls = isActive
-    ? 'border-[var(--cinnamon-500)] bg-[var(--cinnamon-500)]/10'
+    ? 'border-cinnamon-500 bg-cinnamon-500/10'
     : isCompleted
-      ? 'border-transparent bg-[var(--espresso-700)]'
-      : 'border-[var(--espresso-500)] bg-transparent';
+      ? 'border-transparent bg-espresso-700'
+      : 'border-espresso-500 bg-transparent';
 
   return (
     <div
-      className={`relative flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] border ${containerCls}`}
+      className={`relative flex items-center gap-3 px-3 py-2 rounded-md border ${containerCls}`}
       style={{ minWidth: 260, maxWidth: 360 }}
     >
-      <span className="font-mono tabular-nums text-[10px] md:text-xs text-[var(--crema-300)] absolute -top-2 left-3 bg-[var(--espresso-900)] px-1 rounded whitespace-nowrap">
+      <span className="font-mono tabular-nums text-[10px] md:text-xs text-crema-300 absolute -top-2 left-3 bg-espresso-900 px-1 rounded whitespace-nowrap">
         {label}
       </span>
       <MiniCompetitorRow entry={duel.entryA} isWinner={winnerId === duel.entryA?.id} />
       <div className="flex flex-col items-center justify-center px-1 flex-shrink-0">
-        <span className="font-mono text-[10px] tracking-wider uppercase text-[var(--crema-300)]">×</span>
+        <span className="font-mono text-[10px] tracking-wider uppercase text-crema-300">×</span>
         {isCompleted && (
-          <span className="font-mono tabular-nums text-xs md:text-sm font-semibold text-[var(--crema-50)] mt-0.5">
+          <span className="font-mono tabular-nums text-xs md:text-sm font-semibold text-crema-50 mt-0.5">
             {duel.votesA}–{duel.votesB}
           </span>
         )}
@@ -798,8 +795,8 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
   if (!entry) {
     return (
       <div className="flex items-center gap-2 flex-1 min-w-0 opacity-50">
-        <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[var(--espresso-700)] border border-[var(--espresso-500)] flex-shrink-0" />
-        <span className="font-display text-xs md:text-sm text-[var(--crema-300)] truncate" aria-label="Sem oponente">—</span>
+        <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-espresso-700 border border-espresso-500 flex-shrink-0" />
+        <span className="font-display text-xs md:text-sm text-crema-300 truncate" aria-label="Sem oponente">—</span>
       </div>
     );
   }
@@ -809,16 +806,16 @@ function MiniCompetitorRow({ entry, isWinner }: { entry: Entry | null; isWinner:
         src={entry.competitor.photoUrl}
         alt={entry.competitor.name}
         className={`w-8 h-8 md:w-9 md:h-9 rounded-full object-cover flex-shrink-0 border ${
-          isWinner ? 'border-[var(--marigold-500)]' : 'border-[var(--crema-200)]'
+          isWinner ? 'border-marigold-500' : 'border-crema-200'
         }`}
       />
       <div className="flex flex-col min-w-0 flex-1">
         <span className={`font-display text-xs md:text-sm font-semibold truncate leading-tight ${
-          isWinner ? 'text-[var(--crema-50)]' : 'text-[var(--crema-100)]'
+          isWinner ? 'text-crema-50' : 'text-crema-100'
         }`}>
           {entry.competitor.name}
         </span>
-        <span className="font-serif italic text-[10px] md:text-xs text-[var(--crema-300)] truncate leading-tight">
+        <span className="font-serif italic text-[10px] md:text-xs text-crema-300 truncate leading-tight">
           {entry.competitor.coffeeShop}
         </span>
       </div>
@@ -850,10 +847,10 @@ function PodiumCrowdFavorite({ favorite }: { favorite: CrowdFavorite | null }) {
       aria-label="Favorito do público"
       className="mt-8 md:mt-10 flex flex-col items-center w-full"
     >
-      <p className="font-display text-sm md:text-base lg:text-lg text-[var(--crema-200)] text-center">
+      <p className="font-display text-sm md:text-base lg:text-lg text-crema-200 text-center">
         Favorito do público
       </p>
-      <p className="mt-1 font-display font-bold text-2xl md:text-3xl text-[var(--marigold-500)] text-center text-balance">
+      <p className="mt-1 font-display font-bold text-2xl md:text-3xl text-marigold-500 text-center text-balance">
         {favorite.competitor.name}
       </p>
     </section>
@@ -868,7 +865,7 @@ function PodiumSponsorCredit({ sponsors }: { sponsors: SponsorEntry[] }) {
       aria-label="Patrocinadores"
       className="mt-10 md:mt-14 flex flex-col items-center w-full"
     >
-      <p className="font-display text-sm md:text-base lg:text-lg text-[var(--crema-200)] text-center">
+      <p className="font-display text-sm md:text-base lg:text-lg text-crema-200 text-center">
         Patrocinado por
       </p>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-3 md:gap-4 max-w-5xl">
@@ -888,12 +885,18 @@ function PodiumSlot({
   position: 1 | 2 | 3;
 }) {
   const isFirst = position === 1;
-  const accent =
+  const accentBorderCls =
     position === 1
-      ? 'var(--marigold-500)'
+      ? 'border-marigold-500'
       : position === 2
-        ? 'var(--crema-300)'
-        : 'var(--cinnamon-500)';
+        ? 'border-crema-300'
+        : 'border-cinnamon-500';
+  const accentBgCls =
+    position === 1
+      ? 'bg-marigold-500'
+      : position === 2
+        ? 'bg-crema-300'
+        : 'bg-cinnamon-500';
   const photoSize = isFirst
     ? 'w-28 h-28 md:w-44 md:h-44'
     : position === 2
@@ -907,7 +910,7 @@ function PodiumSlot({
     <div className={`flex flex-col items-center flex-1 ${slotWidth}`}>
       {/* Stamp-seal "VENCEDOR" badge for 1st place — espresso-on-crema, set on a light disk so it reads on dark bg */}
       {isFirst && (
-        <div className="w-24 h-24 md:w-28 md:h-28 mb-2 -mr-6 self-end rounded-full bg-[var(--crema-50)] flex items-center justify-center shadow-[var(--shadow-1)]">
+        <div className="w-24 h-24 md:w-28 md:h-28 mb-2 -mr-6 self-end rounded-full bg-crema-50 flex items-center justify-center shadow-1">
           <img
             src="/assets/stamp-seal.svg"
             alt="Campeão"
@@ -916,8 +919,7 @@ function PodiumSlot({
         </div>
       )}
       <div
-        className={`relative ${photoSize} rounded-full overflow-hidden mb-4 shadow-[var(--shadow-2)]`}
-        style={{ border: `${isFirst ? 6 : 4}px solid ${accent}` }}
+        className={`relative ${photoSize} rounded-full overflow-hidden mb-4 shadow-2 ${accentBorderCls} ${isFirst ? 'border-[6px]' : 'border-4'}`}
       >
         <img
           src={entry.competitor.photoUrl}
@@ -926,18 +928,17 @@ function PodiumSlot({
         />
       </div>
       <p
-        className={`${isFirst ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-display font-bold text-center text-[var(--crema-50)]`}
+        className={`${isFirst ? 'text-xl md:text-2xl' : 'text-base md:text-lg'} font-display font-bold text-center text-crema-50`}
       >
         {entry.competitor.name}
       </p>
-      <p className="text-sm md:text-base font-serif italic text-[var(--crema-200)] text-center mt-1">
+      <p className="text-sm md:text-base font-serif italic text-crema-200 text-center mt-1">
         {entry.competitor.coffeeShop}
       </p>
       <div
-        className={`mt-4 w-full ${blockHeight} rounded-t-[var(--radius-sm)] flex items-center justify-center`}
-        style={{ backgroundColor: accent }}
+        className={`mt-4 w-full ${blockHeight} rounded-t-sm flex items-center justify-center ${accentBgCls}`}
       >
-        <span className={`${positionNumberSize} font-display font-bold text-[var(--espresso-900)] tabular-nums`}>
+        <span className={`${positionNumberSize} font-display font-bold text-espresso-900 tabular-nums`}>
           {position}
         </span>
       </div>
@@ -948,21 +949,21 @@ function PodiumSlot({
 function FlankSlot({ entry, position }: { entry: LeaderboardEntry; position: 4 | 5 }) {
   return (
     <div className="flex flex-col items-center flex-1 max-w-[170px] opacity-90 self-end">
-      <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-[var(--espresso-500)] mb-3">
+      <div className="w-16 h-16 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-espresso-500 mb-3">
         <img
           src={entry.competitor.photoUrl}
           alt={entry.competitor.name}
           className="w-full h-full object-cover"
         />
       </div>
-      <p className="text-sm md:text-base font-display font-bold text-center text-[var(--crema-50)]">
+      <p className="text-sm md:text-base font-display font-bold text-center text-crema-50">
         {entry.competitor.name}
       </p>
-      <p className="text-xs md:text-sm font-serif italic text-[var(--crema-200)] text-center mt-0.5 line-clamp-1">
+      <p className="text-xs md:text-sm font-serif italic text-crema-200 text-center mt-0.5 line-clamp-1">
         {entry.competitor.coffeeShop}
       </p>
-      <div className="mt-3 w-full py-2 md:py-3 rounded-t-[var(--radius-sm)] bg-[var(--espresso-700)] flex items-center justify-center">
-        <span className="text-xl md:text-2xl font-display font-bold text-[var(--crema-100)] tabular-nums">
+      <div className="mt-3 w-full py-2 md:py-3 rounded-t-sm bg-espresso-700 flex items-center justify-center">
+        <span className="text-xl md:text-2xl font-display font-bold text-crema-100 tabular-nums">
           {position}
         </span>
       </div>

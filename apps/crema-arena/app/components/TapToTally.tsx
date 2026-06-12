@@ -300,12 +300,12 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
 
     return (
       <>
-        <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+        <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
           <div className="text-center py-8">
-            <h3 className="text-xl font-semibold text-[var(--fg)] mb-4 font-[family-name:var(--font-display)]">
+            <h3 className="text-xl font-semibold text-fg mb-4 font-display">
               Duelo {duel.position + 1} - Pronto para começar
             </h3>
-            <p className="text-[var(--fg-2)] mb-6">
+            <p className="text-fg-2 mb-6">
               {hasEmptySlot
                 ? 'Este duelo tem uma vaga vazia. Você pode adicionar um wildcard ou fazer um W.O.'
                 : 'Clique para iniciar o duelo, ou substitua um competidor com wildcard.'}
@@ -355,13 +355,13 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
 
   if (duel.status === 'completed') {
     return (
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
         <div className="text-center py-8">
-          <Trophy size={48} className="mx-auto text-[var(--success)] mb-4" />
-          <h3 className="text-xl font-semibold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
+          <Trophy size={48} className="mx-auto text-success mb-4" />
+          <h3 className="text-xl font-semibold text-fg mb-2 font-display">
             Duelo concluído
           </h3>
-          <p className="text-[var(--fg-2)]">
+          <p className="text-fg-2">
             Este duelo já foi finalizado
           </p>
         </div>
@@ -371,12 +371,12 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
 
   return (
     <>
-      <div className="bg-[var(--surface-raised)] rounded-[var(--radius-lg)] p-6 md:p-8 border border-[var(--border)] shadow-[var(--shadow-1)]">
+      <div className="bg-surface-raised rounded-lg p-6 md:p-8 border border-border shadow-1">
         <div className="mb-6">
-          <h3 className="text-xl font-semibold text-[var(--fg)] font-[family-name:var(--font-display)]">
+          <h3 className="text-xl font-semibold text-fg font-display">
             Duelo {duel.position + 1} - Rodada {duel.round}
           </h3>
-          <p className="text-sm text-[var(--fg-3)] mt-1">
+          <p className="text-sm text-fg-3 mt-1">
             Toque nos copos para registrar votos
           </p>
         </div>
@@ -396,10 +396,10 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
             /* Orientation capture step (crowd vote on): bind the LEFT cup to a
                competitor before the photo goes live. Votes will follow this. */
             <div className="space-y-4">
-              <p className="text-[var(--fg)] font-medium">
+              <p className="text-fg font-medium">
                 Toque no copo de {captureCupAName}
               </p>
-              <div className="relative rounded-[var(--radius-md)] overflow-hidden border border-[var(--border)]">
+              <div className="relative rounded-md overflow-hidden border border-border">
                 <img
                   src={pendingPhoto.previewUrl}
                   alt="Foto dos copos"
@@ -414,13 +414,13 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                     aria-label={`Copo da esquerda é de ${captureLeftSlot === 'a' ? entryAName : entryBName}`}
                     className={`relative flex flex-col justify-end p-3 text-left transition-colors ${
                       captureLeftSlot === 'a'
-                        ? 'bg-[var(--brand)]/25 ring-2 ring-inset ring-[var(--brand)]'
-                        : 'hover:bg-[var(--brand)]/10'
+                        ? 'bg-brand/25 ring-2 ring-inset ring-brand'
+                        : 'hover:bg-brand/10'
                     }`}
                   >
-                    <span className="inline-flex items-center gap-1.5 self-start rounded-[var(--radius-xs)] bg-[var(--surface-raised)]/90 px-2 py-1 text-sm font-medium text-[var(--fg)]">
+                    <span className="inline-flex items-center gap-1.5 self-start rounded-xs bg-surface-raised/90 px-2 py-1 text-sm font-medium text-fg">
                       {captureLeftSlot === 'a' && (
-                        <span aria-hidden className="text-[var(--brand)]">●</span>
+                        <span aria-hidden className="text-brand">●</span>
                       )}
                       {captureLeftSlot === 'a' ? entryAName : entryBName}
                     </span>
@@ -430,15 +430,15 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                     onClick={() => setCaptureLeftSlot('b')}
                     aria-pressed={captureLeftSlot === 'b'}
                     aria-label={`Copo da direita é de ${captureLeftSlot === 'a' ? entryBName : entryAName}`}
-                    className={`relative flex flex-col justify-end border-l border-[var(--surface-raised)]/60 p-3 text-right transition-colors ${
+                    className={`relative flex flex-col justify-end border-l border-surface-raised/60 p-3 text-right transition-colors ${
                       captureLeftSlot === 'b'
-                        ? 'bg-[var(--brand)]/25 ring-2 ring-inset ring-[var(--brand)]'
-                        : 'hover:bg-[var(--brand)]/10'
+                        ? 'bg-brand/25 ring-2 ring-inset ring-brand'
+                        : 'hover:bg-brand/10'
                     }`}
                   >
-                    <span className="inline-flex items-center gap-1.5 self-end rounded-[var(--radius-xs)] bg-[var(--surface-raised)]/90 px-2 py-1 text-sm font-medium text-[var(--fg)]">
+                    <span className="inline-flex items-center gap-1.5 self-end rounded-xs bg-surface-raised/90 px-2 py-1 text-sm font-medium text-fg">
                       {captureLeftSlot === 'b' && (
-                        <span aria-hidden className="text-[var(--brand)]">●</span>
+                        <span aria-hidden className="text-brand">●</span>
                       )}
                       {captureLeftSlot === 'b' ? entryAName : entryBName}
                     </span>
@@ -462,7 +462,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                 >
                   {isUploading ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-[var(--fg-inverse)] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-5 h-5 border-2 border-fg-inverse border-t-transparent rounded-full animate-spin"></div>
                       Enviando...
                     </>
                   ) : (
@@ -476,7 +476,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
             </div>
           ) : duel.pourPhotoUrl ? (
             <div className="space-y-3">
-              <div className="relative rounded-[var(--radius-md)] overflow-hidden">
+              <div className="relative rounded-md overflow-hidden">
                 <img
                   src={duel.pourPhotoUrl}
                   alt="Foto dos copos"
@@ -491,7 +491,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                 >
                   {isUploading ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-fg border-t-transparent rounded-full animate-spin"></div>
                       Enviando...
                     </>
                   ) : (
@@ -504,7 +504,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
               </div>
               {/* Orientation summary + correction without re-uploading. */}
               <div className="flex items-center justify-between gap-3 flex-wrap">
-                <p className="text-xs text-[var(--fg-3)]">
+                <p className="text-xs text-fg-3">
                   Copo da esquerda: {leftCupName}
                 </p>
                 <Button
@@ -515,7 +515,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                 >
                   {isFlippingSides ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-fg border-t-transparent rounded-full animate-spin"></div>
                       Trocando...
                     </>
                   ) : (
@@ -536,7 +536,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
             >
               {isUploading ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-[var(--fg)] border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-5 h-5 border-2 border-fg border-t-transparent rounded-full animate-spin"></div>
                   Enviando...
                 </>
               ) : (
@@ -568,7 +568,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                 type="button"
                 onClick={() => handleUndoVote('A')}
                 disabled={votesA <= 0}
-                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[var(--fg-3)] hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-fg-3 hover:text-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 aria-label={`Remover último voto de ${duel.entryA.competitor.name}`}
               >
                 <span aria-hidden className="text-base leading-none">−</span> Remover voto
@@ -588,7 +588,7 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
                 type="button"
                 onClick={() => handleUndoVote('B')}
                 disabled={votesB <= 0}
-                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[var(--fg-3)] hover:text-[var(--fg)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="self-center inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-fg-3 hover:text-fg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 aria-label={`Remover último voto de ${duel.entryB.competitor.name}`}
               >
                 <span aria-hidden className="text-base leading-none">−</span> Remover voto
@@ -605,9 +605,9 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
         })()}
 
         {/* Complete Duel Button */}
-        <div className="pt-6 border-t border-[var(--border)]">
+        <div className="pt-6 border-t border-border">
           {totalVotes < judgesCount && (
-            <p className="text-center text-sm text-[var(--fg-3)] mb-3">
+            <p className="text-center text-sm text-fg-3 mb-3">
               Faltam {judgesCount - totalVotes} {judgesCount - totalVotes === 1 ? 'voto' : 'votos'}
             </p>
           )}
@@ -631,13 +631,13 @@ export default function TapToTally({ duel, judgesCount, crowdVoteEnabled, onRefr
       >
         <div className="space-y-6">
           <div className="text-center py-4">
-            <p className="text-3xl font-mono font-bold text-[var(--fg)] mb-2">
+            <p className="text-3xl font-mono font-bold text-fg mb-2">
               {scoreDisplay}
             </p>
-            <p className="text-lg text-[var(--fg-2)]">
-              para <span className="font-semibold text-[var(--fg)]">{computedWinnerName}</span>
+            <p className="text-lg text-fg-2">
+              para <span className="font-semibold text-fg">{computedWinnerName}</span>
             </p>
-            <p className="text-sm text-[var(--fg-3)] mt-3">
+            <p className="text-sm text-fg-3 mt-3">
               Confirmar resultado e avançar para a próxima rodada?
             </p>
           </div>
@@ -694,10 +694,10 @@ function VoteButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={`Votar em ${competitor.name} (Copa ${side})`}
-      className="group relative w-full text-left rounded-[var(--radius-lg)] border-2 border-[var(--border-strong)] bg-[var(--surface-raised)] p-4 md:p-5 transition-all duration-[var(--dur-base)] ease-[var(--ease-standard)] hover:border-[var(--brand)] hover:bg-[var(--brand-soft)] active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
+      className="group relative w-full text-left rounded-lg border-2 border-border-strong bg-surface-raised p-4 md:p-5 transition-all duration-base ease-standard hover:border-brand hover:bg-brand-soft active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed"
     >
       <div className="flex items-center gap-4">
-        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+        <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
           <img
             src={competitor.photoUrl}
             alt=""
@@ -706,18 +706,18 @@ function VoteButton({
           />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="text-xl md:text-2xl font-display font-bold text-[var(--fg)] leading-tight line-clamp-2">
+          <h4 className="text-xl md:text-2xl font-display font-bold text-fg leading-tight line-clamp-2">
             {competitor.name}
           </h4>
-          <p className="text-sm font-serif italic text-[var(--fg-2)] mt-1 line-clamp-1">
+          <p className="text-sm font-serif italic text-fg-2 mt-1 line-clamp-1">
             {competitor.coffeeShop}
           </p>
         </div>
         <div className="flex-shrink-0 min-w-[64px] text-right">
-          <span className="block font-mono text-4xl md:text-5xl font-semibold tabular-nums text-[var(--fg)]">
+          <span className="block font-mono text-4xl md:text-5xl font-semibold tabular-nums text-fg">
             {votes}
           </span>
-          <span className="block font-mono text-[10px] uppercase tracking-wider text-[var(--fg-3)] mt-0.5">
+          <span className="block font-mono text-[10px] uppercase tracking-wider text-fg-3 mt-0.5">
             {votes === 1 ? 'voto' : 'votos'}
           </span>
         </div>

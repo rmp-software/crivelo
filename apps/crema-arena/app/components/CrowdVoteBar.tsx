@@ -149,23 +149,23 @@ export default function CrowdVoteBar({ duel }: CrowdVoteBarProps) {
   }
 
   return (
-    <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] border border-[var(--border)] shadow-[var(--shadow-1)] p-4">
+    <div className="bg-surface-raised rounded-md border border-border shadow-1 p-4">
       {/* Label + unofficial disclaimer */}
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--fg-3)] font-[family-name:var(--font-mono)]">
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-fg-3 font-mono">
           Voto do público
         </span>
-        <span className="text-[10px] uppercase tracking-wider text-[var(--fg-3)] font-[family-name:var(--font-mono)] opacity-70">
+        <span className="text-[10px] uppercase tracking-wider text-fg-3 font-mono opacity-70">
           · não oficial
         </span>
       </div>
-      <p className="text-xs text-[var(--fg-3)] mb-3">
+      <p className="text-xs text-fg-3 mb-3">
         Quem decide o duelo são os jurados.
       </p>
 
       {/* Ballot */}
       {hasPhoto ? (
-        <div className="relative rounded-[var(--radius-sm)] overflow-hidden border border-[var(--border)]">
+        <div className="relative rounded-sm overflow-hidden border border-border">
           <img
             src={duel.pourPhotoUrl!}
             alt="Duelo"
@@ -192,7 +192,7 @@ export default function CrowdVoteBar({ duel }: CrowdVoteBarProps) {
           </div>
           {/* Hairline divider down the middle */}
           <div
-            className="absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 bg-[var(--fg-inverse)]/40"
+            className="absolute top-0 bottom-0 left-1/2 w-px -translate-x-1/2 bg-fg-inverse/40"
             aria-hidden
           />
         </div>
@@ -217,16 +217,16 @@ export default function CrowdVoteBar({ duel }: CrowdVoteBarProps) {
 
       {/* Tally: lean bar + mono N × M */}
       <div className="mt-3">
-        <div className="h-2 rounded-[var(--radius-full)] bg-[var(--bg-2)] overflow-hidden flex">
+        <div className="h-2 rounded-full bg-bg-2 overflow-hidden flex">
           {total > 0 && (
             <>
               <div
-                className="h-full bg-[var(--brand)] transition-all"
+                className="h-full bg-brand transition-all"
                 style={{ width: `${shareA}%` }}
                 aria-hidden
               />
               <div
-                className="h-full bg-[var(--fg-3)] transition-all"
+                className="h-full bg-fg-3 transition-all"
                 style={{ width: `${100 - shareA}%` }}
                 aria-hidden
               />
@@ -235,16 +235,16 @@ export default function CrowdVoteBar({ duel }: CrowdVoteBarProps) {
         </div>
         <div className="flex items-center justify-between mt-2">
           {total > 0 ? (
-            <span className="text-sm font-semibold tabular-nums text-[var(--fg)] font-[family-name:var(--font-mono)]">
+            <span className="text-sm font-semibold tabular-nums text-fg font-mono">
               {counts.a} × {counts.b}
             </span>
           ) : isOpen ? (
-            <span className="text-xs text-[var(--fg-3)]">Seja o primeiro a votar</span>
+            <span className="text-xs text-fg-3">Seja o primeiro a votar</span>
           ) : (
             <span />
           )}
           {!isOpen && (
-            <span className="text-xs font-medium text-[var(--fg-3)]">
+            <span className="text-xs font-medium text-fg-3">
               Votação encerrada.
             </span>
           )}
@@ -253,7 +253,7 @@ export default function CrowdVoteBar({ duel }: CrowdVoteBarProps) {
 
       {/* Post-vote caption — persists after close so a voter still sees their pick */}
       {(isOpen || !!selected) && selectedName && (
-        <p className="text-xs text-[var(--fg-2)] mt-2">
+        <p className="text-xs text-fg-2 mt-2">
           {hasPhoto
             ? `Você votou no copo de ${selectedName}`
             : `Você votou em ${selectedName}`}
@@ -288,11 +288,11 @@ function CupZone({
       className={`relative flex flex-col justify-end p-3 min-h-[44px] transition-all touch-manipulation ${
         align === 'right' ? 'items-end text-right' : 'items-start text-left'
       } ${disabled ? 'cursor-default' : 'cursor-pointer'} ${
-        selected ? 'ring-2 ring-inset ring-[var(--brand)] bg-[var(--brand)]/10' : ''
+        selected ? 'ring-2 ring-inset ring-brand bg-brand/10' : ''
       } ${dimmed ? 'opacity-50' : ''}`}
     >
       {entryName && (
-        <span className="text-[var(--fg-inverse)] text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] truncate max-w-full">
+        <span className="text-fg-inverse text-sm font-semibold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] truncate max-w-full">
           {selected && <span aria-hidden>▸ </span>}
           {entryName}
         </span>
@@ -316,7 +316,7 @@ function CardZone({
 }) {
   if (!entry) {
     return (
-      <div className="rounded-[var(--radius-sm)] border border-[var(--border)] bg-[var(--bg-2)] p-4 flex items-center justify-center text-xs text-[var(--fg-3)] min-h-[44px]">
+      <div className="rounded-sm border border-border bg-bg-2 p-4 flex items-center justify-center text-xs text-fg-3 min-h-[44px]">
         —
       </div>
     );
@@ -328,26 +328,26 @@ function CardZone({
       disabled={disabled}
       aria-pressed={selected}
       aria-label={`Votar em ${entry.competitor.name}`}
-      className={`rounded-[var(--radius-sm)] border p-4 flex flex-col items-center text-center min-h-[44px] transition-all touch-manipulation ${
+      className={`rounded-sm border p-4 flex flex-col items-center text-center min-h-[44px] transition-all touch-manipulation ${
         disabled ? 'cursor-default' : 'cursor-pointer'
       } ${
         selected
-          ? 'border-[var(--brand)] ring-2 ring-[var(--brand)] bg-[var(--brand-soft)]'
-          : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--border-strong)]'
+          ? 'border-brand ring-2 ring-brand bg-brand-soft'
+          : 'border-border bg-surface hover:border-border-strong'
       } ${dimmed ? 'opacity-50' : ''}`}
     >
-      <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] mb-2">
+      <div className="w-16 h-16 rounded-full overflow-hidden bg-bg-2 border-2 border-border mb-2">
         <img
           src={entry.competitor.photoUrl}
           alt={entry.competitor.name}
           className="w-full h-full object-cover"
         />
       </div>
-      <p className="font-semibold text-sm text-[var(--fg)] line-clamp-2 leading-tight">
+      <p className="font-semibold text-sm text-fg line-clamp-2 leading-tight">
         {selected && <span aria-hidden>▸ </span>}
         {entry.competitor.name}
       </p>
-      <p className="text-xs text-[var(--fg-3)] line-clamp-1 mt-0.5">
+      <p className="text-xs text-fg-3 line-clamp-1 mt-0.5">
         {entry.competitor.coffeeShop}
       </p>
     </button>

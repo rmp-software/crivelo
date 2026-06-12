@@ -195,16 +195,16 @@ export function LandingFeat() {
   };
 
   return (
-    <section className="relative bg-[var(--bg-inverse)] px-7 py-[90px] text-[var(--fg-inverse)] max-[560px]:px-[18px] max-[560px]:py-16">
+    <section className="relative bg-bg-inverse px-7 py-[90px] text-fg-inverse max-[560px]:px-[18px] max-[560px]:py-16">
       <div className="relative z-[1] mx-auto max-w-[1200px]">
         <Reveal className="mb-[52px] max-w-[760px]">
-          <div className="mb-[26px] inline-flex items-center gap-[10px] font-mono text-xs font-medium uppercase tracking-[0.14em] text-[var(--crema-300)]">
-            <span className="size-[7px] rounded-full bg-[var(--brand)]" aria-hidden="true" />
+          <div className="mb-[26px] inline-flex items-center gap-2.5 font-mono text-xs font-medium uppercase tracking-[0.14em] text-crema-300">
+            <span className="size-[7px] rounded-full bg-brand" aria-hidden="true" />
             Por dentro da plataforma
           </div>
-          <h2 className="m-0 text-balance font-display text-[clamp(30px,4.4vw,48px)] font-extrabold leading-[1.04] tracking-[-0.025em] text-[var(--crema-50)]">
+          <h2 className="m-0 text-balance font-display text-[clamp(30px,4.4vw,48px)] font-extrabold leading-[1.04] tracking-[-0.025em] text-crema-50">
             Tudo que roda no dia do{" "}
-            <em className="font-serif font-normal italic text-[var(--marigold-300)]">TNT</em>
+            <em className="font-serif font-normal italic text-marigold-300">TNT</em>
           </h2>
         </Reveal>
 
@@ -214,7 +214,7 @@ export function LandingFeat() {
             role="tablist"
             aria-label="Funcionalidades"
             onKeyDown={onTabsKeyDown}
-            className="sticky top-[92px] flex flex-col gap-[10px] max-[960px]:static max-[960px]:flex-row max-[960px]:flex-nowrap max-[960px]:gap-2 max-[960px]:overflow-x-auto max-[960px]:pb-1"
+            className="sticky top-[92px] flex flex-col gap-2.5 max-[960px]:static max-[960px]:flex-row max-[960px]:flex-nowrap max-[960px]:gap-2 max-[960px]:overflow-x-auto max-[960px]:pb-1"
           >
             {PANELS.map((p, i) => {
               const on = p.id === active;
@@ -232,22 +232,22 @@ export function LandingFeat() {
                   tabIndex={on ? 0 : -1}
                   onClick={() => setActive(p.id)}
                   className={cn(
-                    "flex w-full min-h-[44px] items-start gap-[14px] rounded-md border px-[18px] py-4 text-left font-body transition-colors",
-                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]",
+                    "flex w-full min-h-[44px] items-start gap-3.5 rounded-md border px-[18px] py-4 text-left font-body transition-colors",
+                    "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--focus-ring)]",
                     "max-[960px]:w-auto max-[960px]:min-w-[170px] max-[960px]:flex-[0_0_auto]",
                     on
-                      ? "border-[var(--cinnamon-500)] bg-[var(--espresso-800)] shadow-[inset_3px_0_0_var(--cinnamon-500)]"
-                      : "border-[var(--crema-50)]/10 bg-transparent hover:bg-[var(--espresso-800)]",
+                      ? "border-cinnamon-500 bg-espresso-800 shadow-[inset_3px_0_0_var(--cinnamon-500)]"
+                      : "border-crema-50/10 bg-transparent hover:bg-espresso-800",
                   )}
                 >
-                  <span className="shrink-0 pt-[2px] font-mono text-xs font-semibold text-[var(--cinnamon-300)]">
+                  <span className="shrink-0 pt-0.5 font-mono text-xs font-semibold text-cinnamon-300">
                     {p.num}
                   </span>
                   <span className="min-w-0">
-                    <b className="block font-display text-[17px] font-bold leading-[1.15] tracking-[-0.01em] text-[var(--crema-50)]">
+                    <b className="block font-display text-h4 font-bold leading-[1.15] tracking-[-0.01em] text-crema-50">
                       {p.label}
                     </b>
-                    <span className="mt-[2px] block text-[13px] leading-[1.3] text-[var(--crema-400)]">
+                    <span className="mt-0.5 block text-[13px] leading-[1.3] text-crema-400">
                       {p.sub}
                     </span>
                   </span>
@@ -305,34 +305,34 @@ function PanelBody({ panel: p }: { panel: Panel }) {
   return (
     <>
       <div className="mb-[30px]">
-        <h3 className="m-0 mb-[6px] font-display text-[26px] font-bold tracking-[-0.02em] text-[var(--crema-50)]">
+        <h3 className="m-0 mb-1.5 font-display text-[26px] font-bold tracking-[-0.02em] text-crema-50">
           {p.introTitle}
         </h3>
-        <p className="m-0 font-serif text-[19px] italic text-[var(--crema-200)]">{p.introText}</p>
+        <p className="m-0 font-serif text-[19px] italic text-crema-200">{p.introText}</p>
       </div>
 
       {/* Zig: alternating cards on a center spine (desktop); left-spine ladder (mobile) */}
-      <div className="relative flex flex-col gap-[30px] before:absolute before:left-1/2 before:top-[14px] before:bottom-[14px] before:w-[2px] before:-translate-x-1/2 before:bg-gradient-to-b before:from-[var(--cinnamon-500)] before:to-[var(--cinnamon-300)] before:content-[''] max-[960px]:gap-4 max-[960px]:pl-[38px] max-[960px]:before:left-[11px] max-[960px]:before:top-[22px] max-[960px]:before:bottom-[22px] max-[960px]:before:translate-x-0">
+      <div className="relative flex flex-col gap-[30px] before:absolute before:left-1/2 before:top-[14px] before:bottom-[14px] before:w-0.5 before:-translate-x-1/2 before:bg-gradient-to-b before:from-cinnamon-500 before:to-cinnamon-300 before:content-[''] max-[960px]:gap-4 max-[960px]:pl-[38px] max-[960px]:before:left-[11px] max-[960px]:before:top-[22px] max-[960px]:before:bottom-[22px] max-[960px]:before:translate-x-0">
         {p.cards.map((c, i) => (
           <div
             key={i}
             className={cn(
-              "relative z-[1] w-[66%] rounded-md border border-[var(--crema-50)]/12 bg-[var(--espresso-800)] px-6 py-[22px] shadow-2",
+              "relative z-[1] w-[66%] rounded-md border border-crema-50/12 bg-espresso-800 px-6 py-[22px] shadow-2",
               c.side === "left" ? "self-start" : "self-end",
               // mobile: full-width ladder rung with node + connector
               "max-[960px]:w-full max-[960px]:self-stretch",
-              "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-[var(--cinnamon-500)] max-[960px]:before:bg-[var(--espresso-900)] max-[960px]:before:shadow-[0_0_0_4px_var(--bg-inverse)] max-[960px]:before:content-['']",
-              "max-[960px]:after:absolute max-[960px]:after:-left-[17px] max-[960px]:after:top-[29px] max-[960px]:after:h-[2px] max-[960px]:after:w-[17px] max-[960px]:after:bg-[var(--cinnamon-500)] max-[960px]:after:content-['']",
+              "max-[960px]:before:absolute max-[960px]:before:-left-[33px] max-[960px]:before:top-[22px] max-[960px]:before:size-4 max-[960px]:before:rounded-full max-[960px]:before:border-2 max-[960px]:before:border-cinnamon-500 max-[960px]:before:bg-espresso-900 max-[960px]:before:shadow-[0_0_0_4px_var(--bg-inverse)] max-[960px]:before:content-['']",
+              "max-[960px]:after:absolute max-[960px]:after:-left-[17px] max-[960px]:after:top-[29px] max-[960px]:after:h-0.5 max-[960px]:after:w-[17px] max-[960px]:after:bg-cinnamon-500 max-[960px]:after:content-['']",
             )}
           >
-            <span className="mb-[10px] block font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--cinnamon-300)]">
+            <span className="mb-2.5 block font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-cinnamon-300">
               {c.kicker}
             </span>
-            <h4 className="m-0 mb-2 font-display text-[20px] font-bold leading-[1.15] tracking-[-0.015em] text-[var(--crema-50)]">
+            <h4 className="m-0 mb-2 font-display text-h3 font-bold leading-[1.15] tracking-[-0.015em] text-crema-50">
               {c.title}
             </h4>
             {c.mock ? <div aria-hidden="true">{c.mock}</div> : null}
-            <p className="m-0 mt-2 font-body text-[14.5px] leading-[1.55] text-[var(--crema-300)]">
+            <p className="m-0 mt-2 font-body text-[14.5px] leading-[1.55] text-crema-300">
               {c.body}
             </p>
           </div>
