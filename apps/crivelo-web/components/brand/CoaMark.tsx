@@ -24,7 +24,7 @@ export function CoaMark({ px = 26, color = "var(--brand)" }: CoaMarkProps) {
       height={px}
       viewBox="0 0 64 64"
       fill="none"
-      style={{ display: "block", flexShrink: 0 }}
+      className="block shrink-0"
       aria-hidden="true"
     >
       <path

@@ -26,6 +26,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
+import { Button } from "../ui/Button";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
@@ -157,16 +158,19 @@ export function CoaCalculator() {
 
   const cta = (
     <>
-      {/* TODO(RMP-217): commodity-UI sweep — bespoke full-width CTA (custom 56px
-          height, mono time tail, play icon); not routed through @crivelo/ui/button
-          to stay pixel-identical. */}
-      <button
+      {/* Routed through the app-local Button wrapper (RMP-217 commodity-UI sweep);
+          the bespoke geometry (56px height, brand fill, mono time tail, 18px play
+          icon) rides in className via tailwind-merge so the primitive's
+          buttonVariants defaults (rounded-md, h-9/px, bg-primary, text-sm,
+          font-medium, gap-2, hover, the 16px svg rule) are neutralised — pixel
+          identical to the prior hand-rolled <button>. */}
+      <Button
         onClick={startBrew}
-        className="mt-6 flex h-14 w-full cursor-pointer items-center justify-center gap-[10px] rounded-[var(--radius-md)] border-none bg-brand font-body text-[16px] font-semibold text-white shadow-[var(--shadow-1)]"
+        className="mt-6 flex h-14 w-full gap-[10px] rounded-[var(--radius-md)] border-none bg-brand p-0 font-body text-[16px] font-semibold whitespace-normal text-white shadow-[var(--shadow-1)] hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[18px]"
       >
         <Icon name="play" size={18} /> {t("beginBrew")}{" "}
         <span className={cn("opacity-[0.85]", MONO)}>{recipe.totalTime}</span>
-      </button>
+      </Button>
       <div className="mt-4 text-center">
         <a
           href="https://en.philocoffea.com/blogs/blog/coffee-brewing-method"

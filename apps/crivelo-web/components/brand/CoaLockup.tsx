@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { CoaMark } from "./CoaMark";
 
 /**
@@ -37,46 +38,39 @@ export function CoaLockup({
   mono = true,
 }: CoaLockupProps) {
   const [mark, title, sub] = SIZES[size];
-  const ink = variant === "light" ? "var(--crema-50)" : "var(--fg)";
-  const muted = variant === "light" ? "var(--crema-300)" : "var(--fg-3)";
+  // last-resort: runtime font sizes only
+  const vars = {
+    "--title-size": `${title}px`,
+    "--sub-size": `${sub}px`,
+  } as CSSProperties;
   return (
     <div
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 10,
-        color: ink,
-      }}
+      style={vars}
+      className={
+        "inline-flex items-center gap-[10px] " +
+        (variant === "light" ? "text-[color:var(--crema-50)]" : "text-[color:var(--fg)]")
+      }
     >
       {mono && <CoaMark px={mark} />}
-      <span
-        style={{
-          display: "inline-flex",
-          flexDirection: "column",
-          lineHeight: 1,
-          gap: 2,
-        }}
-      >
-        <span
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: title,
-            letterSpacing: "-0.02em",
-          }}
-        >
+      <span className="inline-flex flex-col gap-0.5 leading-none">
+        <span className="font-display text-[length:var(--title-size)] font-bold tracking-[-0.02em]">
           Coa
         </span>
         <span
-          style={{
-            fontFamily: "var(--font-body)",
-            fontSize: sub,
-            color: muted,
-            letterSpacing: "0.01em",
-          }}
+          className={
+            "font-body text-[length:var(--sub-size)] tracking-[0.01em] " +
+            (variant === "light" ? "text-[color:var(--crema-300)]" : "text-[color:var(--fg-3)]")
+          }
         >
           by{" "}
-          <span style={{ color: ink, fontWeight: 600 }}>Crivelo</span>
+          <span
+            className={
+              "font-semibold " +
+              (variant === "light" ? "text-[color:var(--crema-50)]" : "text-[color:var(--fg)]")
+            }
+          >
+            Crivelo
+          </span>
         </span>
       </span>
     </div>

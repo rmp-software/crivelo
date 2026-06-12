@@ -16,6 +16,7 @@
  */
 import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { Button } from "../ui/Button";
 import { cn } from "@crivelo/ui/lib/utils";
 import { Icon } from "./icons";
 import { clamp } from "../../lib/four-six";
@@ -35,15 +36,21 @@ function StepButton({
   label: string;
   children: ReactNode;
 }) {
+  // Routed through the app-local Button wrapper (RMP-217 commodity-UI sweep). The
+  // 24px circular stepper geometry rides in className via tailwind-merge so the
+  // primitive's buttonVariants defaults (h-9/px, rounded-md, bg-primary, gap-2,
+  // transition-all, the 16px svg rule) are neutralised — pixel identical to the
+  // prior hand-rolled <button>. Hover recolours the border only, so the default
+  // hover:bg-primary/90 is cancelled with hover:bg-[color:var(--surface)].
   return (
-    <button
+    <Button
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-[color:var(--fg)] transition-colors hover:border-[color:var(--brand)]"
+      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] p-0 text-[color:var(--fg)] transition-colors hover:border-[color:var(--brand)] hover:bg-[color:var(--surface)] has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

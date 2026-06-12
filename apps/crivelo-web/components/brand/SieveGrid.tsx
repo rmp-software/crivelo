@@ -82,7 +82,7 @@ export function SieveGrid({
       height={stretch ? "100%" : h}
       viewBox={`0 0 ${w} ${h}`}
       preserveAspectRatio={stretch ? "none" : "xMidYMid meet"}
-      style={{ display: "block" }}
+      className="block"
       aria-hidden="true"
     >
       {cells.map((cell, i) =>

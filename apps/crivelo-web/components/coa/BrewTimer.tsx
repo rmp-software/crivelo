@@ -21,6 +21,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
+import { Button } from "../ui/Button";
 import { clamp, fmtTime, type Recipe } from "../../lib/four-six";
 import { Icon } from "./icons";
 import type { Breakpoint } from "./useViewport";
@@ -35,17 +36,21 @@ const CAP =
   "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
 
 /**
- * Shared CTA look (54px tall pill). `solid` paints the brand action (white ink,
+ * Shared CTA look (54px tall pill), worn by the app-local Button wrapper
+ * (RMP-217 commodity-UI sweep). `solid` paints the brand action (white ink,
  * shadow); `outline` is the secondary ghost variant (--fg ink, 1px strong border).
- * TODO(RMP-217): commodity-UI sweep — could route through components/ui/Button.tsx
- * once its variants land pixel-identical; kept bespoke here to preserve geometry.
+ * The geometry rides in className via tailwind-merge so the primitive's
+ * buttonVariants defaults (rounded-md, h-9/px, bg-primary, text-sm, font-medium,
+ * gap-2) are neutralised — pixel identical to the prior hand-rolled <button>.
+ * `p-0 has-[>svg]:px-0` cancels the size-default horizontal padding (these
+ * full-width pills are centred, never inset).
  */
 const CTA_BASE =
-  "flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-[var(--radius-md)] font-body text-[16px] font-semibold";
+  "flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-[var(--radius-md)] p-0 font-body text-[16px] font-semibold whitespace-normal has-[>svg]:px-0";
 const CTA_SOLID =
-  "bg-brand text-white border-none shadow-[var(--shadow-1)]";
+  "bg-brand text-white border-none shadow-[var(--shadow-1)] hover:bg-brand";
 const CTA_OUTLINE =
-  "bg-transparent text-[color:var(--fg)] border border-[color:var(--border-strong)] shadow-none";
+  "bg-transparent text-[color:var(--fg)] border border-[color:var(--border-strong)] shadow-none hover:bg-transparent hover:text-[color:var(--fg)]";
 
 type Status = "running" | "paused" | "done";
 
@@ -181,12 +186,14 @@ export function BrewTimer({
         wide ? "px-6 pt-[18px] pb-[44px]" : "px-5 pt-[14px] pb-9",
       )}
     >
-      {/* top row */}
+      {/* top row — the back-to-recipe affordance also rides the Button wrapper
+          (RMP-217); h-auto/py-[6px] + has-[>svg]:px-1 neutralise the size-default
+          height and padding so it stays the bespoke text-link height. */}
       <div className="mb-2 flex items-center justify-between">
-        <button
+        <Button
           type="button"
           onClick={exit}
-          className="-ml-1 inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent px-1 py-[6px] font-body text-[14px] font-semibold text-[color:var(--fg-2)]"
+          className="-ml-1 inline-flex h-auto cursor-pointer items-center gap-[5px] rounded-none justify-start border-none bg-transparent px-1 py-[6px] font-body text-[14px] font-semibold text-[color:var(--fg-2)] hover:bg-transparent hover:text-[color:var(--fg-2)] has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
         >
           <svg
             width="18"
@@ -202,7 +209,7 @@ export function BrewTimer({
             <path d="M15 5l-7 7 7 7" />
           </svg>
           {t("recipe")}
-        </button>
+        </Button>
         <span
           className={cn(
             CAP,
@@ -463,31 +470,37 @@ export function BrewTimer({
             })}
           </div>
 
-          {/* controls — TODO(RMP-217): commodity-UI sweep (route through
-              components/ui/Button.tsx once its variants land pixel-identical). */}
+          {/* controls — routed through the app-local Button wrapper (RMP-217
+              commodity-UI sweep); CTA_BASE/SOLID/OUTLINE neutralise the primitive
+              defaults so the look is pixel-identical. The 17px resume icon and 20px
+              restart icon override the primitive's 16px svg sizing rule. */}
           {done ? (
             <div className="flex flex-col gap-[10px]">
-              <button
+              <Button
                 type="button"
                 onClick={restart}
                 className={cn(CTA_BASE, CTA_SOLID)}
               >
                 {t("brewAgain")}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={exit}
                 className={cn(CTA_BASE, CTA_OUTLINE)}
               >
                 {t("backToRecipe")}
-              </button>
+              </Button>
             </div>
           ) : (
             <div className="flex gap-[10px]">
-              <button
+              <Button
                 type="button"
                 onClick={paused ? resume : pause}
-                className={cn(CTA_BASE, paused ? CTA_SOLID : CTA_OUTLINE, "flex-1")}
+                className={cn(
+                  CTA_BASE,
+                  paused ? CTA_SOLID : CTA_OUTLINE,
+                  "flex-1 [&_svg:not([class*='size-'])]:size-[17px]",
+                )}
               >
                 {paused ? (
                   <>
@@ -496,12 +509,12 @@ export function BrewTimer({
                 ) : (
                   t("pause")
                 )}
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
                 onClick={restart}
                 aria-label={t("restartAria")}
-                className="flex h-[54px] w-[56px] cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--border-strong)] bg-[color:var(--surface)] text-[color:var(--fg-2)]"
+                className="flex h-[54px] w-[56px] cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--border-strong)] bg-[color:var(--surface)] p-0 text-[color:var(--fg-2)] hover:bg-[color:var(--surface)] has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[20px]"
               >
                 <svg
                   width="20"
@@ -517,7 +530,7 @@ export function BrewTimer({
                   <path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" />
                   <path d="M3 4v4h4" />
                 </svg>
-              </button>
+              </Button>
             </div>
           )}
         </div>
