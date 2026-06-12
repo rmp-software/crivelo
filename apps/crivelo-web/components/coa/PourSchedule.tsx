@@ -26,7 +26,7 @@ import type { Recipe } from "../../lib/four-six";
 
 /** Section caption ("POUR SCHEDULE"). */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 /** Tabular mono numerals — keeps the values from jittering as digits change. */
 const MONO = "font-mono [font-feature-settings:'tnum','zero']";
@@ -88,27 +88,27 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
         {recipe.steps.map((s) => (
           <div
             key={s.index}
-            className="flex items-center gap-3 border-b border-[color:var(--border)] py-[7px]"
+            className="flex items-center gap-3 border-b border-border py-[7px]"
           >
             <span
-              className={cn(MONO, "w-8 text-[13px] font-semibold text-[color:var(--fg-2)]")}
+              className={cn(MONO, "w-8 text-[13px] font-semibold text-fg-2")}
             >
               {s.time}
             </span>
-            <span className="flex-1 text-[14px] whitespace-nowrap text-[color:var(--fg-2)]">
+            <span className="flex-1 text-small whitespace-nowrap text-fg-2">
               {t("pour", { n: s.index + 1 })}
             </span>
-            <span className={cn(MONO, "text-[12px] text-[color:var(--fg-3)]")}>
+            <span className={cn(MONO, "text-caption text-fg-3")}>
               +{s.pourG}
             </span>
             <span
               className={cn(
                 MONO,
-                "w-[46px] text-right text-[16px] font-semibold whitespace-nowrap",
+                "w-[46px] text-right text-body font-semibold whitespace-nowrap",
               )}
             >
               {s.cumulativeG}
-              <span className="text-[11px] text-[color:var(--fg-3)]">
+              <span className="text-[11px] text-fg-3">
                 {" "}
                 {tCalc("grams")}
               </span>
@@ -117,11 +117,11 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
         ))}
         <div className="flex items-center gap-3 pt-[9px]">
           <span
-            className={cn(MONO, "w-8 text-[13px] font-semibold text-[color:var(--fg-3)]")}
+            className={cn(MONO, "w-8 text-[13px] font-semibold text-fg-3")}
           >
             {recipe.removeTime}
           </span>
-          <span className="flex-1 text-[14px] text-[color:var(--fg-3)]">
+          <span className="flex-1 text-small text-fg-3">
             {t("removeDripper")}
           </span>
         </div>

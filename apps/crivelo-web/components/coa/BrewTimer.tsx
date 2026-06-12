@@ -33,7 +33,7 @@ const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 /** Section caption / dial label (11px uppercase tracked). */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 /**
  * Shared CTA look (54px tall pill), worn by the app-local Button wrapper
@@ -46,11 +46,11 @@ const CAP =
  * full-width pills are centred, never inset).
  */
 const CTA_BASE =
-  "flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-[var(--radius-md)] p-0 font-body text-[16px] font-semibold whitespace-normal has-[>svg]:px-0";
+  "flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-md p-0 font-body text-body font-semibold whitespace-normal has-[>svg]:px-0";
 const CTA_SOLID =
-  "bg-brand text-white border-none shadow-[var(--shadow-1)] hover:bg-brand";
+  "bg-brand text-white border-none shadow-1 hover:bg-brand";
 const CTA_OUTLINE =
-  "bg-transparent text-[color:var(--fg)] border border-[color:var(--border-strong)] shadow-none hover:bg-transparent hover:text-[color:var(--fg)]";
+  "bg-transparent text-fg border border-border-strong shadow-none hover:bg-transparent hover:text-fg";
 
 type Status = "running" | "paused" | "done";
 
@@ -193,7 +193,7 @@ export function BrewTimer({
         <Button
           type="button"
           onClick={exit}
-          className="-ml-1 inline-flex h-auto cursor-pointer items-center gap-[5px] rounded-none justify-start border-none bg-transparent px-1 py-[6px] font-body text-[14px] font-semibold text-[color:var(--fg-2)] hover:bg-transparent hover:text-[color:var(--fg-2)] has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
+          className="-ml-1 inline-flex h-auto cursor-pointer items-center gap-[5px] rounded-none justify-start border-none bg-transparent px-1 py-[6px] font-body text-small font-semibold text-fg-2 hover:bg-transparent hover:text-fg-2 has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
         >
           <svg
             width="18"
@@ -214,16 +214,16 @@ export function BrewTimer({
           className={cn(
             CAP,
             "inline-flex items-center gap-[7px]",
-            done ? "text-[color:var(--success)]" : "text-[color:var(--fg-2)]",
+            done ? "text-success" : "text-fg-2",
           )}
         >
           <span
             className={cn(
               "h-[7px] w-[7px] rounded-full",
               done
-                ? "bg-[color:var(--success)]"
+                ? "bg-success"
                 : paused
-                  ? "bg-[color:var(--fg-4)]"
+                  ? "bg-fg-4"
                   : "bg-brand",
               !paused &&
                 !done &&
@@ -238,13 +238,13 @@ export function BrewTimer({
         className={cn(
           "items-center",
           wide
-            ? "mt-[10px] grid grid-cols-[300px_1fr] gap-[44px]"
+            ? "mt-2.5 grid grid-cols-[300px_1fr] gap-11"
             : "mt-0 block gap-0",
         )}
       >
         <div>
           {/* dial */}
-          <div className="mx-0 mt-[10px] mb-[6px] flex justify-center">
+          <div className="mx-0 mt-2.5 mb-1.5 flex justify-center">
             {/* last-resort: dial box sized to the runtime ring constant SZ */}
             <div
               className="relative"
@@ -303,8 +303,8 @@ export function BrewTimer({
                 <span
                   className={cn(
                     CAP,
-                    "mb-[6px]",
-                    done ? "text-[color:var(--success)]" : "text-[color:var(--fg-3)]",
+                    "mb-1.5",
+                    done ? "text-success" : "text-fg-3",
                   )}
                 >
                   {centerStatus}
@@ -320,11 +320,11 @@ export function BrewTimer({
                     <span
                       className={cn(
                         MONO,
-                        "whitespace-nowrap text-[58px] font-semibold leading-[0.92] tracking-[-0.02em] text-[color:var(--fg)]",
+                        "whitespace-nowrap text-[58px] font-semibold leading-[0.92] tracking-[-0.02em] text-fg",
                       )}
                     >
                       {cur.cumulativeG}
-                      <span className="text-[22px] text-[color:var(--fg-3)]">
+                      <span className="text-[22px] text-fg-3">
                         {" "}
                         {tCalc("grams")}
                       </span>
@@ -332,7 +332,7 @@ export function BrewTimer({
                     <span
                       className={cn(
                         MONO,
-                        "mt-[6px] whitespace-nowrap text-[15px] font-semibold text-accent-ink",
+                        "mt-1.5 whitespace-nowrap text-mono font-semibold text-accent-ink",
                       )}
                     >
                       {t("thisPour", { g: cur.pourG })}
@@ -344,12 +344,12 @@ export function BrewTimer({
           </div>
 
           {/* action + countdown */}
-          <div className="mb-[14px] min-h-[58px] text-center">
+          <div className="mb-3.5 min-h-[58px] text-center">
             {done ? (
               <div
                 className={cn(
                   MONO,
-                  "text-[15px] font-semibold text-[color:var(--fg-2)]",
+                  "text-mono font-semibold text-fg-2",
                 )}
               >
                 {t("totalTime", { time: recipe.totalTime })}
@@ -361,7 +361,7 @@ export function BrewTimer({
                     "font-display text-[21px] font-bold tracking-[-0.01em]",
                     pouring
                       ? "text-accent-ink"
-                      : "text-[color:var(--fg-2)]",
+                      : "text-fg-2",
                   )}
                 >
                   {pouring
@@ -371,7 +371,7 @@ export function BrewTimer({
                 <div
                   className={cn(
                     MONO,
-                    "mt-1 text-[14px] font-semibold text-[color:var(--fg-3)]",
+                    "mt-1 text-small font-semibold text-fg-3",
                   )}
                 >
                   {t.rich(isLastPour ? "removeIn" : "nextPourIn", {
@@ -379,12 +379,12 @@ export function BrewTimer({
                     // but supply it via interpolation so a whitespace-stripping
                     // formatter can't collapse "Next pour in" + the time.
                     time: () => (
-                      <span className="text-[color:var(--fg)]">
+                      <span className="text-fg">
                         {fmtTime(toNext)}
                       </span>
                     ),
                   })}
-                  <span className="text-[color:var(--fg-4)]">
+                  <span className="text-fg-4">
                     {"  ·  "}
                     {fmtTime(Math.floor(elapsed))} / {recipe.totalTime}
                   </span>
@@ -396,7 +396,7 @@ export function BrewTimer({
 
         <div>
           {/* schedule list */}
-          <div className="mb-[18px] rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface-raised)] px-4 py-[6px] shadow-[var(--shadow-1)]">
+          <div className="mb-[18px] rounded-md border border-border bg-surface-raised px-4 py-[6px] shadow-1">
             {steps.map((s, i) => {
               const stDone = i < curIdx || finished;
               const active = i === curIdx && !finished;
@@ -406,7 +406,7 @@ export function BrewTimer({
                   className={cn(
                     "flex items-center gap-3 py-[9px]",
                     i < steps.length - 1 &&
-                      "border-b border-[color:var(--border)]",
+                      "border-b border-border",
                     !active && !stDone ? "opacity-55" : "opacity-100",
                   )}
                 >
@@ -418,8 +418,8 @@ export function BrewTimer({
                         : cn(
                             "border-[1.5px] bg-transparent",
                             stDone
-                              ? "border-[color:var(--success)]"
-                              : "border-[color:var(--border-strong)]",
+                              ? "border-success"
+                              : "border-border-strong",
                           ),
                     )}
                   >
@@ -439,17 +439,17 @@ export function BrewTimer({
                     className={cn(
                       MONO,
                       "w-[34px] text-[13px] font-semibold",
-                      active ? "text-[color:var(--fg)]" : "text-[color:var(--fg-3)]",
+                      active ? "text-fg" : "text-fg-3",
                     )}
                   >
                     {s.time}
                   </span>
                   <span
                     className={cn(
-                      "flex-1 text-[14px]",
+                      "flex-1 text-small",
                       active
-                        ? "font-semibold text-[color:var(--fg)]"
-                        : "font-normal text-[color:var(--fg-2)]",
+                        ? "font-semibold text-fg"
+                        : "font-normal text-fg-2",
                     )}
                   >
                     {tSchedule("pour", { n: i + 1 })}
@@ -457,10 +457,10 @@ export function BrewTimer({
                   <span
                     className={cn(
                       MONO,
-                      "whitespace-nowrap text-[15px] font-semibold",
+                      "whitespace-nowrap text-mono font-semibold",
                       active
                         ? "text-accent-ink"
-                        : "text-[color:var(--fg-2)]",
+                        : "text-fg-2",
                     )}
                   >
                     {s.cumulativeG} {tCalc("grams")}
@@ -475,7 +475,7 @@ export function BrewTimer({
               defaults so the look is pixel-identical. The 17px resume icon and 20px
               restart icon override the primitive's 16px svg sizing rule. */}
           {done ? (
-            <div className="flex flex-col gap-[10px]">
+            <div className="flex flex-col gap-2.5">
               <Button
                 type="button"
                 onClick={restart}
@@ -492,7 +492,7 @@ export function BrewTimer({
               </Button>
             </div>
           ) : (
-            <div className="flex gap-[10px]">
+            <div className="flex gap-2.5">
               <Button
                 type="button"
                 onClick={paused ? resume : pause}
@@ -514,7 +514,7 @@ export function BrewTimer({
                 type="button"
                 onClick={restart}
                 aria-label={t("restartAria")}
-                className="flex h-[54px] w-[56px] cursor-pointer items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--border-strong)] bg-[color:var(--surface)] p-0 text-[color:var(--fg-2)] hover:bg-[color:var(--surface)] has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[20px]"
+                className="flex h-[54px] w-[56px] cursor-pointer items-center justify-center rounded-md border border-border-strong bg-surface p-0 text-fg-2 hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[20px]"
               >
                 <svg
                   width="20"

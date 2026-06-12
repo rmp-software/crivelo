@@ -34,8 +34,8 @@ export function Shell({ children }: { children: ReactNode }) {
       <div
         className={cn(
           "flex min-h-screen flex-col font-body",
-          "bg-[color:var(--bg)] text-[color:var(--fg)]",
-          "transition-[background] duration-[var(--dur-stage)] ease-[var(--ease-standard)]",
+          "bg-bg text-fg",
+          "transition-[background] duration-stage ease-standard",
         )}
       >
         <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />

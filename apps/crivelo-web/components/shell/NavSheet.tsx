@@ -14,12 +14,12 @@
  * maps to this site's `var(--accent-ink)`. Family links + URLs come from NAV_ITEMS.
  *
  * Styling: the foundation's neutral semantic tokens (--fg/--fg-2/3/4, --border,
- * --font-display/--font-serif, …) are referenced via arbitrary-value utility
- * classes (`text-[color:var(--fg-2)]`), which are classNames — NOT inline `style`
- * (the no-`var(--)`-in-`style` rule). The Sheet panel/overlay/close-button are
- * themed by the shared shadcn alias layer (bg-background/border/…).
+ * --font-display/--font-serif, …) are used via bare token utilities (`text-fg-2`,
+ * `bg-bg`, `border-border`, etc.) — NOT inline `style` and NOT `[var(--…)]`
+ * arbitraries. The Sheet panel/overlay/close-button are themed by the shared
+ * shadcn alias layer (bg-background/border/…).
  */
-import type { CSSProperties, RefObject } from "react";
+import type { RefObject } from "react";
 import { useTranslations } from "next-intl";
 import {
   Sheet,
@@ -37,7 +37,7 @@ import { ThemeControl } from "./ThemeControl";
 
 /** Section caption ("THE HOUSE" / "LANGUAGE" / "APPEARANCE"). */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 export function NavSheet({
   open,
@@ -76,7 +76,7 @@ export function NavSheet({
         // The accessible name comes from the sr-only SheetTitle below; the legacy
         // dialog carried no description, so opt out of Radix's description warning.
         aria-describedby={undefined}
-        className="z-[60] w-[84%] max-w-[340px] gap-0 overflow-y-auto bg-[color:var(--bg)] px-[22px] pt-[22px] pb-[26px] shadow-[var(--shadow-2)]"
+        className="z-[60] w-[84%] max-w-[340px] gap-0 overflow-y-auto bg-bg px-[22px] pt-[22px] pb-[26px] shadow-2"
       >
         <SheetHeader className="mb-[22px] flex-row items-start justify-between gap-0 p-0">
           <CriveloLockup size="md" />
@@ -89,8 +89,8 @@ export function NavSheet({
             aria-label={t("closeMenu")}
             className={cn(
               "-mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full",
-              "border border-[color:var(--border)] bg-[color:var(--surface-raised)]",
-              "text-[color:var(--fg)] cursor-pointer transition-opacity hover:opacity-80",
+              "border border-border bg-surface-raised",
+              "text-fg cursor-pointer transition-opacity hover:opacity-80",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             )}
           >
@@ -109,7 +109,7 @@ export function NavSheet({
           </SheetClose>
         </SheetHeader>
 
-        <p className="mb-5 font-serif text-[17px] italic leading-[1.35] text-[color:var(--fg-2)]">
+        <p className="mb-5 font-serif text-h4 italic leading-[1.35] text-fg-2">
           {t("tagline")}
         </p>
 
@@ -117,41 +117,38 @@ export function NavSheet({
         <nav className="flex flex-col">
           {NAV_ITEMS.map((it) => {
             const rowClass = cn(
-              "flex items-center gap-3 py-[13px] no-underline border-b border-[color:var(--border)]",
+              "flex items-center gap-3 py-[13px] no-underline border-b border-border",
               it.soon
-                ? "text-[color:var(--fg-4)] cursor-default"
-                : "text-[color:var(--fg)] cursor-pointer",
+                ? "text-fg-4 cursor-default"
+                : "text-fg cursor-pointer",
             );
-            // The family-marker colour is per-item DATA from NAV_ITEMS (Coa's
-            // `var(--brand)` teal, Crema Arena's cinnamon — a non-token external
-            // brand colour, soon items fall back to --fg-4). A runtime data value
-            // can't live in a static utility class, so it travels through a CSS
-            // custom property consumed by the `bg-[var(--dot)]` utility — the dot's
-            // box itself is still styled with utilities, not an inline `style`.
-            const dotVar = {
-              "--dot": it.dot ?? "var(--fg-4)",
-            } as CSSProperties;
+            // The family-marker colour is per-item DATA from NAV_ITEMS:
+            // - Token-backed dots use className utilities (bg-brand, bg-fg-4).
+            // - The lone external rgb (Crema Arena cinnamon — not a crivelo-web
+            //   token) uses inline style={{ background }} as the documented OQ2
+            //   exception. The `--dot` custom-property bridge is removed.
             const inner = (
               <>
-                {/* last-resort: runtime-positioned active-nav dot (data-driven) */}
+                {/* Dot: token dots → className utility; external rgb → inline style (OQ2). */}
                 <span
                   className={cn(
-                    "h-[9px] w-[9px] shrink-0 rounded-full bg-[var(--dot)]",
+                    "h-[9px] w-[9px] shrink-0 rounded-full",
+                    !it.dot && (it.markerClass ?? "bg-fg-4"),
                     it.soon && "opacity-50",
                   )}
-                  style={dotVar}
+                  style={it.dot ? { background: it.dot } : undefined}
                 />
                 <span className="flex-1">
-                  <span className="font-display text-[17px] font-bold tracking-[-0.01em]">
+                  <span className="font-display text-h4 font-bold tracking-[-0.01em]">
                     {it.name}
                   </span>
                   {it.current && (
-                    <span className="ml-2 text-[11px] font-semibold text-[color:var(--accent-ink)]">
+                    <span className="ml-2 text-[11px] font-semibold text-accent-ink">
                       · {t("youAreHere")}
                     </span>
                   )}
                 </span>
-                <span className="inline-flex items-center gap-[5px] text-[12.5px] text-[color:var(--fg-3)]">
+                <span className="inline-flex items-center gap-[5px] text-[12.5px] text-fg-3">
                   {it.soon ? t("soon") : it.tagKey ? tNav(it.tagKey) : null}
                   {it.external && (
                     <svg
@@ -206,11 +203,11 @@ export function NavSheet({
 
         <div className="mt-auto flex flex-col gap-[18px] pt-[26px]">
           <div>
-            <div className={cn(CAP, "mb-[10px]")}>{t("language")}</div>
+            <div className={cn(CAP, "mb-2.5")}>{t("language")}</div>
             <LangToggle size="lg" />
           </div>
           <div>
-            <div className={cn(CAP, "mb-[10px]")}>{t("appearance")}</div>
+            <div className={cn(CAP, "mb-2.5")}>{t("appearance")}</div>
             <ThemeControl />
           </div>
         </div>

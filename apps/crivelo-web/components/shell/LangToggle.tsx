@@ -54,14 +54,14 @@ export function LangToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
         value={active}
         onValueChange={go}
         aria-label={t("language")}
-        className="inline-flex items-center gap-1 p-[3px] rounded-full bg-[color:var(--bg-2)] border border-[color:var(--border)]"
+        className="inline-flex items-center gap-1 p-[3px] rounded-full bg-bg-2 border border-border"
       >
         {CODES.map(({ locale, code, name }) => (
           <ToggleGroupItem
             key={locale}
             value={locale}
             aria-label={name}
-            className="h-auto min-w-0 flex-none px-3 py-[6px] rounded-full font-body font-semibold text-[14px] text-[color:var(--fg-3)] first:rounded-full last:rounded-full hover:bg-transparent hover:text-[color:var(--fg-3)] data-[state=on]:bg-brand data-[state=on]:text-white data-[state=on]:hover:bg-brand data-[state=on]:hover:text-white"
+            className="h-auto min-w-0 flex-none px-3 py-1.5 rounded-full font-body font-semibold text-small text-fg-3 first:rounded-full last:rounded-full hover:bg-transparent hover:text-fg-3 data-[state=on]:bg-brand data-[state=on]:text-white data-[state=on]:hover:bg-brand data-[state=on]:hover:text-white"
           >
             {code}
           </ToggleGroupItem>
@@ -71,7 +71,7 @@ export function LangToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
   }
 
   return (
-    <div role="radiogroup" aria-label={t("language")} className="inline-flex items-center gap-[6px]">
+    <div role="radiogroup" aria-label={t("language")} className="inline-flex items-center gap-1.5">
       {CODES.map(({ locale, code, name }, i) => (
         <span key={locale} className="inline-flex items-center">
           <button
@@ -82,13 +82,13 @@ export function LangToggle({ size = "sm" }: { size?: "sm" | "lg" }) {
             onClick={() => go(locale)}
             className={cn(
               "cursor-pointer font-body font-semibold text-[12.5px]",
-              active === locale ? "text-[color:var(--fg)]" : "text-[color:var(--fg-3)]",
+              active === locale ? "text-fg" : "text-fg-3",
             )}
           >
             {code}
           </button>
           {i === 0 && (
-            <span aria-hidden="true" className="text-[color:var(--fg-4)] text-[12px] ml-[6px]">
+            <span aria-hidden="true" className="text-fg-4 text-[12px] ml-1.5">
               ·
             </span>
           )}

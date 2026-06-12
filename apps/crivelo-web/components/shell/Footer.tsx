@@ -5,14 +5,13 @@
  * + "The family" list + copyright + language toggle. Ported from coa-shell.jsx;
  * uses the centralized NAV_ITEMS. Client component because it embeds LangToggle.
  *
- * Styling (RMP-212): the foundation's neutral semantic tokens (--bg-2/--fg/--fg-2/3/4,
- * --border, --font-serif, …) are referenced via arbitrary-value utility classes
- * (`text-[color:var(--fg-3)]`), which are classNames — NOT inline `style` (the
- * no-`var(--)`-in-`style` rule). Per-item DATA colours from NAV_ITEMS (`it.dot`)
- * travel through a CSS custom property consumed by a `bg-[var(--dot)]` utility, so
- * the dot box itself is still styled with utilities, not an inline `style`.
+ * Styling (RMP-212): the foundation's neutral semantic tokens are used via bare
+ * token utilities (`text-fg-3`, `bg-bg-2`, `border-border`, etc.) — NOT inline
+ * `style` and NOT `[var(--…)]` arbitraries. Per-item DATA colours from NAV_ITEMS:
+ * token-backed dots use className utilities (markerClass / bg-fg-4); the lone
+ * external rgb (Crema Arena cinnamon) uses inline style={{ background }} as the
+ * documented OQ2 exception.
  */
-import type { CSSProperties } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import { CriveloLockup, SieveGrid } from "../brand";
@@ -22,17 +21,17 @@ import { LangToggle } from "./LangToggle";
 
 /** Section caption ("THE FAMILY"). */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 export function Footer() {
   const t = useTranslations("Shell");
   return (
-    <footer className="mt-10 border-t border-[color:var(--border)] bg-[color:var(--bg-2)]">
+    <footer className="mt-10 border-t border-border bg-bg-2">
       <div className="mx-auto box-border max-w-[1060px] px-6 pt-10 pb-8">
         <div className="mb-[22px] flex items-end justify-between gap-4">
-          <div className="flex flex-col gap-[10px]">
+          <div className="flex flex-col gap-2.5">
             <CriveloLockup size="lg" />
-            <span className="font-serif text-[18px] italic text-[color:var(--fg-2)]">
+            <span className="font-serif text-[18px] italic text-fg-2">
               {t("tagline")}
             </span>
           </div>
@@ -48,34 +47,32 @@ export function Footer() {
           />
         </div>
 
-        <div className={cn(CAP, "mb-[10px]")}>{t("theFamily")}</div>
+        <div className={cn(CAP, "mb-2.5")}>{t("theFamily")}</div>
         <div className="mb-6 flex flex-row flex-wrap gap-7">
           {NAV_ITEMS.map((it) => {
-            const dotVar = {
-              "--dot": it.dot ?? "var(--fg-4)",
-            } as CSSProperties;
             const row = (
               <span className="flex items-center gap-[9px]">
-                {/* last-resort: data-driven dot colour passed as a CSS custom property (--dot) */}
+                {/* Dot: token dots → className utility; external rgb → inline style (OQ2). */}
                 <span
                   className={cn(
-                    "h-[7px] w-[7px] shrink-0 rounded-full bg-[var(--dot)]",
+                    "h-[7px] w-[7px] shrink-0 rounded-full",
+                    !it.dot && (it.markerClass ?? "bg-fg-4"),
                     it.soon && "opacity-50",
                   )}
-                  style={dotVar}
+                  style={it.dot ? { background: it.dot } : undefined}
                 />
                 <span
                   className={cn(
                     "text-[14.5px] font-semibold",
                     it.soon
-                      ? "text-[color:var(--fg-4)]"
-                      : "text-[color:var(--fg)]",
+                      ? "text-fg-4"
+                      : "text-fg",
                   )}
                 >
                   {it.name}
                 </span>
                 {it.soon && (
-                  <span className="text-[11.5px] text-[color:var(--fg-4)]">
+                  <span className="text-[11.5px] text-fg-4">
                     {t("soon")}
                   </span>
                 )}
@@ -90,7 +87,7 @@ export function Footer() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
-                    className="text-[color:var(--fg-3)]"
+                    className="text-fg-3"
                   >
                     <path d="M7 17L17 7M9 7h8v8" />
                   </svg>
@@ -126,7 +123,7 @@ export function Footer() {
           })}
         </div>
 
-        <div className="mb-[18px] h-px bg-[color:var(--border)]" />
+        <div className="mb-[18px] h-px bg-border" />
         <div className="flex items-center justify-between">
           {/*
             The `copyright` message keeps the Portuguese tagline "Para quem vive
@@ -134,7 +131,7 @@ export function Footer() {
             signature, kept in its origin language like a motto. This is NOT a
             missed translation — do not "translate" it in messages/en.json.
           */}
-          <span className="text-[12.5px] text-[color:var(--fg-3)]">
+          <span className="text-[12.5px] text-fg-3">
             {t("copyright")}
           </span>
           <LangToggle />

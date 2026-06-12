@@ -40,8 +40,8 @@ export function CriveloLockup({
     <div
       style={vars}
       className={
-        "inline-flex items-center gap-[10px] " +
-        (variant === "light" ? "text-[color:var(--crema-50)]" : "text-[color:var(--fg)]")
+        "inline-flex items-center gap-2.5 " +
+        (variant === "light" ? "text-crema-50" : "text-fg")
       }
     >
       <Monogram px={mono} color={inkColor} />

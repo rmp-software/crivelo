@@ -43,7 +43,7 @@ export function ThemeControl() {
         if (value) setThemePref(value as ThemePref);
       }}
       aria-label={tShell("appearance")}
-      className="inline-flex items-center gap-1 rounded-full border border-[color:var(--border)] bg-[color:var(--bg-2)] p-[3px]"
+      className="inline-flex items-center gap-1 rounded-full border border-border bg-bg-2 p-[3px]"
     >
       {OPTIONS.map(([key, label, icon]) => (
         <ToggleGroupItem
@@ -54,7 +54,7 @@ export function ThemeControl() {
           // px-3 py-[7px], text-sm font-medium → text-[13.5px] font-semibold),
           // drop the stock hover tint (the original had none), and map the
           // active state to the brand pill via data-[state=on]:*.
-          className="h-auto min-w-0 flex-none gap-1.5 rounded-full px-3 py-[7px] font-body text-[13.5px] font-semibold text-[color:var(--fg-3)] first:rounded-full last:rounded-full hover:bg-transparent hover:text-[color:var(--fg-3)] data-[state=on]:bg-brand data-[state=on]:text-white data-[state=on]:hover:bg-brand data-[state=on]:hover:text-white"
+          className="h-auto min-w-0 flex-none gap-1.5 rounded-full px-3 py-[7px] font-body text-[13.5px] font-semibold text-fg-3 first:rounded-full last:rounded-full hover:bg-transparent hover:text-fg-3 data-[state=on]:bg-brand data-[state=on]:text-white data-[state=on]:hover:bg-brand data-[state=on]:hover:text-white"
         >
           {/* color follows currentColor (text-white when active) — size-[15px]
               both pins the 15px icon and opts out of the primitive's size-4. */}

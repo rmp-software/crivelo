@@ -25,7 +25,7 @@ import { clamp } from "../../lib/four-six";
 const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 const LABEL =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 function StepButton({
   onClick,
@@ -47,7 +47,7 @@ function StepButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-[color:var(--border-strong)] bg-[color:var(--surface)] p-0 text-[color:var(--fg)] transition-colors hover:border-[color:var(--brand)] hover:bg-[color:var(--surface)] has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
+      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
     >
       {children}
     </Button>
@@ -77,7 +77,7 @@ function Stepper({
           <Icon name="minus" size={12} />
         </StepButton>
         <span
-          className={cn("text-[15px] font-semibold whitespace-nowrap", MONO)}
+          className={cn("text-mono font-semibold whitespace-nowrap", MONO)}
         >
           {value}
         </span>
@@ -110,7 +110,7 @@ export function RecipeInputs({
   const ratioLabel = t("ratio");
 
   return (
-    <div className="grid grid-cols-3 items-end gap-1 border-y border-[color:var(--border)] px-1 py-4">
+    <div className="grid grid-cols-3 items-end gap-1 border-y border-border px-1 py-4">
       <Stepper
         label={coffee}
         value={`${dose} ${tCalc("grams")}`}
@@ -131,7 +131,7 @@ export function RecipeInputs({
         <span className={LABEL}>{t("water")}</span>
         <span
           className={cn(
-            "text-[17px] font-semibold whitespace-nowrap text-accent-ink",
+            "text-h4 font-semibold whitespace-nowrap text-accent-ink",
             MONO,
           )}
         >

@@ -38,7 +38,7 @@ import { tasteKey } from "../../lib/four-six";
 
 /** Section caption — uppercase micro-label. */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 /** Tabular mono numerals — keeps values from jittering as digits change. */
 const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
@@ -95,7 +95,7 @@ export function CoaCalculator() {
       <div className={cn(CAP, "mb-2")}>{t("introCaption")}</div>
       <p
         className={cn(
-          "m-0 max-w-[17em] font-serif italic leading-[1.28] text-[color:var(--fg-2)]",
+          "m-0 max-w-[17em] font-serif italic leading-[1.28] text-fg-2",
           bp === "desktop"
             ? "text-[30px]"
             : bp === "tablet"
@@ -130,9 +130,9 @@ export function CoaCalculator() {
   );
 
   const panelHeader = wide && (
-    <div className="mb-4 border-b border-[color:var(--border)] pb-[18px]">
+    <div className="mb-4 border-b border-border pb-[18px]">
       <div className={cn(CAP, "mb-2")}>{t("yourRecipe")}</div>
-      <div className="flex items-end gap-[14px]">
+      <div className="flex items-end gap-3.5">
         <span
           className={cn(
             "text-[44px] font-semibold leading-[0.9] tracking-[-0.02em] whitespace-nowrap text-accent-ink",
@@ -140,12 +140,12 @@ export function CoaCalculator() {
           )}
         >
           {recipe.waterG}
-          <span className="text-[20px] text-[color:var(--fg-3)]">
+          <span className="text-h3 text-fg-3">
             {" "}
             {t("grams")}
           </span>
         </span>
-        <span className="pb-1 text-[13.5px] leading-[1.4] text-[color:var(--fg-2)]">
+        <span className="pb-1 text-[13.5px] leading-[1.4] text-fg-2">
           {t("doseRatioSummary", { dose, ratio })}
           <br />
           {tasteSummary}
@@ -166,7 +166,7 @@ export function CoaCalculator() {
           identical to the prior hand-rolled <button>. */}
       <Button
         onClick={startBrew}
-        className="mt-6 flex h-14 w-full gap-[10px] rounded-[var(--radius-md)] border-none bg-brand p-0 font-body text-[16px] font-semibold whitespace-normal text-white shadow-[var(--shadow-1)] hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[18px]"
+        className="mt-6 flex h-14 w-full gap-[10px] rounded-md border-none bg-brand p-0 font-body text-body font-semibold whitespace-normal text-white shadow-1 hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[18px]"
       >
         <Icon name="play" size={18} /> {t("beginBrew")}{" "}
         <span className={cn("opacity-[0.85]", MONO)}>{recipe.totalTime}</span>
@@ -176,10 +176,10 @@ export function CoaCalculator() {
           href="https://en.philocoffea.com/blogs/blog/coffee-brewing-method"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-[7px] text-[14px] text-[color:var(--fg-2)] no-underline"
+          className="inline-flex items-center gap-[7px] text-small text-fg-2 no-underline"
         >
           <Icon name="book" size={15} color="var(--fg-3)" />
-          <span className="underline decoration-[color:var(--border-strong)] underline-offset-[3px]">
+          <span className="underline decoration-border-strong underline-offset-[3px]">
             {t("methodLink")}
           </span>
           <svg
@@ -192,7 +192,7 @@ export function CoaCalculator() {
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            className="text-[color:var(--fg-3)]"
+            className="text-fg-3"
           >
             <path d="M7 17L17 7M9 7h8v8" />
           </svg>
@@ -213,7 +213,7 @@ export function CoaCalculator() {
   }
 
   const panelClass = cn(
-    "rounded-[var(--radius-md)] border border-[color:var(--border)] bg-[color:var(--surface-raised)] shadow-[var(--shadow-1)]",
+    "rounded-md border border-border bg-surface-raised shadow-1",
     bp === "desktop" ? "p-7" : "p-6",
   );
 

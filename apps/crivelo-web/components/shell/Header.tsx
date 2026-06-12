@@ -20,8 +20,8 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
     return (
     <header
       className={cn(
-        "sticky top-0 z-40 bg-[color:var(--bg)]",
-        "border-b border-[color:var(--border)]",
+        "sticky top-0 z-40 bg-bg",
+        "border-b border-border",
       )}
     >
       <div
@@ -36,7 +36,7 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
           size="icon-lg"
           onClick={onMenu}
           aria-label={t("openMenu")}
-          className="-ml-1 shrink-0 rounded-full text-[color:var(--fg)] hover:bg-transparent hover:text-[color:var(--fg)]"
+          className="-ml-1 shrink-0 rounded-full text-fg hover:bg-transparent hover:text-fg"
         >
           <svg
             viewBox="0 0 24 24"

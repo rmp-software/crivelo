@@ -47,8 +47,8 @@ export function CoaLockup({
     <div
       style={vars}
       className={
-        "inline-flex items-center gap-[10px] " +
-        (variant === "light" ? "text-[color:var(--crema-50)]" : "text-[color:var(--fg)]")
+        "inline-flex items-center gap-2.5 " +
+        (variant === "light" ? "text-crema-50" : "text-fg")
       }
     >
       {mono && <CoaMark px={mark} />}
@@ -59,14 +59,14 @@ export function CoaLockup({
         <span
           className={
             "font-body text-[length:var(--sub-size)] tracking-[0.01em] " +
-            (variant === "light" ? "text-[color:var(--crema-300)]" : "text-[color:var(--fg-3)]")
+            (variant === "light" ? "text-crema-300" : "text-fg-3")
           }
         >
           by{" "}
           <span
             className={
               "font-semibold " +
-              (variant === "light" ? "text-[color:var(--crema-50)]" : "text-[color:var(--fg)]")
+              (variant === "light" ? "text-crema-50" : "text-fg")
             }
           >
             Crivelo

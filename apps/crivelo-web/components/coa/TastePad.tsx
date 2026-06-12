@@ -38,7 +38,7 @@ import { clamp, tasteKey } from "../../lib/four-six";
 
 /** Section caption ("TASTE"). */
 const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-[color:var(--fg-3)]";
+  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
 
 /** Tabular mono numerals — keeps the summary from jittering as digits change. */
 const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
@@ -198,8 +198,8 @@ export function TastePad({
         // breakpoint (--pad-h) so the card keeps a sensible aspect.
         className={cn(
           "relative w-full max-w-[var(--pad-maxw)] mx-[var(--pad-mx)] h-[var(--pad-h)]",
-          "rounded-[var(--radius-md)] bg-[color:var(--surface-raised)] shadow-[var(--shadow-1)]",
-          "border border-[color:var(--border)] cursor-crosshair touch-none overflow-hidden",
+          "rounded-md bg-surface-raised shadow-1",
+          "border border-border cursor-crosshair touch-none overflow-hidden",
           "outline-offset-2",
           focused
             ? "outline outline-2 outline-[color:var(--focus-ring)]"
@@ -236,7 +236,7 @@ export function TastePad({
             "absolute left-[var(--puck-x)] top-[var(--puck-y)] -translate-x-1/2 -translate-y-1/2",
             "h-[30px] w-[30px] rounded-full bg-brand",
             "shadow-[0_0_0_6px_var(--accent-halo),var(--shadow-1)]",
-            "border-2 border-[color:var(--surface-raised)] pointer-events-none",
+            "border-2 border-surface-raised pointer-events-none",
           )}
           style={puckVar}
         />
