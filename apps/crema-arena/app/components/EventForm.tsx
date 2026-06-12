@@ -128,7 +128,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="p-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
@@ -169,7 +169,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
       <div>
         <label
           htmlFor="description"
-          className="block text-sm font-medium text-[var(--fg-2)] mb-1.5"
+          className="block text-sm font-medium text-fg-2 mb-1.5"
         >
           Descrição
         </label>
@@ -178,11 +178,10 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           rows={4}
-          className="w-full px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 focus:border-[var(--brand)] bg-[var(--surface)] text-[var(--fg)] transition-all"
+          className="w-full px-3 py-2 rounded-sm border border-border-strong focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 focus:border-brand bg-surface text-fg transition-all duration-base ease-standard"
           placeholder="Detalhes do evento..."
-          style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
         />
-        <p className="mt-1.5 text-sm text-[var(--fg-3)]">Opcional</p>
+        <p className="mt-1.5 text-sm text-fg-3">Opcional</p>
       </div>
 
       {/* Judges Count Input */}
@@ -204,7 +203,7 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
         <div className="flex items-center justify-between gap-4">
           <label
             htmlFor="crowd_vote_enabled"
-            className="block text-sm font-medium text-[var(--fg-2)]"
+            className="block text-sm font-medium text-fg-2"
           >
             Voto do público
           </label>
@@ -216,20 +215,18 @@ export default function EventForm({ eventId, initialData, mode }: EventFormProps
             onClick={() =>
               setFormData({ ...formData, crowd_vote_enabled: !formData.crowd_vote_enabled })
             }
-            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 ${
-              formData.crowd_vote_enabled ? 'bg-[var(--brand)]' : 'bg-[var(--border-strong)]'
+            className={`relative inline-flex h-6 w-11 flex-shrink-0 items-center rounded-full transition-colors duration-base ease-standard focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 ${
+              formData.crowd_vote_enabled ? 'bg-brand' : 'bg-border-strong'
             }`}
-            style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
           >
             <span
-              className={`inline-block h-4 w-4 transform rounded-full bg-[var(--surface-raised)] shadow transition-transform ${
+              className={`inline-block h-4 w-4 transform rounded-full bg-surface-raised shadow transition-transform duration-base ease-standard ${
                 formData.crowd_vote_enabled ? 'translate-x-6' : 'translate-x-1'
               }`}
-              style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
             />
           </button>
         </div>
-        <p className="mt-1.5 text-sm text-[var(--fg-3)]">
+        <p className="mt-1.5 text-sm text-fg-3">
           O público vota pelo celular, sem afetar o resultado dos jurados.
         </p>
       </div>

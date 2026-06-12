@@ -139,7 +139,7 @@ export default function SponsorForm({ mode, initialData, onSuccess, onCancel }: 
     <form onSubmit={handleSubmit}>
       {/* General Error */}
       {generalError && (
-        <div className="mb-6 p-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="mb-6 p-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {generalError}
         </div>
       )}
@@ -160,15 +160,15 @@ export default function SponsorForm({ mode, initialData, onSuccess, onCancel }: 
 
       {/* Logo Upload */}
       <div className="mb-6">
-        <label className="block text-sm font-medium text-[var(--fg-2)] mb-1.5">Logo</label>
+        <label className="block text-sm font-medium text-fg-2 mb-1.5">Logo</label>
 
         {logoPreview && (
-          <div className="relative w-32 h-32 mb-4 rounded-[var(--radius-md)] overflow-hidden border-2 border-[var(--border)] bg-[var(--bg-2)]">
+          <div className="relative w-32 h-32 mb-4 rounded-md overflow-hidden border-2 border-border bg-bg-2">
             <img src={logoPreview} alt="Pré-visualização do logo" className="w-full h-full object-contain" />
             <button
               type="button"
               onClick={handleRemoveLogo}
-              className="absolute top-2 right-2 p-1.5 bg-[var(--danger)] text-white rounded-full hover:bg-[#9E2F24] transition-colors"
+              className="absolute top-2 right-2 p-1.5 bg-danger text-white rounded-full hover:bg-[#9E2F24] transition-colors"
               aria-label="Remover logo"
             >
               <X size={16} />
@@ -179,15 +179,15 @@ export default function SponsorForm({ mode, initialData, onSuccess, onCancel }: 
         {!logoPreview && (
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="w-full p-8 border-2 border-dashed border-[var(--border)] rounded-[var(--radius-md)] bg-[var(--bg-2)] hover:bg-[var(--bg-3)] cursor-pointer transition-colors text-center"
+            className="w-full p-8 border-2 border-dashed border-border rounded-md bg-bg-2 hover:bg-bg-3 cursor-pointer transition-colors text-center"
           >
             <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[var(--surface)] flex items-center justify-center">
-                <Upload size={24} className="text-[var(--fg-3)]" />
+              <div className="w-12 h-12 rounded-full bg-surface flex items-center justify-center">
+                <Upload size={24} className="text-fg-3" />
               </div>
               <div>
-                <p className="text-sm font-medium text-[var(--fg)]">Toque para enviar logo</p>
-                <p className="text-xs text-[var(--fg-3)] mt-1">JPG ou PNG, máx. 4MB</p>
+                <p className="text-sm font-medium text-fg">Toque para enviar logo</p>
+                <p className="text-xs text-fg-3 mt-1">JPG ou PNG, máx. 4MB</p>
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function SponsorForm({ mode, initialData, onSuccess, onCancel }: 
           className="hidden"
         />
 
-        {errors.logo && <p className="mt-1.5 text-sm text-[var(--danger)]">{errors.logo}</p>}
+        {errors.logo && <p className="mt-1.5 text-sm text-danger">{errors.logo}</p>}
       </div>
 
       {/* Website Input */}

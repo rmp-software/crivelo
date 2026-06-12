@@ -19,19 +19,19 @@ interface StatCardProps {
   label: string;
   value: string;
   sub: string;
-  accent?: string;
+  accentClass?: string;
 }
 
-function StatCard({ label, value, sub, accent }: StatCardProps) {
+function StatCard({ label, value, sub, accentClass = 'text-fg-3' }: StatCardProps) {
   return (
-    <div className="bg-[var(--surface-raised)] rounded-[var(--radius-md)] p-4 md:p-5 shadow-[var(--shadow-1)]">
-      <div className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[var(--fg-3)]">
+    <div className="bg-surface-raised rounded-md p-4 md:p-5 shadow-1">
+      <div className="font-mono text-[10px] font-semibold uppercase tracking-wider text-fg-3">
         {label}
       </div>
-      <div className="font-mono text-3xl md:text-4xl font-semibold tabular-nums text-[var(--fg)] leading-none mt-1">
+      <div className="font-mono text-3xl md:text-4xl font-semibold tabular-nums text-fg leading-none mt-1">
         {value}
       </div>
-      <div className="text-xs mt-1" style={{ color: accent ?? 'var(--fg-3)' }}>
+      <div className={`text-xs mt-1 ${accentClass}`}>
         {sub}
       </div>
     </div>
@@ -82,7 +82,7 @@ export default function EventStatStrip({
             ? `Rodada ${currentRound} · ${pct}% concluída`
             : 'Aguardando'
         }
-        accent="var(--cinnamon-600)"
+        accentClass="text-cinnamon-600"
       />
       <StatCard
         label="Unânimes"
@@ -93,7 +93,7 @@ export default function EventStatStrip({
         label="Próxima"
         value={nextPending ? 'Pronto' : '—'}
         sub={nextPending ? `Bateria ${nextPending.round}.${duels.indexOf(nextPending) + 1}` : 'Sem duelos pendentes'}
-        accent={nextPending ? 'var(--mint-700)' : undefined}
+        accentClass={nextPending ? 'text-mint-700' : undefined}
       />
     </section>
   );

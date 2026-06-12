@@ -86,7 +86,7 @@ export default function OrganizerForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {serverError && (
-        <div className="p-4 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 rounded-sm bg-danger-soft border border-danger text-danger">
           {serverError}
         </div>
       )}
@@ -126,15 +126,14 @@ export default function OrganizerForm({
       />
 
       <div>
-        <label htmlFor="role" className="block text-sm font-medium text-[var(--fg-2)] mb-1.5">
-          Função <span className="text-[var(--danger)] ml-1">*</span>
+        <label htmlFor="role" className="block text-sm font-medium text-fg-2 mb-1.5">
+          Função <span className="text-danger ml-1">*</span>
         </label>
         <select
           id="role"
           value={formData.role}
           onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'organizer' })}
-          className="w-full px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] text-[var(--fg)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 focus:border-[var(--brand)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ transitionDuration: 'var(--dur-base)', transitionTimingFunction: 'var(--ease-standard)' }}
+          className="w-full px-3 py-2 rounded-sm border border-border-strong bg-surface text-fg focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring)] focus:ring-offset-1 focus:border-brand transition-all duration-base ease-standard disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={isLoading}
           required
         >
@@ -143,7 +142,7 @@ export default function OrganizerForm({
         </select>
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border)]">
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
         <Button
           type="button"
           variant="ghost"

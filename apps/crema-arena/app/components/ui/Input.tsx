@@ -48,10 +48,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-[var(--fg-2)] mb-1.5"
+          className="block text-sm font-medium text-fg-2 mb-1.5"
         >
           {label}
-          {props.required && <span className="text-[var(--danger)] ml-1">*</span>}
+          {props.required && <span className="text-danger ml-1">*</span>}
         </label>
       )}
       <ShadcnInput
@@ -62,21 +62,21 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           error ? `${inputId}-error` : helperText ? `${inputId}-helper` : undefined
         }
         className={cn(
-          'h-auto rounded-[var(--radius-sm)] border bg-[var(--surface)] py-2 text-[var(--fg)] shadow-none',
+          'h-auto rounded-sm border bg-surface py-2 text-fg shadow-none',
           hasError
-            ? 'border-[var(--danger)] focus-visible:border-[var(--danger)]'
-            : 'border-[var(--border-strong)] focus-visible:border-[var(--brand)]',
+            ? 'border-danger focus-visible:border-danger'
+            : 'border-border-strong focus-visible:border-brand',
           className
         )}
         {...props}
       />
       {error && (
-        <p id={`${inputId}-error`} className="mt-1.5 text-sm text-[var(--danger)]">
+        <p id={`${inputId}-error`} className="mt-1.5 text-sm text-danger">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p id={`${inputId}-helper`} className="mt-1.5 text-sm text-[var(--fg-3)]">
+        <p id={`${inputId}-helper`} className="mt-1.5 text-sm text-fg-3">
           {helperText}
         </p>
       )}
