@@ -31,7 +31,6 @@ export function CriveloLockup({
   variant = "dark",
 }: CriveloLockupProps) {
   const [mono, font] = SIZES[size];
-  const inkColor = variant === "light" ? "var(--crema-50)" : "var(--fg)";
   // last-resort: runtime font sizes only
   const vars = {
     "--wordmark-size": `${font}px`,
@@ -44,7 +43,7 @@ export function CriveloLockup({
         (variant === "light" ? "text-crema-50" : "text-fg")
       }
     >
-      <Monogram px={mono} color={inkColor} />
+      <Monogram px={mono} />
       <span className="font-display text-[length:var(--wordmark-size)] font-bold tracking-[-0.02em]">
         Crivelo
       </span>

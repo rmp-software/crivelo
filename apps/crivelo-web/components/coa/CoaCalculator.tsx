@@ -178,7 +178,7 @@ export function CoaCalculator() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-[7px] text-small text-fg-2 no-underline"
         >
-          <Icon name="book" size={15} color="var(--fg-3)" />
+          <Icon name="book" size={15} className="text-fg-3" />
           <span className="underline decoration-border-strong underline-offset-[3px]">
             {t("methodLink")}
           </span>

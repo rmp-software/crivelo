@@ -51,7 +51,7 @@ export function CoaLockup({
         (variant === "light" ? "text-crema-50" : "text-fg")
       }
     >
-      {mono && <CoaMark px={mark} />}
+      {mono && <CoaMark px={mark} className="text-brand" />}
       <span className="inline-flex flex-col gap-0.5 leading-none">
         <span className="font-display text-[length:var(--title-size)] font-bold tracking-[-0.02em]">
           Coa

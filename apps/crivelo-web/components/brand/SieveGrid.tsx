@@ -9,6 +9,13 @@
  *    (footer motif): kept cells use the accent, the rest are faint ink.
  *
  * If both are passed, `puck` takes precedence (matches the reference).
+ *
+ * Colour API: unlike the single-colour marks (Monogram/CoaMark, which use
+ * `currentColor` + a `text-*` class), SieveGrid draws TWO independent colours per
+ * render — `color` (ink) and `accent` — which one `currentColor` can't express.
+ * They stay typed CSS-colour props (a data API, like a chart's colours); forcing
+ * the second onto a className would mean a `[--accent:var(--…)]` arbitrary, i.e.
+ * the var-in-className this codebase is eliminating. So the var props are correct.
  */
 export interface SieveGridProps {
   cols?: number;
