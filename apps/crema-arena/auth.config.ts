@@ -11,18 +11,19 @@ import type { NextAuthConfig } from 'next-auth';
 export const authConfig = {
   pages: { signIn: '/login' },
   session: { strategy: 'jwt' },
+  // Callbacks must live here (not auth.ts) so the edge middleware instance shares them.
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as { role?: string }).role;
+        token.role = user.role; // user.role is typed via types/next-auth.d.ts augmentation
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        if (typeof token.id === 'string') session.user.id = token.id;
+        if (typeof token.role === 'string') session.user.role = token.role;
       }
       return session;
     },
