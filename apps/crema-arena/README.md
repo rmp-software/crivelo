@@ -40,8 +40,8 @@ cp .env.example .env
 
 Update the following variables:
 - `DATABASE_URL` - Your Neon PostgreSQL connection string
-- `NEXTAUTH_SECRET` - Generate with: `openssl rand -base64 32`
-- `NEXTAUTH_URL` - Your application URL (default: `http://localhost:3000`)
+- `AUTH_SECRET` - Generate with: `openssl rand -base64 32` (Auth.js v5; reads it from env automatically)
+- `AUTH_URL` - Your application URL (default: `http://localhost:3000`; inferred on Vercel)
 - `ADMIN_EMAIL` - Default admin user email
 - `ADMIN_PASSWORD` - Default admin user password
 

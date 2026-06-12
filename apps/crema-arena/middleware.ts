@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import NextAuth from 'next-auth';
+import { authConfig } from './auth.config';
 
 /**
  * Auth-aware routing for the admin surfaces:
@@ -11,11 +11,16 @@ import { getToken } from 'next-auth/jwt';
  *
  * Public routes (`/live/[eventId]`, `/e/[eventId]`, all `/api/*`, static assets)
  * are excluded by the matcher and unaffected.
+ *
+ * Runs on the Edge runtime, so it instantiates NextAuth from the edge-safe
+ * `authConfig` ONLY — no bcryptjs/Prisma (those live behind the Credentials
+ * provider in `auth.ts`, the Node-only instance).
  */
-export async function middleware(req: NextRequest) {
+const { auth } = NextAuth(authConfig);
+
+export default auth((req) => {
   const { pathname } = req.nextUrl;
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
-  const isAuthed = !!token;
+  const isAuthed = !!req.auth;
 
   if (pathname === '/') {
     if (isAuthed) {
@@ -41,7 +46,7 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ['/', '/login', '/dashboard/:path*'],

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 // POST /api/duels/[id]/defer    — mark the duel as deferred (skipped, come back later).
@@ -11,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 // just hides the duel from active-duel selection until resumed.
 
 async function checkAuth(duelId: string) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !session.user) {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   }

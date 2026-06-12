@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { saveUploadedFile, deleteUploadedFile } from '@/lib/file-upload';
 
@@ -9,7 +8,7 @@ const ALLOWED_ROLES = ['admin', 'organizer'] as const;
 // GET /api/sponsors - List sponsors with events_count
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -45,7 +44,7 @@ export async function GET() {
 // POST /api/sponsors - Create sponsor (multipart, optional logo)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

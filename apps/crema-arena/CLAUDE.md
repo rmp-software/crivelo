@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Required env (in `.env`, gitignored):**
 - `DATABASE_URL` — local Postgres (see Local database below). **Never put the prod URL in `.env` — Prisma CLI reads `.env`, not `.env.local`, so any migration command targets whatever DB this points at.**
-- `NEXTAUTH_SECRET`, `NEXTAUTH_URL`
+- `AUTH_SECRET` (Auth.js v5 reads it from env automatically); `AUTH_URL` (inferred on Vercel)
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD` — seeded admin
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob (photo uploads). Without it, every upload fails. Set in Vercel project env vars for dev/preview/production too.
 
