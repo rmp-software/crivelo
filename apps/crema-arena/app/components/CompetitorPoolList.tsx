@@ -99,7 +99,7 @@ export default function CompetitorPoolList({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-[var(--fg-2)]">
+      <p className="text-sm text-fg-2">
         Busque e selecione competidores do seu pool global.
       </p>
 
@@ -113,25 +113,25 @@ export default function CompetitorPoolList({
         />
         <Search
           size={20}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-3)] pointer-events-none"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none"
         />
       </div>
 
       {error && (
-        <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)] text-sm">
+        <div className="p-3 rounded-sm bg-danger-soft border border-danger text-danger text-sm">
           {error.message}
         </div>
       )}
 
       {isLoading && !data && (
         <div className="text-center py-8">
-          <div className="inline-block w-6 h-6 border-4 border-[var(--brand)] border-t-transparent rounded-full animate-spin"></div>
+          <div className="inline-block w-6 h-6 border-4 border-brand border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
 
       {!isLoading && competitors.length === 0 && (
-        <div className="text-center py-8 bg-[var(--bg-2)] rounded-[var(--radius-md)] border border-[var(--border)]">
-          <p className="text-sm text-[var(--fg-2)]">
+        <div className="text-center py-8 bg-bg-2 rounded-md border border-border">
+          <p className="text-sm text-fg-2">
             {debouncedSearch
               ? 'Nenhum competidor corresponde à busca.'
               : 'Nenhum competidor no pool global.'}
@@ -150,14 +150,14 @@ export default function CompetitorPoolList({
               return (
                 <div
                   key={competitor.id}
-                  className="flex items-center gap-3 p-3 rounded-[var(--radius-md)] border border-[var(--border)] bg-[var(--surface)] opacity-60"
+                  className="flex items-center gap-3 p-3 rounded-md border border-border bg-surface opacity-60"
                 >
                   <Thumb competitor={competitor} />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[var(--fg)] truncate">{competitor.name}</p>
-                    <p className="text-sm text-[var(--fg-2)] truncate">{competitor.coffeeShop}</p>
+                    <p className="font-medium text-fg truncate">{competitor.name}</p>
+                    <p className="text-sm text-fg-2 truncate">{competitor.coffeeShop}</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-[var(--live)] font-medium">
+                  <div className="flex items-center gap-2 text-sm text-live font-medium">
                     <Check size={16} />
                     Inscrito
                   </div>
@@ -171,23 +171,23 @@ export default function CompetitorPoolList({
                 type="button"
                 onClick={() => toggle(competitor)}
                 aria-pressed={isSelected}
-                className={`w-full flex items-center gap-3 p-3 rounded-[var(--radius-md)] border text-left transition-colors ${
+                className={`w-full flex items-center gap-3 p-3 rounded-md border text-left transition-colors ${
                   isSelected
-                    ? 'border-[var(--brand)] bg-[var(--brand-soft)]'
-                    : 'border-[var(--border)] bg-[var(--surface)] hover:border-[var(--brand)]'
+                    ? 'border-brand bg-brand-soft'
+                    : 'border-border bg-surface hover:border-brand'
                 }`}
               >
                 <Thumb competitor={competitor} />
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--fg)] truncate">{competitor.name}</p>
-                  <p className="text-sm text-[var(--fg-2)] truncate">{competitor.coffeeShop}</p>
+                  <p className="font-medium text-fg truncate">{competitor.name}</p>
+                  <p className="text-sm text-fg-2 truncate">{competitor.coffeeShop}</p>
                 </div>
                 {/* Selection indicator */}
                 <div
                   className={`w-6 h-6 flex-shrink-0 rounded-full border flex items-center justify-center ${
                     isSelected
-                      ? 'bg-[var(--brand)] border-[var(--brand)] text-[var(--fg-inverse)]'
-                      : 'border-[var(--border-strong)] text-transparent'
+                      ? 'bg-brand border-brand text-fg-inverse'
+                      : 'border-border-strong text-transparent'
                   }`}
                 >
                   <Check size={14} />
@@ -199,7 +199,7 @@ export default function CompetitorPoolList({
       )}
 
       {truncated && (
-        <p className="text-xs text-[var(--fg-3)] text-center font-mono uppercase tracking-wider">
+        <p className="text-xs text-fg-3 text-center font-mono uppercase tracking-wider">
           Mostrando {competitors.length} de {total} · refine a busca
         </p>
       )}
@@ -227,7 +227,7 @@ export default function CompetitorPoolList({
 
 function Thumb({ competitor }: { competitor: Competitor }) {
   return (
-    <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border border-[var(--border)] flex-shrink-0">
+    <div className="w-10 h-10 rounded-full overflow-hidden bg-bg-2 border border-border flex-shrink-0">
       <img src={competitor.photoUrl} alt={competitor.name} className="w-full h-full object-cover" />
     </div>
   );

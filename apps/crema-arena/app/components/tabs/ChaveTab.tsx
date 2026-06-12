@@ -47,13 +47,13 @@ export default function ChaveTab({ event, duels, totalRounds, currentDuel }: Cha
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6">
         <div className="text-center max-w-md">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--bg-2)] mb-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-bg-2 mb-4">
             <span className="text-3xl">📋</span>
           </div>
-          <h2 className="text-xl font-bold text-[var(--fg)] mb-2 font-[family-name:var(--font-display)]">
+          <h2 className="text-xl font-bold text-fg mb-2 font-display">
             O evento ainda não começou
           </h2>
-          <p className="text-[var(--fg-3)] text-sm">
+          <p className="text-fg-3 text-sm">
             A chave será exibida quando o evento começar
           </p>
         </div>
@@ -79,10 +79,10 @@ export default function ChaveTab({ event, duels, totalRounds, currentDuel }: Cha
   return (
     <div className="p-4">
       <div className="mb-4">
-        <h2 className="text-lg font-bold text-[var(--fg)] font-[family-name:var(--font-display)]">
+        <h2 className="text-lg font-bold text-fg font-display">
           Chave do torneio
         </h2>
-        <p className="text-xs text-[var(--fg-3)] mt-1">
+        <p className="text-xs text-fg-3 mt-1">
           Role horizontalmente para ver todas as rodadas
         </p>
       </div>
@@ -93,11 +93,11 @@ export default function ChaveTab({ event, duels, totalRounds, currentDuel }: Cha
           {duelsByRound.map((roundDuels, roundIndex) => (
             <div key={roundIndex} className="flex flex-col justify-around min-w-[280px]">
               {/* Round Header */}
-              <div className="mb-3 sticky top-0 bg-[var(--bg)] py-2 z-10">
-                <h3 className="font-semibold text-sm text-[var(--fg)] font-[family-name:var(--font-display)]">
+              <div className="mb-3 sticky top-0 bg-bg py-2 z-10">
+                <h3 className="font-semibold text-sm text-fg font-display">
                   {getRoundLabel(roundIndex)}
                 </h3>
-                <p className="text-xs text-[var(--fg-3)]">
+                <p className="text-xs text-fg-3">
                   {roundDuels.length} {roundDuels.length === 1 ? 'duelo' : 'duelos'}
                 </p>
               </div>
@@ -133,7 +133,7 @@ function MobileDuelCard({ duel, isActive }: MobileDuelCardProps) {
       case 'in_progress':
         return (
           <div className="flex items-center gap-1">
-            <div className="w-1.5 h-1.5 rounded-full bg-[var(--live)] animate-pulse"></div>
+            <div className="w-1.5 h-1.5 rounded-full bg-live animate-pulse"></div>
             <Badge variant="success" size="sm">Ao vivo</Badge>
           </div>
         );
@@ -151,13 +151,13 @@ function MobileDuelCard({ duel, isActive }: MobileDuelCardProps) {
 
   return (
     <div
-      className={`bg-[var(--surface-raised)] rounded-[var(--radius-md)] overflow-hidden shadow-[var(--shadow-1)] ${
-        isActive ? 'border-2 border-[var(--live)]' : 'border border-[var(--border)]'
+      className={`bg-surface-raised rounded-md overflow-hidden shadow-1 ${
+        isActive ? 'border-2 border-live' : 'border border-border'
       }`}
     >
       {/* Header */}
-      <div className="px-3 py-2 bg-[var(--bg-2)] border-b border-[var(--border)] flex items-center justify-between">
-        <span className="text-xs text-[var(--fg-3)]">Duelo {duel.position + 1}</span>
+      <div className="px-3 py-2 bg-bg-2 border-b border-border flex items-center justify-between">
+        <span className="text-xs text-fg-3">Duelo {duel.position + 1}</span>
         {getStatusBadge()}
       </div>
 
@@ -170,8 +170,8 @@ function MobileDuelCard({ duel, isActive }: MobileDuelCardProps) {
       />
 
       {/* VS Divider */}
-      <div className="px-3 py-1 bg-[var(--bg)] text-center">
-        <span className="text-xs font-semibold text-[var(--fg-3)]">VS</span>
+      <div className="px-3 py-1 bg-bg text-center">
+        <span className="text-xs font-semibold text-fg-3">VS</span>
       </div>
 
       {/* Competitor B */}
@@ -195,12 +195,12 @@ interface CompetitorSlotProps {
 function CompetitorSlot({ entry, votes, isWinner, showVotes }: CompetitorSlotProps) {
   if (!entry) {
     return (
-      <div className="px-3 py-3 flex items-center gap-3 bg-[var(--surface)]">
-        <div className="w-10 h-10 rounded-full bg-[var(--bg-2)] border border-[var(--border)] flex items-center justify-center flex-shrink-0">
-          <Circle size={20} className="text-[var(--fg-3)]" />
+      <div className="px-3 py-3 flex items-center gap-3 bg-surface">
+        <div className="w-10 h-10 rounded-full bg-bg-2 border border-border flex items-center justify-center flex-shrink-0">
+          <Circle size={20} className="text-fg-3" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm text-[var(--fg-3)]" aria-label="Sem oponente">—</p>
+          <p className="text-sm text-fg-3" aria-label="Sem oponente">—</p>
         </div>
       </div>
     );
@@ -209,11 +209,11 @@ function CompetitorSlot({ entry, votes, isWinner, showVotes }: CompetitorSlotPro
   return (
     <div
       className={`px-3 py-3 flex items-center gap-3 ${
-        isWinner ? 'bg-[var(--live-soft)]' : 'bg-[var(--surface)]'
+        isWinner ? 'bg-live-soft' : 'bg-surface'
       }`}
     >
       {/* Photo */}
-      <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+      <div className="w-10 h-10 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
         <img
           src={entry.competitor.photoUrl}
           alt={entry.competitor.name}
@@ -224,24 +224,24 @@ function CompetitorSlot({ entry, votes, isWinner, showVotes }: CompetitorSlotPro
       {/* Info */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <p className="font-semibold text-sm text-[var(--fg)] truncate">
+          <p className="font-semibold text-sm text-fg truncate">
             {entry.competitor.name}
           </p>
           {isWinner && (
-            <Trophy size={14} className="text-[var(--live)] flex-shrink-0" />
+            <Trophy size={14} className="text-live flex-shrink-0" />
           )}
         </div>
-        <p className="text-xs text-[var(--fg-3)] truncate">{entry.competitor.coffeeShop}</p>
+        <p className="text-xs text-fg-3 truncate">{entry.competitor.coffeeShop}</p>
       </div>
 
       {/* Votes */}
       {showVotes && (
         <div className="flex-shrink-0">
           <div
-            className={`px-2 py-1 rounded-[var(--radius-xs)] text-sm font-semibold font-[family-name:var(--font-mono)] ${
+            className={`px-2 py-1 rounded-xs text-sm font-semibold font-mono ${
               isWinner
-                ? 'bg-[var(--live)] text-white'
-                : 'bg-[var(--bg-2)] text-[var(--fg-2)]'
+                ? 'bg-live text-white'
+                : 'bg-bg-2 text-fg-2'
             }`}
           >
             {votes}

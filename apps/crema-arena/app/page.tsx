@@ -10,7 +10,7 @@ import { LandingFooter } from "./components/landing/LandingFooter";
 // layer on in RMP-204.
 export default function Home() {
   return (
-    <div className="bg-[var(--bg-inverse)] text-[var(--fg-inverse)]">
+    <div className="bg-bg-inverse text-fg-inverse">
       <LandingHeader />
       <main id="top">
         <LandingHero />

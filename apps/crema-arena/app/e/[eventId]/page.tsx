@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 // This is a public page - no authentication required, mobile-first
 export default function LiveCompanionPage({ params }: PageProps) {
   return (
-    <div className="min-h-screen bg-[var(--bg)]">
+    <div className="min-h-screen bg-bg">
       <LiveCompanion eventId={params.eventId} />
     </div>
   );

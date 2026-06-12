@@ -124,14 +124,14 @@ export default function OrganizersPage() {
           />
           <Search
             size={20}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-3)] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none"
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="p-4 mb-6 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-6 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
@@ -140,17 +140,17 @@ export default function OrganizersPage() {
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando organizadores...</p>
+          <p className="mt-4 text-fg-2">Carregando organizadores...</p>
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !error && organizers.length === 0 && (
-        <div className="text-center py-12 bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)]">
-          <p className="text-xl font-medium text-[var(--fg-2)] mb-2">
+        <div className="text-center py-12 bg-surface rounded-lg border border-border">
+          <p className="text-xl font-medium text-fg-2 mb-2">
             {search ? 'Nenhum organizador encontrado' : 'Nenhum organizador ainda'}
           </p>
-          <p className="text-[var(--fg-3)] mb-6">
+          <p className="text-fg-3 mb-6">
             {search
               ? 'Tente ajustar seus termos de busca'
               : 'Comece adicionando seu primeiro organizador'}
@@ -168,36 +168,36 @@ export default function OrganizersPage() {
 
       {/* Organizers Table */}
       {!isLoading && !error && organizers.length > 0 && (
-        <div className="bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
+        <div className="bg-surface rounded-lg border border-border overflow-hidden">
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[var(--bg-2)] border-b border-[var(--border)]">
+              <thead className="bg-bg-2 border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Papel
                   </th>
-                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Criado em
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
+              <tbody className="divide-y divide-border">
                 {organizers.map((organizer) => (
-                  <tr key={organizer.id} className="hover:bg-[var(--bg-2)] transition-colors">
+                  <tr key={organizer.id} className="hover:bg-bg-2 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-[var(--fg)]">{organizer.name}</div>
+                      <div className="font-medium text-fg">{organizer.name}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="px-6 py-4 whitespace-nowrap text-fg-2">
                       {organizer.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -205,7 +205,7 @@ export default function OrganizersPage() {
                         {organizer.role}
                       </Badge>
                     </td>
-                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-fg-2">
                       {formatDate(organizer.createdAt)}
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right">
@@ -233,19 +233,19 @@ export default function OrganizersPage() {
           </div>
 
           {/* Mobile Card List */}
-          <div className="md:hidden divide-y divide-[var(--border)]">
+          <div className="md:hidden divide-y divide-border">
             {organizers.map((organizer) => (
               <div key={organizer.id} className="p-4">
                 <div className="flex items-start justify-between mb-3">
                   <div>
-                    <h3 className="font-medium text-[var(--fg)]">{organizer.name}</h3>
-                    <p className="text-sm text-[var(--fg-2)] mt-1">{organizer.email}</p>
+                    <h3 className="font-medium text-fg">{organizer.name}</h3>
+                    <p className="text-sm text-fg-2 mt-1">{organizer.email}</p>
                   </div>
                   <Badge variant={organizer.role === 'admin' ? 'success' : 'default'}>
                     {organizer.role}
                   </Badge>
                 </div>
-                <p className="text-sm text-[var(--fg-3)] mb-3">
+                <p className="text-sm text-fg-3 mb-3">
                   Criado em {formatDate(organizer.createdAt)}
                 </p>
                 <div className="flex items-center gap-2">

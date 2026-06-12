@@ -129,14 +129,14 @@ export default function CompetitorsPage() {
           />
           <Search
             size={20}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--fg-3)] pointer-events-none"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-fg-3 pointer-events-none"
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="p-4 mb-6 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] border border-[var(--danger)] text-[var(--danger)]">
+        <div className="p-4 mb-6 rounded-sm bg-danger-soft border border-danger text-danger">
           {error}
         </div>
       )}
@@ -145,7 +145,7 @@ export default function CompetitorsPage() {
       {isLoading && (
         <div className="flex flex-col items-center justify-center py-12">
           <Spinner size="lg" />
-          <p className="mt-4 text-[var(--fg-2)]">Carregando competidores...</p>
+          <p className="mt-4 text-fg-2">Carregando competidores...</p>
         </div>
       )}
 
@@ -172,41 +172,37 @@ export default function CompetitorsPage() {
 
       {/* Competitors Table */}
       {!isLoading && !error && competitors.length > 0 && (
-        <div className="bg-[var(--surface)] rounded-[var(--radius-lg)] border border-[var(--border)] overflow-hidden">
+        <div className="bg-surface rounded-lg border border-border overflow-hidden">
           {/* Desktop Table */}
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-[var(--bg-2)] border-b border-[var(--border)]">
+              <thead className="bg-bg-2 border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Foto
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Cafeteria
                   </th>
-                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="hidden xl:table-cell px-6 py-3 text-left text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Criado em
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-[var(--fg-3)] uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-fg-3 uppercase tracking-wider">
                     Ações
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--border)]">
+              <tbody className="divide-y divide-border">
                 {competitors.map((competitor) => (
                   <tr
                     key={competitor.id}
-                    className="hover:bg-[var(--bg-2)] transition-colors"
-                    style={{
-                      transitionDuration: 'var(--dur-base)',
-                      transitionTimingFunction: 'var(--ease-standard)',
-                    }}
+                    className="hover:bg-bg-2 transition-colors duration-base ease-standard"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="w-12 h-12 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)]">
+                      <div className="w-12 h-12 rounded-full overflow-hidden bg-bg-2 border-2 border-border">
                         <img
                           src={competitor.photoUrl}
                           alt={`Foto de ${competitor.name}`}
@@ -215,12 +211,12 @@ export default function CompetitorsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="font-medium text-[var(--fg)]">{competitor.name}</div>
+                      <div className="font-medium text-fg">{competitor.name}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="px-6 py-4 whitespace-nowrap text-fg-2">
                       {competitor.coffeeShop}
                     </td>
-                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-[var(--fg-2)]">
+                    <td className="hidden xl:table-cell px-6 py-4 whitespace-nowrap text-fg-2">
                       <time dateTime={competitor.createdAt}>{formatDate(competitor.createdAt)}</time>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
@@ -249,11 +245,11 @@ export default function CompetitorsPage() {
           </div>
 
           {/* Mobile Card List */}
-          <div className="md:hidden divide-y divide-[var(--border)]">
+          <div className="md:hidden divide-y divide-border">
             {competitors.map((competitor) => (
               <div key={competitor.id} className="p-4">
                 <div className="flex items-start gap-4 mb-3">
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-[var(--bg-2)] border-2 border-[var(--border)] flex-shrink-0">
+                  <div className="w-16 h-16 rounded-full overflow-hidden bg-bg-2 border-2 border-border flex-shrink-0">
                     <img
                       src={competitor.photoUrl}
                       alt={competitor.name}
@@ -261,9 +257,9 @@ export default function CompetitorsPage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-[var(--fg)]">{competitor.name}</h3>
-                    <p className="text-sm text-[var(--fg-2)] mt-1">{competitor.coffeeShop}</p>
-                    <p className="text-xs text-[var(--fg-3)] mt-1">
+                    <h3 className="font-medium text-fg">{competitor.name}</h3>
+                    <p className="text-sm text-fg-2 mt-1">{competitor.coffeeShop}</p>
+                    <p className="text-xs text-fg-3 mt-1">
                       Created {formatDate(competitor.createdAt)}
                     </p>
                   </div>
