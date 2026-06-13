@@ -13,6 +13,15 @@ READMEs), config, and test names. The only pt-BR allowed is the literal text a u
 in the rendered UI (and its source strings). A spec written in Portuguese is a defect —
 rewrite it. (App-specific UI copy rules live in `apps/crema-arena/CLAUDE.md` / `app_spec.txt`.)
 
+## Subagents (hard rule)
+**Never dispatch the generic `general-purpose` subagent** — every dispatch in this repo must
+use a specialized agent, even when a skill (e.g. `rmp:work-iteration`) tells you to use
+`general-purpose`. A `PreToolUse` hook (`.claude/hooks/enforce-specialized-agent.sh`) enforces
+this and will deny the call. Substitute by role: **implementation** → `principal-engineer`
+(new code) or `code-refactor-master` (pure restructuring); **correctness review** →
+`rmp:code-reviewer`; **UI/copy/spec compliance** → `rmp:spec-compliance-reviewer`;
+**architecture/system-integration** → `code-architecture-reviewer`.
+
 ## Environment (bites every session)
 - Shell defaults to **Node 20**; everything needs **24**. Prefix commands:
   `export NVM_DIR="$HOME/.nvm"; \. "$NVM_DIR/nvm.sh"; nvm use 24` (pnpm 11 needs ≥22.13).
