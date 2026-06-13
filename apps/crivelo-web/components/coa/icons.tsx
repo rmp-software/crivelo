@@ -24,6 +24,10 @@ const PATHS: Record<string, ReactNode> = {
       <path d="M20 5.5A2 2 0 0018 4h-6v15h6a2 2 0 012 1.5V5.5z" />
     </>
   ),
+  droplet: (
+    <path d="M12 3.2C9 7 5.5 10 5.5 14a6.5 6.5 0 0013 0c0-4-3.5-7-6.5-10.8z" />
+  ),
+  chevR: <path d="M9 5l7 7-7 7" />,
 };
 
 export type CoaIconName = keyof typeof PATHS;
