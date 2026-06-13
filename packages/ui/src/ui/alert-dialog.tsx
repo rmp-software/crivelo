@@ -55,12 +55,6 @@ function AlertDialogOverlay({
   )
 }
 
-/**
- * Known limitation on React 18: a consumer-supplied `ref` to this component is
- * not forwarded (new-york source targets React 19 ref-as-prop). Radix-internal
- * focus/positioning is unaffected. Do not rely on a content/overlay ref until
- * the monorepo is on React 19.
- */
 function AlertDialogContent({
   className,
   size = "default",
