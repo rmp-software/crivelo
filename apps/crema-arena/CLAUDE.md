@@ -35,7 +35,7 @@ Default admin (dev): `admin@crema-arena.com` / `admin123`.
 
 ## Architecture
 
-The app is a single Next.js 14 App Router project covering three audiences from one codebase:
+The app is a single Next.js 15 App Router project covering three audiences from one codebase:
 
 - **Admin dashboard** at `/dashboard/*` — protected by `middleware.ts` (Auth.js v5 edge `auth()` wrapper built from `auth.config.ts`). Two roles: `admin` (CRUD organizers) and `organizer` (own events + global competitor pool). The Credentials provider (bcrypt + Prisma) lives in `auth.ts` (Node runtime); `auth.config.ts` holds the edge-safe callbacks/session/pages. Session reads use `auth()` from `@/auth`. Secret env var: `AUTH_SECRET`.
 - **TV / live display** at `/live/[eventId]` — public, unauthenticated, optimized for 1920×1080. Split-cadence polling (see below): `current-duel` at 1s, `bracket` + `leaderboard` at 5s, `sponsors` at 15s. Renders pour-photo-as-centerpiece when the duel has a photo, otherwise profile cards. Includes AO VIVO badge, central `N × M` mono score, bottom-right QR. Finished state renders the podium.

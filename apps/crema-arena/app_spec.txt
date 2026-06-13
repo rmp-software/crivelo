@@ -35,13 +35,13 @@
     </backend>
     <deployment>
       <platform>Vercel</platform>
-      <env_vars>DATABASE_URL, NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD</env_vars>
+      <env_vars>DATABASE_URL, AUTH_SECRET, AUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD</env_vars>
     </deployment>
   </technology_stack>
 
   <prerequisites>
     <environment_setup>
-      - .env with DATABASE_URL (Neon PostgreSQL), NEXTAUTH_SECRET, NEXTAUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD
+      - .env with DATABASE_URL (Neon PostgreSQL), AUTH_SECRET, AUTH_URL, ADMIN_EMAIL, ADMIN_PASSWORD
       - Font files from the Crema Arena design system bundle in /public/fonts/:
           BricolageGrotesque-VariableFont_opsz_wdth_wght.ttf
           InstrumentSerif-Regular.ttf
