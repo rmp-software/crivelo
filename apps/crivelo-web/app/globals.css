@@ -47,3 +47,23 @@
     opacity: 0.35;
   }
 }
+
+/* Named utility for the brewing-pulse keyframe. Lifted out of an arbitrary
+ * `animate-[…var(--ease-standard)…]` className (banned: no design-token var()
+ * in a className) — var() inside a real CSS rule is fine.
+ *
+ * The reduced-motion guard is baked in here rather than left to a separate
+ * `motion-reduce:animate-none` className: this custom @layer utilities block is
+ * emitted AFTER Tailwind's generated utilities, so an equal-specificity
+ * `motion-reduce:animate-none` would lose the source-order tie to
+ * `.animate-brew-pulse`. Self-contained, the guard is order-independent. */
+@layer utilities {
+  .animate-brew-pulse {
+    animation: coaBrewPulse 1.6s var(--ease-standard) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .animate-brew-pulse {
+      animation: none;
+    }
+  }
+}

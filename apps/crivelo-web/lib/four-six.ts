@@ -17,6 +17,15 @@
 export const POUR_GAP = 45;
 /** Seconds from the last pour to removing the dripper (final drawdown). */
 export const DRAWDOWN = 30;
+/**
+ * Water flow rate — grams of water poured per second. The pour-step window is
+ * derived as `pourGrams / POUR_FLOW_RATE`, so a 60 g pour takes 15 s (the 4:6
+ * method's ~4 g/s ceiling). Presentation-only: it shapes how the brew timer
+ * splits each pour into a "pour" then a "draw" phase (see {@link buildPhases})
+ * and does NOT affect {@link computeRecipe}, `removeAt`, or the 45 s
+ * {@link POUR_GAP} spacing.
+ */
+export const POUR_FLOW_RATE = 4;
 
 /** Water-temperature guidance by roast (°C). */
 export const TEMP = {
@@ -241,4 +250,84 @@ export function strengthLabel(n: number): string {
     4: 'Strong',
   };
   return map[n] || 'Medium';
+}
+
+/**
+ * One phase of the running brew timer. Every pour in the schedule expands into
+ * exactly two contiguous phases: a `'pour'` (add water up to `target`) followed
+ * by a `'draw'` (let it draw down to the next pour, or the final removal).
+ */
+export interface TimerPhase {
+  /** `'pour'` adds water; `'draw'` is the draw-down that follows it. */
+  kind: 'pour' | 'draw';
+  /** 1-based pour number this phase belongs to. */
+  pourNo: number;
+  /** Total number of pours in the schedule. */
+  total: number;
+  /** Phase start time in seconds (elapsed brew time). */
+  start: number;
+  /** Phase end time in seconds (elapsed brew time). */
+  end: number;
+  /** Cumulative target grams for this pour (the scale reading to hit). */
+  target: number;
+  /** Grams added during this pour. Set on `'pour'` phases; omitted for `'draw'`. */
+  add?: number;
+  /** Brew phase of the source pour. */
+  phase: Phase;
+  /** Start time (s) of the next pour, or `null` on the last pour. */
+  nextPourStart: number | null;
+  /** True when this phase belongs to the final pour. */
+  isLastPour: boolean;
+}
+
+/**
+ * Expand a {@link Recipe}'s pour schedule into the contiguous pour/draw phases
+ * the brew timer renders. Each step `i` yields a `'pour'` phase
+ * [`steps[i].t`, `pourEnd`] then a `'draw'` phase [`pourEnd`, `drawEnd`], where:
+ *
+ *   drawEnd = i is last ? recipe.removeAt : steps[i + 1].t
+ *   pourEnd = min(steps[i].t + steps[i].pourG / POUR_FLOW_RATE, drawEnd)
+ *
+ * The pour window scales with the pour size at {@link POUR_FLOW_RATE} g/s, so a
+ * 60 g pour occupies 15 s. The phases tile the whole brew with no gaps or
+ * overlaps: the first phase starts at 0 and the last `'draw'` ends at
+ * `recipe.removeAt`. Clamping `pourEnd` to `drawEnd` means a pour window never
+ * overruns its draw-down (it collapses to zero length if the derived window
+ * reaches past `drawEnd`). Pure.
+ */
+export function buildPhases(recipe: Recipe): TimerPhase[] {
+  const steps = recipe.steps;
+  const total = steps.length;
+  const out: TimerPhase[] = [];
+  for (let i = 0; i < steps.length; i++) {
+    const s = steps[i];
+    const isLastPour = i === total - 1;
+    const drawEnd = isLastPour ? recipe.removeAt : steps[i + 1].t;
+    const pourEnd = Math.min(s.t + s.pourG / POUR_FLOW_RATE, drawEnd);
+    const nextPourStart = isLastPour ? null : steps[i + 1].t;
+    out.push({
+      kind: 'pour',
+      pourNo: i + 1,
+      total,
+      start: s.t,
+      end: pourEnd,
+      target: s.cumulativeG,
+      add: s.pourG,
+      phase: s.phase,
+      nextPourStart,
+      isLastPour,
+    });
+    out.push({
+      kind: 'draw',
+      pourNo: i + 1,
+      total,
+      start: pourEnd,
+      end: drawEnd,
+      target: s.cumulativeG,
+      phase: s.phase,
+      nextPourStart,
+      isLastPour,
+    });
+  }
+  return out;
 }
