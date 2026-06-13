@@ -7,5 +7,8 @@ import base from "@crivelo/eslint-config";
  */
 export default [
   ...base,
-  { ignores: [".next/**", "next-env.d.ts"] },
+  // `.design/` (and `.design_system/`) hold the gitignored Claude Design handoff
+  // bundle — local-only, never committed, never our code. Keep `eslint .` from
+  // scanning the throwaway prototype/`_ds_bundle.js` inside it.
+  { ignores: [".next/**", "next-env.d.ts", ".design/**", ".design_system/**"] },
 ];
