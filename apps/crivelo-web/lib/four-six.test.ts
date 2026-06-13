@@ -7,16 +7,23 @@ import {
   fmtG,
   clamp,
   finiteOr,
+  buildPhases,
   POUR_GAP,
   DRAWDOWN,
+  POUR_SECS,
   TEMP,
   type Recipe,
+  type TimerPhase,
 } from './four-six';
 
 describe('constants', () => {
   it('uses the canonical 4:6 timing constants', () => {
     expect(POUR_GAP).toBe(45);
     expect(DRAWDOWN).toBe(30);
+  });
+
+  it('exposes the presentation-only pour window', () => {
+    expect(POUR_SECS).toBe(9);
   });
 
   it('exposes the roast temperature table', () => {
@@ -369,6 +376,124 @@ describe('strengthLabel', () => {
   });
 });
 
+describe('buildPhases — expands the schedule into pour/draw phases', () => {
+  // Canonical recipe: 5 pours -> 10 phases (pour+draw each).
+  const r = computeRecipe({ dose: 20, ratio: 15, acidity: 0, strengthPours: 3 });
+  const phases = buildPhases(r);
+
+  it('emits 2 phases per step (pour then draw)', () => {
+    expect(phases).toHaveLength(2 * r.steps.length);
+    phases.forEach((p, i) => {
+      expect(p.kind).toBe(i % 2 === 0 ? 'pour' : 'draw');
+    });
+  });
+
+  it('is contiguous: first starts at 0 and each start meets the prior end', () => {
+    expect(phases[0].start).toBe(0);
+    for (let i = 1; i < phases.length; i++) {
+      expect(phases[i].start).toBe(phases[i - 1].end);
+    }
+  });
+
+  it('the final draw phase ends exactly at recipe.removeAt', () => {
+    const last = phases[phases.length - 1];
+    expect(last.kind).toBe('draw');
+    expect(last.end).toBe(r.removeAt);
+  });
+
+  it('each pour window is min(start + POUR_SECS, drawEnd) and never overruns', () => {
+    for (let i = 0; i < r.steps.length; i++) {
+      const s = r.steps[i];
+      const isLast = i === r.steps.length - 1;
+      const drawEnd = isLast ? r.removeAt : r.steps[i + 1].t;
+      const pour = phases[2 * i];
+      const draw = phases[2 * i + 1];
+
+      expect(pour.start).toBe(s.t);
+      expect(pour.end).toBe(Math.min(s.t + POUR_SECS, drawEnd));
+      expect(pour.end).toBeLessThanOrEqual(drawEnd);
+      expect(draw.start).toBe(pour.end);
+      expect(draw.end).toBe(drawEnd);
+    }
+  });
+
+  it('clamps the pour window to drawEnd when pours are closer than POUR_SECS apart', () => {
+    // The real schedule spaces pours POUR_GAP (45 s) apart and ends the last
+    // draw DRAWDOWN (30 s) after it — both wider than POUR_SECS (9 s), so the
+    // min() clamp never bites on a computed recipe. Hand-build a Recipe-shaped
+    // object (NOT via computeRecipe) whose first two pours sit only 5 s apart so
+    // drawEnd - start (5) < POUR_SECS (9), forcing the guard to fire.
+    const synthetic = {
+      steps: [
+        { t: 0, cumulativeG: 30, pourG: 30, phase: 'flavor' },
+        { t: 5, cumulativeG: 60, pourG: 30, phase: 'strength' },
+      ],
+      removeAt: 8,
+    } as unknown as Recipe;
+
+    const phases = buildPhases(synthetic);
+    const firstPour = phases[0];
+    const firstDraw = phases[1];
+
+    // start + POUR_SECS would be 9, but drawEnd is only 5 → clamp to drawEnd.
+    expect(firstPour.start).toBe(0);
+    expect(firstPour.end).toBe(5); // == drawEnd, NOT start + POUR_SECS (9)
+    expect(firstPour.end).toBeLessThan(0 + POUR_SECS);
+    // The draw phase collapses to zero length: it starts and ends at drawEnd.
+    expect(firstDraw.start).toBe(5);
+    expect(firstDraw.end).toBe(5);
+  });
+
+  it('carries pourNo (1-based), total, target, phase and nextPourStart', () => {
+    for (let i = 0; i < r.steps.length; i++) {
+      const s = r.steps[i];
+      const isLast = i === r.steps.length - 1;
+      const expectedNext = isLast ? null : r.steps[i + 1].t;
+      for (const p of [phases[2 * i], phases[2 * i + 1]]) {
+        expect(p.pourNo).toBe(i + 1);
+        expect(p.total).toBe(r.steps.length);
+        expect(p.target).toBe(s.cumulativeG);
+        expect(p.phase).toBe(s.phase);
+        expect(p.nextPourStart).toBe(expectedNext);
+        expect(p.isLastPour).toBe(isLast);
+      }
+    }
+  });
+
+  it('sets `add` (grams) on pour phases and leaves it undefined on draw phases', () => {
+    for (let i = 0; i < r.steps.length; i++) {
+      expect(phases[2 * i].add).toBe(r.steps[i].pourG);
+      expect(phases[2 * i + 1].add).toBeUndefined();
+    }
+  });
+
+  it('edge: a single strength pour (3 pours total) yields 6 contiguous phases', () => {
+    const r1 = computeRecipe({ dose: 20, ratio: 15, acidity: 0, strengthPours: 1 });
+    const p1 = buildPhases(r1);
+    expect(r1.steps).toHaveLength(3);
+    expect(p1).toHaveLength(6);
+
+    expect(p1[0].start).toBe(0);
+    for (let i = 1; i < p1.length; i++) {
+      expect(p1[i].start).toBe(p1[i - 1].end);
+    }
+    expect(p1[p1.length - 1].end).toBe(r1.removeAt);
+
+    // Last pour: nextPourStart is null and it is flagged as the last.
+    const lastPour = p1[p1.length - 2];
+    const lastDraw = p1[p1.length - 1];
+    expect(lastPour.kind).toBe('pour');
+    expect(lastPour.isLastPour).toBe(true);
+    expect(lastPour.nextPourStart).toBeNull();
+    expect(lastDraw.isLastPour).toBe(true);
+    expect(lastDraw.nextPourStart).toBeNull();
+  });
+});
+
 // Compile-time guard: the exported Recipe type stays consumable by name.
 const _typecheck: Recipe = computeRecipe({ dose: 20, ratio: 15 });
 void _typecheck;
+
+// Compile-time guard: the exported TimerPhase type stays consumable by name.
+const _phase: TimerPhase = buildPhases(computeRecipe({ dose: 20, ratio: 15 }))[0];
+void _phase;
