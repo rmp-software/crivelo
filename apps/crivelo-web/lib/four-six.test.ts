@@ -10,7 +10,7 @@ import {
   buildPhases,
   POUR_GAP,
   DRAWDOWN,
-  POUR_SECS,
+  POUR_FLOW_RATE,
   TEMP,
   type Recipe,
   type TimerPhase,
@@ -22,8 +22,8 @@ describe('constants', () => {
     expect(DRAWDOWN).toBe(30);
   });
 
-  it('exposes the presentation-only pour window', () => {
-    expect(POUR_SECS).toBe(9);
+  it('exposes the presentation-only pour flow rate (g/s)', () => {
+    expect(POUR_FLOW_RATE).toBe(4);
   });
 
   it('exposes the roast temperature table', () => {
@@ -401,7 +401,7 @@ describe('buildPhases — expands the schedule into pour/draw phases', () => {
     expect(last.end).toBe(r.removeAt);
   });
 
-  it('each pour window is min(start + POUR_SECS, drawEnd) and never overruns', () => {
+  it('each pour window is min(start + pourG / POUR_FLOW_RATE, drawEnd) and never overruns', () => {
     for (let i = 0; i < r.steps.length; i++) {
       const s = r.steps[i];
       const isLast = i === r.steps.length - 1;
@@ -410,19 +410,31 @@ describe('buildPhases — expands the schedule into pour/draw phases', () => {
       const draw = phases[2 * i + 1];
 
       expect(pour.start).toBe(s.t);
-      expect(pour.end).toBe(Math.min(s.t + POUR_SECS, drawEnd));
+      expect(pour.end).toBe(Math.min(s.t + s.pourG / POUR_FLOW_RATE, drawEnd));
       expect(pour.end).toBeLessThanOrEqual(drawEnd);
       expect(draw.start).toBe(pour.end);
       expect(draw.end).toBe(drawEnd);
     }
   });
 
-  it('clamps the pour window to drawEnd when pours are closer than POUR_SECS apart', () => {
-    // The real schedule spaces pours POUR_GAP (45 s) apart and ends the last
-    // draw DRAWDOWN (30 s) after it — both wider than POUR_SECS (9 s), so the
-    // min() clamp never bites on a computed recipe. Hand-build a Recipe-shaped
-    // object (NOT via computeRecipe) whose first two pours sit only 5 s apart so
-    // drawEnd - start (5) < POUR_SECS (9), forcing the guard to fire.
+  it('a 60 g pour yields a 15 s window (60 / POUR_FLOW_RATE)', () => {
+    // Canonical recipe: every pour is 60 g, so at 4 g/s each pour window is
+    // exactly 15 s. The first balanced pour runs 0:00 -> 0:15.
+    const firstPour = phases[0];
+    expect(r.steps[0].pourG).toBe(60);
+    expect(firstPour.kind).toBe('pour');
+    expect(firstPour.start).toBe(0);
+    expect(firstPour.end).toBe(15);
+    expect(firstPour.end - firstPour.start).toBe(60 / POUR_FLOW_RATE);
+  });
+
+  it('clamps the pour window to drawEnd when the derived window overruns the gap', () => {
+    // On a computed recipe the derived window (pourG / POUR_FLOW_RATE) never
+    // exceeds the POUR_GAP (45 s) spacing or the DRAWDOWN (30 s) tail, so the
+    // min() clamp doesn't bite. Hand-build a Recipe-shaped object (NOT via
+    // computeRecipe) whose first two pours sit only 5 s apart while the first
+    // pour is 30 g: its derived window is 30 / 4 = 7.5 s > the 5 s gap to the
+    // next pour, forcing the guard to fire.
     const synthetic = {
       steps: [
         { t: 0, cumulativeG: 30, pourG: 30, phase: 'flavor' },
@@ -435,10 +447,11 @@ describe('buildPhases — expands the schedule into pour/draw phases', () => {
     const firstPour = phases[0];
     const firstDraw = phases[1];
 
-    // start + POUR_SECS would be 9, but drawEnd is only 5 → clamp to drawEnd.
+    // start + pourG / POUR_FLOW_RATE would be 7.5, but drawEnd is only 5 →
+    // clamp to drawEnd.
     expect(firstPour.start).toBe(0);
-    expect(firstPour.end).toBe(5); // == drawEnd, NOT start + POUR_SECS (9)
-    expect(firstPour.end).toBeLessThan(0 + POUR_SECS);
+    expect(firstPour.end).toBe(5); // == drawEnd, NOT 0 + 30 / 4 (7.5)
+    expect(firstPour.end).toBeLessThan(0 + 30 / POUR_FLOW_RATE);
     // The draw phase collapses to zero length: it starts and ends at drawEnd.
     expect(firstDraw.start).toBe(5);
     expect(firstDraw.end).toBe(5);

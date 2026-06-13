@@ -18,13 +18,14 @@ export const POUR_GAP = 45;
 /** Seconds from the last pour to removing the dripper (final drawdown). */
 export const DRAWDOWN = 30;
 /**
- * Nominal window (seconds) the pour action itself occupies before a step
- * settles into its draw-down. Presentation-only: it shapes how the brew timer
+ * Water flow rate — grams of water poured per second. The pour-step window is
+ * derived as `pourGrams / POUR_FLOW_RATE`, so a 60 g pour takes 15 s (the 4:6
+ * method's ~4 g/s ceiling). Presentation-only: it shapes how the brew timer
  * splits each pour into a "pour" then a "draw" phase (see {@link buildPhases})
  * and does NOT affect {@link computeRecipe}, `removeAt`, or the 45 s
  * {@link POUR_GAP} spacing.
  */
-export const POUR_SECS = 9;
+export const POUR_FLOW_RATE = 4;
 
 /** Water-temperature guidance by roast (°C). */
 export const TEMP = {
@@ -285,13 +286,14 @@ export interface TimerPhase {
  * [`steps[i].t`, `pourEnd`] then a `'draw'` phase [`pourEnd`, `drawEnd`], where:
  *
  *   drawEnd = i is last ? recipe.removeAt : steps[i + 1].t
- *   pourEnd = min(steps[i].t + POUR_SECS, drawEnd)
+ *   pourEnd = min(steps[i].t + steps[i].pourG / POUR_FLOW_RATE, drawEnd)
  *
- * The phases tile the whole brew with no gaps or overlaps: the first phase
- * starts at 0 and the last `'draw'` ends at `recipe.removeAt`. Clamping
- * `pourEnd` to `drawEnd` means a pour window never overruns its draw-down (it
- * collapses to zero length if a pour is shorter than {@link POUR_SECS}).
- * Pure; ported faithfully from the prototype's `buildPhases`.
+ * The pour window scales with the pour size at {@link POUR_FLOW_RATE} g/s, so a
+ * 60 g pour occupies 15 s. The phases tile the whole brew with no gaps or
+ * overlaps: the first phase starts at 0 and the last `'draw'` ends at
+ * `recipe.removeAt`. Clamping `pourEnd` to `drawEnd` means a pour window never
+ * overruns its draw-down (it collapses to zero length if the derived window
+ * reaches past `drawEnd`). Pure.
  */
 export function buildPhases(recipe: Recipe): TimerPhase[] {
   const steps = recipe.steps;
@@ -301,7 +303,7 @@ export function buildPhases(recipe: Recipe): TimerPhase[] {
     const s = steps[i];
     const isLastPour = i === total - 1;
     const drawEnd = isLastPour ? recipe.removeAt : steps[i + 1].t;
-    const pourEnd = Math.min(s.t + POUR_SECS, drawEnd);
+    const pourEnd = Math.min(s.t + s.pourG / POUR_FLOW_RATE, drawEnd);
     const nextPourStart = isLastPour ? null : steps[i + 1].t;
     out.push({
       kind: 'pour',
