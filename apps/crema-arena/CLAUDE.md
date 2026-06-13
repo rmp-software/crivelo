@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Required env (in `.env`, gitignored):**
 - `DATABASE_URL` — local Postgres (see Local database below). **Never put the prod URL in `.env` — Prisma CLI reads `.env`, not `.env.local`, so any migration command targets whatever DB this points at.**
-- `AUTH_SECRET` (Auth.js v5 reads it from env automatically); `AUTH_URL` (inferred on Vercel)
+- `AUTH_SECRET` (Auth.js v5 reads it from env automatically); `AUTH_URL` (inferred on Vercel). **The live secret is still the legacy `NEXTAUTH_SECRET`** — `auth.config.ts` signs with `AUTH_SECRET ?? NEXTAUTH_SECRET`, so the v4→v5 cutover needed no secret rotation. **Do NOT delete `NEXTAUTH_SECRET` from Vercel** (Prod + Preview) until a real `AUTH_SECRET` is set everywhere and the fallback is removed — see RMP-219. It's a Vercel "sensitive" var (unreadable), so its value can't be recovered, only regenerated (which would log everyone out once).
 - `ADMIN_EMAIL`, `ADMIN_PASSWORD` — seeded admin
 - `BLOB_READ_WRITE_TOKEN` — Vercel Blob (photo uploads). Without it, every upload fails. Set in Vercel project env vars for dev/preview/production too.
 
