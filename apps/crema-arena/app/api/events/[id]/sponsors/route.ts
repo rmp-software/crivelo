@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { Prisma } from '@prisma/client';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { CADENCE_FROZEN_MS } from '@/lib/data-cadence';
 
@@ -11,10 +10,8 @@ const FROZEN_S = CADENCE_FROZEN_MS / 1000;
 // GET /api/events/[id]/sponsors - List event's sponsors ordered by position
 // Public, unauthenticated: this is the frozen-tier endpoint polled (~15s) by the
 // live display and audience companion. Matches current-duel/leaderboard (no session).
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     // Check if event exists
     const event = await prisma.event.findUnique({
@@ -63,12 +60,10 @@ export async function GET(
 }
 
 // POST /api/events/[id]/sponsors - Attach sponsor to event
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -202,12 +197,10 @@ export async function POST(
 }
 
 // PATCH /api/events/[id]/sponsors - Reorder sponsors within event
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

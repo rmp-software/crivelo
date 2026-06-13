@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 // DELETE /api/events/[id]/sponsors/[sponsorId] - Detach sponsor from event by sponsor_id
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; sponsorId: string } }
+  props: { params: Promise<{ id: string; sponsorId: string }> }
 ) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

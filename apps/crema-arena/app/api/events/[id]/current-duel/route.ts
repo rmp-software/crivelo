@@ -12,10 +12,8 @@ function toCamelCompetitor(c: CompetitorDb) {
 }
 
 // GET /api/events/[id]/current-duel - Get current active duel (public endpoint for live display)
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const event = await prisma.event.findUnique({
       where: { id: params.id },

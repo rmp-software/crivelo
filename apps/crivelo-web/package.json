@@ -17,17 +17,17 @@
     "@crivelo/pwa": "workspace:*",
     "@crivelo/tokens": "workspace:*",
     "@crivelo/ui": "workspace:*",
-    "next": "^14.2.0",
+    "next": "^15.5.0",
     "next-intl": "^4.13.0",
-    "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
     "@crivelo/eslint-config": "workspace:*",
     "@crivelo/tsconfig": "workspace:*",
     "@types/node": "^24",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "@tailwindcss/postcss": "^4.1.0",
     "eslint": "^9.13.0",
     "postcss": "^8",

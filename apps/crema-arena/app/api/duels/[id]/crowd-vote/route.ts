@@ -6,10 +6,8 @@ import { prisma } from '@/lib/prisma';
 // No session: the audience is unauthenticated. This handler must NEVER read or
 // write the judge-vote path (votes_a / votes_b / Vote / winner_entry_id / status).
 // It only touches CrowdVote rows and the duel's denormalized crowd_votes_a/b.
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   // Hoisted so the outer P2002 recovery (below) can re-read this device's
   // persisted vote without re-consuming the already-read request body.
   let deviceId: unknown;

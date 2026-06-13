@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { generateBracket } from '@/lib/bracket';
 
@@ -15,10 +14,8 @@ function toCamelCompetitor(c: CompetitorDb) {
 }
 
 // GET /api/events/[id]/bracket - Get bracket state (public endpoint for live display)
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const event = await prisma.event.findUnique({
       where: { id: params.id },
@@ -110,12 +107,10 @@ export async function GET(
 }
 
 // POST /api/events/[id]/bracket - Generate bracket for event
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function POST(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

@@ -7,17 +7,22 @@
  *
  * Client component: it triggers the nav-sheet open state owned by Shell.
  */
-import { forwardRef } from "react";
+import { type Ref } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import { CoaLockup } from "../brand";
 import { Button } from "../ui/Button";
 import { Link } from "../../i18n/navigation";
 
-export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
-  function Header({ onMenu }, ref) {
-    const t = useTranslations("Shell");
-    return (
+export function Header({
+  onMenu,
+  ref,
+}: {
+  onMenu: () => void;
+  ref?: Ref<HTMLButtonElement>;
+}) {
+  const t = useTranslations("Shell");
+  return (
     <header
       className={cn(
         "sticky top-0 z-40 bg-bg",
@@ -59,6 +64,5 @@ export const Header = forwardRef<HTMLButtonElement, { onMenu: () => void }>(
         </Link>
       </div>
     </header>
-    );
-  },
-);
+  );
+}

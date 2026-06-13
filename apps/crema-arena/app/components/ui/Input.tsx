@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes } from 'react';
 import { Input as ShadcnInput } from '@crivelo/ui/input';
 import { cn } from '@crivelo/ui/lib/utils';
 
@@ -22,24 +22,18 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
  *   - radius / pad  → --radius-sm / py-2  (over shadcn rounded-md / py-1)
  *   - height/shadow → auto / none        (drop shadcn h-9 / shadow-xs)
  *
- * forwardRef preserves the legacy hand-rolled Input's API contract (the field was a
- * forwardRef so call sites can reach the <input>). NOTE: the shared @crivelo/ui
- * Input is currently a plain function component (not forwardRef), so the ref does
- * NOT presently reach the underlying <input>. Forwarding it here is harmless and
- * keeps the contract ready for when the shared primitive forwards refs.
+ * React 19: ref is a plain prop — no forwardRef needed.
  */
-const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  {
-    label,
-    error,
-    helperText,
-    fullWidth = false,
-    className = '',
-    id,
-    ...props
-  },
-  ref
-) {
+export default function Input({
+  label,
+  error,
+  helperText,
+  fullWidth = false,
+  className = '',
+  id,
+  ref,
+  ...props
+}: InputProps & { ref?: React.Ref<HTMLInputElement> }) {
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
   const hasError = !!error;
 
@@ -82,6 +76,4 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
     </div>
   );
-});
-
-export default Input;
+}

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 // POST /api/duels/[id]/defer    — mark the duel as deferred (skipped, come back later).
@@ -11,7 +10,7 @@ import { prisma } from '@/lib/prisma';
 // just hides the duel from active-duel selection until resumed.
 
 async function checkAuth(duelId: string) {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
   if (!session || !session.user) {
     return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
   }
@@ -36,7 +35,8 @@ async function checkAuth(duelId: string) {
   return { duel };
 }
 
-export async function POST(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = await checkAuth(params.id);
   if ('error' in auth) return auth.error;
   const updated = await prisma.duel.update({
@@ -47,7 +47,8 @@ export async function POST(_req: NextRequest, { params }: { params: { id: string
   return NextResponse.json({ success: true, duel: { id: updated.id, deferredAt: updated.deferred_at?.toISOString() ?? null } });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const auth = await checkAuth(params.id);
   if ('error' in auth) return auth.error;
   const updated = await prisma.duel.update({

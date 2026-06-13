@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
 // PUT /api/events/[id]/entries/[entry_id] - Update competitor entry (seed assignment)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string; entry_id: string } }
+  props: { params: Promise<{ id: string; entry_id: string }> }
 ) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -108,10 +108,11 @@ export async function PUT(
 // DELETE /api/events/[id]/entries/[entry_id] - Remove competitor from event
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; entry_id: string } }
+  props: { params: Promise<{ id: string; entry_id: string }> }
 ) {
+  const params = await props.params;
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session || !session.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
