@@ -116,6 +116,25 @@ function loadSession(): Session | null {
   }
 }
 
+/**
+ * Discard any persisted brew session. Call when starting a brand-new brew so a
+ * stale session left behind by a previous, abandoned brew can't auto-resume
+ * (which would skip the "Get ready" pre-roll and drop the user mid-brew).
+ *
+ * The persisted session exists for resume-on-reload (a phone propped on the
+ * counter), but that path is not wired today: `CoaCalculator`'s `view` resets to
+ * "idle" on every load, so this timer only ever mounts via "Begin brew". Until a
+ * future change reopens an active brew on reload, the only consumer of a stale
+ * session is the "Begin brew" button — which must start fresh, hence this clear.
+ */
+export function clearBrewSession(): void {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 export interface BrewTimerProps {
   recipe: Recipe;
   onExit: () => void;
@@ -230,11 +249,7 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const startNow = () =>
     setSess({ status: "running", base: 0, startTs: Date.now() });
   const exit = () => {
-    try {
-      localStorage.removeItem(KEY);
-    } catch {
-      /* ignore */
-    }
+    clearBrewSession();
     onExit();
   };
 
