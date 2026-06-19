@@ -6,6 +6,8 @@
     ".": "./index.ts",
     "./manifest": "./manifest.ts",
     "./icon": "./icon.tsx",
+    "./splash": "./splash.tsx",
+    "./devices": "./devices.ts",
     "./metadata": "./metadata.ts"
   },
   "peerDependencies": {

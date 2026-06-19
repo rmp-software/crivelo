@@ -27,9 +27,9 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
 
 ## Gotchas (these bite)
 - **next-intl middleware 307s the icon routes.** If the app uses i18n middleware,
-  its matcher will redirect `/icon`, `/apple-icon`, `/pwa-icon/*` to `/en/...`
-  (they're extension-less, so a `.*\..*` exclusion misses them) — tiles come back
-  as redirect HTML, not PNGs. Add `icon|apple-icon|pwa-icon` to the matcher's
+  its matcher will redirect `/icon`, `/apple-icon`, `/pwa-icon/*`, `/pwa-splash/*` to `/en/...`
+  (they're extension-less, so a `.*\..*` exclusion misses them) — tiles/splashes come back
+  as redirect HTML, not PNGs. Add `icon|apple-icon|pwa-icon|pwa-splash` to the matcher's
   negative lookahead. `manifest.webmanifest` is safe (it has a dot).
 - **Satori (next/og) can't resolve CSS variables or external fonts.** The `mark`
   callback gets a concrete hex `color` — use literal colours in the glyph SVG, never `var(--brand)`.
