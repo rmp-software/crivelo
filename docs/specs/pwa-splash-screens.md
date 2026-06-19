@@ -287,7 +287,7 @@ preview returns `401` to credential-less image fetches.
 - [x] Startup-image link tags in `pwaMetadata` — PR #44
   - AC: `pwaMetadata` returns `appleWebApp.startupImage[]` with a portrait AND a landscape entry per geometry; each `media` has exact `device-width`/`device-height`/`-webkit-device-pixel-ratio`/`orientation`; URLs carry physical pixels (portrait `WxH`, landscape swapped); the iPhone Air `420×912@3` pair is present.
   - Test: `npx tsc --noEmit` exits 0. Unit test: `startupImage.length === geometries × 2`; a sampled entry's `url` and `media` strings match expected verbatim.
-- [ ] crivelo-web route handler + i18n middleware exemption
+- [x] crivelo-web route handler + i18n middleware exemption — PR #45
   - AC: `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (`runtime = "nodejs"`) parses `WxH` → `renderSplash(criveloPwa, …)`, 404s on malformed or over-max dimensions; `pwa-splash` added to the next-intl middleware matcher negative lookahead (alongside `icon|apple-icon|pwa-icon`).
   - Test: `next start`, then `GET /pwa-splash/1206x2622` → `200 image/png` at 1206×2622; `/pwa-splash/2622x1206` → 2622×1206; `/pwa-splash/bad` → 404; confirm responses are PNGs, not `307` redirects to `/en/...`.
 - [ ] Whole-feature verification gate
