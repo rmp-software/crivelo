@@ -167,11 +167,15 @@ Extend the returned `appleWebApp` with `startupImage: AppleImage[]` built from
 }
 // landscape — swap width/height in BOTH the URL dims and the media query
 {
-  url: `${base}/${cssH * dpr}x${cssW * dpr}`,
+  url: `${base}/${cssH * dpr}x${cssW * dpr}`,   // only the URL pixel dims swap
   media: `(device-width: ${cssW}px) and (device-height: ${cssH}px) `
        + `and (-webkit-device-pixel-ratio: ${dpr}) and (orientation: landscape)`,
 }
 ```
+
+> Landscape keeps the **portrait** `device-width`/`device-height` in the media
+> query (iOS reports the viewport unrotated) — only the URL's pixel dimensions
+> swap and the `orientation` keyword flips.
 
 `base` is `cfg.splash?.basePath` (default `/pwa-splash`). The media
 query uses logical points; the URL carries physical pixels so the route renders at
@@ -280,7 +284,7 @@ preview returns `401` to credential-less image fetches.
 - [x] Device matrix + splash renderer in `@crivelo/pwa` — PR #43
   - AC: `packages/pwa/devices.ts` holds the unique-geometry matrix (incl. iPhone Air `420×912@3`); `renderSplash(cfg, {width, height})` returns a `next/og` PNG of the white Monogram on teal at native resolution, mark scaled to the shorter edge; `PwaConfig.splash` block added (`background`/`markColor`/`markScale`/`basePath`, all optional with B-design defaults); `renderSplash` + `devices` exported from the barrel.
   - Test: `npx tsc --noEmit` exits 0. Unit test in `packages/pwa`: each geometry maps to the expected dims (`cssW*dpr`); a sample `renderSplash` call returns an `ImageResponse` of exactly the requested pixel dimensions.
-- [ ] Startup-image link tags in `pwaMetadata`
+- [x] Startup-image link tags in `pwaMetadata` — PR #44
   - AC: `pwaMetadata` returns `appleWebApp.startupImage[]` with a portrait AND a landscape entry per geometry; each `media` has exact `device-width`/`device-height`/`-webkit-device-pixel-ratio`/`orientation`; URLs carry physical pixels (portrait `WxH`, landscape swapped); the iPhone Air `420×912@3` pair is present.
   - Test: `npx tsc --noEmit` exits 0. Unit test: `startupImage.length === geometries × 2`; a sampled entry's `url` and `media` strings match expected verbatim.
 - [ ] crivelo-web route handler + i18n middleware exemption
