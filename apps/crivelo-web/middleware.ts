@@ -11,9 +11,9 @@ export default createMiddleware(routing);
 export const config = {
   // Match all pathnames except for static files, _next internals, anything
   // containing a dot (e.g. favicon.ico, manifest.webmanifest), and the
-  // extension-less PWA metadata routes (icon/apple-icon/pwa-icon) — those are
+  // extension-less PWA metadata routes (icon/apple-icon/pwa-icon/pwa-splash) — those are
   // served at the root, NOT under a locale prefix, so they must skip i18n.
   // The PWA routes are anchored to a full path segment ((?:/|$)) so a future
   // page like /icons or /iconography is NOT accidentally excluded from i18n.
-  matcher: "/((?!_next|_vercel|(?:icon|apple-icon|pwa-icon)(?:/|$)|.*\\..*).*)",
+  matcher: "/((?!_next|_vercel|(?:icon|apple-icon|pwa-icon|pwa-splash)(?:/|$)|.*\\..*).*)",
 };
