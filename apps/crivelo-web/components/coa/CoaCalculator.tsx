@@ -32,7 +32,7 @@ import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
-import { BrewTimer } from "./BrewTimer";
+import { BrewTimer, clearBrewSession } from "./BrewTimer";
 import { Icon } from "./icons";
 import { tasteKey } from "../../lib/four-six";
 
@@ -79,6 +79,9 @@ export function CoaCalculator() {
   const [view, setView] = useState<View>("idle");
 
   const startBrew = () => {
+    // "Begin brew" always starts fresh: clear any stale session from a previous,
+    // abandoned brew so the timer opens on the pre-roll instead of resuming.
+    clearBrewSession();
     setView("brew");
     if (typeof window !== "undefined") window.scrollTo(0, 0);
   };
