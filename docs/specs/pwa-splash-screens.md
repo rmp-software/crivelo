@@ -277,7 +277,7 @@ preview returns `401` to credential-less image fetches.
 
 ## Tasks
 
-- [ ] Device matrix + splash renderer in `@crivelo/pwa`
+- [x] Device matrix + splash renderer in `@crivelo/pwa` — PR #43
   - AC: `packages/pwa/devices.ts` holds the unique-geometry matrix (incl. iPhone Air `420×912@3`); `renderSplash(cfg, {width, height})` returns a `next/og` PNG of the white Monogram on teal at native resolution, mark scaled to the shorter edge; `PwaConfig.splash` block added (`background`/`markColor`/`markScale`/`basePath`, all optional with B-design defaults); `renderSplash` + `devices` exported from the barrel.
   - Test: `npx tsc --noEmit` exits 0. Unit test in `packages/pwa`: each geometry maps to the expected dims (`cssW*dpr`); a sample `renderSplash` call returns an `ImageResponse` of exactly the requested pixel dimensions.
 - [ ] Startup-image link tags in `pwaMetadata`
