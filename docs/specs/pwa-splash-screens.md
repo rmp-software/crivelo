@@ -1,6 +1,6 @@
 ---
 slug: pwa-splash-screens
-status: planned
+status: in-review
 created: 2026-06-19
 tracker: local      # set by /breakdown-feature — linear | local
 linear_project_id:  # linear mode only
@@ -290,6 +290,6 @@ preview returns `401` to credential-less image fetches.
 - [x] crivelo-web route handler + i18n middleware exemption — PR #45
   - AC: `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (`runtime = "nodejs"`) parses `WxH` → `renderSplash(criveloPwa, …)`, 404s on malformed or over-max dimensions; `pwa-splash` added to the next-intl middleware matcher negative lookahead (alongside `icon|apple-icon|pwa-icon`).
   - Test: `next start`, then `GET /pwa-splash/1206x2622` → `200 image/png` at 1206×2622; `/pwa-splash/2622x1206` → 2622×1206; `/pwa-splash/bad` → 404; confirm responses are PNGs, not `307` redirects to `/en/...`.
-- [ ] Whole-feature verification gate
+- [x] Whole-feature verification gate — PR #46 (real-device iOS cold-start: pending human)
   - AC: `next build` green; root `<head>` contains the `apple-touch-startup-image` links for every geometry in both orientations; splash renders teal in both light and dark theme; the white Monogram is centred and legible; installed iOS PWA shows the splash on cold-start.
   - Test: `npx tsc --noEmit` + `next build` exit 0. Playwright: assert head startup-image link tags (sample incl. iPhone Air) and screenshot the route at one phone + one tablet size. Manual: install on a real iPhone, confirm the splash appears on cold-start.
