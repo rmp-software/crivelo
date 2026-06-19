@@ -25,6 +25,7 @@
  * three breakpoints, `prefers-reduced-motion` honored.
  */
 import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import { Button } from "../ui/Button";
@@ -35,10 +36,41 @@ import {
   type Recipe,
   type TimerPhase,
 } from "../../lib/four-six";
+import { IS_DEBUG_ENV } from "../../lib/debug-env";
+import { toBrewSpeed, type BrewSpeed } from "./brew-speed";
 import { Icon } from "./icons";
 import type { Breakpoint } from "./useViewport";
 
 const KEY = "coa-brew";
+
+/** localStorage key for the dev-only chosen brew speed (non-prod only). */
+const DEBUG_SPEED_KEY = "coa-debug-speed";
+
+/**
+ * The dev speed panel is code-split AND gated on a build-time-literal env check
+ * (not the `IS_DEBUG_ENV` constant, whose function-call value the bundler can't
+ * fold). Next inlines `process.env.NODE_ENV` / `NEXT_PUBLIC_*`, so on a Vercel
+ * production build this whole expression folds to `null` and the dynamic
+ * `import()` is dead-code-eliminated — the panel chunk is never emitted, fetched,
+ * or rendered. `ssr: false`: a purely client-side, non-production affordance.
+ */
+const BrewDebugPanel =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_VERCEL_ENV !== "production"
+    ? dynamic(() => import("./BrewDebugPanel").then((m) => m.BrewDebugPanel), {
+        ssr: false,
+      })
+    : null;
+
+/** Read the persisted dev speed. Pinned to real time (1×) outside debug envs. */
+function loadDebugSpeed(): BrewSpeed {
+  if (!IS_DEBUG_ENV || typeof window === "undefined") return 1;
+  try {
+    return toBrewSpeed(Number(localStorage.getItem(DEBUG_SPEED_KEY)));
+  } catch {
+    return 1;
+  }
+}
 
 /** Seconds the "Get ready" pre-roll runs before the clock starts. */
 const PREROLL = 5;
@@ -167,6 +199,12 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const [, force] = useState(0);
   const [expandDone, setExpandDone] = useState(false);
 
+  // Dev-only brew-clock multiplier (always 1× in production). It scales the live
+  // wall-clock delta below so a full brew can be exercised in seconds; recipe
+  // math and displayed times are untouched.
+  const [debugSpeed, setDebugSpeed] = useState<BrewSpeed>(loadDebugSpeed);
+  const speed = IS_DEBUG_ENV ? debugSpeed : 1;
+
   // Persist on every change.
   useEffect(() => {
     try {
@@ -182,9 +220,13 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
     return () => clearInterval(id);
   }, []);
 
+  // Seconds elapsed since a stored timestamp, scaled by the (dev) brew speed.
+  // The single funnel for every wall-clock read so acceleration is uniform.
+  const since = (ts: number) => ((Date.now() - ts) / 1000) * speed;
+
   const liveElapsed = () => {
     if (sess.status === "running" && sess.startTs != null) {
-      return (sess.base ?? 0) + (Date.now() - sess.startTs) / 1000;
+      return (sess.base ?? 0) + since(sess.startTs);
     }
     if (sess.status === "countdown") return 0;
     return sess.base ?? 0;
@@ -198,16 +240,12 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const counting = sess.status === "countdown";
   const cdLeft =
     counting && sess.cdStart != null
-      ? Math.max(0, PREROLL - (Date.now() - sess.cdStart) / 1000)
+      ? Math.max(0, PREROLL - since(sess.cdStart))
       : 0;
 
   // Auto-transition the pre-roll into the running clock at 0.
   useEffect(() => {
-    if (
-      counting &&
-      sess.cdStart != null &&
-      (Date.now() - sess.cdStart) / 1000 >= PREROLL
-    ) {
+    if (counting && sess.cdStart != null && since(sess.cdStart) >= PREROLL) {
       setSess({ status: "running", base: 0, startTs: Date.now() });
     }
   });
@@ -251,6 +289,29 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const exit = () => {
     clearBrewSession();
     onExit();
+  };
+
+  // Dev-only: change the brew speed. Rebase a running clock first — freeze the
+  // brew-seconds accumulated at the old speed into `base` and restart the delta —
+  // so the new multiplier applies going forward without a jump in the readout.
+  // `base` is computed from the updater's own `s` (not the render-closure `sess`)
+  // and the current `speed`, so a concurrent re-render can't desync the rebase.
+  const changeSpeed = (next: BrewSpeed) => {
+    setSess((s) =>
+      s.status === "running" && s.startTs != null
+        ? {
+            ...s,
+            base: (s.base ?? 0) + ((Date.now() - s.startTs) / 1000) * speed,
+            startTs: Date.now(),
+          }
+        : s,
+    );
+    setDebugSpeed(next);
+    try {
+      localStorage.setItem(DEBUG_SPEED_KEY, String(next));
+    } catch {
+      /* ignore */
+    }
   };
 
   // Ring-center status word (distinguishes pour vs draw, unlike the top pill).
@@ -324,7 +385,9 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
     action = t("drawDown");
     detail = t.rich("nextPourIn", {
       b: fg,
-      time: fmtTime(Math.ceil((cur.nextPourStart ?? recipe.removeAt) - elapsed)),
+      time: fmtTime(
+        Math.ceil((cur.nextPourStart ?? recipe.removeAt) - elapsed),
+      ),
     });
     actionTone = "text-fg-2";
   }
@@ -451,7 +514,12 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
             )}
           >
             {isDone ? (
-              <Icon name="check" size={12} className="text-success" stroke={2.6} />
+              <Icon
+                name="check"
+                size={12}
+                className="text-success"
+                stroke={2.6}
+              />
             ) : (
               <span
                 className={cn(
@@ -495,12 +563,7 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
       );
     }
     return (
-      <div
-        className={cn(
-          "flex items-center gap-3 py-1 pr-1 pl-9",
-          dim,
-        )}
-      >
+      <div className={cn("flex items-center gap-3 py-1 pr-1 pl-9", dim)}>
         <span
           className={cn(
             "h-[7px] w-[7px] shrink-0 rounded-full",
@@ -532,7 +595,12 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
           )}
         >
           {complete ? (
-            <Icon name="check" size={12} className="text-success" stroke={2.6} />
+            <Icon
+              name="check"
+              size={12}
+              className="text-success"
+              stroke={2.6}
+            />
           ) : (
             <Icon name="droplet" size={12} className="text-fg-3" />
           )}
@@ -553,9 +621,7 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   }
 
   // Done: show every phase as a static row + the completed drip finale.
-  const doneRows = phases.map((p, i) => (
-    <CompactRow key={i} p={p} st="done" />
-  ));
+  const doneRows = phases.map((p, i) => <CompactRow key={i} p={p} st="done" />);
 
   const summaryBtn =
     "my-0.5 flex w-full cursor-pointer items-center gap-2.5 rounded-sm border border-border bg-surface px-3.5 py-[11px] text-left font-body text-[13.5px] font-semibold text-fg-2 hover:bg-surface";
@@ -600,12 +666,10 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
                   stroke={2.6}
                 />
               </span>
-              <span className="flex-1">{t("stepsDone", { count: curIdx })}</span>
-              <Icon
-                name="chevR"
-                size={15}
-                className="rotate-90 text-fg-4"
-              />
+              <span className="flex-1">
+                {t("stepsDone", { count: curIdx })}
+              </span>
+              <Icon name="chevR" size={15} className="rotate-90 text-fg-4" />
             </Button>
           ))}
         <CurrentCard p={cur} />
@@ -622,278 +686,287 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   }
 
   return (
-    <main
-      // last-resort: runtime container max-width (data-driven `max`/bp).
-      style={mwVar}
-      className={cn(
-        "mx-auto box-border max-w-[var(--mw)]",
-        wide ? "px-6 pt-4 pb-[60px]" : "px-5 pt-2.5 pb-12",
+    <>
+      {BrewDebugPanel && (
+        <BrewDebugPanel speed={speed} onSpeedChange={changeSpeed} />
       )}
-    >
-      {/* top bar — back affordance + status pill */}
-      <div
+      <main
+        // last-resort: runtime container max-width (data-driven `max`/bp).
+        style={mwVar}
         className={cn(
-          "flex items-center justify-between",
-          wide ? "mb-4" : "mb-2",
+          "mx-auto box-border max-w-[var(--mw)]",
+          wide ? "px-6 pt-4 pb-[60px]" : "px-5 pt-2.5 pb-12",
         )}
       >
-        <Button
-          type="button"
-          onClick={exit}
-          className="-ml-1 inline-flex h-auto cursor-pointer items-center justify-start gap-[5px] rounded-none border-none bg-transparent px-1 py-[6px] font-body text-small font-semibold text-fg-2 hover:bg-transparent hover:text-fg-2 has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.75"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M15 5l-7 7 7 7" />
-          </svg>
-          {t("recipe")}
-        </Button>
-        <span
+        {/* top bar — back affordance + status pill */}
+        <div
           className={cn(
-            CAP,
-            "inline-flex items-center gap-[7px]",
-            done ? "text-success" : "text-fg-2",
+            "flex items-center justify-between",
+            wide ? "mb-4" : "mb-2",
           )}
         >
+          <Button
+            type="button"
+            onClick={exit}
+            className="-ml-1 inline-flex h-auto cursor-pointer items-center justify-start gap-[5px] rounded-none border-none bg-transparent px-1 py-[6px] font-body text-small font-semibold text-fg-2 hover:bg-transparent hover:text-fg-2 has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+            {t("recipe")}
+          </Button>
           <span
             className={cn(
-              "h-[7px] w-[7px] rounded-full",
-              done ? "bg-success" : paused ? "bg-fg-4" : "bg-brand",
-              !paused && !done && PULSE,
+              CAP,
+              "inline-flex items-center gap-[7px]",
+              done ? "text-success" : "text-fg-2",
             )}
-          />
-          {counting
-            ? t("getReady")
-            : done
-              ? t("done")
-              : paused
-                ? t("paused")
-                : t("brewing")}
-        </span>
-      </div>
+          >
+            <span
+              className={cn(
+                "h-[7px] w-[7px] rounded-full",
+                done ? "bg-success" : paused ? "bg-fg-4" : "bg-brand",
+                !paused && !done && PULSE,
+              )}
+            />
+            {counting
+              ? t("getReady")
+              : done
+                ? t("done")
+                : paused
+                  ? t("paused")
+                  : t("brewing")}
+          </span>
+        </div>
 
-      <div
-        className={cn(
-          "items-start",
-          wide
-            ? cn(
-                "grid gap-[52px]",
-                desktop ? "grid-cols-[340px_1fr]" : "grid-cols-[300px_1fr]",
-              )
-            : "block",
-        )}
-      >
-        <div>
-          {/* ring */}
-          <div className="flex justify-center">
-            {/* last-resort: dial box sized to the runtime ring constant SZ */}
-            <div className="relative" style={{ width: SZ, height: SZ }}>
-              <svg
-                width={SZ}
-                height={SZ}
-                viewBox={`0 0 ${SZ} ${SZ}`}
-                // last-resort: ring starts at 12 o'clock
-                style={{ transform: "rotate(-90deg)" }}
-              >
-                <circle
-                  cx={CX}
-                  cy={CX}
-                  r={R}
-                  fill="none"
-                  stroke="var(--border-strong)"
-                  strokeWidth={STROKE}
-                />
-                <circle
-                  cx={CX}
-                  cy={CX}
-                  r={R}
-                  fill="none"
-                  stroke={ringStroke}
-                  strokeWidth={STROKE}
-                  strokeLinecap="round"
-                  strokeDasharray={CIRC}
-                  className="transition-[stroke-dashoffset] duration-[250ms] ease-linear motion-reduce:transition-none"
-                  // last-resort: live ring fill — runtime strokeDashoffset
-                  strokeDashoffset={CIRC * (1 - progress)}
-                />
-                {!counting &&
-                  pourTicks.map((tick, i) => {
-                    const a = tick * 2 * Math.PI;
-                    const dx = CX + Math.cos(a) * R;
-                    const dy = CX + Math.sin(a) * R;
-                    const passed = progress >= tick - 0.002;
-                    return (
-                      <circle
-                        key={i}
-                        cx={dx}
-                        cy={dy}
-                        r={3.4}
-                        fill={passed ? ringStroke : "var(--surface-raised)"}
-                        stroke={passed ? ringStroke : "var(--border-strong)"}
-                        strokeWidth="1.5"
-                      />
-                    );
-                  })}
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span
-                  className={cn(
-                    CAP,
-                    "mb-2 inline-flex items-center gap-1.5",
-                    statusTone,
-                  )}
+        <div
+          className={cn(
+            "items-start",
+            wide
+              ? cn(
+                  "grid gap-[52px]",
+                  desktop ? "grid-cols-[340px_1fr]" : "grid-cols-[300px_1fr]",
+                )
+              : "block",
+          )}
+        >
+          <div>
+            {/* ring */}
+            <div className="flex justify-center">
+              {/* last-resort: dial box sized to the runtime ring constant SZ */}
+              <div className="relative" style={{ width: SZ, height: SZ }}>
+                <svg
+                  width={SZ}
+                  height={SZ}
+                  viewBox={`0 0 ${SZ} ${SZ}`}
+                  // last-resort: ring starts at 12 o'clock
+                  style={{ transform: "rotate(-90deg)" }}
                 >
+                  <circle
+                    cx={CX}
+                    cy={CX}
+                    r={R}
+                    fill="none"
+                    stroke="var(--border-strong)"
+                    strokeWidth={STROKE}
+                  />
+                  <circle
+                    cx={CX}
+                    cy={CX}
+                    r={R}
+                    fill="none"
+                    stroke={ringStroke}
+                    strokeWidth={STROKE}
+                    strokeLinecap="round"
+                    strokeDasharray={CIRC}
+                    className="transition-[stroke-dashoffset] duration-[250ms] ease-linear motion-reduce:transition-none"
+                    // last-resort: live ring fill — runtime strokeDashoffset
+                    strokeDashoffset={CIRC * (1 - progress)}
+                  />
+                  {!counting &&
+                    pourTicks.map((tick, i) => {
+                      const a = tick * 2 * Math.PI;
+                      const dx = CX + Math.cos(a) * R;
+                      const dy = CX + Math.sin(a) * R;
+                      const passed = progress >= tick - 0.002;
+                      return (
+                        <circle
+                          key={i}
+                          cx={dx}
+                          cy={dy}
+                          r={3.4}
+                          fill={passed ? ringStroke : "var(--surface-raised)"}
+                          stroke={passed ? ringStroke : "var(--border-strong)"}
+                          strokeWidth="1.5"
+                        />
+                      );
+                    })}
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                   <span
                     className={cn(
-                      "h-1.5 w-1.5 rounded-full",
-                      dotTone,
-                      !paused && !done && PULSE,
+                      CAP,
+                      "mb-2 inline-flex items-center gap-1.5",
+                      statusTone,
                     )}
-                  />
-                  {statusWord}
-                </span>
-                <span
-                  className={cn(
-                    MONO,
-                    "font-semibold leading-[0.92] tracking-[-0.02em]",
-                    wide ? "text-[60px]" : "text-[52px]",
-                    counting ? "text-accent-ink" : "text-fg",
-                  )}
-                >
-                  {counting ? Math.ceil(cdLeft) : fmtMMSS(elapsed)}
-                </span>
-                <span
-                  className={cn(
-                    MONO,
-                    "mt-2 text-[13px] font-semibold text-fg-4",
-                  )}
-                >
-                  {counting ? t("getSet") : t("ofTotal", { time: recipe.totalTime })}
-                </span>
+                  >
+                    <span
+                      className={cn(
+                        "h-1.5 w-1.5 rounded-full",
+                        dotTone,
+                        !paused && !done && PULSE,
+                      )}
+                    />
+                    {statusWord}
+                  </span>
+                  <span
+                    className={cn(
+                      MONO,
+                      "font-semibold leading-[0.92] tracking-[-0.02em]",
+                      wide ? "text-[60px]" : "text-[52px]",
+                      counting ? "text-accent-ink" : "text-fg",
+                    )}
+                  >
+                    {counting ? Math.ceil(cdLeft) : fmtMMSS(elapsed)}
+                  </span>
+                  <span
+                    className={cn(
+                      MONO,
+                      "mt-2 text-[13px] font-semibold text-fg-4",
+                    )}
+                  >
+                    {counting
+                      ? t("getSet")
+                      : t("ofTotal", { time: recipe.totalTime })}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* action + detail */}
-          <div className="mt-4 min-h-[50px] text-center">
-            <div
-              className={cn(
-                "font-display text-[22px] font-bold tracking-[-0.01em]",
-                actionTone,
-              )}
-            >
-              {action}
+            {/* action + detail */}
+            <div className="mt-4 min-h-[50px] text-center">
+              <div
+                className={cn(
+                  "font-display text-[22px] font-bold tracking-[-0.01em]",
+                  actionTone,
+                )}
+              >
+                {action}
+              </div>
+              <div
+                className={cn(MONO, "mt-1 text-small font-semibold text-fg-3")}
+              >
+                {detail}
+              </div>
             </div>
-            <div className={cn(MONO, "mt-1 text-small font-semibold text-fg-3")}>
-              {detail}
-            </div>
-          </div>
 
-          {/* controls */}
-          {counting ? (
-            <div className="mt-[22px]">
-              <Button
-                type="button"
-                onClick={startNow}
-                className={cn(
-                  CTA_BASE,
-                  CTA_SOLID,
-                  "[&_svg:not([class*='size-'])]:size-[17px]",
-                )}
-              >
-                <Icon name="play" size={17} className="text-white" />{" "}
-                {t("startNow")}
-              </Button>
-            </div>
-          ) : done ? (
-            <div className="mt-[22px] flex flex-col gap-2.5">
-              <Button
-                type="button"
-                onClick={restart}
-                className={cn(
-                  CTA_BASE,
-                  CTA_SOLID,
-                  "[&_svg:not([class*='size-'])]:size-[17px]",
-                )}
-              >
-                <Icon name="play" size={17} className="text-white" />{" "}
-                {t("brewAgain")}
-              </Button>
-              <Button
-                type="button"
-                onClick={exit}
-                className={cn(CTA_BASE, CTA_OUTLINE)}
-              >
-                {t("backToRecipe")}
-              </Button>
-            </div>
-          ) : (
-            <div className="mt-[22px] flex gap-2.5">
-              <Button
-                type="button"
-                onClick={paused ? resume : pause}
-                className={cn(
-                  CTA_BASE,
-                  paused ? CTA_SOLID : CTA_OUTLINE,
-                  "flex-1 [&_svg:not([class*='size-'])]:size-[17px]",
-                )}
-              >
-                {paused ? (
-                  <>
-                    <Icon name="play" size={17} className="text-white" />{" "}
-                    {t("resume")}
-                  </>
-                ) : (
-                  t("pause")
-                )}
-              </Button>
-              <Button
-                type="button"
-                onClick={restart}
-                aria-label={t("restartAria")}
-                className="flex h-[54px] w-[54px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-border-strong bg-surface p-0 text-fg-2 hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-5"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+            {/* controls */}
+            {counting ? (
+              <div className="mt-[22px]">
+                <Button
+                  type="button"
+                  onClick={startNow}
+                  className={cn(
+                    CTA_BASE,
+                    CTA_SOLID,
+                    "[&_svg:not([class*='size-'])]:size-[17px]",
+                  )}
                 >
-                  <path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" />
-                  <path d="M3 4v4h4" />
-                </svg>
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* recipe list */}
-        <div className={wide ? "mt-1" : "mt-7"}>
-          <div className="mb-3.5 flex items-center justify-between">
-            <span className={cn(CAP, "text-fg-3")}>{t("recipe")}</span>
-            <span className={cn(MONO, "text-[12px] font-semibold text-fg-3")}>
-              {done
-                ? t("finished")
-                : t("stepCounter", { n: stepNo, total: stepCount })}
-            </span>
+                  <Icon name="play" size={17} className="text-white" />{" "}
+                  {t("startNow")}
+                </Button>
+              </div>
+            ) : done ? (
+              <div className="mt-[22px] flex flex-col gap-2.5">
+                <Button
+                  type="button"
+                  onClick={restart}
+                  className={cn(
+                    CTA_BASE,
+                    CTA_SOLID,
+                    "[&_svg:not([class*='size-'])]:size-[17px]",
+                  )}
+                >
+                  <Icon name="play" size={17} className="text-white" />{" "}
+                  {t("brewAgain")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={exit}
+                  className={cn(CTA_BASE, CTA_OUTLINE)}
+                >
+                  {t("backToRecipe")}
+                </Button>
+              </div>
+            ) : (
+              <div className="mt-[22px] flex gap-2.5">
+                <Button
+                  type="button"
+                  onClick={paused ? resume : pause}
+                  className={cn(
+                    CTA_BASE,
+                    paused ? CTA_SOLID : CTA_OUTLINE,
+                    "flex-1 [&_svg:not([class*='size-'])]:size-[17px]",
+                  )}
+                >
+                  {paused ? (
+                    <>
+                      <Icon name="play" size={17} className="text-white" />{" "}
+                      {t("resume")}
+                    </>
+                  ) : (
+                    t("pause")
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={restart}
+                  aria-label={t("restartAria")}
+                  className="flex h-[54px] w-[54px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-border-strong bg-surface p-0 text-fg-2 hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-5"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.7L3 8" />
+                    <path d="M3 4v4h4" />
+                  </svg>
+                </Button>
+              </div>
+            )}
           </div>
-          <div className="flex flex-col gap-1">{listInner()}</div>
+
+          {/* recipe list */}
+          <div className={wide ? "mt-1" : "mt-7"}>
+            <div className="mb-3.5 flex items-center justify-between">
+              <span className={cn(CAP, "text-fg-3")}>{t("recipe")}</span>
+              <span className={cn(MONO, "text-[12px] font-semibold text-fg-3")}>
+                {done
+                  ? t("finished")
+                  : t("stepCounter", { n: stepNo, total: stepCount })}
+              </span>
+            </div>
+            <div className="flex flex-col gap-1">{listInner()}</div>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
