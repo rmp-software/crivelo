@@ -108,6 +108,23 @@
     "restartAria": "Reiniciar preparo",
     "brewAgain": "Preparar de novo",
     "backToRecipe": "Voltar à receita",
-    "totalTime": "Tempo total {time}"
+    "totalTime": "Tempo total {time}",
+    "saveRecipe": "Salvar receita"
+  },
+  "SaveRecipe": {
+    "title": "Salvar esta receita",
+    "subtitle": "Guarde este preparo para repetir depois.",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Dê um nome à receita",
+    "beanLabel": "Grão",
+    "beanPlaceholder": "Qual café você usou?",
+    "grindLabel": "Moagem",
+    "grindPlaceholder": "Seu ajuste de moagem",
+    "ratingLabel": "Nota",
+    "ratingStar": "{n, plural, one {# estrela} other {# estrelas}}",
+    "save": "Salvar receita",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "savedToast": "Receita salva"
   }
 }

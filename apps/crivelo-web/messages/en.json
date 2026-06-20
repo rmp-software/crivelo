@@ -108,6 +108,23 @@
     "restartAria": "Restart brew",
     "brewAgain": "Brew again",
     "backToRecipe": "Back to recipe",
-    "totalTime": "Total {time}"
+    "totalTime": "Total {time}",
+    "saveRecipe": "Save recipe"
+  },
+  "SaveRecipe": {
+    "title": "Save this recipe",
+    "subtitle": "Keep this brew to make it again later.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name this recipe",
+    "beanLabel": "Bean",
+    "beanPlaceholder": "Which coffee did you use?",
+    "grindLabel": "Grind size",
+    "grindPlaceholder": "Your grinder setting",
+    "ratingLabel": "Rating",
+    "ratingStar": "{n, plural, one {# star} other {# stars}}",
+    "save": "Save recipe",
+    "cancel": "Cancel",
+    "close": "Close",
+    "savedToast": "Recipe saved"
   }
 }

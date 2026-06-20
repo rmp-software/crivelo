@@ -101,6 +101,7 @@ export function BrewView() {
     <BrewTimer
       key={query}
       recipe={recipe}
+      params={params}
       query={query}
       autostart={autostart}
       onExit={() => router.push("/")}
