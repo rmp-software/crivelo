@@ -110,10 +110,17 @@ const CTA_SOLID = "bg-brand text-white border-none shadow-1 hover:bg-brand";
 const CTA_OUTLINE =
   "bg-transparent text-fg border border-border-strong shadow-none hover:bg-transparent hover:text-fg";
 
-type Status = "countdown" | "running" | "paused" | "done";
+type Status = "ready" | "countdown" | "running" | "paused" | "done";
 
 interface Session {
   status: Status;
+  /**
+   * Canonical recipe-params query stamp (`recipeParamsToQuery` output) this
+   * session was started for. The brew route resets a session whose stamp doesn't
+   * match the incoming URL params, so starting a brew with new params never
+   * resumes a previous brew's timer; a same-params reload resumes it.
+   */
+  params?: string;
   /** Frozen elapsed seconds (paused/done) or the running baseline. */
   base?: number;
   /** Wall-clock ms when the running clock last started; null when not running. */
@@ -135,7 +142,8 @@ function loadSession(): Session | null {
     if (
       !s ||
       typeof s !== "object" ||
-      (s.status !== "countdown" &&
+      (s.status !== "ready" &&
+        s.status !== "countdown" &&
         s.status !== "running" &&
         s.status !== "paused" &&
         s.status !== "done")
@@ -149,15 +157,16 @@ function loadSession(): Session | null {
 }
 
 /**
- * Discard any persisted brew session. Call when starting a brand-new brew so a
- * stale session left behind by a previous, abandoned brew can't auto-resume
- * (which would skip the "Get ready" pre-roll and drop the user mid-brew).
+ * Discard any persisted brew session. Used on exit (leaving the brew route) so a
+ * completed/abandoned brew doesn't linger, and as the underlying primitive for
+ * the params-change reset below.
  *
- * The persisted session exists for resume-on-reload (a phone propped on the
- * counter), but that path is not wired today: `CoaCalculator`'s `view` resets to
- * "idle" on every load, so this timer only ever mounts via "Begin brew". Until a
- * future change reopens an active brew on reload, the only consumer of a stale
- * session is the "Begin brew" button — which must start fresh, hence this clear.
+ * Resume-on-reload is now wired via the route: the `/brew` page mounts this timer
+ * directly, and a same-params reload mid-brew resumes the persisted session (a
+ * phone propped on the counter). The reset that prevents resuming a *different*
+ * brew's timer is driven by the params stamp in `resolveSession`, not by this
+ * clear — starting a brew with new URL params lands a fresh session because its
+ * stamp won't match the stale one.
  */
 export function clearBrewSession(): void {
   try {
@@ -167,34 +176,72 @@ export function clearBrewSession(): void {
   }
 }
 
-export interface BrewTimerProps {
-  recipe: Recipe;
-  onExit: () => void;
-  bp?: Breakpoint;
-  /**
-   * Container max-width the idle calculator uses for its wide layout. Accepted
-   * for API parity with `CoaCalculator`'s call site, but the timer caps its own
-   * two-column container narrower (700 tablet / 1000 desktop) so the brew flow
-   * reads as a focused, centred panel rather than a full-bleed calculator — the
-   * locked prototype's intent.
-   */
-  max?: number;
+/** A session that is mid-brew — the only kind worth resuming on re-entry. */
+function isInProgress(status: Status): boolean {
+  return status === "countdown" || status === "running" || status === "paused";
 }
 
-// `max` is part of BrewTimerProps for call-site parity with CoaCalculator but is
-// intentionally not destructured here: the timer caps its own wide container.
-export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
+/**
+ * Resolve the session to open with, given the route's canonical params `query`
+ * and the `autostart` flag. Resume the persisted session ONLY when its params
+ * stamp matches the incoming query AND it is still mid-brew (`countdown` /
+ * `running` / `paused`) — an accidental reload of a live brew. A stamped session
+ * that is `done` or `ready` is NOT resumed even on matching params: tapping
+ * "Begin brew" again must start fresh, honoring the incoming `autostart`, not
+ * remount onto the done/ready screen. Otherwise start fresh — `countdown`
+ * (pre-roll on load) when `autostart`, else the `ready` pre-state. Every fresh
+ * session is stamped with `query` so the next mount can tell "same brew" from
+ * "new params". Pure but reads localStorage.
+ */
+function resolveSession(query: string, autostart: boolean): Session {
+  const prev = loadSession();
+  if (prev && prev.params === query && isInProgress(prev.status)) return prev;
+  return autostart
+    ? { status: "countdown", cdStart: Date.now(), params: query }
+    : { status: "ready", params: query };
+}
+
+export interface BrewTimerProps {
+  recipe: Recipe;
+  /**
+   * Canonical recipe-params query (`recipeParamsToQuery` output) the brew route
+   * derived `recipe` from. Stamped onto the persisted session so a same-params
+   * reload resumes and a different-params entry resets (never resuming a previous
+   * brew's timer).
+   */
+  query: string;
+  /**
+   * `true` (URL `autostart=1`, from "Begin brew") starts the pre-roll countdown
+   * on load; `false` (URL `autostart=0`, from a "Brew again") lands in the
+   * "ready" state until the user taps Start. Only decides the *fresh* session's
+   * initial status — a matching-params resume keeps its persisted status.
+   */
+  autostart: boolean;
+  /** Leave the brew route (back to the idle calculator). Clears the session. */
+  onExit: () => void;
+  bp?: Breakpoint;
+}
+
+export function BrewTimer({
+  recipe,
+  query,
+  autostart,
+  onExit,
+  bp = "mobile",
+}: BrewTimerProps) {
   const t = useTranslations("BrewTimer");
   const tCalc = useTranslations("Calculator");
   const tSchedule = useTranslations("Schedule");
   const wide = bp !== "mobile";
   const desktop = bp === "desktop";
 
-  // Resume any persisted session synchronously, else open in the pre-roll.
-  // BrewTimer only mounts client-side (behind "Begin brew"), so reading
-  // localStorage in the initializer is safe (no SSR/hydration concern).
-  const [sess, setSess] = useState<Session>(
-    () => loadSession() || { status: "countdown", cdStart: Date.now() },
+  // Resolve the opening session from the route's params + autostart: resume a
+  // same-params session (accidental reload), else start fresh (pre-roll on
+  // autostart, otherwise the "ready" pre-state). BrewTimer only mounts
+  // client-side, so reading localStorage in the initializer is safe (no
+  // SSR/hydration concern).
+  const [sess, setSess] = useState<Session>(() =>
+    resolveSession(query, autostart),
   );
   const [, force] = useState(0);
   const [expandDone, setExpandDone] = useState(false);
@@ -243,17 +290,18 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
       ? Math.max(0, PREROLL - since(sess.cdStart))
       : 0;
 
-  // Auto-transition the pre-roll into the running clock at 0.
+  // Auto-transition the pre-roll into the running clock at 0. Keeps the params
+  // stamp so a reload through running still resumes (no reset).
   useEffect(() => {
     if (counting && sess.cdStart != null && since(sess.cdStart) >= PREROLL) {
-      setSess({ status: "running", base: 0, startTs: Date.now() });
+      setSess((s) => ({ ...s, status: "running", base: 0, startTs: Date.now() }));
     }
   });
 
   // Flip a running session to done once it crosses removeAt.
   useEffect(() => {
     if (sess.status === "running" && liveElapsed() >= recipe.removeAt) {
-      setSess({ status: "done", base: recipe.removeAt, startTs: null });
+      setSess((s) => ({ ...s, status: "done", base: recipe.removeAt, startTs: null }));
     }
   });
 
@@ -261,10 +309,12 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const phases = buildPhases(recipe);
   const done = sess.status === "done" || finished;
   const paused = sess.status === "paused";
+  // The "ready" pre-state (autostart=0): nothing runs until Start is tapped.
+  const ready = sess.status === "ready";
   let curIdx = phases.findIndex((p) => elapsed < p.end);
   if (curIdx === -1) curIdx = phases.length - 1;
   const cur = phases[curIdx];
-  const pourPhase = !done && !counting && cur.kind === "pour";
+  const pourPhase = !done && !counting && !ready && cur.kind === "pour";
 
   // Ring geometry (runtime constants → inline style bridges only).
   const SZ = wide ? 272 : 236;
@@ -272,20 +322,31 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   const R = SZ / 2 - STROKE / 2 - 13;
   const CX = SZ / 2;
   const CIRC = 2 * Math.PI * R;
-  const progress = counting
-    ? clamp(cdLeft / PREROLL, 0, 1)
-    : clamp(elapsed / recipe.removeAt, 0, 1);
+  const progress =
+    counting || ready
+      ? // Ready + the pre-roll's first frame both show a full ring (it depletes
+        // once the countdown starts).
+        ready
+        ? 1
+        : clamp(cdLeft / PREROLL, 0, 1)
+      : clamp(elapsed / recipe.removeAt, 0, 1);
   const ringStroke = done ? "var(--success)" : "var(--brand)";
   const pourTicks = recipe.steps.map((s) => s.t / recipe.removeAt);
 
-  // Controls.
+  // Controls. Every fresh-session transition re-stamps `query` so a reload after
+  // it still resumes (a stamp drop would look like new params and reset).
   const pause = () =>
-    setSess({ status: "paused", base: liveElapsed(), startTs: null });
+    setSess((s) => ({ ...s, status: "paused", base: liveElapsed(), startTs: null }));
   const resume = () =>
     setSess((s) => ({ ...s, status: "running", startTs: Date.now() }));
-  const restart = () => setSess({ status: "countdown", cdStart: Date.now() });
+  // Start (from the "ready" pre-state) enters the existing countdown → running
+  // flow — the pre-roll, identical to an autostart entry.
+  const start = () =>
+    setSess({ status: "countdown", cdStart: Date.now(), params: query });
+  const restart = () =>
+    setSess({ status: "countdown", cdStart: Date.now(), params: query });
   const startNow = () =>
-    setSess({ status: "running", base: 0, startTs: Date.now() });
+    setSess({ status: "running", base: 0, startTs: Date.now(), params: query });
   const exit = () => {
     clearBrewSession();
     onExit();
@@ -315,34 +376,37 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   };
 
   // Ring-center status word (distinguishes pour vs draw, unlike the top pill).
-  const statusWord = counting
-    ? t("getReady")
-    : done
-      ? t("complete")
-      : paused
-        ? t("paused")
-        : pourPhase
-          ? t("pouring")
-          : t("drawDown");
-  const statusTone = counting
-    ? "text-accent-ink"
-    : done
-      ? "text-success"
-      : paused
-        ? "text-fg-3"
-        : pourPhase
-          ? "text-accent-ink"
-          : "text-fg-3";
+  const statusWord =
+    ready || counting
+      ? t("getReady")
+      : done
+        ? t("complete")
+        : paused
+          ? t("paused")
+          : pourPhase
+            ? t("pouring")
+            : t("drawDown");
+  const statusTone =
+    ready || counting
+      ? "text-accent-ink"
+      : done
+        ? "text-success"
+        : paused
+          ? "text-fg-3"
+          : pourPhase
+            ? "text-accent-ink"
+            : "text-fg-3";
   // The pulsing status dot rides currentColor so it tracks the status tone.
-  const dotTone = counting
-    ? "bg-accent-ink"
-    : done
-      ? "bg-success"
-      : paused
-        ? "bg-fg-3"
-        : pourPhase
-          ? "bg-accent-ink"
-          : "bg-fg-3";
+  const dotTone =
+    ready || counting
+      ? "bg-accent-ink"
+      : done
+        ? "bg-success"
+        : paused
+          ? "bg-fg-3"
+          : pourPhase
+            ? "bg-accent-ink"
+            : "bg-fg-3";
 
   // Bold "what now" + a mono detail under the ring.
   // Rich-text emphasis renders via t.rich; emphasized values get a colored span.
@@ -354,7 +418,11 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
   let action: ReactNode;
   let detail: ReactNode;
   let actionTone: string;
-  if (counting) {
+  if (ready) {
+    action = t("readyTitle");
+    detail = t("readyHint");
+    actionTone = "text-accent-ink";
+  } else if (counting) {
     action = t("getReady");
     detail = t("brewStartsIn", { n: Math.ceil(cdLeft) });
     actionTone = "text-accent-ink";
@@ -735,17 +803,19 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
             <span
               className={cn(
                 "h-[7px] w-[7px] rounded-full",
-                done ? "bg-success" : paused ? "bg-fg-4" : "bg-brand",
-                !paused && !done && PULSE,
+                done ? "bg-success" : paused || ready ? "bg-fg-4" : "bg-brand",
+                !paused && !done && !ready && PULSE,
               )}
             />
-            {counting
-              ? t("getReady")
-              : done
-                ? t("done")
-                : paused
-                  ? t("paused")
-                  : t("brewing")}
+            {ready
+              ? t("readyTitle")
+              : counting
+                ? t("getReady")
+                : done
+                  ? t("done")
+                  : paused
+                    ? t("paused")
+                    : t("brewing")}
           </span>
         </div>
 
@@ -824,7 +894,7 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
                       className={cn(
                         "h-1.5 w-1.5 rounded-full",
                         dotTone,
-                        !paused && !done && PULSE,
+                        !paused && !done && !ready && PULSE,
                       )}
                     />
                     {statusWord}
@@ -834,10 +904,18 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
                       MONO,
                       "font-semibold leading-[0.92] tracking-[-0.02em]",
                       wide ? "text-[60px]" : "text-[52px]",
-                      counting ? "text-accent-ink" : "text-fg",
+                      counting || ready ? "text-accent-ink" : "text-fg",
                     )}
                   >
-                    {counting ? Math.ceil(cdLeft) : fmtMMSS(elapsed)}
+                    {/* `ready` is a non-running state: instead of a meaningless
+                        00:00 running clock, the center previews the planned total
+                        brew duration. countdown shows the seconds left; otherwise
+                        the live elapsed clock. */}
+                    {ready
+                      ? recipe.totalTime
+                      : counting
+                        ? Math.ceil(cdLeft)
+                        : fmtMMSS(elapsed)}
                   </span>
                   <span
                     className={cn(
@@ -845,9 +923,13 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
                       "mt-2 text-[13px] font-semibold text-fg-4",
                     )}
                   >
-                    {counting
-                      ? t("getSet")
-                      : t("ofTotal", { time: recipe.totalTime })}
+                    {/* No "of {total}" before the brew starts — in `ready` the
+                        center IS the total, so the subtext labels it instead. */}
+                    {ready
+                      ? t("totalLabel")
+                      : counting
+                        ? t("getSet")
+                        : t("ofTotal", { time: recipe.totalTime })}
                   </span>
                 </div>
               </div>
@@ -871,7 +953,22 @@ export function BrewTimer({ recipe, onExit, bp = "mobile" }: BrewTimerProps) {
             </div>
 
             {/* controls */}
-            {counting ? (
+            {ready ? (
+              <div className="mt-[22px]">
+                <Button
+                  type="button"
+                  onClick={start}
+                  className={cn(
+                    CTA_BASE,
+                    CTA_SOLID,
+                    "[&_svg:not([class*='size-'])]:size-[17px]",
+                  )}
+                >
+                  <Icon name="play" size={17} className="text-white" />{" "}
+                  {t("start")}
+                </Button>
+              </div>
+            ) : counting ? (
               <div className="mt-[22px]">
                 <Button
                   type="button"

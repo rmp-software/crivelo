@@ -19,6 +19,7 @@ export { PourSchedule } from "./PourSchedule";
 export type { PourScheduleProps } from "./PourSchedule";
 export { BrewTimer } from "./BrewTimer";
 export type { BrewTimerProps } from "./BrewTimer";
+export { BrewView } from "./BrewView";
 export { useRecipe } from "./useRecipe";
 export type { UseRecipe, RecipeInit } from "./useRecipe";
 export { useViewport } from "./useViewport";
