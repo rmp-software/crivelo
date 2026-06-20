@@ -11,6 +11,8 @@ Spec: `docs/specs/pwa-add-to-home-screen.md`. First consumer: `apps/crivelo-web`
 - `index.ts` — `PwaConfig` type + barrel. Read its header for the design rationale.
 - `manifest.ts` — `createManifest(cfg)` → `MetadataRoute.Manifest`.
 - `icon.tsx` — `renderIcon(cfg, {size, rounded, maskable})` → `ImageResponse`. The one tile renderer.
+- `splash.tsx` — `renderSplash(cfg, {width, height})` → `ImageResponse` (the splash renderer) **and** `createSplashRoute(cfg)` → `{ GET }`, the factory that owns the `pwa-splash/[size]` route logic (size parsing + max-dimension guard) so the app wrapper is a one-liner.
+- `devices.ts` — `splashDevices` (the unique-geometry Apple matrix) + `DEFAULT_SPLASH_BASE_PATH`.
 - `metadata.ts` — `pwaMetadata(cfg)` / `pwaViewport(cfg)` → layout fragments.
 
 The package owns the **logic**; App-Router convention files (`manifest.ts`,
@@ -21,9 +23,18 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
 ## Adding this to a new app (checklist)
 1. Add dep `"@crivelo/pwa": "workspace:*"` and add `"@crivelo/pwa"` to `next.config` **`transpilePackages`**.
 2. Create `app/pwa.config.tsx`: export a `PwaConfig` with the app's name/colours and a `mark` glyph.
-3. Add the four wrapper files (copy crivelo-web's; they're ~5 lines each):
-   `app/manifest.ts`, `app/icon.tsx`, `app/apple-icon.tsx`, `app/pwa-icon/[variant]/route.tsx`.
+3. Add the wrapper files (copy crivelo-web's; they're ~5 lines each):
+   `app/manifest.ts`, `app/icon.tsx`, `app/apple-icon.tsx`, `app/pwa-icon/[variant]/route.tsx`,
+   `app/pwa-splash/[size]/route.tsx`.
+   The splash route is now a one-line factory — the package owns the size-parsing +
+   bounds-guard logic, so the wrapper is just:
+   ```tsx
+   export const runtime = "nodejs";
+   export const { GET } = createSplashRoute(cfg);
+   ```
+   The `[size]` segment must be named `size` (the factory reads `params.size`).
 4. In the root layout: merge `pwaMetadata(cfg)` into `metadata` (+ `manifest: "/manifest.webmanifest"`) and `export const viewport = pwaViewport(cfg)`.
+5. Add `pwa-splash` (alongside `icon|apple-icon|pwa-icon`) to the i18n middleware matcher negative lookahead — see the gotcha below.
 
 ## Gotchas (these bite)
 - **next-intl middleware 307s the icon routes.** If the app uses i18n middleware,
