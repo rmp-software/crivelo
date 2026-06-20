@@ -60,7 +60,7 @@ export interface PwaConfig {
 
 export { createManifest } from "./manifest";
 export { renderIcon } from "./icon";
-export { renderSplash } from "./splash";
+export { renderSplash, createSplashRoute } from "./splash";
 export { splashDevices, DEFAULT_SPLASH_BASE_PATH } from "./devices";
 export type { SplashDevice } from "./devices";
 export { pwaMetadata, pwaViewport } from "./metadata";
