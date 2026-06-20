@@ -175,7 +175,7 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
   - AC: Reaching "done" writes `coa-last-brew` with the brew's params without any prompt; a "Save recipe" form (`@crivelo/ui` Dialog/Sheet) with name (required, default-filled), bean (optional), grind size (optional), rating (optional ★ 1–5) appends to `coa-recipes` and shows a success toast; dismissing the offer adds nothing but `coa-last-brew` still reflects the brew.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Run a brew to done (dev speed debugger) → devtools shows `coa-last-brew` written. 3. Tap "Save recipe", fill name + optional fields, confirm → new `coa-recipes` entry + success toast. 4. Dismiss without saving → no `coa-recipes` entry, `coa-last-brew` still set. 5. Playwright check on mobile + desktop.
 
-- [ ] Calculator URL pre-fill + home last-brew card + saved-recipes entry
+- [~] Calculator URL pre-fill + home last-brew card + saved-recipes entry
   - AC: The calculator seeds `useRecipe` from `dose/ratio/acidity/strength` query params on mount (Edit lands here); the home screen shows a "Last brew" card (params summary, "Brew again" → `/brew?…&autostart=0`, "Edit" → `/?…`) only when `coa-last-brew` exists; a "Saved recipes →" entry point navigates to `/[locale]/recipes`.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]?dose=25&ratio=16&acidity=0.5&strength=2` → calculator inputs reflect those values. 3. With `coa-last-brew` seeded, home shows the card; "Brew again" → `/brew?…&autostart=0`, "Edit" → calculator pre-filled. 4. "Saved recipes →" navigates to `/[locale]/recipes`. 5. Playwright check on mobile + desktop.
 
