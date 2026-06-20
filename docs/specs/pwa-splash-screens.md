@@ -260,9 +260,10 @@ PNGs.
   is teal regardless of theme.
 - [ ] Given crivelo-web's i18n middleware, when `/pwa-splash/<W>x<H>` is requested,
   then it returns the PNG directly (not a `307` redirect to `/en/...`).
-- [ ] Given an installed iOS PWA launched from the home screen, when it cold-starts,
+- [x] Given an installed iOS PWA launched from the home screen, when it cold-starts,
   then the teal splash with the white Monogram displays before first paint
-  (manual real-device verification, per the UI-change rule).
+  (confirmed on a real iPhone Pro — required re-adding the legacy
+  `apple-mobile-web-app-capable` meta that Next 15 drops; see Gotchas).
 - [ ] Given any app that supplies a `PwaConfig`, when it adds the
   `pwa-splash/[size]` wrapper + the matcher exemption, then it inherits
   startup-image generation with no other per-app logic (portability check —
@@ -301,7 +302,8 @@ preview returns `401` to credential-less image fetches.
 - [x] crivelo-web route handler + i18n middleware exemption — PR #45
   - AC: `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (`runtime = "nodejs"`) parses `WxH` → `renderSplash(criveloPwa, …)`, 404s on malformed or over-max dimensions; `pwa-splash` added to the next-intl middleware matcher negative lookahead (alongside `icon|apple-icon|pwa-icon`).
   - Test: `next start`, then `GET /pwa-splash/1206x2622` → `200 image/png` at 1206×2622; `/pwa-splash/2622x1206` → 2622×1206; `/pwa-splash/bad` → 404; confirm responses are PNGs, not `307` redirects to `/en/...`.
-- [x] Whole-feature verification gate — PR #46 (real-device iOS cold-start: pending human)
+- [x] Whole-feature verification gate — PR #46
 - [x] Route-handler factory (`createSplashRoute`, no per-app size logic) — PR #48
+- [x] Fix: re-add `apple-mobile-web-app-capable` meta (Next 15 dropped it; iOS needs it) — PR #49. **Confirmed working on a real iPhone Pro.**
   - AC: `next build` green; root `<head>` contains the `apple-touch-startup-image` links for every geometry in both orientations; splash renders teal in both light and dark theme; the white Monogram is centred and legible; installed iOS PWA shows the splash on cold-start.
   - Test: `npx tsc --noEmit` + `next build` exit 0. Playwright: assert head startup-image link tags (sample incl. iPhone Air) and screenshot the route at one phone + one tablet size. Manual: install on a real iPhone, confirm the splash appears on cold-start.

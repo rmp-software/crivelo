@@ -45,6 +45,15 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
 - **Satori (next/og) can't resolve CSS variables or external fonts.** The `mark`
   callback gets a concrete hex `color` — use literal colours in the glyph SVG, never `var(--brand)`.
 - **`pwa-icon/[variant]` route needs `export const runtime = "nodejs"`** for reliable `ImageResponse` under Next 14.
+- **iOS splash needs the legacy `apple-mobile-web-app-capable` meta — Next 15 drops it.** iOS
+  only shows `apple-touch-startup-image` when `<meta name="apple-mobile-web-app-capable" content="yes">`
+  is present; `display: standalone` + the modern `mobile-web-app-capable` do NOT trigger it. Next 15
+  (vercel/next.js#70363) emits only `mobile-web-app-capable` from `appleWebApp.capable`, so the splash
+  silently never shows on a real install. `pwaMetadata` re-adds it via `metadata.other` — don't remove
+  it. Two more iOS catches: the startup image must EXACTLY match the device geometry (it's a hard
+  pixel match — a device missing from `splashDevices` gets a blank splash, not a fallback), and iOS
+  reads all this **at "Add to Home Screen" time**, so after any change you must DELETE and re-add the
+  home-screen icon to re-test (a stale install keeps the old head). Only validatable on a real device.
 
 ## Verify
 `tsc --noEmit` + `next build`, then `next start` and check: `GET /manifest.webmanifest`
