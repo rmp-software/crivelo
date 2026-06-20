@@ -167,7 +167,7 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
   - AC: A typed `lib/recipes-store.ts` wraps `coa-last-brew` (single slot) and `coa-recipes` (array) with SSR guards and safe JSON parsing; a param helper parses recipe params from a URL query and clamps/falls back out-of-range or missing values to the calculator defaults (dose 20, ratio 15, acidity 0, strength 3).
   - Test: 1. `npx tsc --noEmit` exits 0. 2. In devtools console, exercise the store helpers — adding a recipe round-trips through `coa-recipes`, delete removes it, and `coa-last-brew` read/write round-trips. 3. The param helper clamps `?dose=999` to 60 and returns defaults for a missing/garbage query.
 
-- [ ] Brew route + URL params + autostart/ready state + session reset
+- [~] Brew route + URL params + autostart/ready state + session reset
   - AC: `BrewTimer` moves to its own route `/[locale]/brew` driven by the URL; "Begin brew" navigates to `/brew?…&autostart=1` and the pre-roll countdown starts on load (unchanged); `autostart=0` lands on a new "ready" state with a Start button and nothing runs until tapped; missing/out-of-range params clamp/fall back; starting a brew with new params resets any stale `coa-brew` session.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]/brew?dose=20&ratio=15&acidity=0&strength=3&autostart=1` → countdown starts on load. 3. Same URL with `autostart=0` → "ready" state, timer only runs after tapping Start. 4. `/brew?dose=999` → params clamp, no error. 5. After a stale session exists, starting a new brew with different params reflects the new params. 6. Playwright check on mobile + desktop breakpoints.
 
