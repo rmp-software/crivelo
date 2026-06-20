@@ -11,6 +11,8 @@
  *  - useViewport   — mobile <700 / tablet 700–1023 / desktop ≥1024
  */
 export { CoaCalculator } from "./CoaCalculator";
+export type { CoaCalculatorProps } from "./CoaCalculator";
+export { LastBrewCard } from "./LastBrewCard";
 export { TastePad } from "./TastePad";
 export type { TastePadProps, PadDims } from "./TastePad";
 export { RecipeInputs } from "./RecipeInputs";
@@ -24,3 +26,4 @@ export { useRecipe } from "./useRecipe";
 export type { UseRecipe, RecipeInit } from "./useRecipe";
 export { useViewport } from "./useViewport";
 export type { Breakpoint } from "./useViewport";
+export { CAP, MONO } from "./style-tokens";
