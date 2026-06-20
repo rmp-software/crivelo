@@ -182,22 +182,33 @@ query uses logical points; the URL carries physical pixels so the route renders 
 native resolution. (`statusBarStyle` stays `"default"`; `capable: true` is already
 set, which is the prerequisite for startup images to fire on iOS.)
 
-### `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (new)
+### `packages/pwa/splash.tsx` — `createSplashRoute` factory
 
-Thin wrapper, mirrors `pwa-icon/[variant]/route.tsx`:
+The size-parse + bounds-guard logic is identical for every consuming app (only
+the `PwaConfig` differs), so it lives in the package as a NextAuth-style handler
+factory rather than being copy-pasted into each app's route:
 
 ```ts
-export const runtime = "nodejs"; // reliable ImageResponse, per @crivelo/pwa gotcha
-
-export async function GET(_req, { params }) {
-  const { size } = await params;            // e.g. "1206x2622"
-  const m = /^(\d{2,5})x(\d{2,5})$/.exec(size);
-  if (!m) return new Response("Not found", { status: 404 });
-  const width = Number(m[1]), height = Number(m[2]);
-  // guard against arbitrary huge requests (DoS): cap to the matrix's max dim
-  if (width > MAX || height > MAX) return new Response("Not found", { status: 404 });
-  return renderSplash(criveloPwa, { width, height });
+export function createSplashRoute(cfg: PwaConfig): {
+  GET: (req: Request, ctx: { params: Promise<{ size: string }> }) => Promise<Response>
 }
+```
+
+`GET` encapsulates: the `^(\d{2,5})x(\d{2,5})$` parse, `MAX_DIMENSION` derived
+once from `splashDevices` (largest `cssW*dpr`/`cssH*dpr`), a 404 on no-match or
+oversized, else `renderSplash(cfg, { width, height })`. The `[size]` dynamic
+segment must be named `size` (the factory reads `params.size`).
+
+### `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (new)
+
+A one-liner wiring the config into the factory — no per-app size logic:
+
+```tsx
+import { createSplashRoute } from "@crivelo/pwa";
+import { criveloPwa } from "../../pwa.config";
+
+export const runtime = "nodejs";          // Next needs this as a static literal in the route module
+export const { GET } = createSplashRoute(criveloPwa);
 ```
 
 ### `apps/crivelo-web` i18n middleware matcher (change)
@@ -291,5 +302,6 @@ preview returns `401` to credential-less image fetches.
   - AC: `apps/crivelo-web/app/pwa-splash/[size]/route.tsx` (`runtime = "nodejs"`) parses `WxH` → `renderSplash(criveloPwa, …)`, 404s on malformed or over-max dimensions; `pwa-splash` added to the next-intl middleware matcher negative lookahead (alongside `icon|apple-icon|pwa-icon`).
   - Test: `next start`, then `GET /pwa-splash/1206x2622` → `200 image/png` at 1206×2622; `/pwa-splash/2622x1206` → 2622×1206; `/pwa-splash/bad` → 404; confirm responses are PNGs, not `307` redirects to `/en/...`.
 - [x] Whole-feature verification gate — PR #46 (real-device iOS cold-start: pending human)
+- [x] Route-handler factory (`createSplashRoute`, no per-app size logic) — PR #48
   - AC: `next build` green; root `<head>` contains the `apple-touch-startup-image` links for every geometry in both orientations; splash renders teal in both light and dark theme; the white Monogram is centred and legible; installed iOS PWA shows the splash on cold-start.
   - Test: `npx tsc --noEmit` + `next build` exit 0. Playwright: assert head startup-image link tags (sample incl. iPhone Air) and screenshot the route at one phone + one tablet size. Manual: install on a real iPhone, confirm the splash appears on cold-start.
