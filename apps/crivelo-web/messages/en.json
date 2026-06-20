@@ -38,7 +38,13 @@
     "tasteSummary": "{taste} · {count, plural, one {# pour} other {# pours}}",
     "beginBrew": "Begin brew",
     "methodLink": "How the 4:6 method works",
-    "grams": "g"
+    "grams": "g",
+    "savedRecipes": "Saved recipes"
+  },
+  "LastBrew": {
+    "title": "Last brew",
+    "brewAgain": "Brew again",
+    "edit": "Edit"
   },
   "Taste": {
     "label": "Taste",

@@ -26,23 +26,20 @@
  */
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
+import { buttonVariants } from "@crivelo/ui/button";
 import { Button } from "../ui/Button";
-import { useRouter } from "../../i18n/navigation";
+import { Link, useRouter } from "../../i18n/navigation";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
+import { LastBrewCard } from "./LastBrewCard";
 import { Icon } from "./icons";
 import { tasteKey } from "../../lib/four-six";
 import { brewHref } from "../../lib/coa-nav";
-
-/** Section caption — uppercase micro-label. */
-const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
-
-/** Tabular mono numerals — keeps values from jittering as digits change. */
-const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
+import { DEFAULT_PARAMS, type RecipeParams } from "../../lib/recipes-store";
+import { CAP, MONO } from "./style-tokens";
 
 const PAD_DIMS: Record<Breakpoint, PadDims> = {
   desktop: { w: 430, h: 350, gap: 48 },
@@ -56,7 +53,20 @@ const CONTAINER_MAX: Record<Breakpoint, number> = {
   mobile: 390,
 };
 
-export function CoaCalculator() {
+/**
+ * Props seeded by the server `page.tsx` from the URL query (the "Edit" landing). The
+ * server parses + clamps `dose/ratio/acidity/strength` via `parseRecipeParams` and
+ * passes the result here, so the calculator's first paint already reflects the URL — no
+ * client `useSearchParams`/Suspense and no hydration mismatch (server + client seed from
+ * the same params). A bare `/[locale]` (no query) yields the calculator defaults.
+ */
+export interface CoaCalculatorProps {
+  initialParams?: RecipeParams;
+}
+
+export function CoaCalculator({
+  initialParams = DEFAULT_PARAMS,
+}: CoaCalculatorProps = {}) {
   const t = useTranslations("Calculator");
   const tTaste = useTranslations("Taste");
   const bp = useViewport();
@@ -74,7 +84,7 @@ export function CoaCalculator() {
     strengthPours,
     setStrength,
     recipe,
-  } = useRecipe();
+  } = useRecipe(initialParams);
 
   const startBrew = () => {
     // "Begin brew" navigates to the brew route with the current recipe params +
@@ -106,6 +116,28 @@ export function CoaCalculator() {
       >
         {t("introLine")}
       </p>
+    </div>
+  );
+
+  // Home-only extras: the last-brew card (self-hiding when no last brew exists) and
+  // the saved-recipes entry point. The entry is a locale-aware <Link> (prefetch,
+  // middle/right-click) styled through the @crivelo/ui buttonVariants `link` look —
+  // a secondary text-link entry point, not a filled CTA. The i18n Link injects the
+  // active locale prefix, so it resolves to /[locale]/recipes. (The recipes route is
+  // built in a later task — the entry is already correct.)
+  const homeExtras = (
+    <div className="mb-5">
+      <LastBrewCard />
+      <Link
+        href="/recipes"
+        className={cn(
+          buttonVariants({ variant: "link" }),
+          "h-auto gap-1 p-0 text-small font-medium text-fg-2 underline decoration-border-strong underline-offset-[3px] hover:text-fg has-[>svg]:px-0",
+        )}
+      >
+        {t("savedRecipes")}
+        <Icon name="chevR" size={14} className="text-fg-3" />
+      </Link>
     </div>
   );
 
@@ -226,6 +258,7 @@ export function CoaCalculator() {
         >
           <div className="flex flex-col gap-[22px]">
             {intro}
+            {homeExtras}
             {pad}
             {inputs}
           </div>
@@ -247,6 +280,7 @@ export function CoaCalculator() {
   return (
     <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-2">
       {intro}
+      {homeExtras}
       <div className="mb-3">{pad}</div>
       <div className="mb-[22px]">{inputs}</div>
       {schedule}

@@ -38,7 +38,13 @@
     "tasteSummary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
     "beginBrew": "Começar preparo",
     "methodLink": "Como funciona o método 4:6",
-    "grams": "g"
+    "grams": "g",
+    "savedRecipes": "Receitas salvas"
+  },
+  "LastBrew": {
+    "title": "Último preparo",
+    "brewAgain": "Preparar de novo",
+    "edit": "Editar"
   },
   "Taste": {
     "label": "Gosto",
