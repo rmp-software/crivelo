@@ -1,11 +1,11 @@
 ---
 slug: coa-save-recipes
-status: draft
+status: planned
 created: 2026-06-20
-tracker:            # set by /breakdown-feature — linear | local
+tracker: local      # set by /breakdown-feature — linear | local
 linear_project_id:  # linear mode only
 linear_parent_issue: # linear mode only
-feature_branch:
+feature_branch: feature/coa-save-recipes
 ---
 
 # Coa — Save Recipes + Brew Route
@@ -160,3 +160,25 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
 - [ ] Given no saved recipes, when I open `/[locale]/recipes`, then an empty state is shown.
 - [ ] Given a `/brew` URL with missing or out-of-range params, when it loads, then params clamp to valid ranges / fall back to defaults rather than erroring.
 - [ ] Given a stale `coa-brew` session exists, when I start a brew with new params from the calculator or "Brew again", then the old session is reset and the timer reflects the new params.
+
+## Tasks
+
+- [ ] Storage module + URL param helpers
+  - AC: A typed `lib/recipes-store.ts` wraps `coa-last-brew` (single slot) and `coa-recipes` (array) with SSR guards and safe JSON parsing; a param helper parses recipe params from a URL query and clamps/falls back out-of-range or missing values to the calculator defaults (dose 20, ratio 15, acidity 0, strength 3).
+  - Test: 1. `npx tsc --noEmit` exits 0. 2. In devtools console, exercise the store helpers — adding a recipe round-trips through `coa-recipes`, delete removes it, and `coa-last-brew` read/write round-trips. 3. The param helper clamps `?dose=999` to 60 and returns defaults for a missing/garbage query.
+
+- [ ] Brew route + URL params + autostart/ready state + session reset
+  - AC: `BrewTimer` moves to its own route `/[locale]/brew` driven by the URL; "Begin brew" navigates to `/brew?…&autostart=1` and the pre-roll countdown starts on load (unchanged); `autostart=0` lands on a new "ready" state with a Start button and nothing runs until tapped; missing/out-of-range params clamp/fall back; starting a brew with new params resets any stale `coa-brew` session.
+  - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]/brew?dose=20&ratio=15&acidity=0&strength=3&autostart=1` → countdown starts on load. 3. Same URL with `autostart=0` → "ready" state, timer only runs after tapping Start. 4. `/brew?dose=999` → params clamp, no error. 5. After a stale session exists, starting a new brew with different params reflects the new params. 6. Playwright check on mobile + desktop breakpoints.
+
+- [ ] Done-screen save flow (last-brew write + Save recipe form)
+  - AC: Reaching "done" writes `coa-last-brew` with the brew's params without any prompt; a "Save recipe" form (`@crivelo/ui` Dialog/Sheet) with name (required, default-filled), bean (optional), grind size (optional), rating (optional ★ 1–5) appends to `coa-recipes` and shows a success toast; dismissing the offer adds nothing but `coa-last-brew` still reflects the brew.
+  - Test: 1. `npx tsc --noEmit` exits 0. 2. Run a brew to done (dev speed debugger) → devtools shows `coa-last-brew` written. 3. Tap "Save recipe", fill name + optional fields, confirm → new `coa-recipes` entry + success toast. 4. Dismiss without saving → no `coa-recipes` entry, `coa-last-brew` still set. 5. Playwright check on mobile + desktop.
+
+- [ ] Calculator URL pre-fill + home last-brew card + saved-recipes entry
+  - AC: The calculator seeds `useRecipe` from `dose/ratio/acidity/strength` query params on mount (Edit lands here); the home screen shows a "Last brew" card (params summary, "Brew again" → `/brew?…&autostart=0`, "Edit" → `/?…`) only when `coa-last-brew` exists; a "Saved recipes →" entry point navigates to `/[locale]/recipes`.
+  - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]?dose=25&ratio=16&acidity=0.5&strength=2` → calculator inputs reflect those values. 3. With `coa-last-brew` seeded, home shows the card; "Brew again" → `/brew?…&autostart=0`, "Edit" → calculator pre-filled. 4. "Saved recipes →" navigates to `/[locale]/recipes`. 5. Playwright check on mobile + desktop.
+
+- [ ] Saved recipes route
+  - AC: `/[locale]/recipes` lists saved recipes as cards (name, bean, grind size, rating, params summary), each with "Brew again" (→ `/brew?…&autostart=0`), "Edit" (→ calculator pre-filled), and "Delete" (`AlertDialog` confirm) that removes it from `coa-recipes` and updates the list immediately; an empty state shows when none are saved.
+  - Test: 1. `npx tsc --noEmit` exits 0. 2. Seed `coa-recipes` → `/[locale]/recipes` renders the cards with all fields. 3. "Brew again" → `/brew?…&autostart=0` with the recipe's params; "Edit" → calculator pre-filled. 4. "Delete" → confirm → recipe removed and list updates. 5. Clear all recipes → empty state shows. 6. Playwright check on mobile + desktop.
