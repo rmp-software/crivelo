@@ -163,7 +163,7 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
 
 ## Tasks
 
-- [ ] Storage module + URL param helpers
+- [~] Storage module + URL param helpers
   - AC: A typed `lib/recipes-store.ts` wraps `coa-last-brew` (single slot) and `coa-recipes` (array) with SSR guards and safe JSON parsing; a param helper parses recipe params from a URL query and clamps/falls back out-of-range or missing values to the calculator defaults (dose 20, ratio 15, acidity 0, strength 3).
   - Test: 1. `npx tsc --noEmit` exits 0. 2. In devtools console, exercise the store helpers — adding a recipe round-trips through `coa-recipes`, delete removes it, and `coa-last-brew` read/write round-trips. 3. The param helper clamps `?dose=999` to 60 and returns defaults for a missing/garbage query.
 
