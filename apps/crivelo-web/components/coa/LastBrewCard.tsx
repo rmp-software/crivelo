@@ -36,7 +36,7 @@ import { getLastBrew, type LastBrew } from "../../lib/recipes-store";
 import { paramsSummary } from "../../lib/recipe-summary";
 import { tasteKey } from "../../lib/four-six";
 import { Icon } from "./icons";
-import { CAP, MONO } from "./style-tokens";
+import { CAP, CARD_PILL_SOLID, CARD_PILL_OUTLINE, MONO } from "./style-tokens";
 
 export function LastBrewCard() {
   const t = useTranslations("LastBrew");
@@ -67,13 +67,13 @@ export function LastBrewCard() {
       <div className="flex gap-2.5">
         <Button
           onClick={() => router.push(brewHref(params, false))}
-          className="flex h-11 flex-1 gap-2 rounded-md border-none bg-brand p-0 font-body text-small font-semibold whitespace-normal text-white shadow-1 hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-4"
+          className={CARD_PILL_SOLID}
         >
           <Icon name="play" size={16} /> {t("brewAgain")}
         </Button>
         <Button
           onClick={() => router.push(editHref(params))}
-          className="flex h-11 flex-1 rounded-md border border-border-strong bg-transparent p-0 font-body text-small font-semibold whitespace-normal text-fg shadow-none hover:bg-transparent hover:text-fg"
+          className={CARD_PILL_OUTLINE}
         >
           {t("edit")}
         </Button>

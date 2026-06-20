@@ -46,6 +46,24 @@
     "brewAgain": "Preparar de novo",
     "edit": "Editar"
   },
+  "Recipes": {
+    "title": "Receitas salvas",
+    "subtitle": "Seus preparos salvos, prontos pra repetir.",
+    "bean": "Grão",
+    "grind": "Moagem",
+    "ratingValue": "{n, plural, one {# estrela} other {# estrelas}}",
+    "brewAgain": "Preparar de novo",
+    "edit": "Editar",
+    "delete": "Excluir",
+    "deleteAria": "Excluir {name}",
+    "confirmTitle": "Excluir esta receita?",
+    "confirmBody": "Isso remove {name} de vez. Não dá pra desfazer.",
+    "confirmCancel": "Cancelar",
+    "confirmDelete": "Excluir",
+    "emptyTitle": "Nenhuma receita salva ainda",
+    "emptyBody": "Termine um preparo e salve pra encontrá-lo aqui.",
+    "emptyAction": "Abrir a calculadora"
+  },
   "Taste": {
     "label": "Gosto",
     "summary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
