@@ -13,6 +13,9 @@
 export { CoaCalculator } from "./CoaCalculator";
 export type { CoaCalculatorProps } from "./CoaCalculator";
 export { LastBrewCard } from "./LastBrewCard";
+export { RecipesList } from "./RecipesList";
+export { RecipeCard } from "./RecipeCard";
+export type { RecipeCardProps } from "./RecipeCard";
 export { TastePad } from "./TastePad";
 export type { TastePadProps, PadDims } from "./TastePad";
 export { RecipeInputs } from "./RecipeInputs";

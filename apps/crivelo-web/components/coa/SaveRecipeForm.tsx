@@ -37,6 +37,7 @@ import { cn } from "@crivelo/ui/lib/utils";
 import { Button } from "../ui/Button";
 import { addRecipe, type RecipeParams } from "../../lib/recipes-store";
 import { doseRatioSummary } from "../../lib/recipe-summary";
+import { StarGlyph } from "./StarGlyph";
 
 /** Shared CTA look, matching the BrewTimer pills (54px solid/outline). */
 const CTA_BASE =
@@ -177,19 +178,7 @@ export function SaveRecipeForm({ open, onOpenChange, params }: SaveRecipeFormPro
                       filled ? "text-brand" : "text-fg-4",
                     )}
                   >
-                    <svg
-                      width="22"
-                      height="22"
-                      viewBox="0 0 24 24"
-                      fill={filled ? "currentColor" : "none"}
-                      stroke="currentColor"
-                      strokeWidth="1.6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M12 3.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L12 16.77l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L12 3.5z" />
-                    </svg>
+                    <StarGlyph size={22} filled={filled} />
                   </button>
                 );
               })}

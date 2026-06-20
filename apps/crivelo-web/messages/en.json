@@ -46,6 +46,24 @@
     "brewAgain": "Brew again",
     "edit": "Edit"
   },
+  "Recipes": {
+    "title": "Saved recipes",
+    "subtitle": "Your saved brews, ready to make again.",
+    "bean": "Bean",
+    "grind": "Grind size",
+    "ratingValue": "{n, plural, one {# star} other {# stars}}",
+    "brewAgain": "Brew again",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteAria": "Delete {name}",
+    "confirmTitle": "Delete this recipe?",
+    "confirmBody": "This removes {name} for good. You can't undo it.",
+    "confirmCancel": "Cancel",
+    "confirmDelete": "Delete",
+    "emptyTitle": "No saved recipes yet",
+    "emptyBody": "Finish a brew and save it to find it here.",
+    "emptyAction": "Open the calculator"
+  },
   "Taste": {
     "label": "Taste",
     "summary": "{taste} · {count, plural, one {# pour} other {# pours}}",

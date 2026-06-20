@@ -179,6 +179,6 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
   - AC: The calculator seeds `useRecipe` from `dose/ratio/acidity/strength` query params on mount (Edit lands here); the home screen shows a "Last brew" card (params summary, "Brew again" → `/brew?…&autostart=0`, "Edit" → `/?…`) only when `coa-last-brew` exists; a "Saved recipes →" entry point navigates to `/[locale]/recipes`.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]?dose=25&ratio=16&acidity=0.5&strength=2` → calculator inputs reflect those values. 3. With `coa-last-brew` seeded, home shows the card; "Brew again" → `/brew?…&autostart=0`, "Edit" → calculator pre-filled. 4. "Saved recipes →" navigates to `/[locale]/recipes`. 5. Playwright check on mobile + desktop.
 
-- [~] Saved recipes route
+- [x] Saved recipes route
   - AC: `/[locale]/recipes` lists saved recipes as cards (name, bean, grind size, rating, params summary), each with "Brew again" (→ `/brew?…&autostart=0`), "Edit" (→ calculator pre-filled), and "Delete" (`AlertDialog` confirm) that removes it from `coa-recipes` and updates the list immediately; an empty state shows when none are saved.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Seed `coa-recipes` → `/[locale]/recipes` renders the cards with all fields. 3. "Brew again" → `/brew?…&autostart=0` with the recipe's params; "Edit" → calculator pre-filled. 4. "Delete" → confirm → recipe removed and list updates. 5. Clear all recipes → empty state shows. 6. Playwright check on mobile + desktop.
