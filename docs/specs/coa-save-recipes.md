@@ -108,10 +108,25 @@ Everything else (water, pour schedule, times) stays derived from `params` via
 
 ## Home screen additions
 
-- **Last brew card** — shown only when `coa-last-brew` exists. Compact params summary
-  (e.g. `20g · 1:15 · balanced`) with **Brew again** (`/brew?…&autostart=0`) and
-  **Edit** (`/?…`).
-- **Saved recipes →** — an entry point (header icon or link) to `/[locale]/recipes`.
+> **Design revision (post-implementation):** the original in-flow "Last brew card" +
+> "Saved recipes →" link caused a large layout shift (the card reads `localStorage`
+> post-mount and pops into flow) and competed for the same region. Replaced with a
+> sticky bottom bar + a header bookmark (see mockup `apps/crivelo-web/.design/last-brew-mockups.html`).
+
+- **Last brew — sticky bottom bar.** Shown only when `coa-last-brew` exists, on the
+  **home route** (mobile/narrow). Floats over content (out of flow → **zero layout
+  shift** on its post-mount reveal), thumb-reachable. Carries: a compact params summary
+  + **Brew again** (`/brew?…&autostart=0`, styled **tonal** so it doesn't compete with
+  the solid "Begin brew" primary) + **Edit** (`/?…`, an icon button). Sits above
+  `env(safe-area-inset-bottom)`; the home scroll container reserves matching
+  bottom-padding so nothing is occluded. Reveal gated by `prefers-reduced-motion`; sits
+  under modals in z-order. On the **wide** (desktop/tablet two-column) layout a floating
+  bar reads oddly — there the last brew shows as a **compact inline element** in the
+  left column instead.
+- **Saved recipes — header bookmark.** A bookmark icon in the global `Shell` header
+  (with a saved-count badge when `coa-recipes` is non-empty) navigating to
+  `/[locale]/recipes`. Persists in the empty state (unlike the old in-flow link, which
+  vanished with the card).
 
 ## Saved recipes route (`/[locale]/recipes`)
 
@@ -180,5 +195,6 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]?dose=25&ratio=16&acidity=0.5&strength=2` → calculator inputs reflect those values. 3. With `coa-last-brew` seeded, home shows the card; "Brew again" → `/brew?…&autostart=0`, "Edit" → calculator pre-filled. 4. "Saved recipes →" navigates to `/[locale]/recipes`. 5. Playwright check on mobile + desktop.
 
 - [x] Saved recipes route
+- [~] Last-brew sticky bottom bar + header Saved-recipes bookmark (replaces the in-flow card/link; fixes layout shift)
   - AC: `/[locale]/recipes` lists saved recipes as cards (name, bean, grind size, rating, params summary), each with "Brew again" (→ `/brew?…&autostart=0`), "Edit" (→ calculator pre-filled), and "Delete" (`AlertDialog` confirm) that removes it from `coa-recipes` and updates the list immediately; an empty state shows when none are saved.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Seed `coa-recipes` → `/[locale]/recipes` renders the cards with all fields. 3. "Brew again" → `/brew?…&autostart=0` with the recipe's params; "Edit" → calculator pre-filled. 4. "Delete" → confirm → recipe removed and list updates. 5. Clear all recipes → empty state shows. 6. Playwright check on mobile + desktop.
