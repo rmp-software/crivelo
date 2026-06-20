@@ -38,6 +38,14 @@ describe('pwa-splash startup-image head tags', () => {
     }
   });
 
+  it('emits the legacy apple-mobile-web-app-capable meta (required for iOS splash)', () => {
+    // iOS only honors apple-touch-startup-image when this legacy meta is present.
+    // Next 15 dropped it from appleWebApp.capable (it now emits only
+    // mobile-web-app-capable), so pwaMetadata must re-add it via `other`.
+    const meta = pwaMetadata(criveloPwa);
+    expect(meta.other?.['apple-mobile-web-app-capable']).toBe('yes');
+  });
+
   it('includes the iPhone Air 420×912@3 portrait + landscape pair', () => {
     const imgs = startupImages();
 
