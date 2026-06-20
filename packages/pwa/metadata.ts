@@ -45,6 +45,15 @@ export function pwaMetadata(cfg: PwaConfig): Metadata {
       startupImage: startupImages(cfg),
     },
     formatDetection: { telephone: false },
+    other: {
+      // iOS REQUIRES the legacy `apple-mobile-web-app-capable` meta for
+      // apple-touch-startup-image splash screens to display — `display: standalone`
+      // and the modern `mobile-web-app-capable` do NOT trigger them. Next 15
+      // (PR vercel/next.js#70363) emits ONLY `mobile-web-app-capable` from
+      // appleWebApp.capable and dropped the apple-prefixed tag, which silently
+      // breaks the iOS splash. Re-add it here. https://github.com/vercel/next.js/issues/74524
+      "apple-mobile-web-app-capable": "yes",
+    },
   };
 }
 
