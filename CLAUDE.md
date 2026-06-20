@@ -74,6 +74,28 @@ to `@crivelo/ui/src/ui/**`**; app/component code uses the house neutrals.
 app's scope; an app may add a thin local **wrapper** that imports a `@crivelo/ui` primitive and
 extends it (variants, sizes), but a wrapper is an extension, not a new primitive.
 
+## Shared-package API design (think through the abstraction)
+When you build or extend a shared package (`@crivelo/*`), **the package absorbs the complexity so
+its consumers don't.** Business logic, parsing, guards, assembly — push them *into* the package and
+expose the highest-leverage entry point, not raw building blocks each app must re-wire.
+
+- **The test: look at what every consumer has to write, and push everything identical down.** If two
+  apps would copy the same wiring and only a config object differs, that wiring is package logic —
+  move it in, behind a single call. **Duplicated boilerplate across apps is the smell that logic
+  leaked out of the package**; fix it by relocating the logic, not by documenting the boilerplate.
+- **Design for N consumers, not just the first.** Only genuinely per-app values (the config, the
+  brand glyph, colours) stay app-local; anything the same across apps belongs to the package. Ask
+  "what happens when the 2nd and 3rd app adopt this?" before settling an API.
+- **Prefer a factory / handler over exposed internals** when the integration is otherwise
+  boilerplate — mirror the ecosystem's own patterns (NextAuth-style `export const { GET } =
+  createSplashRoute(cfg)` beats making each app hand-write the parse-guard-render route). The
+  consumer keeps only what the framework *forces* to be app-local (a static `runtime` export, a
+  file-convention path); everything else is one call.
+- Worked example: `@crivelo/pwa` drives `createManifest` / `renderIcon` / `createSplashRoute` from a
+  single `PwaConfig` — onboarding a new app (incl. out-of-repo Molly) is config + thin wrappers,
+  never re-implementing logic. The first cut exposed only `renderSplash` and left each app to wire
+  the route; the duplicated size logic was the signal to raise the abstraction to a route factory.
+
 ## Claude Design handoffs
 - **Never commit a Claude Design output** (the exported bundle: `project/`, `_ds/`
   design-system, `chats/`, screenshots, etc.) into the repo.

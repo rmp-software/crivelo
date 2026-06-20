@@ -42,8 +42,25 @@ export interface PwaConfig {
   radiusScale?: number;
   /** Manifest icon `src` prefix. Default "/pwa-icon". */
   iconBasePath?: string;
+  /**
+   * iOS splash (apple-touch-startup-image) overrides. All optional — the
+   * defaults reproduce the icon-tile lockup (brand mark on themeColor).
+   */
+  splash?: {
+    /** Field colour. Default: themeColor. */
+    background?: string;
+    /** Mark colour. Default: markColor ?? "#ffffff". */
+    markColor?: string;
+    /** Mark size as a fraction of the shorter screen edge. Default 0.22. */
+    markScale?: number;
+    /** Route prefix the startup-image URLs point at. Default `DEFAULT_SPLASH_BASE_PATH` ("/pwa-splash"). */
+    basePath?: string;
+  };
 }
 
 export { createManifest } from "./manifest";
 export { renderIcon } from "./icon";
+export { renderSplash, createSplashRoute } from "./splash";
+export { splashDevices, DEFAULT_SPLASH_BASE_PATH } from "./devices";
+export type { SplashDevice } from "./devices";
 export { pwaMetadata, pwaViewport } from "./metadata";
