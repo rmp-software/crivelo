@@ -5,6 +5,7 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { fontVariables } from "@crivelo/tokens/fonts";
 import { pwaMetadata, pwaViewport } from "@crivelo/pwa";
+import { Toaster } from "@crivelo/ui/sonner";
 import { Shell, NO_FOUC_SCRIPT } from "../../components/shell";
 import { routing } from "../../i18n/routing";
 import { criveloPwa } from "../pwa.config";
@@ -67,6 +68,11 @@ export default async function LocaleLayout({
       <body className={fontVariables}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <Shell>{children}</Shell>
+          {/* App-wide Sonner toast outlet (success toast on saving a recipe, etc.).
+              Mounted once at the document root so any client surface can fire `toast`
+              from the same module instance; inherits the house tokens via the alias
+              layer (see @crivelo/ui/sonner). */}
+          <Toaster />
         </NextIntlClientProvider>
       </body>
     </html>

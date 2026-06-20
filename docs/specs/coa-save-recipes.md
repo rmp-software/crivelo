@@ -171,7 +171,7 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
   - AC: `BrewTimer` moves to its own route `/[locale]/brew` driven by the URL; "Begin brew" navigates to `/brew?…&autostart=1` and the pre-roll countdown starts on load (unchanged); `autostart=0` lands on a new "ready" state with a Start button and nothing runs until tapped; missing/out-of-range params clamp/fall back; starting a brew with new params resets any stale `coa-brew` session.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Visit `/[locale]/brew?dose=20&ratio=15&acidity=0&strength=3&autostart=1` → countdown starts on load. 3. Same URL with `autostart=0` → "ready" state, timer only runs after tapping Start. 4. `/brew?dose=999` → params clamp, no error. 5. After a stale session exists, starting a new brew with different params reflects the new params. 6. Playwright check on mobile + desktop breakpoints.
 
-- [~] Done-screen save flow (last-brew write + Save recipe form)
+- [x] Done-screen save flow (last-brew write + Save recipe form)
   - AC: Reaching "done" writes `coa-last-brew` with the brew's params without any prompt; a "Save recipe" form (`@crivelo/ui` Dialog/Sheet) with name (required, default-filled), bean (optional), grind size (optional), rating (optional ★ 1–5) appends to `coa-recipes` and shows a success toast; dismissing the offer adds nothing but `coa-last-brew` still reflects the brew.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Run a brew to done (dev speed debugger) → devtools shows `coa-last-brew` written. 3. Tap "Save recipe", fill name + optional fields, confirm → new `coa-recipes` entry + success toast. 4. Dismiss without saving → no `coa-recipes` entry, `coa-last-brew` still set. 5. Playwright check on mobile + desktop.
 

@@ -24,7 +24,13 @@
  * backward-tolerant so a stale/old-shaped session can't crash. Both themes,
  * three breakpoints, `prefers-reduced-motion` honored.
  */
-import { useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
@@ -37,8 +43,10 @@ import {
   type TimerPhase,
 } from "../../lib/four-six";
 import { IS_DEBUG_ENV } from "../../lib/debug-env";
+import { setLastBrew, type RecipeParams } from "../../lib/recipes-store";
 import { toBrewSpeed, type BrewSpeed } from "./brew-speed";
 import { Icon } from "./icons";
+import { SaveRecipeForm } from "./SaveRecipeForm";
 import type { Breakpoint } from "./useViewport";
 
 const KEY = "coa-brew";
@@ -204,6 +212,14 @@ function resolveSession(query: string, autostart: boolean): Session {
 export interface BrewTimerProps {
   recipe: Recipe;
   /**
+   * The resolved recipe inputs `recipe` was derived from. Carried alongside
+   * `recipe` (which is the derived schedule) because the save system persists the
+   * four inputs, not the schedule: on `done` they are written to `coa-last-brew`
+   * and seed the "Save recipe" form. Kept in lockstep with `query` (its canonical
+   * serialization) via the route.
+   */
+  params: RecipeParams;
+  /**
    * Canonical recipe-params query (`recipeParamsToQuery` output) the brew route
    * derived `recipe` from. Stamped onto the persisted session so a same-params
    * reload resumes and a different-params entry resets (never resuming a previous
@@ -224,6 +240,7 @@ export interface BrewTimerProps {
 
 export function BrewTimer({
   recipe,
+  params,
   query,
   autostart,
   onExit,
@@ -245,6 +262,8 @@ export function BrewTimer({
   );
   const [, force] = useState(0);
   const [expandDone, setExpandDone] = useState(false);
+  // Controls the "Save recipe" dialog opened from the done screen.
+  const [saveOpen, setSaveOpen] = useState(false);
 
   // Dev-only brew-clock multiplier (always 1× in production). It scales the live
   // wall-clock delta below so a full brew can be exercised in seconds; recipe
@@ -309,6 +328,22 @@ export function BrewTimer({
   const phases = buildPhases(recipe);
   const done = sess.status === "done" || finished;
   const paused = sess.status === "paused";
+
+  // Silently capture this brew as the implicit "last brew" the instant it reaches
+  // done — no prompt. Guarded so it writes exactly once per done-entry: the 200ms
+  // tick re-renders this component ~5×/s while the done screen is shown, and a
+  // same-params reload remounts with `key={query}`, so without a guard `setLastBrew`
+  // would fire on every frame. The ref is keyed on `query` (the canonical params): a
+  // fresh brew with new params re-arms the write, but repeated renders of the same
+  // done screen do not. The "Save recipe" form is an explicit, separate action; this
+  // last-brew write happens regardless of whether the user saves.
+  const lastBrewWrittenFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (done && lastBrewWrittenFor.current !== query) {
+      lastBrewWrittenFor.current = query;
+      setLastBrew(params);
+    }
+  }, [done, query, params]);
   // The "ready" pre-state (autostart=0): nothing runs until Start is tapped.
   const ready = sess.status === "ready";
   let curIdx = phases.findIndex((p) => elapsed < p.end);
@@ -758,6 +793,11 @@ export function BrewTimer({
       {BrewDebugPanel && (
         <BrewDebugPanel speed={speed} onSpeedChange={changeSpeed} />
       )}
+      <SaveRecipeForm
+        open={saveOpen}
+        onOpenChange={setSaveOpen}
+        params={params}
+      />
       <main
         // last-resort: runtime container max-width (data-driven `max`/bp).
         style={mwVar}
@@ -987,14 +1027,16 @@ export function BrewTimer({
               <div className="mt-[22px] flex flex-col gap-2.5">
                 <Button
                   type="button"
-                  onClick={restart}
-                  className={cn(
-                    CTA_BASE,
-                    CTA_SOLID,
-                    "[&_svg:not([class*='size-'])]:size-[17px]",
-                  )}
+                  onClick={() => setSaveOpen(true)}
+                  className={cn(CTA_BASE, CTA_SOLID)}
                 >
-                  <Icon name="play" size={17} className="text-white" />{" "}
+                  {t("saveRecipe")}
+                </Button>
+                <Button
+                  type="button"
+                  onClick={restart}
+                  className={cn(CTA_BASE, CTA_OUTLINE)}
+                >
                   {t("brewAgain")}
                 </Button>
                 <Button
