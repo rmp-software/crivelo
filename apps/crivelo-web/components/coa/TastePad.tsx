@@ -17,12 +17,16 @@
  *
  * Styling (RMP-216): inline `style`/style-constants migrated to Tailwind utility
  * classes (the no-`var(--)`-in-`style` / no-inline-theming rule). Neutral tokens
- * ride arbitrary `text-[color:var(--fg-3)]` utilities; the accent summary uses the
- * promoted `text-accent-ink`. The focus ring is a conditional className driven by
- * the `focused` state. The two surviving inline `style`s are genuinely
- * data-driven: the pad's runtime dims (center/dims props) and the puck's
- * continuous left/top, both threaded through CSS custom properties consumed by
- * static utilities.
+ * ride their registered house utilities (`text-fg-3`, …); the accent summary uses
+ * the promoted `text-accent-ink`. The focus ring is a conditional className driven
+ * by the `focused` state.
+ *
+ * Responsive (RMP-226): the pad box is sized entirely by responsive utilities — no
+ * `dims`/`center` props, no JS measurement. Width is `w-full` (the column caps it
+ * via the page container); height is a per-breakpoint constant expressed as
+ * `h-[280px] md:h-[300px] lg:h-[350px]`. The ONLY surviving inline `style` is the
+ * puck's continuous left/top (a genuine runtime bridge — drag state), threaded
+ * through CSS custom properties consumed by static utilities.
  */
 import {
   useRef,
@@ -36,6 +40,14 @@ import { cn } from "@crivelo/ui/lib/utils";
 import { SieveGrid } from "../brand";
 import { clamp, tasteKey } from "../../lib/four-six";
 
+/**
+ * SieveGrid `gap` (viewBox coordinate spacing). With `stretch` +
+ * `preserveAspectRatio="none"` the field fills the pad regardless of `gap`, and the
+ * puck neighbourhood math is normalized 0..1, so `gap` has negligible visual effect
+ * — a single constant replaces the old per-breakpoint values (38/41/48).
+ */
+const PAD_GAP = 41;
+
 /** Section caption ("TASTE"). */
 const CAP =
   "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
@@ -46,20 +58,11 @@ const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 /** Edge label (absolute, slightly smaller than the section caption). */
 const EDGE = cn(CAP, "absolute text-[10px]");
 
-export interface PadDims {
-  w: number;
-  h: number;
-  gap: number;
-}
-
 export interface TastePadProps {
   acidity: number;
   strengthPours: number;
   setAcidity: (v: number) => void;
   setStrength: (v: number) => void;
-  dims: PadDims;
-  /** Centre the pad horizontally (mobile single column). */
-  center?: boolean;
 }
 
 export function TastePad({
@@ -67,8 +70,6 @@ export function TastePad({
   strengthPours,
   setAcidity,
   setStrength,
-  dims,
-  center = false,
 }: TastePadProps) {
   const t = useTranslations("Taste");
   const summary = t("summary", {
@@ -148,17 +149,6 @@ export function TastePad({
     setPad({ x: (nextAcidity + 1) / 2, y: (4 - nextStrength) / 3 });
   };
 
-  // last-resort: the pad's box is sized from runtime props — `center` toggles a
-  // max-width cap + horizontal auto-centring (mobile single column), and the
-  // height is the per-breakpoint `dims.h`. These runtime values travel through
-  // CSS custom properties consumed by the static `max-w-[var(--pad-maxw)]` /
-  // `h-[var(--pad-h)]` / `mx-[var(--pad-mx)]` utilities below.
-  const padBoxVar = {
-    "--pad-maxw": center ? `${dims.w}px` : "none",
-    "--pad-h": `${dims.h}px`,
-    "--pad-mx": center ? "auto" : "0",
-  } as CSSProperties;
-
   // last-resort: the puck is positioned from the continuous drag state (pad.x /
   // pad.y). Percentage-based so it tracks the fluid pad width and stays aligned
   // with the stretched dot field (inset 12px, matching the grid). The computed
@@ -194,10 +184,11 @@ export function TastePad({
         tabIndex={0}
         aria-label={t("padAria")}
         // Fluid: the pad spans the full content/column width at every breakpoint
-        // (the dot field stretches to fill via SieveGrid). Height stays fixed per
-        // breakpoint (--pad-h) so the card keeps a sensible aspect.
+        // (the dot field stretches to fill via SieveGrid). Height is a fixed
+        // per-breakpoint constant via responsive utilities so the card keeps a
+        // sensible aspect — no runtime measurement.
         className={cn(
-          "relative w-full max-w-[var(--pad-maxw)] mx-[var(--pad-mx)] h-[var(--pad-h)]",
+          "relative w-full h-[280px] md:h-[300px] lg:h-[350px]",
           "rounded-md bg-surface-raised shadow-1",
           "border border-border cursor-crosshair touch-none overflow-hidden",
           "outline-offset-2",
@@ -205,13 +196,12 @@ export function TastePad({
             ? "outline outline-2 outline-[color:var(--focus-ring)]"
             : "outline-none",
         )}
-        style={padBoxVar}
       >
         <div className="absolute inset-3">
           <SieveGrid
             cols={9}
             rows={7}
-            gap={dims.gap}
+            gap={PAD_GAP}
             dot={5}
             pad={6}
             puck={{ x: pad.x, y: pad.y }}
