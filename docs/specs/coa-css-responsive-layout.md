@@ -153,7 +153,7 @@ custom properties remain legitimate runtime bridges.
 
 ## Tasks
 
-- [ ] TastePad — propless responsive sizing
+- [x] TastePad — propless responsive sizing — PR #58
   - AC: the taste pad renders at the correct size on all breakpoints with no JS
     breakpoint switch (sizes from its container + responsive utilities).
   - Test: 1. `pnpm --filter crivelo-web type-check` exits 0. 2. Load `/` at 393 /
@@ -163,7 +163,7 @@ custom properties remain legitimate runtime bridges.
     stays `w-full`; remove the mobile max-width cap; `SieveGrid` gets one constant
     `gap`.
 
-- [ ] CoaCalculator — single CSS-driven markup tree
+- [x] CoaCalculator — single CSS-driven markup tree — PR #58
   - AC: cold (throttled) load at 1280 / 768 / 393 paints the correct layout on
     first paint with no mobile→desktop flash; no hydration error; CLS ≈ 0 on the
     home route; save-recipes bottom-bar (narrow) vs compact-inline (wide) still
@@ -176,7 +176,7 @@ custom properties remain legitimate runtime bridges.
     → responsive `max-w-*`; padding/gap/intro-font → `md:` / `lg:`; consume the new
     propless TastePad; no `useViewport` here.
 
-- [ ] BrewView + BrewTimer — drop `bp`, breakpoint-driven brew screens
+- [x] BrewView + BrewTimer — drop `bp`, breakpoint-driven brew screens — PR #59
   - AC: `/brew` paints the correct layout on first paint with no flash; no
     hydration error; CLS ≈ 0; the ring renders at the correct size at each
     breakpoint.
