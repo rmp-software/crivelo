@@ -164,10 +164,15 @@ matching how `createSplashRoute` reads `params.size`.
   }
   ```
 
-- **`app/manifest.ts`** (existing static route at `/manifest.webmanifest`):
-  **kept** as a default-locale fallback for anything hitting the bare URL
-  (crawlers, link previews). `createManifest(criveloPwa)` still returns the
-  non-localized manifest — unchanged.
+- **`app/manifest.ts`** (the static route at `/manifest.webmanifest`):
+  **REMOVED.** Next's `manifest` file convention auto-emits
+  `<link rel="manifest" href="/manifest.webmanifest">` into the head and that
+  link **overrides** the layout's `metadata.manifest`, so keeping `manifest.ts`
+  would pin the head link to the non-localized URL for every locale and defeat
+  the feature. With it gone, `metadata.manifest: /manifest/${locale}` owns the
+  head link. To keep the bare URL alive for clients that cached it at install
+  time, add a **`next.config.js` redirect** `/manifest.webmanifest` →
+  `/manifest/en` (the default locale).
 - iOS metadata in `pwaMetadata` (`apple-mobile-web-app-title`, startup-image
   links) is **unchanged**: the title `"Crivelo"` is constant and startup images
   are device-based, not locale-based.
@@ -270,16 +275,18 @@ A README documenting the whole package. Scope:
     `apps/crivelo-web/lib/`) — route tests pass: known locale → 200 + content-type +
     localized body; unknown → 404; cfg without `i18n` → 200 non-localized.
     `npx tsc --noEmit` exits 0.
-- [ ] crivelo-web — wire per-locale manifest
+- [x] crivelo-web — wire per-locale manifest — PR #64
   - AC: `app/manifest/[locale]/route.ts` → `createManifestRoute(criveloPwa)`;
     `manifest` added to middleware matcher; layout `generateMetadata` sets
-    `manifest: /manifest/${locale}`; `pwa.config.tsx` `i18n` block (en+pt); bare
-    `/manifest.webmanifest` still works; `/pt` head links `/manifest/pt`, `/en`
-    links `/manifest/en`; localized `start_url`s resolve 200.
-  - Test: `pnpm --filter crivelo-web build` succeeds; `curl -s
-    localhost:3000/manifest/pt` → pt JSON; `curl -sL localhost:3000/pt | grep
-    'rel="manifest"'` → `/manifest/pt` (same for en); `curl -sI localhost:3000/en`
-    → 200 (no 307).
+    `manifest: /manifest/${locale}`; `pwa.config.tsx` `i18n` block (en+pt);
+    `app/manifest.ts` REMOVED + `next.config.js` redirect `/manifest.webmanifest`
+    → `/manifest/en`; `/pt` head links `/manifest/pt`, `/en` links `/manifest/en`;
+    localized `start_url`s resolve 200.
+  - Test (browser-driven, not curl): dev server boots; in the browser the `/pt`
+    head `link[rel=manifest]` href is `/manifest/pt` (same for en → `/manifest/en`);
+    `fetch('/manifest/pt')` → 200 `application/manifest+json` pt body;
+    `fetch('/en',{redirect:'manual'})` → 200 (no 307); `fetch('/manifest.webmanifest')`
+    → redirects to `/manifest/en`. `npx tsc --noEmit` exits 0.
 - [ ] `packages/pwa/README.md` — Getting started + API reference
   - AC: non-locale Getting started (config → `transpilePackages` → thin wrapper
     files → layout metadata); API reference for every export (`createManifest`,
