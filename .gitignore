@@ -48,3 +48,6 @@ pnpm-debug.log*
 **/.design-system/**/fonts/
 **/.design-system/**/*.bak-*/
 .claude/settings.local.json
+
+# TypeScript incremental build cache (local tooling)
+.claude/tsc-cache/

@@ -262,7 +262,7 @@ A README documenting the whole package. Scope:
     (b) `createManifest(cfg,'pt')` → `start_url:'/pt'`, `id:'/pt'`, `lang:'pt-BR'`,
     pt description; (c) `createManifest(cfg,'fr')` falls back; (d) empty
     `startUrl:''` falls back to `/${locale}`. `npx tsc --noEmit` exits 0.
-- [ ] Package — `createManifestRoute(cfg)` factory
+- [x] Package — `createManifestRoute(cfg)` factory — PR #63
   - AC: factory mirrors `createSplashRoute`; reads `params.locale`; unknown locale
     → 404 when `i18n` configured; absent `i18n` → serves non-localized manifest (no
     404); `Content-Type: application/manifest+json`.
