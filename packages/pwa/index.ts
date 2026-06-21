@@ -56,6 +56,32 @@ export interface PwaConfig {
     /** Route prefix the startup-image URLs point at. Default `DEFAULT_SPLASH_BASE_PATH` ("/pwa-splash"). */
     basePath?: string;
   };
+  /**
+   * Optional locale-aware manifest data. Omit for single-locale apps — today's
+   * behaviour is unchanged (`createManifest(cfg)` stays byte-identical). The app
+   * supplies this as plain data; the package never imports an i18n library.
+   */
+  i18n?: {
+    /**
+     * Per-locale overrides, keyed by the route's `[locale]` segment. List every
+     * locale you serve (including the default — its strings double as the bare
+     * `/manifest.webmanifest` fallback via the top-level `cfg.description`/
+     * `cfg.lang`). Any locale absent here falls back to the top-level fields.
+     */
+    locales: Record<
+      string,
+      {
+        /** Localized manifest `description`. */
+        description: string;
+        /** BCP-47 manifest `lang` (e.g. "en", "pt-BR"). */
+        lang: string;
+        /** Manifest `dir`. Default "ltr". */
+        dir?: "ltr" | "rtl";
+        /** 200 `start_url` for this locale. Default `/${locale}`. */
+        startUrl?: string;
+      }
+    >;
+  };
 }
 
 export { createManifest } from "./manifest";
