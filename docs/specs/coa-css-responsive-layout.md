@@ -5,7 +5,7 @@ created: 2026-06-20
 tracker: local
 linear_project_id:  # linear mode only
 linear_parent_issue: # linear mode only — RMP-226 is the durable Linear record
-feature_branch: feature/coa-css-responsive-layout
+feature_branch: lucasrmagalhaes/rmp-226-coa-css-driven-responsive-layout-kill-the-first-load-mobile
 ---
 
 # Coa: CSS-driven responsive layout — drop `useViewport`
