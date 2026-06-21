@@ -1,11 +1,14 @@
 ---
 slug: locale-aware-pwa-manifest
-status: draft
+status: planned
 created: 2026-06-21
-tracker:            # set by /breakdown-feature — linear | local
-linear_project_id:  # linear mode only
-linear_parent_issue: # linear mode only
-feature_branch:
+tracker: local
+# Linear breakdown was partially created before arcade.dev got Cloudflare-blocked
+# (parent RMP-227 + children RMP-228/229/230/231; the crivelo-web wiring child was
+# never created). Running locally; the final task reconciles Linear at the end.
+linear_project_id: 2ac8ab29-150b-4787-b0dc-c75613daa20d
+linear_parent_issue: RMP-227
+feature_branch: feature/locale-aware-pwa-manifest
 ---
 
 # Locale-aware PWA manifest (`@crivelo/pwa`)
@@ -246,3 +249,51 @@ A README documenting the whole package. Scope:
 - npm publishing and out-of-monorepo distribution (peer-dep/install docs).
 - RTL locales (the `dir` field is plumbed but unused by current `en`/`pt`).
 - Localizing the installed app `name`/`short_name`.
+
+## Tasks
+
+- [ ] Package — `PwaConfig.i18n` + `createManifest(cfg, locale?)` builder
+  - AC: no-`i18n` `createManifest(cfg)` is byte-identical to today;
+    `createManifest(cfg, locale)` emits localized `start_url`/`id`/`lang`/`dir`/
+    `description`; absent-`i18n` or unknown locale falls back to non-localized.
+  - Test: `cd packages/pwa && pnpm test` — unit tests pass: (a) `createManifest(cfg)`
+    deep-equals pre-change output; (b) `createManifest(cfg,'pt')` →
+    `start_url:'/pt'`, `id:'/pt'`, `lang:'pt-BR'`, pt description; (c)
+    `createManifest(cfg,'fr')` falls back. `npx tsc --noEmit` exits 0.
+- [ ] Package — `createManifestRoute(cfg)` factory
+  - AC: factory mirrors `createSplashRoute`; reads `params.locale`; unknown locale
+    → 404 when `i18n` configured; absent `i18n` → serves non-localized manifest (no
+    404); `Content-Type: application/manifest+json`.
+  - Test: `cd packages/pwa && pnpm test` — route tests pass: known locale → 200 +
+    content-type + localized body; unknown → 404; cfg without `i18n` → 200
+    non-localized. `npx tsc --noEmit` exits 0.
+- [ ] crivelo-web — wire per-locale manifest
+  - AC: `app/manifest/[locale]/route.ts` → `createManifestRoute(criveloPwa)`;
+    `manifest` added to middleware matcher; layout `generateMetadata` sets
+    `manifest: /manifest/${locale}`; `pwa.config.tsx` `i18n` block (en+pt); bare
+    `/manifest.webmanifest` still works; `/pt` head links `/manifest/pt`, `/en`
+    links `/manifest/en`; localized `start_url`s resolve 200.
+  - Test: `pnpm --filter crivelo-web build` succeeds; `curl -s
+    localhost:3000/manifest/pt` → pt JSON; `curl -sL localhost:3000/pt | grep
+    'rel="manifest"'` → `/manifest/pt` (same for en); `curl -sI localhost:3000/en`
+    → 200 (no 307).
+- [ ] `packages/pwa/README.md` — Getting started + API reference
+  - AC: non-locale Getting started (config → `transpilePackages` → thin wrapper
+    files → layout metadata); API reference for every export (`createManifest`,
+    `createManifestRoute`, `renderIcon`, `renderSplash`, `createSplashRoute`,
+    `pwaMetadata`, `pwaViewport`, `PwaConfig`, `splashDevices`,
+    `DEFAULT_SPLASH_BASE_PATH`, `SplashDevice`); locale-aware section. No installation.
+  - Test: README exists; grep each export name appears; Getting started wires a
+    non-locale app end-to-end; no installation section.
+- [ ] Verification gate (manual, real device)
+  - AC: install crivelo-web from `/pt`, reboot phone (clears iOS launch snapshots),
+    cold-launch → Portuguese app at `/pt` with the teal splash; `/en` likewise.
+  - Test: deploy preview; on iPhone install `/pt` → Add to Home Screen → reboot →
+    cold-launch → confirm pt + splash; repeat `/en`. Headless checks can't prove
+    iOS splash — physical device required.
+- [ ] Reconcile Linear (run when arcade.dev is reachable)
+  - AC: the partial Linear breakdown is completed and synced — create the missing
+    `crivelo-web — wire per-locale manifest` child under parent **RMP-227** (Crivelo
+    project), and reflect final state (parent + all children → Done) at feature end.
+  - Test: parent RMP-227 has 5 children (RMP-228/229/230/231 + the wiring child);
+    `Linear_GetIssue RMP-227` shows it closed once the feature→main PR merges.
