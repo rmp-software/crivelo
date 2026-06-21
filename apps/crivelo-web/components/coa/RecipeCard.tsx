@@ -3,25 +3,37 @@
 /**
  * RecipeCard (feature: coa-save-recipes) — one saved recipe on the `/recipes` list.
  *
- * Renders a saved recipe's name, optional bean / grind-size notes, optional ★ rating
- * (read-only), and the params summary, plus three actions:
- *   - "Brew again" → `brewHref(params, false)` (autostart=0 → the brew route's "ready" state),
- *   - "Edit"       → `editHref(params)` (the calculator pre-filled with these params),
- *   - "Delete"     → opens an @crivelo/ui AlertDialog; confirming calls `onDelete(id)`.
- * Both nav actions route through the locale-aware `useRouter` so the active locale prefix is
- * preserved; neither hand-builds a query string (the shared coa-nav helpers own that shape).
+ * Redesign "variant A · Spec-led + chips" (.design/recipe-card-mockups.html). The card
+ * leads with the recipe's IDENTITY, dedup'd so the title never repeats the spec line:
+ *   - **Default-named recipe** (`name === doseRatioSummary(params)` — the user kept the
+ *     Save-form's seeded name): render the dose·ratio AS the title, in mono, and DON'T
+ *     render a separate summary subline (no duplication — the key fix the redesign targets).
+ *   - **Custom-named recipe**: render the custom `name` as the serif (font-display) title
+ *     with the params summary (`paramsSummary`, mono, quiet `text-fg-3`) as a subline.
+ *
+ * Below the title block: a wrapping chip row — the localized **taste chip** (the flavor
+ * identity, always shown: brand-soft bg + accent-ink text) plus optional **bean / grind**
+ * metadata chips (surface-sunken, a small uppercase label + value), replacing the old
+ * ragged label/value `<dl>`. The read-only ★ rating sits top-right beside the title.
+ *
+ * Actions are a single row: "Brew again" (solid, flex-1) + "Edit" (outline) + a quiet
+ * **trash icon button** that opens the @crivelo/ui AlertDialog; confirming calls `onDelete(id)`.
+ * This replaces the old orphaned full-width centered Delete. All three actions share one row
+ * and must not overflow at phone widths (~360px) — `Brew again` flexes, Edit/trash hug.
+ *
+ * Both nav actions route through the locale-aware `useRouter` (preserves the active locale
+ * prefix) and the shared coa-nav helpers (single source of the brew/edit query shape).
  *
  * Delete state lives in the parent list (RecipesList): this card is presentational and just
  * reports the confirmed id up via `onDelete`, so the list can drop it from React state without
- * a reload. The AlertDialog confirm is uncontrolled (Radix manages its open state); confirming
- * fires the Action handler and Radix closes it.
+ * a reload. The AlertDialog confirm is uncontrolled (Radix manages its open state).
  *
- * Styling mirrors LastBrewCard: house tokens/utilities only (no raw hex / no inline `var()`),
- * the same raised surface (`bg-surface-raised`, `border-border`, `rounded-md`, `shadow-1`) and
- * the same solid/outline action pills. The params summary reuses `paramsSummary` + the localized
- * taste label (single source of truth — never re-derived here). The rating reuses the shared
- * `StarGlyph` (also used by SaveRecipeForm) in a read-only display.
+ * Styling: house tokens/utilities only (no raw hex / no inline `var()`), the same raised
+ * surface as LastBrewCard. Summary/taste reuse `doseRatioSummary` / `paramsSummary` + the
+ * localized taste label (single source of truth — never re-derived here). The rating reuses
+ * the shared `StarGlyph`.
  */
+import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import {
@@ -39,14 +51,50 @@ import { Button } from "../ui/Button";
 import { useRouter } from "../../i18n/navigation";
 import { brewHref, editHref } from "../../lib/coa-nav";
 import type { SavedRecipe } from "../../lib/recipes-store";
-import { paramsSummary } from "../../lib/recipe-summary";
+import { doseRatioSummary, paramsSummary } from "../../lib/recipe-summary";
 import { tasteKey } from "../../lib/four-six";
 import { Icon } from "./icons";
 import { StarGlyph } from "./StarGlyph";
-import { CAP, CARD_PILL_SOLID, CARD_PILL_OUTLINE, MONO } from "./style-tokens";
+import { CARD_PILL_SOLID, CARD_PILL_OUTLINE, MONO } from "./style-tokens";
 
 /** 1..5 — the rating scale, rendered read-only (filled vs. muted). */
 const STARS = [1, 2, 3, 4, 5] as const;
+
+/**
+ * A metadata pill in the chip row. The taste chip (the flavor identity) is the accent
+ * variant; bean/grind are the neutral variant with a small uppercase key label.
+ */
+function Chip({
+  label,
+  children,
+  accent = false,
+}: {
+  /** Optional uppercase key (e.g. "Bean"). Omitted for the taste chip. */
+  label?: string;
+  children: ReactNode;
+  /** The taste chip — brand-soft bg + accent-ink text instead of the neutral sunken chip. */
+  accent?: boolean;
+}) {
+  return (
+    <span
+      className={cn(
+        // `min-h-7` (not a fixed height) so a long value wraps and grows the pill
+        // instead of spilling out of it; `py-1` keeps the single-line height ~28px.
+        "inline-flex min-h-7 min-w-0 max-w-full items-center gap-1.5 rounded-md border px-2.5 py-1 text-small",
+        accent
+          ? "border-transparent bg-brand-soft font-semibold text-accent-ink"
+          : "border-border bg-surface-sunken text-fg-2",
+      )}
+    >
+      {label ? (
+        <span className="shrink-0 text-[10.5px] font-semibold uppercase tracking-[0.05em] text-fg-3">
+          {label}
+        </span>
+      ) : null}
+      <span className="min-w-0 break-words">{children}</span>
+    </span>
+  );
+}
 
 export interface RecipeCardProps {
   recipe: SavedRecipe;
@@ -60,94 +108,115 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
   const router = useRouter();
 
   const { id, name, bean, grindSize, rating, params } = recipe;
-  // Localized taste descriptor appended to the language-agnostic dose/ratio half.
-  const summary = paramsSummary(params, tTaste(tasteKey(params.acidity)));
+  const tasteLabel = tTaste(tasteKey(params.acidity));
+  // Identity dedup: if the user kept the default name (the dose·ratio string), the title
+  // IS that string (in mono) and there's no separate spec subline. A custom name is the
+  // serif title with the full params summary as a quiet mono subline beneath it.
+  const isDefaultName = name === doseRatioSummary(params);
+  // Bind each "·" to the token after it (non-breaking space *after* the middot) so the
+  // subline wraps as whole "· value" units — a line break can still land at the normal
+  // space *before* a "·", but never right after one (no orphaned middot at 360px / pt-BR).
+  const summary = paramsSummary(params, tasteLabel).replace(/· /g, "· ");
 
   return (
     <article
-      className="rounded-md border border-border bg-surface-raised p-5 shadow-1"
+      className="rounded-md border border-border bg-surface-raised p-[18px] shadow-1"
       aria-label={name}
     >
-      <h2 className="mb-1 font-display text-h4 font-semibold text-fg">{name}</h2>
-      <div className={cn("mb-3 text-body text-fg-2", MONO)}>{summary}</div>
-
-      {(bean || grindSize || rating) && (
-        <dl className="mb-4 flex flex-col gap-1.5">
-          {bean && (
-            <div className="flex gap-2 text-small">
-              <dt className={CAP}>{t("bean")}</dt>
-              <dd className="text-fg-2">{bean}</dd>
-            </div>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2
+            className={cn(
+              "font-semibold text-fg",
+              isDefaultName
+                ? cn("text-[18px]", MONO)
+                : "font-display text-h3 leading-tight",
+            )}
+          >
+            {name}
+          </h2>
+          {isDefaultName ? null : (
+            <div className={cn("mt-1 text-[13px] text-fg-3", MONO)}>{summary}</div>
           )}
-          {grindSize && (
-            <div className="flex gap-2 text-small">
-              <dt className={CAP}>{t("grind")}</dt>
-              <dd className="text-fg-2">{grindSize}</dd>
-            </div>
-          )}
-          {rating ? (
-            <div
-              className="flex items-center gap-1"
-              role="img"
-              aria-label={t("ratingValue", { n: rating })}
-            >
-              {STARS.map((n) => {
-                const filled = n <= rating;
-                return (
-                  <StarGlyph
-                    key={n}
-                    size={16}
-                    filled={filled}
-                    className={filled ? "text-brand" : "text-fg-4"}
-                  />
-                );
-              })}
-            </div>
-          ) : null}
-        </dl>
-      )}
+        </div>
 
-      <div className="flex gap-2.5">
+        {rating ? (
+          <div
+            className="mt-1 flex shrink-0 items-center gap-0.5"
+            role="img"
+            aria-label={t("ratingValue", { n: rating })}
+          >
+            {STARS.map((n) => {
+              const filled = n <= rating;
+              return (
+                <StarGlyph
+                  key={n}
+                  size={15}
+                  filled={filled}
+                  className={filled ? "text-brand" : "text-fg-4"}
+                />
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Chip accent>{tasteLabel}</Chip>
+        {bean ? <Chip label={t("bean")}>{bean}</Chip> : null}
+        {grindSize ? <Chip label={t("grind")}>{grindSize}</Chip> : null}
+      </div>
+
+      <div className="mt-4 flex gap-2.5">
         <Button
           onClick={() => router.push(brewHref(params, false))}
-          className={CARD_PILL_SOLID}
+          className={cn(CARD_PILL_SOLID, "min-w-0 px-3 whitespace-nowrap")}
         >
           <Icon name="play" size={16} /> {t("brewAgain")}
         </Button>
+        {/* Edit collapses to an icon-only square on phone widths (`< sm`) so the
+            flex-1 "Brew again" label never clips at ~360–393px — notably with the
+            longer pt-BR copy ("Preparar de novo"). The label returns on `sm`+. The
+            `aria-label` keeps it accessible while the text is hidden. */}
         <Button
           onClick={() => router.push(editHref(params))}
-          className={CARD_PILL_OUTLINE}
+          aria-label={t("edit")}
+          className={cn(
+            CARD_PILL_OUTLINE,
+            "size-11 flex-none items-center justify-center gap-2 p-0 whitespace-nowrap [&_svg:not([class*='size-'])]:size-4 sm:w-auto sm:px-4",
+          )}
         >
-          {t("edit")}
+          <Icon name="edit" size={16} />
+          <span className="hidden sm:inline">{t("edit")}</span>
         </Button>
-      </div>
 
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button
-            aria-label={t("deleteAria", { name })}
-            className="mt-2.5 flex h-11 w-full rounded-md border-none bg-transparent p-0 font-body text-small font-semibold whitespace-normal text-fg-3 shadow-none hover:bg-transparent hover:text-fg"
-          >
-            {t("delete")}
-          </Button>
-        </AlertDialogTrigger>
-        <AlertDialogContent size="sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="font-display text-h4 font-bold text-fg">
-              {t("confirmTitle")}
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-small text-fg-3">
-              {t("confirmBody", { name })}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("confirmCancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => onDelete(id)}>
-              {t("confirmDelete")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              aria-label={t("deleteAria", { name })}
+              className="flex size-11 shrink-0 items-center justify-center rounded-md border border-border-strong bg-transparent p-0 text-fg-3 shadow-none hover:bg-transparent hover:text-fg [&_svg:not([class*='size-'])]:size-[17px]"
+            >
+              <Icon name="trash" size={17} />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="font-display text-h4 font-bold text-fg">
+                {t("confirmTitle")}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-small text-fg-3">
+                {t("confirmBody", { name })}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("confirmCancel")}</AlertDialogCancel>
+              <AlertDialogAction onClick={() => onDelete(id)}>
+                {t("confirmDelete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
     </article>
   );
 }
