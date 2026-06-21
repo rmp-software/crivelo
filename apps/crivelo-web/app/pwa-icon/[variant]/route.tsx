@@ -1,7 +1,7 @@
 import { renderIcon } from "@crivelo/pwa";
 import { criveloPwa } from "../../pwa.config";
 
-// Manifest icon tiles (referenced by app/manifest.ts):
+// Manifest icon tiles (referenced by app/manifest/[locale]/route.ts):
 //   /pwa-icon/192          → rounded 192 tile
 //   /pwa-icon/512          → rounded 512 tile
 //   /pwa-icon/512-maskable → full-bleed 512 tile (purpose: maskable)
