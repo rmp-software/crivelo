@@ -1,11 +1,11 @@
 ---
 slug: coa-css-responsive-layout
-status: draft
+status: planned
 created: 2026-06-20
-tracker:            # set by /breakdown-feature — linear | local
+tracker: local
 linear_project_id:  # linear mode only
-linear_parent_issue: # linear mode only
-feature_branch:
+linear_parent_issue: # linear mode only — RMP-226 is the durable Linear record
+feature_branch: feature/coa-css-responsive-layout
 ---
 
 # Coa: CSS-driven responsive layout — drop `useViewport`
@@ -143,3 +143,60 @@ custom properties remain legitimate runtime bridges.
   (CSS instead of JS).
 - Surfaced while reviewing the save-recipes home redesign (PR #55); independent of
   that feature.
+
+## Tasks
+
+- [ ] TastePad — propless responsive sizing
+  - AC: the taste pad renders at the correct size on all breakpoints with no JS
+    breakpoint switch (sizes from its container + responsive utilities).
+  - Test: 1. `pnpm --filter crivelo-web type-check` exits 0. 2. Load `/` at 393 /
+    768 / 1280; screenshot the pad at each — height 280 / 300 / 350, fills its
+    column. 3. Drag the puck — it still tracks acidity/strength. Drop the
+    `dims` / `center` props; height `h-[280px] md:h-[300px] lg:h-[350px]`; width
+    stays `w-full`; remove the mobile max-width cap; `SieveGrid` gets one constant
+    `gap`.
+
+- [ ] CoaCalculator — single CSS-driven markup tree
+  - AC: cold (throttled) load at 1280 / 768 / 393 paints the correct layout on
+    first paint with no mobile→desktop flash; no hydration error; CLS ≈ 0 on the
+    home route; save-recipes bottom-bar (narrow) vs compact-inline (wide) still
+    correct.
+  - Test: 1. `type-check` exits 0. 2. Throttled cold load at 1280 and 768 — the
+    first paint is already the correct (two-column / single-column) layout, no
+    flash. 3. Console clean (no hydration mismatch). 4. Seed a last-brew; confirm
+    the bottom-bar shows narrow and the compact-inline row shows wide. Collapse the
+    two `wide`-gated returns into one `lg:grid lg:grid-cols-2` tree; `CONTAINER_MAX`
+    → responsive `max-w-*`; padding/gap/intro-font → `md:` / `lg:`; consume the new
+    propless TastePad; no `useViewport` here.
+
+- [ ] BrewView + BrewTimer — drop `bp`, breakpoint-driven brew screens
+  - AC: `/brew` paints the correct layout on first paint with no flash; no
+    hydration error; CLS ≈ 0; the ring renders at the correct size at each
+    breakpoint.
+  - Test: 1. `type-check` exits 0. 2. Cold load `/brew` at 1280 / 768 / 393;
+    screenshot — ring sized correctly (fixed viewBox scaled by responsive width),
+    grid/fonts correct. 3. Console clean. BrewView stops calling `useViewport` /
+    passing `bp`; BrewTimer derives `wide` / `desktop` from breakpoints.
+
+- [ ] Delete `useViewport` + cleanup + whole-app gate
+  - AC: `useViewport` is removed entirely (no remaining consumer; file + `Breakpoint`
+    export deleted); CLS ≈ 0 on `/`, `/brew`, `/recipes`; verified on a real resized
+    window across breakpoints.
+  - Test: 1. `grep -rn useViewport apps/crivelo-web` → no hits. 2. Delete
+    `components/coa/useViewport.ts` + its `Breakpoint` type; update
+    `components/coa/index.ts` re-exports. 3. `type-check` exits 0. 4. Full Playwright
+    sweep at 1280 / 768 / 393 across all three routes (no flash, console clean,
+    CLS ≈ 0). 5. A real resized-window pass across breakpoints.
+
+- [ ] Follow-up: audit app-wide JS-powered responsiveness & decide
+  - AC: every JS-driven responsiveness usage in `apps/crivelo-web` outside the COA
+    components is catalogued (any `window.innerWidth` / `matchMedia` / `resize`
+    listeners / viewport hooks); for each, a decision is recorded — migrate to CSS
+    breakpoints now (if cheap + in scope) or keep with a one-line justification /
+    file a follow-up. The goal is to remove JS-powered responsiveness app-wide
+    where a CSS equivalent is flash-free.
+  - Test: 1. `grep -rnE 'innerWidth|matchMedia|addEventListener\(.?resize|useViewport|useMediaQuery' apps/crivelo-web`
+    → produce the catalogue. 2. Record the per-finding decision in this spec (a
+    `## App-wide responsiveness audit` section) or as follow-up tasks. 3. Any
+    migrations done in this pass meet the same flash-free / no-hydration-error /
+    CLS ≈ 0 bar as the COA work.
