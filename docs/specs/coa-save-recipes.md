@@ -196,5 +196,6 @@ mid-brew). This extends the existing "brew session reset on re-entry" fix.
 
 - [x] Saved recipes route
 - [x] Last-brew sticky bottom bar + header Saved-recipes bookmark (replaces the in-flow card/link; fixes layout shift)
+- [~] Saved recipe card redesign (variant A: spec-led + chips, identity dedup, trash icon; mobile-first)
   - AC: `/[locale]/recipes` lists saved recipes as cards (name, bean, grind size, rating, params summary), each with "Brew again" (→ `/brew?…&autostart=0`), "Edit" (→ calculator pre-filled), and "Delete" (`AlertDialog` confirm) that removes it from `coa-recipes` and updates the list immediately; an empty state shows when none are saved.
   - Test: 1. `npx tsc --noEmit` exits 0. 2. Seed `coa-recipes` → `/[locale]/recipes` renders the cards with all fields. 3. "Brew again" → `/brew?…&autostart=0` with the recipe's params; "Edit" → calculator pre-filled. 4. "Delete" → confirm → recipe removed and list updates. 5. Clear all recipes → empty state shows. 6. Playwright check on mobile + desktop.
