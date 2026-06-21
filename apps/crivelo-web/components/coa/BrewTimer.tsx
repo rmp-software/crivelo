@@ -21,14 +21,20 @@
  * 0. Real wall-clock time means a mid-brew refresh (phone propped on the
  * counter) resumes from the right place. Session persists under localStorage
  * 'coa-brew' as { status, base?, startTs?, cdStart? }; the load is
- * backward-tolerant so a stale/old-shaped session can't crash. Both themes,
- * three breakpoints, `prefers-reduced-motion` honored.
+ * backward-tolerant so a stale/old-shaped session can't crash. Both themes and
+ * `prefers-reduced-motion` honored.
+ *
+ * Sizing is CSS-driven, not JS: there is no `bp` prop. Responsive Tailwind
+ * utilities (`md:` ≥768 = old "wide", `lg:` ≥1024 = old "desktop") pick the
+ * container max-width, padding, the two-column grid, and the clock font. The ring
+ * keeps a FIXED 272 viewBox (geometry math in the 272 coordinate space) and the
+ * rendered dial box scales via responsive width/height utilities (236px mobile →
+ * 272px ≥md), so the SVG faithfully scales without recomputing geometry.
  */
 import {
   useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode,
 } from "react";
 import dynamic from "next/dynamic";
@@ -47,7 +53,6 @@ import { setLastBrew, type RecipeParams } from "../../lib/recipes-store";
 import { toBrewSpeed, type BrewSpeed } from "./brew-speed";
 import { Icon } from "./icons";
 import { SaveRecipeForm } from "./SaveRecipeForm";
-import type { Breakpoint } from "./useViewport";
 
 const KEY = "coa-brew";
 
@@ -235,7 +240,6 @@ export interface BrewTimerProps {
   autostart: boolean;
   /** Leave the brew route (back to the idle calculator). Clears the session. */
   onExit: () => void;
-  bp?: Breakpoint;
 }
 
 export function BrewTimer({
@@ -244,13 +248,10 @@ export function BrewTimer({
   query,
   autostart,
   onExit,
-  bp = "mobile",
 }: BrewTimerProps) {
   const t = useTranslations("BrewTimer");
   const tCalc = useTranslations("Calculator");
   const tSchedule = useTranslations("Schedule");
-  const wide = bp !== "mobile";
-  const desktop = bp === "desktop";
 
   // Resolve the opening session from the route's params + autostart: resume a
   // same-params session (accidental reload), else start fresh (pre-roll on
@@ -351,8 +352,12 @@ export function BrewTimer({
   const cur = phases[curIdx];
   const pourPhase = !done && !counting && !ready && cur.kind === "pour";
 
-  // Ring geometry (runtime constants → inline style bridges only).
-  const SZ = wide ? 272 : 236;
+  // Ring geometry. The SVG coordinate space is a FIXED 272 viewBox; CSS scales the
+  // rendered dial box per breakpoint (236px mobile → 272px ≥md), so every derived
+  // value (R, CX, CIRC, pour ticks, strokeDashoffset) stays in the 272 space and
+  // scales faithfully with the box. The live ring fill / tick fills remain runtime
+  // inline-style bridges.
+  const SZ = 272;
   const STROKE = 8;
   const R = SZ / 2 - STROKE / 2 - 13;
   const CX = SZ / 2;
@@ -498,13 +503,6 @@ export function BrewTimer({
   // Recipe-list bookkeeping.
   const stepCount = phases.length;
   const stepNo = Math.min(curIdx + 1, stepCount);
-
-  // The container max-width is runtime data (the `max` prop on wide layouts; a
-  // fixed 390 on mobile), so it travels through a CSS custom property consumed by
-  // the static `max-w-[var(--mw)]` utility.
-  const mwVar = {
-    "--mw": `${wide ? (desktop ? 1000 : 700) : 390}px`,
-  } as CSSProperties;
 
   // ===== sub-components (closures over elapsed, t, paused) =====
   function CurrentCard({ p }: { p: TimerPhase }) {
@@ -798,21 +796,9 @@ export function BrewTimer({
         onOpenChange={setSaveOpen}
         params={params}
       />
-      <main
-        // last-resort: runtime container max-width (data-driven `max`/bp).
-        style={mwVar}
-        className={cn(
-          "mx-auto box-border max-w-[var(--mw)]",
-          wide ? "px-6 pt-4 pb-[60px]" : "px-5 pt-2.5 pb-12",
-        )}
-      >
+      <main className="mx-auto box-border max-w-[390px] px-5 pt-2.5 pb-12 md:max-w-[700px] md:px-6 md:pt-4 md:pb-[60px] lg:max-w-[1000px]">
         {/* top bar — back affordance + status pill */}
-        <div
-          className={cn(
-            "flex items-center justify-between",
-            wide ? "mb-4" : "mb-2",
-          )}
-        >
+        <div className="mb-2 flex items-center justify-between md:mb-4">
           <Button
             type="button"
             onClick={exit}
@@ -859,25 +845,16 @@ export function BrewTimer({
           </span>
         </div>
 
-        <div
-          className={cn(
-            "items-start",
-            wide
-              ? cn(
-                  "grid gap-[52px]",
-                  desktop ? "grid-cols-[340px_1fr]" : "grid-cols-[300px_1fr]",
-                )
-              : "block",
-          )}
-        >
+        <div className="block items-start md:grid md:grid-cols-[300px_1fr] md:gap-[52px] lg:grid-cols-[340px_1fr]">
           <div>
             {/* ring */}
             <div className="flex justify-center">
-              {/* last-resort: dial box sized to the runtime ring constant SZ */}
-              <div className="relative" style={{ width: SZ, height: SZ }}>
+              {/* Dial box: responsive size; the SVG fills it via width/height
+                  100% and a fixed 272 viewBox, so the 272-space geometry scales. */}
+              <div className="relative h-[236px] w-[236px] md:h-[272px] md:w-[272px]">
                 <svg
-                  width={SZ}
-                  height={SZ}
+                  width="100%"
+                  height="100%"
                   viewBox={`0 0 ${SZ} ${SZ}`}
                   // last-resort: ring starts at 12 o'clock
                   style={{ transform: "rotate(-90deg)" }}
@@ -942,8 +919,7 @@ export function BrewTimer({
                   <span
                     className={cn(
                       MONO,
-                      "font-semibold leading-[0.92] tracking-[-0.02em]",
-                      wide ? "text-[60px]" : "text-[52px]",
+                      "text-[52px] font-semibold leading-[0.92] tracking-[-0.02em] md:text-[60px]",
                       counting || ready ? "text-accent-ink" : "text-fg",
                     )}
                   >
@@ -1093,7 +1069,7 @@ export function BrewTimer({
           </div>
 
           {/* recipe list */}
-          <div className={wide ? "mt-1" : "mt-7"}>
+          <div className="mt-7 md:mt-1">
             <div className="mb-3.5 flex items-center justify-between">
               <span className={cn(CAP, "text-fg-3")}>{t("recipe")}</span>
               <span className={cn(MONO, "text-[12px] font-semibold text-fg-3")}>

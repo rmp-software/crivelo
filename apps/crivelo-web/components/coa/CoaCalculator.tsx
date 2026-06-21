@@ -7,30 +7,34 @@
  * schedule / CTA), minus the shell chrome (Header / NavSheet / Footer), which the
  * Shell already provides via app/[locale]/layout.tsx.
  *
- * Responsive (breakpoints from the design via useViewport): mobile <700 single
- * column (intro → pad → inputs → schedule → CTA); tablet 700–1023 and desktop
- * ≥1024 two columns (left: intro + pad + inputs; right: sticky "Your recipe"
- * panel with big water total + schedule + CTA).
+ * Responsive (RMP-226): ONE markup tree; CSS breakpoints pick the arrangement, so
+ * the first paint is already correct at any width (no JS viewport measurement, no
+ * mobile→desktop flash). Width mapping: base = mobile (<768,
+ * single column intro → pad → inputs → schedule → CTA); `md:` (≥768, the
+ * old ≥700 wide flip) → two columns (left: intro + pad + inputs; right:
+ * "Your recipe" panel card with big water total + schedule + CTA); `lg:` (≥1024,
+ * was `desktop`) → roomier gap/padding + the sticky panel. On mobile the grid
+ * collapses to block flow, so the left div (intro → pad → inputs) renders above the
+ * right div (panel header hidden → schedule → CTA), giving the exact mobile order.
  *
  * "Begin brew" navigates to the `/[locale]/brew` route (feature: coa-save-recipes)
  * with the recipe params + `autostart=1` in the URL query, so the brew flow is a
  * pure function of its URL. The brew route re-derives the same recipe from those
  * params via the 4:6 engine, so the timer shows exactly the idle schedule.
  *
- * Styling (RMP-214): the foundation's neutral semantic tokens (--fg-2/3, --border,
- * --surface-raised, --font-serif/mono, …) are referenced via arbitrary-value
- * utility classes (`text-[color:var(--fg-3)]`), NOT inline `style` (the
- * no-`var(--)`-in-`style` rule). The teal accent rides the promoted `bg-brand` /
- * `text-accent-ink` tokens. The only surviving inline `style` is the wide-layout
- * container/panel sizing, which is driven by the runtime `bp` viewport value.
+ * Styling (RMP-214): the foundation's neutral semantic tokens ride their registered
+ * utility classes (`text-fg-3`, `border-border`, `bg-surface-raised`, …). The teal
+ * accent rides the promoted `bg-brand` / `text-accent-ink` tokens. The responsive
+ * arrangement (container max-width, grid, panel chrome, fonts) is now fully
+ * CSS-driven via `md:` / `lg:` utilities — no runtime container/panel sizing, no
+ * inline layout `style`.
  */
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import { Button } from "../ui/Button";
 import { useRouter } from "../../i18n/navigation";
 import { useRecipe } from "./useRecipe";
-import { useViewport, type Breakpoint } from "./useViewport";
-import { TastePad, type PadDims } from "./TastePad";
+import { TastePad } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
 import { LastBrewBar } from "./LastBrewBar";
@@ -39,18 +43,6 @@ import { tasteKey } from "../../lib/four-six";
 import { brewHref } from "../../lib/coa-nav";
 import { DEFAULT_PARAMS, type RecipeParams } from "../../lib/recipes-store";
 import { CAP, MONO } from "./style-tokens";
-
-const PAD_DIMS: Record<Breakpoint, PadDims> = {
-  desktop: { w: 430, h: 350, gap: 48 },
-  tablet: { w: 380, h: 300, gap: 41 },
-  mobile: { w: 350, h: 280, gap: 38 },
-};
-
-const CONTAINER_MAX: Record<Breakpoint, number> = {
-  desktop: 1060,
-  tablet: 680,
-  mobile: 390,
-};
 
 /**
  * Props seeded by the server `page.tsx` from the URL query (the "Edit" landing). The
@@ -68,10 +60,7 @@ export function CoaCalculator({
 }: CoaCalculatorProps = {}) {
   const t = useTranslations("Calculator");
   const tTaste = useTranslations("Taste");
-  const bp = useViewport();
   const router = useRouter();
-  const wide = bp !== "mobile";
-  const containerMax = CONTAINER_MAX[bp];
 
   const {
     dose,
@@ -101,18 +90,9 @@ export function CoaCalculator({
 
   // ---------- pieces ----------
   const intro = (
-    <div className={wide ? "mb-6" : "mb-5"}>
+    <div className="md:mb-6">
       <div className={cn(CAP, "mb-2")}>{t("introCaption")}</div>
-      <p
-        className={cn(
-          "m-0 max-w-[17em] font-serif italic leading-[1.28] text-fg-2",
-          bp === "desktop"
-            ? "text-[30px]"
-            : bp === "tablet"
-              ? "text-[25px]"
-              : "text-[19px]",
-        )}
-      >
+      <p className="m-0 max-w-[17em] font-serif text-[19px] italic leading-[1.28] text-fg-2 md:text-[25px] lg:text-[30px]">
         {t("introLine")}
       </p>
     </div>
@@ -124,8 +104,6 @@ export function CoaCalculator({
       strengthPours={strengthPours}
       setAcidity={setAcidity}
       setStrength={setStrength}
-      dims={PAD_DIMS[bp]}
-      center={!wide}
     />
   );
 
@@ -139,8 +117,10 @@ export function CoaCalculator({
     />
   );
 
-  const panelHeader = wide && (
-    <div className="mb-4 border-b border-border pb-[18px]">
+  // Wide-only header (the big 44px water number + summary). Mobile shows the water
+  // total in the inputs row instead, so this is hidden below md.
+  const panelHeader = (
+    <div className="mb-4 hidden border-b border-border pb-[18px] md:block">
       <div className={cn(CAP, "mb-2")}>{t("yourRecipe")}</div>
       <div className="flex items-end gap-3.5">
         <span
@@ -211,66 +191,39 @@ export function CoaCalculator({
     </>
   );
 
-  const panelClass = cn(
-    "rounded-md border border-border bg-surface-raised shadow-1",
-    bp === "desktop" ? "p-7" : "p-6",
-  );
-
-  if (wide) {
-    return (
-      // last-resort: container max-width is the runtime per-breakpoint
-      // CONTAINER_MAX value (desktop 1060 / tablet 680).
-      <main
-        className={cn(
-          "mx-auto box-border",
-          bp === "desktop" ? "px-6 pt-10 pb-2" : "px-6 pt-7 pb-2",
-        )}
-        style={{ maxWidth: containerMax }}
-      >
-        <div
-          className={cn(
-            "grid grid-cols-2 items-start",
-            bp === "desktop" ? "gap-14" : "gap-9",
-          )}
-        >
-          <div className="flex flex-col gap-[22px]">
-            {intro}
-            {/* Wide layout: the last brew reads as a compact inline row in the
-                left column (a floating bottom bar reads oddly across the wide
-                canvas). Self-hides when no last brew exists. */}
-            <LastBrewBar variant="inline" />
-            {pad}
-            {inputs}
-          </div>
-          <div
-            className={cn(
-              panelClass,
-              bp === "desktop" ? "sticky top-[90px]" : "static",
-            )}
-          >
-            {panelHeader}
-            {schedule}
-            {cta}
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    // The narrow home reserves bottom scroll-padding (bar height + gap +
-    // safe-area) so the sticky LastBrewBar never occludes the last control
-    // ("Begin brew"). env() is a runtime value (not a design token), so the
-    // arbitrary is a legitimate runtime bridge.
-    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
-      {intro}
-      <div className="mb-3">{pad}</div>
-      <div className="mb-[22px]">{inputs}</div>
-      {schedule}
-      {cta}
-      {/* Sticky bottom bar (narrow only): fixed/out-of-flow → zero layout shift
-          on its post-mount reveal. Self-hides when no last brew exists. */}
-      <LastBrewBar variant="bar" />
+    // ONE tree, CSS picks the arrangement. Container max-width / padding are the
+    // old per-breakpoint CONTAINER_MAX (390 / 680 / 1060) expressed as responsive
+    // utilities. The mobile bottom-padding reserves room for the sticky LastBrewBar
+    // (bar height + gap + safe-area; env() is a runtime bridge, not a token) and
+    // collapses to pb-2 once two-column (the bar is hidden there).
+    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))] md:max-w-[680px] md:px-6 md:pt-7 md:pb-2 lg:max-w-[1060px] lg:pt-10">
+      <div className="flex flex-col gap-[22px] md:grid md:grid-cols-2 md:items-start md:gap-9 lg:gap-14">
+        <div className="flex flex-col gap-[22px]">
+          {intro}
+          {/* Wide layout: the last brew reads as a compact inline row in the left
+              column (a floating bottom bar reads oddly across the wide canvas).
+              Hidden below md; self-hides when no last brew exists. */}
+          <div className="hidden md:block">
+            <LastBrewBar variant="inline" />
+          </div>
+          {pad}
+          {inputs}
+        </div>
+        {/* Unstyled passthrough on mobile (the grid collapses to block flow, so
+            this renders below the left column → schedule → CTA); a sticky recipe
+            card from md up (panel chrome applied only at md+). */}
+        <div className="md:rounded-md md:border md:border-border md:bg-surface-raised md:p-6 md:shadow-1 lg:sticky lg:top-[90px] lg:p-7">
+          {panelHeader}
+          {schedule}
+          {cta}
+        </div>
+      </div>
+      {/* Sticky bottom bar (narrow only): fixed/out-of-flow → zero layout shift on
+          its post-mount reveal. Hidden at md+; self-hides when no last brew. */}
+      <div className="md:hidden">
+        <LastBrewBar variant="bar" />
+      </div>
     </main>
   );
 }
