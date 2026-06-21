@@ -252,21 +252,24 @@ A README documenting the whole package. Scope:
 
 ## Tasks
 
-- [ ] Package — `PwaConfig.i18n` + `createManifest(cfg, locale?)` builder
+- [x] Package — `PwaConfig.i18n` + `createManifest(cfg, locale?)` builder — PR #62
   - AC: no-`i18n` `createManifest(cfg)` is byte-identical to today;
     `createManifest(cfg, locale)` emits localized `start_url`/`id`/`lang`/`dir`/
     `description`; absent-`i18n` or unknown locale falls back to non-localized.
-  - Test: `cd packages/pwa && pnpm test` — unit tests pass: (a) `createManifest(cfg)`
-    deep-equals pre-change output; (b) `createManifest(cfg,'pt')` →
-    `start_url:'/pt'`, `id:'/pt'`, `lang:'pt-BR'`, pt description; (c)
-    `createManifest(cfg,'fr')` falls back. `npx tsc --noEmit` exits 0.
+  - Test: `pnpm --filter crivelo-web test` (the pwa unit tests live in
+    `apps/crivelo-web/lib/`, like `pwa-splash.test.ts` — the package ships no own
+    runner) — tests pass: (a) `createManifest(cfg)` deep-equals pre-change output;
+    (b) `createManifest(cfg,'pt')` → `start_url:'/pt'`, `id:'/pt'`, `lang:'pt-BR'`,
+    pt description; (c) `createManifest(cfg,'fr')` falls back; (d) empty
+    `startUrl:''` falls back to `/${locale}`. `npx tsc --noEmit` exits 0.
 - [ ] Package — `createManifestRoute(cfg)` factory
   - AC: factory mirrors `createSplashRoute`; reads `params.locale`; unknown locale
     → 404 when `i18n` configured; absent `i18n` → serves non-localized manifest (no
     404); `Content-Type: application/manifest+json`.
-  - Test: `cd packages/pwa && pnpm test` — route tests pass: known locale → 200 +
-    content-type + localized body; unknown → 404; cfg without `i18n` → 200
-    non-localized. `npx tsc --noEmit` exits 0.
+  - Test: `pnpm --filter crivelo-web test` (pwa unit tests live in
+    `apps/crivelo-web/lib/`) — route tests pass: known locale → 200 + content-type +
+    localized body; unknown → 404; cfg without `i18n` → 200 non-localized.
+    `npx tsc --noEmit` exits 0.
 - [ ] crivelo-web — wire per-locale manifest
   - AC: `app/manifest/[locale]/route.ts` → `createManifestRoute(criveloPwa)`;
     `manifest` added to middleware matcher; layout `generateMetadata` sets
