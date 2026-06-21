@@ -301,7 +301,9 @@ A README documenting the whole package. Scope:
   - Test: deploy preview; on iPhone install `/pt` → Add to Home Screen → reboot →
     cold-launch → confirm pt + splash; repeat `/en`. Headless checks can't prove
     iOS splash — physical device required.
-- [ ] Reconcile Linear (run when arcade.dev is reachable)
+- [x] Reconcile Linear — created missing child RMP-232; parent RMP-227 → In
+  Progress; RMP-228/229/232/230 → Done. RMP-231 (device gate) stays open; close
+  RMP-227 after the umbrella feature→main PR merges + device validation passes.
   - AC: the partial Linear breakdown is completed and synced — create the missing
     `crivelo-web — wire per-locale manifest` child under parent **RMP-227** (Crivelo
     project), and reflect final state (parent + all children → Done) at feature end.
