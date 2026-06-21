@@ -8,7 +8,6 @@
  *  - PourSchedule  — phase bar + pour list + "Remove dripper · drawdown" row
  *  - BrewTimer     — RMP-192 running brew timer (live dial, real-time + localStorage resume)
  *  - useRecipe     — recipe state over the engine
- *  - useViewport   — mobile <700 / tablet 700–1023 / desktop ≥1024
  */
 export { CoaCalculator } from "./CoaCalculator";
 export type { CoaCalculatorProps } from "./CoaCalculator";
@@ -28,6 +27,4 @@ export type { BrewTimerProps } from "./BrewTimer";
 export { BrewView } from "./BrewView";
 export { useRecipe } from "./useRecipe";
 export type { UseRecipe, RecipeInit } from "./useRecipe";
-export { useViewport } from "./useViewport";
-export type { Breakpoint } from "./useViewport";
 export { CAP, MONO } from "./style-tokens";
