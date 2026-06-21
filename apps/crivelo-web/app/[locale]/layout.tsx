@@ -30,8 +30,9 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("description"),
-    // PWA: per-locale manifest link + applicationName + iOS web-app meta (RMP / add-to-home-screen).
-    manifest: `/manifest/${locale}`,
+    // PWA: applicationName + iOS web-app meta (RMP / add-to-home-screen). The
+    // per-locale manifest link is rendered manually in <head> (below) — emitting
+    // it via metadata.manifest makes Next inject crossorigin="use-credentials".
     ...pwaMetadata(criveloPwa),
   };
 }
@@ -62,6 +63,9 @@ export default async function LocaleLayout({
     // before React hydrates, so the server/client attribute can differ by design.
     <html lang={locale} suppressHydrationWarning>
       <head>
+        {/* Per-locale PWA manifest. Rendered manually (not via metadata.manifest)
+            so Next doesn't inject crossorigin="use-credentials" on the link. */}
+        <link rel="manifest" href={`/manifest/${locale}`} />
         {/* No-FOUC: set the theme before first paint to avoid a flash. */}
         <script dangerouslySetInnerHTML={{ __html: NO_FOUC_SCRIPT }} />
       </head>
