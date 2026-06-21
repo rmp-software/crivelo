@@ -84,7 +84,7 @@ export interface PwaConfig {
   };
 }
 
-export { createManifest } from "./manifest";
+export { createManifest, createManifestRoute } from "./manifest";
 export { renderIcon } from "./icon";
 export { renderSplash, createSplashRoute } from "./splash";
 export { splashDevices, DEFAULT_SPLASH_BASE_PATH } from "./devices";
