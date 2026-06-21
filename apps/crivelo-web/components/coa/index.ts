@@ -18,7 +18,7 @@ export { RecipesList } from "./RecipesList";
 export { RecipeCard } from "./RecipeCard";
 export type { RecipeCardProps } from "./RecipeCard";
 export { TastePad } from "./TastePad";
-export type { TastePadProps, PadDims } from "./TastePad";
+export type { TastePadProps } from "./TastePad";
 export { RecipeInputs } from "./RecipeInputs";
 export type { RecipeInputsProps } from "./RecipeInputs";
 export { PourSchedule } from "./PourSchedule";

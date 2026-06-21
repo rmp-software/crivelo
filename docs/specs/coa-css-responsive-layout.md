@@ -68,14 +68,17 @@ correct on first paint at any width, no JS measurement for layout.
 ## Approach — one markup tree, breakpoints pick the arrangement
 
 1. **`components/coa/CoaCalculator.tsx`** — collapse the two `wide`-gated
-   `return`s into a single tree using `lg:grid lg:grid-cols-2` + responsive
-   ordering (mobile single column: intro → pad → inputs → schedule → CTA; `lg`
-   two columns: left intro + pad + inputs, right sticky recipe panel). Replace the
-   `CONTAINER_MAX` inline `max-width` with responsive `max-w-*` classes. Convert
-   per-breakpoint padding / gap / intro-font choices to `md:` / `lg:` utilities.
-   The wide-only panel header and the inline-vs-bar `LastBrewBar` selection ride
-   the same breakpoints — render both variants and toggle visibility with
-   `hidden` / `lg:block` (and the reverse) rather than a JS branch.
+   `return`s into a single tree using `md:grid md:grid-cols-2` + responsive
+   ordering (mobile single column: intro → pad → inputs → schedule → CTA; `md`+
+   two columns: left intro + pad + inputs, right recipe panel, sticky at `lg`).
+   Replace the `CONTAINER_MAX` inline `max-width` with responsive `max-w-*` classes.
+   Convert per-breakpoint padding / gap / intro-font choices to `md:` / `lg:`
+   utilities. The wide-only panel header and the inline-vs-bar `LastBrewBar`
+   selection ride the same breakpoints — render both variants and toggle visibility
+   with `hidden` / `md:block` (and the reverse) rather than a JS branch. NOTE the
+   breakpoint mapping: old `wide` (≥700) → `md:` (≥768); old `desktop` (≥1024) →
+   `lg:`. The outer wrapper is `flex flex-col gap-[22px]` on mobile (so the column
+   halves keep their 22px rhythm) and `md:grid` two-column above.
 
 2. **`components/coa/TastePad.tsx`** — drop the `dims` and `center` props. Height
    becomes `h-[280px] md:h-[300px] lg:h-[350px]`; width stays `w-full`; the mobile
@@ -84,13 +87,17 @@ correct on first paint at any width, no JS measurement for layout.
    stay — they are a legitimate runtime bridge, not a breakpoint value.
 
 3. **`components/coa/BrewView.tsx`** — remove the `useViewport` call and stop
-   passing the `bp` prop to `BrewTimer`.
+   passing the `bp` prop to `BrewTimer`. The `BrewSkeleton` loading fallback (the
+   `dynamic`/`Suspense` placeholder) must ALSO be responsive — mirror BrewTimer's
+   container max-width / padding and ring-box size so a desktop/tablet cold load
+   doesn't paint a mobile-width skeleton then jump (the very flash/CLS this fixes).
 
 4. **`components/coa/BrewTimer.tsx`** — derive `wide` / `desktop` from Tailwind
-   breakpoints instead of the `bp` prop. The ring keeps a **fixed viewBox** (the
-   272 coordinate space; `R` / `CX` / `CIRC` / `strokeDashoffset` math unchanged)
-   and the rendered box scales via responsive width utilities
-   (`w-[236px] lg:w-[272px]`, height matching). The two-column grid layout,
+   breakpoints instead of the `bp` prop (old `wide` ≥700 → `md:`; old `desktop`
+   ≥1024 → `lg:`). The ring keeps a **fixed viewBox** (the 272 coordinate space;
+   `R` / `CX` / `CIRC` / `strokeDashoffset` math unchanged) and the rendered box
+   scales via responsive width utilities (`w-[236px] md:w-[272px]`, height
+   matching — 272 ring at `md`+ matches the old `wide` ring). The two-column grid layout,
    container max-width, and the ring-clock / center font sizes become responsive
    utilities. The live ring fill / progress remain runtime inline-style bridges.
 
@@ -165,7 +172,7 @@ custom properties remain legitimate runtime bridges.
     first paint is already the correct (two-column / single-column) layout, no
     flash. 3. Console clean (no hydration mismatch). 4. Seed a last-brew; confirm
     the bottom-bar shows narrow and the compact-inline row shows wide. Collapse the
-    two `wide`-gated returns into one `lg:grid lg:grid-cols-2` tree; `CONTAINER_MAX`
+    two `wide`-gated returns into one `md:grid md:grid-cols-2` tree; `CONTAINER_MAX`
     → responsive `max-w-*`; padding/gap/intro-font → `md:` / `lg:`; consume the new
     propless TastePad; no `useViewport` here.
 
