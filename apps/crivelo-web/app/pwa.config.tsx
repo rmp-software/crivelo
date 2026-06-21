@@ -2,8 +2,9 @@ import type { PwaConfig } from "@crivelo/pwa";
 
 /**
  * Crivelo website PWA config (RMP / pwa-add-to-home-screen). The single source
- * of truth for crivelo-web's manifest + icon tiles, consumed by app/manifest.ts,
- * app/icon.tsx, app/apple-icon.tsx and app/pwa-icon/[variant]/route.tsx.
+ * of truth for crivelo-web's manifest + icon tiles, consumed by
+ * app/manifest/[locale]/route.ts, app/icon.tsx, app/apple-icon.tsx and
+ * app/pwa-icon/[variant]/route.tsx.
  *
  * This app is the **Crivelo hub/website** (Coa is one tool *within* it), so the
  * installed app is branded "Crivelo" with the HOUSE mark — the Monogram sieve —
@@ -68,4 +69,13 @@ export const criveloPwa: PwaConfig = {
   // default single-glyph scale while staying inside the maskable safe zone.
   iconScale: 0.62,
   mark: ({ size, color }) => <CriveloMonogram size={size} color={color} />,
+  // Per-locale manifest data (consumed by app/manifest/[locale]/route.ts). The
+  // top-level description/lang above stay as the bare /manifest.webmanifest
+  // fallback; these localize the installed app per locale (en/pt).
+  i18n: {
+    locales: {
+      en: { description: "Tools for people who live coffee.", lang: "en" },
+      pt: { description: "Ferramentas para quem vive café.", lang: "pt-BR" },
+    },
+  },
 };

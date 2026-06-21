@@ -30,8 +30,8 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("description"),
-    // PWA: manifest link + applicationName + iOS web-app meta (RMP / add-to-home-screen).
-    manifest: "/manifest.webmanifest",
+    // PWA: per-locale manifest link + applicationName + iOS web-app meta (RMP / add-to-home-screen).
+    manifest: `/manifest/${locale}`,
     ...pwaMetadata(criveloPwa),
   };
 }
