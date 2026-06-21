@@ -9,6 +9,7 @@
     "closeMenu": "Fechar menu",
     "siteMenu": "Menu do site",
     "homeAria": "Coa by Crivelo — início",
+    "savedRecipes": "Receitas salvas",
     "theHouse": "A casa",
     "theFamily": "A família",
     "youAreHere": "você está aqui",
@@ -39,6 +40,28 @@
     "beginBrew": "Começar preparo",
     "methodLink": "Como funciona o método 4:6",
     "grams": "g"
+  },
+  "LastBrew": {
+    "title": "Último preparo",
+    "brewAgain": "Preparar de novo",
+    "edit": "Editar"
+  },
+  "Recipes": {
+    "title": "Receitas salvas",
+    "subtitle": "Seus preparos salvos, prontos pra repetir.",
+    "bean": "Grão",
+    "grind": "Moagem",
+    "ratingValue": "{n, plural, one {# estrela} other {# estrelas}}",
+    "brewAgain": "Preparar de novo",
+    "edit": "Editar",
+    "deleteAria": "Excluir {name}",
+    "confirmTitle": "Excluir esta receita?",
+    "confirmBody": "Isso remove {name} de vez. Não dá pra desfazer.",
+    "confirmCancel": "Cancelar",
+    "confirmDelete": "Excluir",
+    "emptyTitle": "Nenhuma receita salva ainda",
+    "emptyBody": "Termine um preparo e salve pra encontrá-lo aqui.",
+    "emptyAction": "Abrir a calculadora"
   },
   "Taste": {
     "label": "Gosto",
@@ -75,8 +98,12 @@
     "done": "Pronto",
     "getSet": "a postos",
     "ofTotal": "de {time}",
+    "totalLabel": "preparo total",
     "brewStartsIn": "O preparo começa em {n} s",
     "startNow": "Comece agora",
+    "readyTitle": "Tudo pronto",
+    "readyHint": "Toque em começar quando estiver pronto",
+    "start": "Começar",
     "pourInSeconds": "Despeje <b>{g} g</b> em <b>{s} s</b>",
     "pourTarget": "→ {g} g",
     "pourNow": "Despeje agora",
@@ -104,6 +131,23 @@
     "restartAria": "Reiniciar preparo",
     "brewAgain": "Preparar de novo",
     "backToRecipe": "Voltar à receita",
-    "totalTime": "Tempo total {time}"
+    "totalTime": "Tempo total {time}",
+    "saveRecipe": "Salvar receita"
+  },
+  "SaveRecipe": {
+    "title": "Salvar esta receita",
+    "subtitle": "Guarde este preparo para repetir depois.",
+    "nameLabel": "Nome",
+    "namePlaceholder": "Dê um nome à receita",
+    "beanLabel": "Grão",
+    "beanPlaceholder": "Qual café você usou?",
+    "grindLabel": "Moagem",
+    "grindPlaceholder": "Seu ajuste de moagem",
+    "ratingLabel": "Nota",
+    "ratingStar": "{n, plural, one {# estrela} other {# estrelas}}",
+    "save": "Salvar receita",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "savedToast": "Receita salva"
   }
 }

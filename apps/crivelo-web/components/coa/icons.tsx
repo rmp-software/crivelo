@@ -28,6 +28,31 @@ const PATHS: Record<string, ReactNode> = {
     <path d="M12 3.2C9 7 5.5 10 5.5 14a6.5 6.5 0 0013 0c0-4-3.5-7-6.5-10.8z" />
   ),
   chevR: <path d="M9 5l7 7-7 7" />,
+  bookmark: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />,
+  // Counter-clockwise restart arrow — the "last brew" lead glyph. Kept distinct
+  // from `bookmark` (the header's saved-recipes affordance) so the last-brew bar
+  // and the saved-recipes entry point don't read as the same control.
+  history: (
+    <>
+      <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+      <path d="M3 3v5h5" />
+    </>
+  ),
+  edit: (
+    <>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z" />
+    </>
+  ),
+  // Trash can — the quiet, confirm-gated delete affordance in the recipe card's
+  // action row (replaces the old orphaned full-width Delete button).
+  trash: (
+    <>
+      <path d="M3 6h18" />
+      <path d="M8 6V4h8v2" />
+      <path d="M19 6l-1 14H6L5 6" />
+    </>
+  ),
 };
 
 export type CoaIconName = keyof typeof PATHS;

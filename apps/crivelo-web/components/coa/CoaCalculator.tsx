@@ -12,9 +12,10 @@
  * ≥1024 two columns (left: intro + pad + inputs; right: sticky "Your recipe"
  * panel with big water total + schedule + CTA).
  *
- * View state: idle ↔ brew. "Begin brew" → brew (the RMP-192 BrewTimer); the math
- * (lib/four-six.ts) is computed once here and handed to whichever view renders,
- * so the timer receives the exact same recipe the idle schedule shows.
+ * "Begin brew" navigates to the `/[locale]/brew` route (feature: coa-save-recipes)
+ * with the recipe params + `autostart=1` in the URL query, so the brew flow is a
+ * pure function of its URL. The brew route re-derives the same recipe from those
+ * params via the 4:6 engine, so the timer shows exactly the idle schedule.
  *
  * Styling (RMP-214): the foundation's neutral semantic tokens (--fg-2/3, --border,
  * --surface-raised, --font-serif/mono, …) are referenced via arbitrary-value
@@ -23,27 +24,21 @@
  * `text-accent-ink` tokens. The only surviving inline `style` is the wide-layout
  * container/panel sizing, which is driven by the runtime `bp` viewport value.
  */
-import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import { Button } from "../ui/Button";
+import { useRouter } from "../../i18n/navigation";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
-import { BrewTimer, clearBrewSession } from "./BrewTimer";
+import { LastBrewBar } from "./LastBrewBar";
 import { Icon } from "./icons";
 import { tasteKey } from "../../lib/four-six";
-
-/** Section caption — uppercase micro-label. */
-const CAP =
-  "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
-
-/** Tabular mono numerals — keeps values from jittering as digits change. */
-const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
-
-type View = "idle" | "brew";
+import { brewHref } from "../../lib/coa-nav";
+import { DEFAULT_PARAMS, type RecipeParams } from "../../lib/recipes-store";
+import { CAP, MONO } from "./style-tokens";
 
 const PAD_DIMS: Record<Breakpoint, PadDims> = {
   desktop: { w: 430, h: 350, gap: 48 },
@@ -57,10 +52,24 @@ const CONTAINER_MAX: Record<Breakpoint, number> = {
   mobile: 390,
 };
 
-export function CoaCalculator() {
+/**
+ * Props seeded by the server `page.tsx` from the URL query (the "Edit" landing). The
+ * server parses + clamps `dose/ratio/acidity/strength` via `parseRecipeParams` and
+ * passes the result here, so the calculator's first paint already reflects the URL — no
+ * client `useSearchParams`/Suspense and no hydration mismatch (server + client seed from
+ * the same params). A bare `/[locale]` (no query) yields the calculator defaults.
+ */
+export interface CoaCalculatorProps {
+  initialParams?: RecipeParams;
+}
+
+export function CoaCalculator({
+  initialParams = DEFAULT_PARAMS,
+}: CoaCalculatorProps = {}) {
   const t = useTranslations("Calculator");
   const tTaste = useTranslations("Taste");
   const bp = useViewport();
+  const router = useRouter();
   const wide = bp !== "mobile";
   const containerMax = CONTAINER_MAX[bp];
 
@@ -74,16 +83,14 @@ export function CoaCalculator() {
     strengthPours,
     setStrength,
     recipe,
-  } = useRecipe();
-
-  const [view, setView] = useState<View>("idle");
+  } = useRecipe(initialParams);
 
   const startBrew = () => {
-    // "Begin brew" always starts fresh: clear any stale session from a previous,
-    // abandoned brew so the timer opens on the pre-roll instead of resuming.
-    clearBrewSession();
-    setView("brew");
-    if (typeof window !== "undefined") window.scrollTo(0, 0);
+    // "Begin brew" navigates to the brew route with the current recipe params +
+    // autostart=1. The brew flow now lives entirely on its own URL; starting with
+    // these params resets any stale `coa-brew` session (the timer stamps + matches
+    // params), so it opens on the pre-roll instead of resuming a previous brew.
+    router.push(brewHref({ dose, ratio, acidity, strengthPours }, true));
   };
 
   // Localized "{taste} · {n} pours" readout shared by the panel header.
@@ -204,17 +211,6 @@ export function CoaCalculator() {
     </>
   );
 
-  if (view === "brew") {
-    return (
-      <BrewTimer
-        recipe={recipe}
-        onExit={() => setView("idle")}
-        bp={bp}
-        max={containerMax}
-      />
-    );
-  }
-
   const panelClass = cn(
     "rounded-md border border-border bg-surface-raised shadow-1",
     bp === "desktop" ? "p-7" : "p-6",
@@ -239,6 +235,10 @@ export function CoaCalculator() {
         >
           <div className="flex flex-col gap-[22px]">
             {intro}
+            {/* Wide layout: the last brew reads as a compact inline row in the
+                left column (a floating bottom bar reads oddly across the wide
+                canvas). Self-hides when no last brew exists. */}
+            <LastBrewBar variant="inline" />
             {pad}
             {inputs}
           </div>
@@ -258,12 +258,19 @@ export function CoaCalculator() {
   }
 
   return (
-    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-2">
+    // The narrow home reserves bottom scroll-padding (bar height + gap +
+    // safe-area) so the sticky LastBrewBar never occludes the last control
+    // ("Begin brew"). env() is a runtime value (not a design token), so the
+    // arbitrary is a legitimate runtime bridge.
+    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
       {intro}
       <div className="mb-3">{pad}</div>
       <div className="mb-[22px]">{inputs}</div>
       {schedule}
       {cta}
+      {/* Sticky bottom bar (narrow only): fixed/out-of-flow → zero layout shift
+          on its post-mount reveal. Self-hides when no last brew exists. */}
+      <LastBrewBar variant="bar" />
     </main>
   );
 }

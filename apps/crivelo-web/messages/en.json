@@ -9,6 +9,7 @@
     "closeMenu": "Close menu",
     "siteMenu": "Site menu",
     "homeAria": "Coa by Crivelo — home",
+    "savedRecipes": "Saved recipes",
     "theHouse": "The house",
     "theFamily": "The family",
     "youAreHere": "you are here",
@@ -39,6 +40,28 @@
     "beginBrew": "Begin brew",
     "methodLink": "How the 4:6 method works",
     "grams": "g"
+  },
+  "LastBrew": {
+    "title": "Last brew",
+    "brewAgain": "Brew again",
+    "edit": "Edit"
+  },
+  "Recipes": {
+    "title": "Saved recipes",
+    "subtitle": "Your saved brews, ready to make again.",
+    "bean": "Bean",
+    "grind": "Grind size",
+    "ratingValue": "{n, plural, one {# star} other {# stars}}",
+    "brewAgain": "Brew again",
+    "edit": "Edit",
+    "deleteAria": "Delete {name}",
+    "confirmTitle": "Delete this recipe?",
+    "confirmBody": "This removes {name} for good. You can't undo it.",
+    "confirmCancel": "Cancel",
+    "confirmDelete": "Delete",
+    "emptyTitle": "No saved recipes yet",
+    "emptyBody": "Finish a brew and save it to find it here.",
+    "emptyAction": "Open the calculator"
   },
   "Taste": {
     "label": "Taste",
@@ -75,8 +98,12 @@
     "done": "Done",
     "getSet": "get set",
     "ofTotal": "of {time}",
+    "totalLabel": "total brew",
     "brewStartsIn": "Brew starts in {n} s",
     "startNow": "Start now",
+    "readyTitle": "Ready to brew",
+    "readyHint": "Tap start when you're set",
+    "start": "Start",
     "pourInSeconds": "Pour <b>{g} g</b> in <b>{s} s</b>",
     "pourTarget": "→ {g} g",
     "pourNow": "Pour now",
@@ -104,6 +131,23 @@
     "restartAria": "Restart brew",
     "brewAgain": "Brew again",
     "backToRecipe": "Back to recipe",
-    "totalTime": "Total {time}"
+    "totalTime": "Total {time}",
+    "saveRecipe": "Save recipe"
+  },
+  "SaveRecipe": {
+    "title": "Save this recipe",
+    "subtitle": "Keep this brew to make it again later.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Name this recipe",
+    "beanLabel": "Bean",
+    "beanPlaceholder": "Which coffee did you use?",
+    "grindLabel": "Grind size",
+    "grindPlaceholder": "Your grinder setting",
+    "ratingLabel": "Rating",
+    "ratingStar": "{n, plural, one {# star} other {# stars}}",
+    "save": "Save recipe",
+    "cancel": "Cancel",
+    "close": "Close",
+    "savedToast": "Recipe saved"
   }
 }
