@@ -8,10 +8,10 @@
  * Shell already provides via app/[locale]/layout.tsx.
  *
  * Responsive (RMP-226): ONE markup tree; CSS breakpoints pick the arrangement, so
- * the first paint is already correct at any width (no useViewport, no JS layout
- * measurement, no mobile→desktop flash). Breakpoint mapping: base = mobile (<768,
- * single column intro → pad → inputs → schedule → CTA); `md:` (≥768, was the
- * useViewport `wide`/700 flip) → two columns (left: intro + pad + inputs; right:
+ * the first paint is already correct at any width (no JS viewport measurement, no
+ * mobile→desktop flash). Width mapping: base = mobile (<768,
+ * single column intro → pad → inputs → schedule → CTA); `md:` (≥768, the
+ * old ≥700 wide flip) → two columns (left: intro + pad + inputs; right:
  * "Your recipe" panel card with big water total + schedule + CTA); `lg:` (≥1024,
  * was `desktop`) → roomier gap/padding + the sticky panel. On mobile the grid
  * collapses to block flow, so the left div (intro → pad → inputs) renders above the
