@@ -31,7 +31,11 @@ export function createManifest(
   ];
 
   const localeData =
-    locale !== undefined ? cfg.i18n?.locales[locale] : undefined;
+    locale !== undefined &&
+    cfg.i18n !== undefined &&
+    Object.hasOwn(cfg.i18n.locales, locale)
+      ? cfg.i18n.locales[locale]
+      : undefined;
 
   // No locale, no i18n, or an unknown locale → the original non-localized
   // manifest. This path must stay byte-identical to the pre-i18n output.
@@ -65,4 +69,60 @@ export function createManifest(
     theme_color: cfg.themeColor,
     icons,
   };
+}
+
+/** The MIME type the spec mandates a web app manifest be served with. */
+const MANIFEST_CONTENT_TYPE = "application/manifest+json";
+
+/**
+ * Build the App-Router `GET` handler for an app's `manifest/[locale]` route from
+ * its PwaConfig. The locale-aware sibling of `createSplashRoute`: the package
+ * owns ALL the route logic (locale lookup + the i18n-aware status decision +
+ * serialization) so the app's route file is just `export const { GET } =
+ * createManifestRoute(cfg)`. The dynamic segment MUST be named `locale` — the
+ * factory reads `params.locale` as a plain string (NO i18n-library import; the
+ * app, the only place that knows the locale set, supplies it via `cfg.i18n`).
+ *
+ * Status policy:
+ *  - `cfg.i18n` configured but the locale is NOT in `cfg.i18n.locales` → 404.
+ *  - `cfg.i18n` absent (the route is wired but no locales declared) → serve the
+ *    non-localized `createManifest(cfg)`. A misconfig degrades to "works, not
+ *    localized", never a 404.
+ *  - otherwise → the localized `createManifest(cfg, locale)`.
+ *
+ * Like `createSplashRoute`, this returns ONLY the handler. A `runtime` export, if
+ * the app needs one, is the app wrapper's job (Next reads it as a static literal
+ * from the route module — it can't be returned from a factory).
+ */
+export function createManifestRoute(cfg: PwaConfig): {
+  GET: (
+    req: Request,
+    ctx: { params: Promise<{ locale: string }> }
+  ) => Promise<Response>;
+} {
+  async function GET(
+    _req: Request,
+    ctx: { params: Promise<{ locale: string }> }
+  ): Promise<Response> {
+    const { locale } = await ctx.params;
+
+    // i18n configured: a locale not declared in `cfg.i18n.locales` → 404. Use
+    // `Object.hasOwn` (not a bracket `=== undefined` check) so inherited
+    // prototype keys ("toString", "constructor", …) don't bypass the guard.
+    if (cfg.i18n !== undefined) {
+      if (!Object.hasOwn(cfg.i18n.locales, locale)) {
+        return new Response("Not found", { status: 404 });
+      }
+      return new Response(JSON.stringify(createManifest(cfg, locale)), {
+        headers: { "Content-Type": MANIFEST_CONTENT_TYPE },
+      });
+    }
+
+    // i18n absent → serve the non-localized manifest (no locale arg).
+    return new Response(JSON.stringify(createManifest(cfg)), {
+      headers: { "Content-Type": MANIFEST_CONTENT_TYPE },
+    });
+  }
+
+  return { GET };
 }
