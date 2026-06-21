@@ -22,6 +22,6 @@ export const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero'
  * These are the in-card pills only; SaveRecipeForm's 54px form CTAs are a different size/context.
  */
 export const CARD_PILL_SOLID =
-  "flex h-11 flex-1 gap-2 rounded-md border-none bg-brand p-0 font-body text-small font-semibold whitespace-normal text-white shadow-1 hover:bg-brand has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-4";
+  "flex h-11 flex-1 gap-2 rounded-md border-none bg-brand p-0 font-body text-small font-semibold whitespace-normal text-white shadow-1 hover:bg-brand [&_svg:not([class*='size-'])]:size-4";
 export const CARD_PILL_OUTLINE =
   "flex h-11 flex-1 rounded-md border border-border-strong bg-transparent p-0 font-body text-small font-semibold whitespace-normal text-fg shadow-none hover:bg-transparent hover:text-fg";

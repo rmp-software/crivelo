@@ -54,7 +54,6 @@
     "ratingValue": "{n, plural, one {# estrela} other {# estrelas}}",
     "brewAgain": "Preparar de novo",
     "edit": "Editar",
-    "delete": "Excluir",
     "deleteAria": "Excluir {name}",
     "confirmTitle": "Excluir esta receita?",
     "confirmBody": "Isso remove {name} de vez. Não dá pra desfazer.",

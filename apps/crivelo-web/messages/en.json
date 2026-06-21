@@ -54,7 +54,6 @@
     "ratingValue": "{n, plural, one {# star} other {# stars}}",
     "brewAgain": "Brew again",
     "edit": "Edit",
-    "delete": "Delete",
     "deleteAria": "Delete {name}",
     "confirmTitle": "Delete this recipe?",
     "confirmBody": "This removes {name} for good. You can't undo it.",
