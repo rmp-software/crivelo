@@ -28,7 +28,6 @@ import {
   parseRecipeParams,
   recipeParamsToQuery,
 } from "../../lib/recipes-store";
-import { useViewport } from "./useViewport";
 
 /**
  * The timer resolves its opening session from `localStorage` + the wall clock
@@ -51,19 +50,43 @@ import { useViewport } from "./useViewport";
  */
 export function BrewSkeleton() {
   return (
-    <main className="mx-auto box-border max-w-[390px] px-5 pt-2.5 pb-12">
-      <div className="mb-2 flex items-center justify-between">
+    <main className="mx-auto box-border max-w-[390px] px-5 pt-2.5 pb-12 md:max-w-[700px] md:px-6 md:pt-4 md:pb-[60px] lg:max-w-[1000px]">
+      <div className="mb-2 flex items-center justify-between md:mb-4">
         <div className="h-5 w-20 rounded-sm bg-surface-raised" />
         <div className="h-4 w-16 rounded-sm bg-surface-raised" />
       </div>
-      <div className="flex justify-center">
-        <div className="h-[236px] w-[236px] animate-pulse rounded-full border-8 border-border-strong motion-reduce:animate-none" />
+      {/* Mirror BrewTimer's two-column shape: at md+ the ring/action/CTA sit in
+          the left column and the recipe list occupies the right, so a desktop
+          cold load reserves the real layout's footprint (no vertical jump when
+          the timer swaps in). */}
+      <div className="block items-start md:grid md:grid-cols-[300px_1fr] md:gap-[52px] lg:grid-cols-[340px_1fr]">
+        <div>
+          <div className="flex justify-center">
+            <div className="h-[236px] w-[236px] animate-pulse rounded-full border-8 border-border-strong motion-reduce:animate-none md:h-[272px] md:w-[272px]" />
+          </div>
+          <div className="mt-4 flex min-h-[50px] flex-col items-center gap-2">
+            <div className="h-6 w-40 rounded-sm bg-surface-raised" />
+            <div className="h-4 w-28 rounded-sm bg-surface-raised" />
+          </div>
+          <div className="mt-[22px] h-[54px] w-full rounded-md bg-surface-raised" />
+        </div>
+        {/* Right column: minimal recipe-list stub (heading bar + a few rows) so
+            the two-column footprint is reserved at md+. Structural parity, not
+            pixel-perfect content. */}
+        <div className="mt-7 md:mt-1">
+          <div className="mb-3.5 flex items-center justify-between">
+            <div className="h-4 w-16 rounded-sm bg-surface-raised" />
+            <div className="h-4 w-12 rounded-sm bg-surface-raised" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="h-9 w-full animate-pulse rounded-sm bg-surface-raised motion-reduce:animate-none" />
+            <div className="h-9 w-full animate-pulse rounded-sm bg-surface-raised motion-reduce:animate-none" />
+            <div className="h-9 w-full animate-pulse rounded-sm bg-surface-raised motion-reduce:animate-none" />
+            <div className="h-9 w-full animate-pulse rounded-sm bg-surface-raised motion-reduce:animate-none" />
+            <div className="h-9 w-full animate-pulse rounded-sm bg-surface-raised motion-reduce:animate-none" />
+          </div>
+        </div>
       </div>
-      <div className="mt-4 flex min-h-[50px] flex-col items-center gap-2">
-        <div className="h-6 w-40 rounded-sm bg-surface-raised" />
-        <div className="h-4 w-28 rounded-sm bg-surface-raised" />
-      </div>
-      <div className="mt-[22px] h-[54px] w-full rounded-md bg-surface-raised" />
     </main>
   );
 }
@@ -75,7 +98,6 @@ const BrewTimer = dynamic(
 
 export function BrewView() {
   const router = useRouter();
-  const bp = useViewport();
   const searchParams = useSearchParams();
 
   // Parse + clamp the recipe params from the URL, then derive the recipe. The
@@ -105,7 +127,6 @@ export function BrewView() {
       query={query}
       autostart={autostart}
       onExit={() => router.push("/")}
-      bp={bp}
     />
   );
 }
