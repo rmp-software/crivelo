@@ -29,6 +29,45 @@ const LAST_BREW_KEY = "coa-last-brew";
 const RECIPES_KEY = "coa-recipes";
 
 /**
+ * Same-window change signal for the saved-recipes list. `localStorage`'s native
+ * `storage` event fires for OTHER tabs only — never for the tab that performed
+ * the write — so a same-window save/delete (the common case: save on a brew's
+ * done screen, delete on `/recipes`) would leave a long-lived consumer (the
+ * header badge) stale until a reload. Every `coa-recipes` write below dispatches
+ * this event so same-window subscribers can re-read. {@link subscribeRecipes}
+ * wires this together with the cross-tab `storage` event.
+ */
+const RECIPES_CHANGED_EVENT = "coa:recipes-changed";
+
+/** Notify same-window subscribers that `coa-recipes` changed. SSR no-op. */
+function notifyRecipesChanged(): void {
+  if (!hasStorage()) return;
+  window.dispatchEvent(new Event(RECIPES_CHANGED_EVENT));
+}
+
+/**
+ * Subscribe to saved-recipe list changes from BOTH sources and return an
+ * unsubscribe. Same-window writes fire {@link RECIPES_CHANGED_EVENT} (dispatched
+ * by `addRecipe`/`deleteRecipe`); other-tab writes fire the native `storage`
+ * event. A consumer (e.g. the header badge) calls this once and re-reads
+ * `getRecipes()` in `cb`, instead of re-wiring both listeners itself. SSR-safe:
+ * returns a no-op unsubscribe off-DOM.
+ */
+export function subscribeRecipes(cb: () => void): () => void {
+  if (!hasStorage()) return () => {};
+  const onStorage = (e: StorageEvent) => {
+    // Ignore unrelated keys; `e.key === null` is a `clear()` (treat as changed).
+    if (e.key === null || e.key === RECIPES_KEY) cb();
+  };
+  window.addEventListener(RECIPES_CHANGED_EVENT, cb);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener(RECIPES_CHANGED_EVENT, cb);
+    window.removeEventListener("storage", onStorage);
+  };
+}
+
+/**
  * Query-string key for the brew-route autostart flag (`1` = start the pre-roll
  * on load, `0` = land in the "ready" state). Exposed for the brew route + the
  * navigation call sites to share one literal; the route task consumes it.
@@ -294,6 +333,7 @@ export function addRecipe(input: AddRecipeInput): SavedRecipe {
     createdAt: Date.now(),
   };
   writeJSON(RECIPES_KEY, [...getRecipes(), recipe]);
+  notifyRecipesChanged();
   return recipe;
 }
 
@@ -303,4 +343,5 @@ export function deleteRecipe(id: string): void {
     RECIPES_KEY,
     getRecipes().filter((r) => r.id !== id),
   );
+  notifyRecipesChanged();
 }
