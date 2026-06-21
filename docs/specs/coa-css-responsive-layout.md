@@ -1,6 +1,6 @@
 ---
 slug: coa-css-responsive-layout
-status: planned
+status: complete
 created: 2026-06-20
 tracker: local
 linear_project_id:  # linear mode only
@@ -185,7 +185,7 @@ custom properties remain legitimate runtime bridges.
     grid/fonts correct. 3. Console clean. BrewView stops calling `useViewport` /
     passing `bp`; BrewTimer derives `wide` / `desktop` from breakpoints.
 
-- [ ] Delete `useViewport` + cleanup + whole-app gate
+- [x] Delete `useViewport` + cleanup + whole-app gate — PR #60
   - AC: `useViewport` is removed entirely (no remaining consumer; file + `Breakpoint`
     export deleted); CLS ≈ 0 on `/`, `/brew`, `/recipes`; verified on a real resized
     window across breakpoints.
@@ -195,7 +195,7 @@ custom properties remain legitimate runtime bridges.
     sweep at 1280 / 768 / 393 across all three routes (no flash, console clean,
     CLS ≈ 0). 5. A real resized-window pass across breakpoints.
 
-- [ ] Follow-up: audit app-wide JS-powered responsiveness & decide
+- [x] Follow-up: audit app-wide JS-powered responsiveness & decide — see audit below
   - AC: every JS-driven responsiveness usage in `apps/crivelo-web` outside the COA
     components is catalogued (any `window.innerWidth` / `matchMedia` / `resize`
     listeners / viewport hooks); for each, a decision is recorded — migrate to CSS
@@ -207,3 +207,16 @@ custom properties remain legitimate runtime bridges.
     `## App-wide responsiveness audit` section) or as follow-up tasks. 3. Any
     migrations done in this pass meet the same flash-free / no-hydration-error /
     CLS ≈ 0 bar as the COA work.
+
+## App-wide responsiveness audit (Task 5)
+
+Swept `apps/crivelo-web` for JS-powered responsiveness:
+`grep -rnE 'innerWidth|innerHeight|matchMedia|addEventListener\(["']resize|useMediaQuery|useViewport|ResizeObserver|clientWidth|offsetWidth'`
+(`.ts`/`.tsx`, excluding `node_modules`).
+
+| Finding | File | Decision |
+|---|---|---|
+| `useViewport` (JS layout breakpoint) | `components/coa/*` | **Removed** — this feature (PRs #58/#59/#60). |
+| `matchMedia('(prefers-color-scheme: dark)')` | `components/shell/ThemeProvider.tsx` | **Keep.** This is OS *theme* detection (+ the `NO_FOUC_SCRIPT` pre-paint guard), not layout responsiveness. There is no CSS equivalent that lets React state track and persist the user's theme choice; `matchMedia` is the correct primitive here and it does not cause a layout flash. |
+
+No other hits — no `innerWidth` / `resize` listeners / `useMediaQuery` / `ResizeObserver` / viewport hooks anywhere in `crivelo-web`. **Conclusion:** with `useViewport` deleted, the app has **zero JS-powered layout responsiveness** remaining; all layout is CSS-driven. No migration or follow-up needed. (The theme `matchMedia` is intentionally out of scope — it is preference detection, not responsive layout.)
