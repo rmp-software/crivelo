@@ -9,6 +9,7 @@
     "closeMenu": "Fechar menu",
     "siteMenu": "Menu do site",
     "homeAria": "Coa by Crivelo — início",
+    "savedRecipes": "Receitas salvas",
     "theHouse": "A casa",
     "theFamily": "A família",
     "youAreHere": "você está aqui",
@@ -38,8 +39,7 @@
     "tasteSummary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
     "beginBrew": "Começar preparo",
     "methodLink": "Como funciona o método 4:6",
-    "grams": "g",
-    "savedRecipes": "Receitas salvas"
+    "grams": "g"
   },
   "LastBrew": {
     "title": "Último preparo",

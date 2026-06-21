@@ -12,7 +12,8 @@
  */
 export { CoaCalculator } from "./CoaCalculator";
 export type { CoaCalculatorProps } from "./CoaCalculator";
-export { LastBrewCard } from "./LastBrewCard";
+export { LastBrewBar } from "./LastBrewBar";
+export type { LastBrewBarProps, LastBrewBarVariant } from "./LastBrewBar";
 export { RecipesList } from "./RecipesList";
 export { RecipeCard } from "./RecipeCard";
 export type { RecipeCardProps } from "./RecipeCard";

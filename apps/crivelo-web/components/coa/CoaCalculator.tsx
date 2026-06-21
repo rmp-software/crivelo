@@ -26,15 +26,14 @@
  */
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
-import { buttonVariants } from "@crivelo/ui/button";
 import { Button } from "../ui/Button";
-import { Link, useRouter } from "../../i18n/navigation";
+import { useRouter } from "../../i18n/navigation";
 import { useRecipe } from "./useRecipe";
 import { useViewport, type Breakpoint } from "./useViewport";
 import { TastePad, type PadDims } from "./TastePad";
 import { RecipeInputs } from "./RecipeInputs";
 import { PourSchedule } from "./PourSchedule";
-import { LastBrewCard } from "./LastBrewCard";
+import { LastBrewBar } from "./LastBrewBar";
 import { Icon } from "./icons";
 import { tasteKey } from "../../lib/four-six";
 import { brewHref } from "../../lib/coa-nav";
@@ -116,28 +115,6 @@ export function CoaCalculator({
       >
         {t("introLine")}
       </p>
-    </div>
-  );
-
-  // Home-only extras: the last-brew card (self-hiding when no last brew exists) and
-  // the saved-recipes entry point. The entry is a locale-aware <Link> (prefetch,
-  // middle/right-click) styled through the @crivelo/ui buttonVariants `link` look —
-  // a secondary text-link entry point, not a filled CTA. The i18n Link injects the
-  // active locale prefix, so it resolves to /[locale]/recipes. (The recipes route is
-  // built in a later task — the entry is already correct.)
-  const homeExtras = (
-    <div className="mb-5">
-      <LastBrewCard />
-      <Link
-        href="/recipes"
-        className={cn(
-          buttonVariants({ variant: "link" }),
-          "h-auto gap-1 p-0 text-small font-medium text-fg-2 underline decoration-border-strong underline-offset-[3px] hover:text-fg has-[>svg]:px-0",
-        )}
-      >
-        {t("savedRecipes")}
-        <Icon name="chevR" size={14} className="text-fg-3" />
-      </Link>
     </div>
   );
 
@@ -258,7 +235,10 @@ export function CoaCalculator({
         >
           <div className="flex flex-col gap-[22px]">
             {intro}
-            {homeExtras}
+            {/* Wide layout: the last brew reads as a compact inline row in the
+                left column (a floating bottom bar reads oddly across the wide
+                canvas). Self-hides when no last brew exists. */}
+            <LastBrewBar variant="inline" />
             {pad}
             {inputs}
           </div>
@@ -278,13 +258,19 @@ export function CoaCalculator({
   }
 
   return (
-    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-2">
+    // The narrow home reserves bottom scroll-padding (bar height + gap +
+    // safe-area) so the sticky LastBrewBar never occludes the last control
+    // ("Begin brew"). env() is a runtime value (not a design token), so the
+    // arbitrary is a legitimate runtime bridge.
+    <main className="mx-auto box-border max-w-[390px] px-5 pt-5 pb-[calc(5.5rem+env(safe-area-inset-bottom))]">
       {intro}
-      {homeExtras}
       <div className="mb-3">{pad}</div>
       <div className="mb-[22px]">{inputs}</div>
       {schedule}
       {cta}
+      {/* Sticky bottom bar (narrow only): fixed/out-of-flow → zero layout shift
+          on its post-mount reveal. Self-hides when no last brew exists. */}
+      <LastBrewBar variant="bar" />
     </main>
   );
 }

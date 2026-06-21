@@ -3,7 +3,7 @@
  * coa-save-recipes).
  *
  * These class strings are verbatim-shared across the home calculator
- * (`CoaCalculator`), the last-brew card (`LastBrewCard`), and the `/recipes`
+ * (`CoaCalculator`), the last-brew surfaces (`LastBrewBar`), and the `/recipes`
  * list (`RecipeCard`), so they live here as a single source of truth rather than
  * being re-declared per file. Pure constants — no React, no runtime.
  */
@@ -16,7 +16,7 @@ export const CAP =
 export const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 /**
- * The two card action pills (44px), verbatim-shared between LastBrewCard and RecipeCard:
+ * The two card action pills (44px), used by RecipeCard:
  *  - `CARD_PILL_SOLID`   — the brand-filled primary ("Brew again", carries a leading icon),
  *  - `CARD_PILL_OUTLINE` — the bordered secondary ("Edit").
  * These are the in-card pills only; SaveRecipeForm's 54px form CTAs are a different size/context.
