@@ -287,7 +287,7 @@ A README documenting the whole package. Scope:
     `fetch('/manifest/pt')` → 200 `application/manifest+json` pt body;
     `fetch('/en',{redirect:'manual'})` → 200 (no 307); `fetch('/manifest.webmanifest')`
     → redirects to `/manifest/en`. `npx tsc --noEmit` exits 0.
-- [ ] `packages/pwa/README.md` — Getting started + API reference
+- [x] `packages/pwa/README.md` — Getting started + API reference — PR #65
   - AC: non-locale Getting started (config → `transpilePackages` → thin wrapper
     files → layout metadata); API reference for every export (`createManifest`,
     `createManifestRoute`, `renderIcon`, `renderSplash`, `createSplashRoute`,
