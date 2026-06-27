@@ -55,6 +55,14 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
   pixel match — a device missing from `splashDevices` gets a blank splash, not a fallback), and iOS
   reads all this **at "Add to Home Screen" time**, so after any change you must DELETE and re-add the
   home-screen icon to re-test (a stale install keeps the old head). Only validatable on a real device.
+- **iOS Display Zoom ("Larger Text" / Zoomed in Settings → Display & Brightness) breaks the splash —
+  by design, not a bug.** Zoom shifts the device into a NON-native logical resolution (e.g. a 15 Pro Max
+  reports `375×812` instead of `430×932`), and `splashDevices` only carries native geometries. Since the
+  match is a hard pixel match with no fallback, the zoomed device finds no matching `apple-touch-startup-image`
+  and shows a blank splash. We deliberately do NOT enumerate the per-device zoomed resolutions (poorly
+  documented, and the zoomed standalone-launch framebuffer can differ from what the Safari tab's `matchMedia`
+  reports anyway). **Known limitation: the splash only renders with Display Zoom set to Standard/Default.**
+  Diagnose by reading `screen.width/height` on the device — a non-native value means zoom is on.
 - **Next 15 streaming metadata renders the splash tags into `<body>`, not `<head>` — iOS can't see them (PROD only).**
   Since Next 15.2, an async `generateMetadata` (e.g. a layout that `await`s next-intl `getTranslations`) is
   *streamed*: Next emits the `apple-touch-startup-image` / `apple-mobile-web-app-*` / `manifest` tags into
