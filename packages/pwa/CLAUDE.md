@@ -35,6 +35,7 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
    The `[size]` segment must be named `size` (the factory reads `params.size`).
 4. In the root layout: merge `pwaMetadata(cfg)` into `metadata` (+ `manifest: "/manifest.webmanifest"`) and `export const viewport = pwaViewport(cfg)`.
 5. Add `pwa-splash` (alongside `icon|apple-icon|pwa-icon`) to the i18n middleware matcher negative lookahead — see the gotcha below.
+6. If the root layout's metadata is async (`async generateMetadata`, e.g. via next-intl `getTranslations`), set `htmlLimitedBots: /.*/` in `next.config` — see the streaming-metadata gotcha below. Without it the iOS splash silently breaks in **production only**.
 
 ## Gotchas (these bite)
 - **next-intl middleware 307s the icon routes.** If the app uses i18n middleware,
@@ -54,6 +55,16 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
   pixel match — a device missing from `splashDevices` gets a blank splash, not a fallback), and iOS
   reads all this **at "Add to Home Screen" time**, so after any change you must DELETE and re-add the
   home-screen icon to re-test (a stale install keeps the old head). Only validatable on a real device.
+- **Next 15 streaming metadata renders the splash tags into `<body>`, not `<head>` — iOS can't see them (PROD only).**
+  Since Next 15.2, an async `generateMetadata` (e.g. a layout that `await`s next-intl `getTranslations`) is
+  *streamed*: Next emits the `apple-touch-startup-image` / `apple-mobile-web-app-*` / `manifest` tags into
+  `<body>` and relies on client-side hoisting into `<head>`, which Safari/iOS does NOT do. Result: tags sit in
+  `<body>`, iOS finds no splash and falls back to `<title>` for the home-screen name. It works in `next dev`
+  (no streaming pipeline) and in headless/desktop Chromium+WebKit — **only a real iOS install reveals it**, so
+  curl/`document.querySelector` (whole-doc) hide it; check `document.head.querySelectorAll(...)` specifically.
+  Fix: `htmlLimitedBots: /.*/` in `next.config` opts every UA back into blocking metadata so the tags render in
+  `<head>`. Negligible TTFB cost when metadata only awaits already-loaded translations. (vercel/next.js#79313;
+  this is intended Next behavior, not a bug they'll fix.)
 
 ## Verify
 `tsc --noEmit` + `next build`, then `next start` and check: `GET /manifest.webmanifest`
