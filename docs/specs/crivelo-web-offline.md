@@ -212,7 +212,7 @@ Minimal, because the app is **fully** functional offline (nothing requires netwo
 
 ## Tasks
 
-- [ ] Phase 0 — Upgrade crivelo-web to Next 16 (PR 1, prerequisite)
+- [x] Phase 0 — Upgrade crivelo-web to Next 16 (PR 1, prerequisite) — PR #69 (merged to feature branch; ⚠️ real-iPhone splash re-validation pending before Phase 1)
   - AC: icon/splash/manifest routes return correct PNGs/JSON; `/`→`/en` and `/pt` resolve; static prerender for both locales intact; splash + icon + home-screen name verified on a real iPhone (no regression of the prior splash fix).
   - Test: run `pnpm dlx @next/codemod@canary upgrade latest`, `pnpm up next-intl@latest`, `next typegen`; fix async `params` in `app/icon.tsx`, `app/apple-icon.tsx`, and `@crivelo/pwa` `createSplashRoute`/icon factory; rename `middleware.ts`→`proxy.ts` and confirm the matcher still excludes `icon|apple-icon|pwa-icon|pwa-splash`; `pnpm --filter crivelo-web type-check` exits 0; `next build` succeeds (Turbopack default); `next start` → curl `/manifest.webmanifest` (200 JSON), `/pwa-icon/512` + `/pwa-splash/<size>` (200 image/png), `/` 307→`/en`, `/pt` 200; on a physical iPhone reinstall, splash + home-screen name correct and `document.head.querySelectorAll('link[rel="apple-touch-startup-image"]').length > 0`.
 
