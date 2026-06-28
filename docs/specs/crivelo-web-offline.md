@@ -1,11 +1,11 @@
 ---
 slug: crivelo-web-offline
-status: draft
+status: planned
 created: 2026-06-28
-tracker:            # set by /breakdown-feature — linear | local
+tracker: local
 linear_project_id:  # linear mode only
 linear_parent_issue: # linear mode only
-feature_branch:
+feature_branch: feature/crivelo-web-offline
 ---
 
 # crivelo-web: PWA offline capability
@@ -209,3 +209,21 @@ Minimal, because the app is **fully** functional offline (nothing requires netwo
 - Headless coverage (Playwright/Chromium): assert SW registration, precache population,
   offline navigation to each route, and the localized offline fallback — as the fast
   pre-device gate.
+
+## Tasks
+
+- [ ] Phase 0 — Upgrade crivelo-web to Next 16 (PR 1, prerequisite)
+  - AC: icon/splash/manifest routes return correct PNGs/JSON; `/`→`/en` and `/pt` resolve; static prerender for both locales intact; splash + icon + home-screen name verified on a real iPhone (no regression of the prior splash fix).
+  - Test: run `pnpm dlx @next/codemod@canary upgrade latest`, `pnpm up next-intl@latest`, `next typegen`; fix async `params` in `app/icon.tsx`, `app/apple-icon.tsx`, and `@crivelo/pwa` `createSplashRoute`/icon factory; rename `middleware.ts`→`proxy.ts` and confirm the matcher still excludes `icon|apple-icon|pwa-icon|pwa-splash`; `pnpm --filter crivelo-web type-check` exits 0; `next build` succeeds (Turbopack default); `next start` → curl `/manifest.webmanifest` (200 JSON), `/pwa-icon/512` + `/pwa-splash/<size>` (200 image/png), `/` 307→`/en`, `/pt` 200; on a physical iPhone reinstall, splash + home-screen name correct and `document.head.querySelectorAll('link[rel="apple-touch-startup-image"]').length > 0`.
+
+- [ ] Phase 1A — `@crivelo/pwa/sw` shared SW foundation
+  - AC: foundation supports app-shell offline with only framework-convention files left app-local; `packages/pwa/CLAUDE.md` no longer claims "no service worker".
+  - Test: new `@crivelo/pwa/sw` worker-context entry exports `createServiceWorker({manifest, locales, offlinePath, defaultCache})` (Serwist instance: precache from `self.__SW_MANIFEST`, `runtimeCaching`, localized `fallbacks`, `cleanupOutdatedCaches`, `skipWaiting`/`clientsClaim`) plus glue `createCriveloSerwistRoute`, a re-exported `SerwistProvider`, and `withCriveloSerwist(nextConfig)`; entry imports no DOM/Next-server modules; `pnpm --filter @crivelo/pwa type-check` exits 0; `packages/pwa/CLAUDE.md` updated with the SW entry, the worker-context constraint, and an "add offline to a new app" checklist (for molly).
+
+- [ ] Phase 1B — crivelo-web SW wiring + offline fallback + offline UX (PR 2)
+  - AC: calculator/brew/recipes all load and function offline; recipes saved online still show offline; navigating to a never-visited route offline renders a localized offline page (not the browser error page); a new deploy reloads with no `ChunkLoadError`; `/serwist/sw.js` returns `Cache-Control: public, max-age=0, must-revalidate`.
+  - Test: add `app/sw.ts` (declares `self.__SW_MANIFEST`, calls `createServiceWorker`), `app/serwist/[path]/route.ts` (`createCriveloSerwistRoute`), `<SerwistProvider swUrl="/serwist/sw.js">` in `app/[locale]/layout.tsx`, `withNextIntl(withCriveloSerwist(cfg))` in `next.config.js` (keep `transpilePackages` + `htmlLimitedBots`), a localized offline page under `app/[locale]/`, and the `/serwist/sw.js` Vercel `Cache-Control` header; `next build` + `next start`; in Chromium set offline → reload → calculator, brew, recipes all render; save a recipe online, go offline, reload `/recipes` → recipe present; navigate offline to an unvisited path → localized offline page; `curl -I /serwist/sw.js` shows the cache header; a subtle offline indicator appears when offline and any external/network-only affordance is disabled offline.
+
+- [ ] Verification gate — headless offline suite + real-iOS validation
+  - AC: device-only gate — an installed iOS PWA launches and operates offline; the splash is not regressed.
+  - Test: Playwright/Chromium suite asserts SW registration, precache populated, offline navigation to each of the three routes, and the localized fallback; then on a physical iPhone — install from a **bypassed** Vercel preview (`get_access_to_vercel_url`) or prod, enable Airplane mode, launch from the home screen → app opens and all three routes work from cache; splash still renders.
