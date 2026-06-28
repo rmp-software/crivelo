@@ -112,8 +112,13 @@ expose the highest-leverage entry point, not raw building blocks each app must r
 - One Vercel project per app; Crema Arena's has Root Directory `apps/crema-arena` +
   `ENABLE_EXPERIMENTAL_COREPACK=1`. `main` auto-deploys to prod
   (`crema-arena.vercel.app`, no custom domain). Work via PR + preview.
-- Previews sit behind Vercel deployment protection — use the Vercel MCP
-  `get_access_to_vercel_url` to get a bypass link for screenshots/login.
+- **This project does NOT use Vercel deployment protection.** Preview deployments
+  are public: pages, `manifest.webmanifest`, `pwa-icon`/`pwa-splash` PNGs, etc. all
+  return `200` to credential-less fetches (`curl`/headless). Do **not** assume a
+  `401`/protection wall or reach for `get_access_to_vercel_url` to "fix" a missing
+  asset — that is never the cause here. If an asset looks wrong on a preview, it is a
+  real bug; debug it. (Verify the no-protection claim cheaply with one
+  `curl -o /dev/null -w '%{http_code}' <preview-asset-url>` before theorizing.)
 - **Migrations are manual**: the build command has no `migrate deploy`. After
   merging a migration run `DATABASE_URL=<target> npx prisma migrate deploy` (the
   prisma guard hook allows inline `DATABASE_URL=`).

@@ -2,21 +2,37 @@
   "name": "@crivelo/pwa",
   "version": "0.0.0",
   "private": true,
+  "scripts": {
+    "type-check": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.worker.json --noEmit"
+  },
   "exports": {
     ".": "./index.ts",
     "./manifest": "./manifest.ts",
     "./icon": "./icon.tsx",
     "./splash": "./splash.tsx",
     "./devices": "./devices.ts",
-    "./metadata": "./metadata.ts"
+    "./metadata": "./metadata.ts",
+    "./sw": "./sw.ts",
+    "./serwist": "./serwist.ts",
+    "./serwist-provider": "./serwist-provider.tsx"
   },
   "peerDependencies": {
     "next": ">=14",
-    "react": ">=18"
+    "react": ">=18",
+    "serwist": "^9",
+    "@serwist/turbopack": "^9",
+    "esbuild": ">=0.25.0 <1.0.0"
+  },
+  "peerDependenciesMeta": {
+    "serwist": { "optional": true },
+    "@serwist/turbopack": { "optional": true },
+    "esbuild": { "optional": true }
   },
   "devDependencies": {
+    "@serwist/turbopack": "^9.5.11",
     "@types/react": "^19",
-    "next": "^15.5.0",
-    "react": "^19.1.0"
+    "next": "^16",
+    "react": "^19.1.0",
+    "serwist": "^9.5.11"
   }
 }

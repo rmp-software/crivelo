@@ -24,6 +24,15 @@ export interface PwaConfig {
   description: string;
   /** Manifest `lang` (e.g. "en"). */
   lang: string;
+  /**
+   * Manifest `start_url` — the URL the installed app launches at. Default `"/"`.
+   * For an i18n app whose offline SW only precaches localized shells (`/{locale}`),
+   * set this to a precached default-locale shell (e.g. `"/en"`): the bare `"/"` is
+   * NOT precached and the locale-redirect middleware does not run offline, so a `"/"`
+   * start_url would launch the installed PWA into the offline fallback instead of
+   * the app. Must be a precached, directly-resolvable URL.
+   */
+  startUrl?: string;
   /** Hex — manifest `theme_color` + viewport theme-color + icon-tile background. */
   themeColor: string;
   /** Hex — manifest `background_color` (the splash screen behind the icon). */

@@ -14,7 +14,9 @@ export function createManifest(cfg: PwaConfig): MetadataRoute.Manifest {
     short_name: cfg.shortName ?? cfg.name,
     description: cfg.description,
     lang: cfg.lang,
-    start_url: "/",
+    // Default "/"; i18n+offline apps override with a precached default-locale shell
+    // (see PwaConfig.startUrl) so an offline launch lands on the app, not the fallback.
+    start_url: cfg.startUrl ?? "/",
     display: "standalone",
     background_color: cfg.backgroundColor,
     theme_color: cfg.themeColor,

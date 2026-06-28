@@ -46,6 +46,13 @@
     "brewAgain": "Brew again",
     "edit": "Edit"
   },
+  "Offline": {
+    "badge": "Offline",
+    "caption": "No connection",
+    "title": "You're offline",
+    "body": "This page wasn't saved for offline use. Reconnect to open it, or head back to the calculator — it works offline.",
+    "action": "Open the calculator"
+  },
   "Recipes": {
     "title": "Saved recipes",
     "subtitle": "Your saved brews, ready to make again.",
