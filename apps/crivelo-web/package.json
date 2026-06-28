@@ -10,17 +10,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit && tsc -p tsconfig.worker.json --noEmit",
     "test": "vitest run"
   },
   "dependencies": {
     "@crivelo/pwa": "workspace:*",
     "@crivelo/tokens": "workspace:*",
     "@crivelo/ui": "workspace:*",
+    "@serwist/turbopack": "^9.5.11",
     "next": "^16.2.0",
     "next-intl": "^4.13.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "serwist": "^9.5.11"
   },
   "devDependencies": {
     "@crivelo/eslint-config": "workspace:*",
@@ -29,6 +31,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@tailwindcss/postcss": "^4.1.0",
+    "esbuild": "^0.25.0",
     "eslint": "^9.13.0",
     "postcss": "^8",
     "tailwindcss": "^4.1.0",

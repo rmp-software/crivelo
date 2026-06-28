@@ -61,6 +61,10 @@ export const criveloPwa: PwaConfig = {
   name: "Crivelo",
   description: "Tools for people who live coffee.",
   lang: "en",
+  // Launch the installed app at the default-locale shell (precached by the offline
+  // SW). A bare "/" is NOT precached and the next-intl locale redirect does not run
+  // offline, so a "/" start_url would open the offline fallback instead of the app.
+  startUrl: "/en",
   // last-resort: PWA manifest requires literal color values (OS-consumed; no CSS-var/utility resolution)
   themeColor: "#1C6E68",
   backgroundColor: "#FBF6EA",

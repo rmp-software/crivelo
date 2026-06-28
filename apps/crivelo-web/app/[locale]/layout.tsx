@@ -5,8 +5,10 @@ import { getMessages, getTranslations, setRequestLocale } from "next-intl/server
 import { notFound } from "next/navigation";
 import { fontVariables } from "@crivelo/tokens/fonts";
 import { pwaMetadata, pwaViewport } from "@crivelo/pwa";
+import { SerwistProvider } from "@crivelo/pwa/serwist-provider";
 import { Toaster } from "@crivelo/ui/sonner";
 import { Shell, NO_FOUC_SCRIPT } from "../../components/shell";
+import { OfflineIndicator } from "../../components/offline-indicator";
 import { routing } from "../../i18n/routing";
 import { criveloPwa } from "../pwa.config";
 import "../globals.css";
@@ -66,14 +68,22 @@ export default async function LocaleLayout({
         <script dangerouslySetInnerHTML={{ __html: NO_FOUC_SCRIPT }} />
       </head>
       <body className={fontVariables}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <Shell>{children}</Shell>
-          {/* App-wide Sonner toast outlet (success toast on saving a recipe, etc.).
-              Mounted once at the document root so any client surface can fire `toast`
-              from the same module instance; inherits the house tokens via the alias
-              layer (see @crivelo/ui/sonner). */}
-          <Toaster />
-        </NextIntlClientProvider>
+        {/* SerwistProvider registers the service worker (/serwist/sw.js) on the
+            client so all three routes work offline once cached. It wraps the app
+            but renders no DOM of its own. */}
+        <SerwistProvider swUrl="/serwist/sw.js">
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <Shell>{children}</Shell>
+            {/* Subtle, informational offline badge — the app is fully functional
+                offline, so this only signals the network state. */}
+            <OfflineIndicator />
+            {/* App-wide Sonner toast outlet (success toast on saving a recipe, etc.).
+                Mounted once at the document root so any client surface can fire `toast`
+                from the same module instance; inherits the house tokens via the alias
+                layer (see @crivelo/ui/sonner). */}
+            <Toaster />
+          </NextIntlClientProvider>
+        </SerwistProvider>
       </body>
     </html>
   );
