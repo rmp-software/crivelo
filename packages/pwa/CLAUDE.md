@@ -11,11 +11,13 @@ halves:
    registrar. Opt-in per app — importing the installability half never pulls in
    the SW code, and vice-versa.
 
-`serwist` + `@serwist/turbopack` are **OPTIONAL peer deps**: a consumer that only
-wants installability (incl. out-of-repo molly) never installs them. The offline
-half is opted into by the consuming app **adding both packages itself** (they are
-ESM-only) — see the offline checklist. They are devDeps here purely so this
-package type-checks.
+`serwist` + `@serwist/turbopack` + `esbuild` are **OPTIONAL peer deps**: a consumer
+that only wants installability (incl. out-of-repo molly) never installs them. The
+offline half is opted into by the consuming app **adding all three itself**
+(`serwist`/`@serwist/turbopack` are ESM-only; `esbuild` is the native bundler the
+SW build uses by default — `useNativeEsbuild: true`) — see the offline checklist.
+`serwist`/`@serwist/turbopack` are devDeps here purely so this package type-checks
+(`esbuild` is not imported by the package source, so it needs no devDep).
 
 Ships raw `.ts`/`.tsx` (no build), like `@crivelo/tokens`.
 
@@ -87,9 +89,13 @@ The package owns all the SW logic; an app keeps only framework-convention files.
 > config to ESM/TS before step 5. (crivelo-web ships CJS today — Phase 1B must
 > migrate it.)
 
-1. **Opt in to the SW runtime (the gate):** add `@serwist/turbopack` + `serwist`
-   as the app's OWN deps (they are optional peers of `@crivelo/pwa`, so an
-   installability-only app never installs them), and ensure `@crivelo/pwa` is in
+1. **Opt in to the SW runtime (the gate):** add `@serwist/turbopack` + `serwist` +
+   `esbuild` as the app's OWN deps (all three are optional peers of `@crivelo/pwa`,
+   so an installability-only app never installs them). `esbuild` is required because
+   the foundation bundles the SW with native esbuild (`useNativeEsbuild: true`); a
+   build without it throws `Cannot find package 'esbuild'`. (Targets lacking the
+   native binary can install `esbuild-wasm` instead and pass `useNativeEsbuild: false`
+   via `createCriveloSerwistRoute`'s overrides.) Also ensure `@crivelo/pwa` is in
    `next.config` **`transpilePackages`**.
 2. `app/sw.ts` (~5 lines) — the WORKER source. Declare the injection token + call the factory:
    ```ts

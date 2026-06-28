@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@crivelo/tsconfig/base.json",
+  "compilerOptions": {
+    "lib": ["WebWorker", "ESNext"],
+    "types": [],
+    "noEmit": true
+  },
+  "comment": "Service-worker entry only. app/sw.ts runs in the ServiceWorker global scope, so it is checked under WebWorker libs (NOT the app's DOM libs) and is excluded from the main tsconfig — mirrors @crivelo/pwa's tsconfig.worker.json.",
+  "include": ["app/sw.ts"]
+}

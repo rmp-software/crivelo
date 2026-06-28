@@ -48,3 +48,6 @@ pnpm-debug.log*
 **/.design-system/**/fonts/
 **/.design-system/**/*.bak-*/
 .claude/settings.local.json
+
+# tsc incremental cache from type-check runs
+.claude/tsc-cache/

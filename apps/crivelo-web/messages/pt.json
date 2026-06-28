@@ -46,6 +46,13 @@
     "brewAgain": "Preparar de novo",
     "edit": "Editar"
   },
+  "Offline": {
+    "badge": "Offline",
+    "caption": "Sem conexão",
+    "title": "Você está offline",
+    "body": "Esta página não foi salva para uso offline. Reconecte para abri-la ou volte à calculadora — ela funciona offline.",
+    "action": "Abrir a calculadora"
+  },
   "Recipes": {
     "title": "Receitas salvas",
     "subtitle": "Seus preparos salvos, prontos pra repetir.",

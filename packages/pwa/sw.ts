@@ -80,10 +80,12 @@ function matchesLocale(pathname: string, locale: string): boolean {
 }
 
 /**
- * The dynamic next/og routes (the configurable `iconBasePath`/`splashBasePath`
- * plus the fixed Next file-convention routes `/icon`, `/apple-icon`) are
- * generated per request and are NOT in the precache manifest, so they need an
- * explicit runtime rule. Same-origin only.
+ * The dynamic PWA routes (the configurable `iconBasePath`/`splashBasePath`, the
+ * fixed Next file-convention routes `/icon`, `/apple-icon`, and the generated
+ * `/manifest.webmanifest`) are produced per request and are NOT in the precache
+ * manifest, so they need an explicit runtime rule. Without the manifest rule, an
+ * offline document load re-requesting `<link rel="manifest">` logs a network
+ * error. Same-origin only.
  */
 function makeDynamicPwaAssetMatcher(
   iconBasePath: string,
@@ -94,17 +96,25 @@ function makeDynamicPwaAssetMatcher(
     (url.pathname.startsWith(`${iconBasePath}/`) ||
       url.pathname.startsWith(`${splashBasePath}/`) ||
       url.pathname === "/icon" ||
-      url.pathname === "/apple-icon");
+      url.pathname === "/apple-icon" ||
+      url.pathname === "/manifest.webmanifest");
 }
 
 /**
- * Build one navigation fallback per locale (a document request under `/{locale}`
- * falls back to that locale's offline page) plus a catch-all on the first locale
- * for document requests with NO recognised locale prefix — e.g. `/`, which the
- * next-intl middleware would normally redirect to `/{defaultLocale}` but the
- * middleware does NOT run offline. The catch-all matcher explicitly EXCLUDES
- * every known locale prefix so it never shadows a localized entry regardless of
- * Serwist's match-iteration order.
+ * Build one offline-page fallback per locale (a document request under
+ * `/{locale}` that misses cache falls back to that locale's offline page) plus a
+ * catch-all on the first locale for document requests with NO recognised locale
+ * prefix — e.g. `/`, the installed app's launch URL when an app keeps a bare-`/`
+ * start_url, which the next-intl middleware would normally redirect to
+ * `/{defaultLocale}` but the middleware does NOT run offline.
+ *
+ * The catch-all resolves to the default-locale **shell** (`/{locales[0]}`), NOT
+ * the offline page: an unlocalized document request structurally means "the app at
+ * the default locale", so offline it should open the app (the shell is precached),
+ * not a dead-route screen. The offline page stays reserved for genuinely unknown
+ * locale-PREFIXED routes (`/{locale}/never-visited`). The catch-all matcher
+ * explicitly EXCLUDES every known locale prefix so it never shadows a localized
+ * entry regardless of Serwist's match-iteration order.
  */
 function offlineFallbackEntries(
   locales: string[],
@@ -122,7 +132,9 @@ function offlineFallbackEntries(
 
   if (locales.length > 0) {
     entries.push({
-      url: `/${locales[0]}${offlinePath}`,
+      // Default-locale SHELL (precached), not the offline page — an unlocalized
+      // document request ("/") should open the app offline, not the fallback.
+      url: `/${locales[0]}`,
       matcher: (param) =>
         isDocument(param) &&
         !locales.some((locale) => matchesLocale(pathOf(param), locale)),
