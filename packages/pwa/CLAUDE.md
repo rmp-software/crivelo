@@ -168,8 +168,11 @@ The package owns all the SW logic; an app keeps only framework-convention files.
 right pixel size), `/pwa-icon/foo` → 404, and `<head>` has the manifest link + `theme-color`.
 Open a tile PNG to confirm the glyph actually rendered (Satori can silently drop unsupported SVG).
 
-**Don't trust a protected Vercel preview for icon verification.** Behind deployment
-protection the manifest + icons return `401` to credential-less fetches; the page nav
-carries your session so the app *name* shows, but Chrome fetches manifest icons without
-credentials → blank icon. This is environmental (prod is unprotected), NOT a code bug.
-Verify locally (`next start`) or on the preview via a `get_access_to_vercel_url` bypass cookie.
+**This repo's previews are NOT protected — don't blame deployment protection.** The
+crivelo monorepo does not use Vercel deployment protection (see the root `CLAUDE.md`
+Deploy/data note): manifest, `pwa-icon`/`pwa-splash` PNGs, and pages all return `200`
+to credential-less fetches on previews. So a missing/blank icon or splash on a preview
+is a **real bug**, never a `401`/protection artifact — debug it, don't reach for a
+bypass cookie. (The generic "behind protection, credential-less fetches 401" caveat
+applies only to repos that *do* enable protection; this one doesn't. Confirm with one
+`curl -w '%{http_code}'` against the asset before theorizing.)
