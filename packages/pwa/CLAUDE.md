@@ -1,11 +1,27 @@
 # CLAUDE.md — @crivelo/pwa
 
-Shared "add to home screen" plumbing: web app manifest + on-the-fly icon tiles
-(`next/og`) + iOS web-app meta, driven by one `PwaConfig`. **Installable only** —
-no service worker, no offline, no install-prompt UI (matches `~/dev/molly`).
+Shared PWA plumbing, driven by one `PwaConfig`, in two independently-importable
+halves:
+
+1. **Installability** — web app manifest + on-the-fly icon tiles (`next/og`) +
+   iOS web-app meta. No install-prompt UI (matches `~/dev/molly`).
+2. **Offline** — a Serwist service-worker foundation (`@serwist/turbopack` on the
+   Next/Turbopack integration): the `@crivelo/pwa/sw` worker entry + the
+   `@crivelo/pwa/serwist` Node glue + the `@crivelo/pwa/serwist-provider` client
+   registrar. Opt-in per app — importing the installability half never pulls in
+   the SW code, and vice-versa.
+
+`serwist` + `@serwist/turbopack` are **OPTIONAL peer deps**: a consumer that only
+wants installability (incl. out-of-repo molly) never installs them. The offline
+half is opted into by the consuming app **adding both packages itself** (they are
+ESM-only) — see the offline checklist. They are devDeps here purely so this
+package type-checks.
+
 Ships raw `.ts`/`.tsx` (no build), like `@crivelo/tokens`.
 
-Spec: `docs/specs/pwa-add-to-home-screen.md`. First consumer: `apps/crivelo-web`.
+Specs: `docs/specs/pwa-add-to-home-screen.md` (installability),
+`docs/specs/crivelo-web-offline.md` (offline). First consumer: `apps/crivelo-web`.
+crema-arena does NOT consume this package.
 
 ## What lives where
 - `index.ts` — `PwaConfig` type + barrel. Read its header for the design rationale.
@@ -14,6 +30,30 @@ Spec: `docs/specs/pwa-add-to-home-screen.md`. First consumer: `apps/crivelo-web`
 - `splash.tsx` — `renderSplash(cfg, {width, height})` → `ImageResponse` (the splash renderer) **and** `createSplashRoute(cfg)` → `{ GET }`, the factory that owns the `pwa-splash/[size]` route logic (size parsing + max-dimension guard) so the app wrapper is a one-liner.
 - `devices.ts` — `splashDevices` (the unique-geometry Apple matrix) + `DEFAULT_SPLASH_BASE_PATH`.
 - `metadata.ts` — `pwaMetadata(cfg)` / `pwaViewport(cfg)` → layout fragments.
+
+### Offline (service worker) — separate import paths
+- `sw.ts` (`@crivelo/pwa/sw`) — **WORKER-CONTEXT entry.** `createServiceWorker({ manifest, locales, offlinePath, defaultCache })` builds + activates the Serwist instance (precache `manifest`, `cleanupOutdatedCaches`, `skipWaiting`/`clientsClaim`, navigation preload, `runtimeCaching` = a StaleWhileRevalidate rule for the dynamic next/og routes prepended to the injected `defaultCache`, localized navigation `fallbacks`). See the worker-context constraint below.
+- `serwist.ts` (`@crivelo/pwa/serwist`) — **NODE/Next context.** `createCriveloSerwistRoute({ swSrc, locales, offlinePath, ...overrides })` wraps Serwist's `createSerwistRoute` (shared `useNativeEsbuild` + the localized `additionalPrecacheEntries` built from `locales`+`offlinePath`, each shell/offline page revisioned); `withCriveloSerwist(nextConfig)` wraps `withSerwist`.
+- `serwist-provider.tsx` (`@crivelo/pwa/serwist-provider`) — **CLIENT.** re-exports `SerwistProvider` (Serwist exports it from `@serwist/turbopack/react`, not the package root — apps import it from here).
+
+#### Worker-context constraint (critical)
+`@crivelo/pwa/sw` is compiled into the **service-worker global scope**. It must
+import ONLY worker-safe code: the bundler-agnostic `serwist` core + its types.
+NO DOM, no React, no `next/og`, no Node built-ins, and deliberately NOT
+`@serwist/turbopack/worker` — the bundler-specific `defaultCache` is **injected**
+by the app (a `createServiceWorker` param) so this module stays
+bundler-independent. It is its own export subpath precisely so importing it never
+drags in the `next/og` modules (and importing those never drags in worker code).
+`offlinePath` is **locale-relative** (e.g. `"/offline"`); the package prefixes it
+per locale → `/{locale}{offlinePath}` for both the precache entries and the
+fallbacks (with a bounded `/{locale}` or `/{locale}/…` prefix test, never a bare
+`startsWith`). The `self.__SW_MANIFEST` injection token must physically appear in
+the **app's** `app/sw.ts`, not here — it is the build-time precache-manifest
+replacement point. The runtime-cache matcher for the on-the-fly next/og routes
+defaults to `iconBasePath: "/pwa-icon"` + `splashBasePath: "/pwa-splash"` (plus
+the fixed `/icon`, `/apple-icon`); **if an app customizes `PwaConfig.iconBasePath`
+or `splash.basePath`, pass the matching `iconBasePath`/`splashBasePath` to
+`createServiceWorker`** or those tiles won't be runtime-cached.
 
 The package owns the **logic**; App-Router convention files (`manifest.ts`,
 `icon.tsx`, `apple-icon.tsx`, `pwa-icon/[variant]/route.tsx`) must live in the
@@ -36,6 +76,48 @@ keeps thin wrappers that call into here. See `apps/crivelo-web/app/*` for the ca
 4. In the root layout: merge `pwaMetadata(cfg)` into `metadata` (+ `manifest: "/manifest.webmanifest"`) and `export const viewport = pwaViewport(cfg)`.
 5. Add `pwa-splash` (alongside `icon|apple-icon|pwa-icon`) to the i18n middleware matcher negative lookahead — see the gotcha below.
 6. If the root layout's metadata is async (`async generateMetadata`, e.g. via next-intl `getTranslations`), set `htmlLimitedBots: /.*/` in `next.config` — see the streaming-metadata gotcha below. Without it the iOS splash silently breaks in **production only**.
+
+## Adding offline to a new app (checklist) — for molly et al.
+The package owns all the SW logic; an app keeps only framework-convention files.
+
+> **PREREQUISITE (do this FIRST): the consuming app's `next.config` MUST be
+> `next.config.ts` or `.mjs`, NOT CJS `next.config.js`.** `@serwist/turbopack` is
+> ESM-only and `@crivelo/pwa` ships raw TS; a CJS config (`require` /
+> `module.exports`) throws the moment it calls `withCriveloSerwist`. Migrate the
+> config to ESM/TS before step 5. (crivelo-web ships CJS today — Phase 1B must
+> migrate it.)
+
+1. **Opt in to the SW runtime (the gate):** add `@serwist/turbopack` + `serwist`
+   as the app's OWN deps (they are optional peers of `@crivelo/pwa`, so an
+   installability-only app never installs them), and ensure `@crivelo/pwa` is in
+   `next.config` **`transpilePackages`**.
+2. `app/sw.ts` (~5 lines) — the WORKER source. Declare the injection token + call the factory:
+   ```ts
+   import { defaultCache } from "@serwist/turbopack/worker";
+   import { createServiceWorker } from "@crivelo/pwa/sw";
+   import type { PrecacheEntry } from "serwist";
+   declare const self: ServiceWorkerGlobalScope & {
+     __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+   };
+   createServiceWorker({
+     manifest: self.__SW_MANIFEST,
+     locales: ["en", "pt"],
+     offlinePath: "/offline",
+     defaultCache,
+   });
+   ```
+   `self.__SW_MANIFEST` MUST appear literally here (it is the build-time precache injection point). `defaultCache` is imported app-side (bundler-specific) and injected.
+3. `app/serwist/[path]/route.ts` — serves the compiled SW at `/serwist/sw.js`:
+   ```ts
+   import { createCriveloSerwistRoute } from "@crivelo/pwa/serwist";
+   export const { GET, generateStaticParams, dynamic, dynamicParams, revalidate } =
+     createCriveloSerwistRoute({ swSrc: "app/sw.ts", locales: ["en", "pt"], offlinePath: "/offline" });
+   ```
+   The `[path]` segment must be named `path`. Override `useNativeEsbuild`/etc. via the spread options if a build target lacks the native esbuild binary.
+4. Root layout — mount `<SerwistProvider swUrl="/serwist/sw.js">` (from `@crivelo/pwa/serwist-provider`) around the app.
+5. `next.config` (already ESM/TS per the prerequisite) — compose `withCriveloSerwist` (from `@crivelo/pwa/serwist`) under the app's other plugins, e.g. `withNextIntl(withCriveloSerwist(cfg))`. Keep `transpilePackages` + `htmlLimitedBots`.
+6. A localized offline page at `app/[locale]/offline/` (statically rendered, inside normal i18n routing) — matches the `offlinePath`/`locales` passed above.
+7. Vercel `Cache-Control: public, max-age=0, must-revalidate` header on `/serwist/sw.js` (the SW itself must not be cached long).
 
 ## Gotchas (these bite)
 - **next-intl middleware 307s the icon routes.** If the app uses i18n middleware,

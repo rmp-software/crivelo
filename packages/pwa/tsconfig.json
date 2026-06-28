@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../tsconfig/react-library.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "comment": "Normal (DOM/React/Next) package surface. The worker entry sw.ts is checked separately under WebWorker libs via tsconfig.worker.json (see the type-check script), so it is excluded here.",
+  "include": [
+    "index.ts",
+    "manifest.ts",
+    "icon.tsx",
+    "splash.tsx",
+    "devices.ts",
+    "metadata.ts",
+    "serwist.ts",
+    "serwist-provider.tsx"
+  ]
+}
