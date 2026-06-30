@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { Analytics } from "@vercel/analytics/next";
 import { fontVariables } from "@crivelo/tokens/fonts";
 import { pwaMetadata, pwaViewport } from "@crivelo/pwa";
 import { SerwistProvider } from "@crivelo/pwa/serwist-provider";
@@ -82,6 +83,8 @@ export default async function LocaleLayout({
                 from the same module instance; inherits the house tokens via the alias
                 layer (see @crivelo/ui/sonner). */}
             <Toaster />
+            {/* Vercel Web Analytics for production tracking and insights. */}
+            <Analytics />
           </NextIntlClientProvider>
         </SerwistProvider>
       </body>
