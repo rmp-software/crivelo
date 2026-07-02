@@ -46,10 +46,10 @@ import { Button } from "../ui/Button";
 import { useRouter } from "../../i18n/navigation";
 import { brewHref, editHref } from "../../lib/coa-nav";
 import { getLastBrew, type LastBrew } from "../../lib/recipes-store";
-import { doseRatioSummary, paramsSummary } from "../../lib/recipe-summary";
+import { doseRatioSummary } from "../../lib/recipe-summary";
 import { tasteKey } from "../../lib/four-six";
 import { Icon } from "./icons";
-import { CAP, MONO } from "./style-tokens";
+import { MONO } from "./style-tokens";
 
 export type LastBrewBarVariant = "bar" | "inline";
 
@@ -60,11 +60,10 @@ export interface LastBrewBarProps {
 
 /**
  * Read the `coa-last-brew` slot post-mount (SSR-safe) and resolve its localized
- * params summary. Returns `null` until mounted or when there is no last brew.
+ * taste label. Returns `null` until mounted or when there is no last brew.
  */
 function useLastBrewSummary(): {
   lastBrew: LastBrew;
-  summary: string;
   taste: string;
 } | null {
   const tTaste = useTranslations("Taste");
@@ -74,8 +73,7 @@ function useLastBrewSummary(): {
   }, []);
 
   if (!lastBrew) return null;
-  const taste = tTaste(tasteKey(lastBrew.params.acidity));
-  return { lastBrew, summary: paramsSummary(lastBrew.params, taste), taste };
+  return { lastBrew, taste: tTaste(tasteKey(lastBrew.params.acidity)) };
 }
 
 export function LastBrewBar({ variant }: LastBrewBarProps) {
@@ -96,7 +94,7 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
   }, [hasData]);
 
   if (!data) return null;
-  const { lastBrew, summary, taste } = data;
+  const { lastBrew, taste } = data;
   const { params } = lastBrew;
 
   const brewAgain = (
@@ -127,29 +125,38 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
     </span>
   );
 
-  // Inline-variant text block (unchanged legacy shape: caption + one-line
-  // ellipsized summary).
-  const text = (
-    <div className="min-w-0 flex-1">
-      <div className={cn(CAP, "leading-none")}>{t("title")}</div>
-      <div className={cn("mt-1 truncate text-small text-fg-2", MONO)}>
-        {summary}
+  // Payload-first two-line text block, shared shape with the bar variant:
+  // line 1 = the numbers + pour count (mono), line 2 = label + taste (muted).
+  // Never truncates.
+  const textBlock = (
+    <div className="min-w-[150px] flex-1">
+      <div className={cn("text-[13.5px] font-semibold", MONO)}>
+        {doseRatioSummary(params)} ·{" "}
+        {t("pours", { count: params.strengthPours })}
+      </div>
+      <div className="text-[12px] text-fg-3">
+        {t("title")} · {taste}
       </div>
     </div>
   );
 
   if (variant === "inline") {
     // Compact left-column row (wide layout). In flow, no float — it reads as a
-    // small card, not the old full-width panel.
+    // small card, not the old full-width panel. `flex-wrap` + the text block's
+    // min-width floor: at lg (~478px column) everything sits on one row; at md
+    // (~298px column) the actions wrap to a right-aligned second row instead of
+    // squeezing the summary into an ellipsis (the old truncation bug).
     return (
       <section
         aria-label={t("title")}
-        className="flex items-center gap-3 rounded-md border border-border bg-surface-raised p-3 shadow-1"
+        className="flex flex-wrap items-center gap-3 rounded-md border border-border bg-surface-raised p-3 shadow-1"
       >
         {lead}
-        {text}
-        {brewAgain}
-        {edit}
+        {textBlock}
+        <div className="ml-auto flex items-center gap-2">
+          {brewAgain}
+          {edit}
+        </div>
       </section>
     );
   }

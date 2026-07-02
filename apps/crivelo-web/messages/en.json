@@ -61,6 +61,7 @@
     "subtitle": "Your saved brews, ready to make again.",
     "bean": "Bean",
     "grind": "Grind size",
+    "pours": "{count, plural, one {# pour} other {# pours}}",
     "ratingValue": "{n, plural, one {# star} other {# stars}}",
     "savedOn": "Saved on {date}",
     "brewAgain": "Brew again",

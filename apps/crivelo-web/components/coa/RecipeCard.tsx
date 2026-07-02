@@ -120,9 +120,16 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
   // Bind each "·" to the token after it (non-breaking space *after* the middot) so the
   // subline wraps as whole "· value" units — a line break can still land at the normal
   // space *before* a "·", but never right after one (no orphaned middot at 360px / pt-BR).
-  // Dose·ratio only — the taste word already renders as the accent Chip below, so
-  // appending it here (the old `paramsSummary`) showed it twice.
-  const summary = doseRatioSummary(params).replace(/· /g, "· ");
+  // Dose·ratio + pour count — the taste word already renders as the accent Chip
+  // below, so appending it here (the old `paramsSummary`) showed it twice; the pour
+  // count is the user-chosen parameter otherwise shown nowhere on the card. When the
+  // title already IS the dose·ratio string (default name), the subline carries only
+  // the pours.
+  const summary = (
+    isDefaultName
+      ? t("pours", { count: params.strengthPours })
+      : `${doseRatioSummary(params)} · ${t("pours", { count: params.strengthPours })}`
+  ).replace(/· /g, "· ");
   // Legacy records saved before `createdAt` existed simply render no date.
   const savedDate =
     typeof createdAt === "number"
@@ -150,9 +157,7 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
           >
             {name}
           </h2>
-          {isDefaultName ? null : (
-            <div className={cn("mt-1 text-[13px] text-fg-3", MONO)}>{summary}</div>
-          )}
+          <div className={cn("mt-1 text-[13px] text-fg-3", MONO)}>{summary}</div>
           {savedDate ? (
             <div className="mt-1 text-[12px] text-fg-4">
               {t("savedOn", { date: savedDate })}

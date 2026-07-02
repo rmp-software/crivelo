@@ -60,6 +60,7 @@
     "title": "Receitas salvas",
     "subtitle": "Seus preparos salvos, prontos pra repetir.",
     "bean": "Grão",
+    "pours": "{count, plural, one {# despejo} other {# despejos}}",
     "grind": "Moagem",
     "ratingValue": "{n, plural, one {# estrela} other {# estrelas}}",
     "savedOn": "Salva em {date}",
