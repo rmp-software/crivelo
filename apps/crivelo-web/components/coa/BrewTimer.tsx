@@ -35,8 +35,11 @@
  *
  * Live-brew guards (RMP-234): while a brew is live (countdown/running/paused)
  * the restart control is hold-to-confirm (~600ms rAF-driven fill; keyboard
- * activation opens an AlertDialog instead) and the exit affordances confirm via
- * AlertDialog before discarding the session. A screen wake lock (RMP-235) is
+ * activation opens an AlertDialog instead) and the in-timer exit ("Back to
+ * recipe") confirms via AlertDialog before discarding the session. Other
+ * navigation (header, nav sheet, browser back) is deliberately unguarded: it
+ * leaves the persisted session intact, so re-entering /brew with the same
+ * params resumes the live brew. A screen wake lock (RMP-235) is
  * held through countdown/running. Opt-in pour cues (RMP-239): a bell toggle
  * (persisted under 'coa-brew-sound', default off) fires a short WebAudio chime
  * + vibration once per crossed pour boundary (and at removeAt), never replayed

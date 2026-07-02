@@ -175,6 +175,7 @@ export function TastePad({
         return;
     }
     e.preventDefault();
+    dismissHint();
     if (nextAcidity !== acidity) setAcidity(nextAcidity);
     if (nextStrength !== strengthPours) setStrength(nextStrength);
     setPad({ x: (nextAcidity + 1) / 2, y: (4 - nextStrength) / 3 });

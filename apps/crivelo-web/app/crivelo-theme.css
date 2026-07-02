@@ -32,11 +32,16 @@
   --color-accent-dot: var(--accent-dot);
   --color-accent-halo: var(--accent-halo);
 
-  /* Intentionally NOT promoted to utilities: --focus-ring and
-   * --pour-strength-rgb are raw-var-only — consumed via `var(--…)` in domain
-   * component styles (TastePad, PourSchedule), never as `bg-*`/`ring-*` classes.
-   * They keep resolving from crivelo-tokens.css; mapping them here would emit
-   * dead utility tokens nothing references. (--accent-halo IS promoted above —
+  /* Strength overlay colour, promoted for static consumers (the pour-schedule
+   * legend swatch uses `bg-pour-strength/58`). The bar segments themselves keep
+   * consuming the raw --pour-strength-rgb triple: their alpha is per-step
+   * recipe DATA (a runtime bridge), which a static utility can't express. */
+  --color-pour-strength: rgb(var(--pour-strength-rgb));
+
+  /* Intentionally NOT promoted to a utility: --focus-ring is raw-var-only —
+   * consumed via `var(--…)` in domain component styles (TastePad), never as a
+   * `ring-*` class. It keeps resolving from crivelo-tokens.css; mapping it here
+   * would emit a dead utility token nothing references. (--accent-halo IS promoted above —
    * it will be consumed by the brew timer's highlighted pour card as the
    * `bg-accent-halo` utility (RMP-224). It also remains legitimately used raw as
    * `var(--accent-halo)` in TastePad's multi-value box-shadow — a multi-value

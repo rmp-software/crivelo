@@ -85,19 +85,15 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
 
       {/* Legend (RMP-242) — keys the bar's two colour families: flavor pours
           (brand teal) vs strength pours (the --pour-strength-rgb alpha ramp).
-          The strength swatch reuses the ramp's mid alpha via a raw var() —
-          --pour-strength-rgb is deliberately raw-var-only (see
-          crivelo-theme.css), consumed in PourSchedule domain styles. */}
+          The strength swatch is the ramp's mid alpha via the promoted
+          `pour-strength` utility (crivelo-theme.css). */}
       <div className="mb-4 flex items-center gap-4">
         <span className="inline-flex items-center gap-1.5 text-[11px] text-fg-3">
           <span className="size-2.5 rounded-[3px] bg-brand" />
           {t("legendFlavor")}
         </span>
         <span className="inline-flex items-center gap-1.5 text-[11px] text-fg-3">
-          <span
-            className="size-2.5 rounded-[3px]"
-            style={{ background: "rgba(var(--pour-strength-rgb), 0.58)" }}
-          />
+          <span className="size-2.5 rounded-[3px] bg-pour-strength/58" />
           {t("legendStrength")}
         </span>
       </div>

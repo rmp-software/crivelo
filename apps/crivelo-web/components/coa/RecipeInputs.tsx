@@ -14,9 +14,13 @@
  * desktop column. Controls are sized to fit the tightest real container with
  * margin to spare, so there is no viewport-dependent sizing and nothing to clip.
  *
- * Input ergonomics: the ± buttons keep their 24px glyph but expose a 44×44px
- * hit area (RMP-233), auto-repeat on press-hold, and the value itself is
- * tappable for direct numeric entry (RMP-243).
+ * Input ergonomics: the ± buttons keep their 24px glyph but expose a 32×44px
+ * hit area (RMP-233) — full 44px on the vertical axis, horizontally capped at
+ * 32px because adjacent steppers' inner buttons sit as close as 0–6px apart in
+ * the tightest containers (320px phones, the md two-column squeeze), where
+ * wider invisible targets would overlap and mis-route taps to the neighbour.
+ * Auto-repeat on press-hold, and the value itself is tappable for direct
+ * numeric entry (RMP-243).
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
@@ -53,8 +57,9 @@ function StepButton({
   // hover:bg-primary/90 is cancelled with hover:bg-surface.
   //
   // Hit area (RMP-233): the layout box stays 24px so the row metrics don't
-  // change; an ::after overlay at -inset-2.5 (10px per side) grows the
-  // effective touch target to 44×44px.
+  // change; an ::after overlay grows the effective touch target to 32×44px
+  // (-inset-y-2.5 / -inset-x-1 — see the header comment for why horizontal
+  // expansion is capped).
   //
   // Press-hold repeat (RMP-243): pointerdown arms a delay, then an interval
   // steps until pointerup/leave/cancel. The latest onClick closure is kept in a
@@ -101,7 +106,7 @@ function StepButton({
       onPointerLeave={stopHold}
       onPointerCancel={stopHold}
       aria-label={label}
-      className="relative grid h-6 w-6 shrink-0 cursor-pointer touch-none place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors select-none after:absolute after:-inset-2.5 after:rounded-full after:content-[''] hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
+      className="relative grid h-6 w-6 shrink-0 cursor-pointer touch-none place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors select-none after:absolute after:-inset-x-1 after:-inset-y-2.5 after:rounded-full after:content-[''] hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
     >
       {children}
     </Button>
@@ -137,8 +142,17 @@ function Stepper({
   // Direct entry (RMP-243): tap the value to edit. draft === null ⇒ display
   // mode. Enter/blur commits (parse → caller clamps), Escape reverts.
   const [draft, setDraft] = useState<string | null>(null);
+  // Unmounting the focused input (Escape's setDraft(null)) can fire a native
+  // blur whose delegated handler still sees the pre-Escape draft — the flag
+  // makes the revert win that race.
+  const cancelingRef = useRef(false);
   const commitDraft = () => {
     if (draft === null) return;
+    if (cancelingRef.current) {
+      cancelingRef.current = false;
+      setDraft(null);
+      return;
+    }
     const n = Number.parseFloat(draft.replace(",", ".")); // pt-BR decimal comma
     if (Number.isFinite(n)) commit(n);
     setDraft(null);
@@ -155,7 +169,10 @@ function Stepper({
           <button
             type="button"
             aria-label={editLabel}
-            onClick={() => setDraft(String(num))}
+            onClick={() => {
+              cancelingRef.current = false;
+              setDraft(String(num));
+            }}
             className={cn(
               "text-mono cursor-text font-semibold whitespace-nowrap",
               MONO,
@@ -174,7 +191,10 @@ function Stepper({
             onBlur={commitDraft}
             onKeyDown={(e) => {
               if (e.key === "Enter") e.currentTarget.blur();
-              if (e.key === "Escape") setDraft(null);
+              if (e.key === "Escape") {
+                cancelingRef.current = true;
+                setDraft(null);
+              }
             }}
             className={cn(
               "text-mono w-12 border-b border-border-strong bg-transparent text-center font-semibold outline-none",
