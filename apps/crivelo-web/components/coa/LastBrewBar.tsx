@@ -125,10 +125,19 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
     </span>
   );
 
-  const text = (
+  // `truncateSummary` — the inline row keeps its one-line ellipsis; the bar
+  // variant wraps the full summary instead (RMP-237: no truncation at 320px /
+  // pt-BR).
+  const text = (truncateSummary: boolean) => (
     <div className="min-w-0 flex-1">
       <div className={cn(CAP, "leading-none")}>{t("title")}</div>
-      <div className={cn("mt-1 truncate text-small text-fg-2", MONO)}>
+      <div
+        className={cn(
+          "mt-1 text-small text-fg-2",
+          truncateSummary && "truncate",
+          MONO,
+        )}
+      >
         {summary}
       </div>
     </div>
@@ -143,7 +152,7 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
         className="flex items-center gap-3 rounded-md border border-border bg-surface-raised p-3 shadow-1"
       >
         {lead}
-        {text}
+        {text(true)}
         {brewAgain}
         {edit}
       </section>
@@ -152,20 +161,26 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
 
   // Sticky bottom bar (narrow). `fixed` + out of flow → zero layout shift. Above
   // the home-indicator safe area; under modals in z-order.
+  // Two-line layout (RMP-237): line 1 = lead + label + full summary (wraps, no
+  // truncation at 320px in either locale); line 2 = actions, right-aligned.
   return (
     <section
       aria-label={t("title")}
       style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
       className={cn(
-        "fixed inset-x-3 z-30 mx-auto flex max-w-[366px] items-center gap-2.5 rounded-lg border border-border-strong bg-surface-raised/90 p-2 pl-3.5 shadow-1 backdrop-blur-md",
+        "fixed inset-x-3 z-30 mx-auto flex max-w-[366px] flex-col gap-2 rounded-lg border border-border-strong bg-surface-raised/90 p-2.5 pl-3.5 shadow-1 backdrop-blur-md",
         "transition-[opacity,transform] duration-stage ease-standard motion-reduce:transition-none",
         revealed ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
       )}
     >
-      {lead}
-      {text}
-      {brewAgain}
-      {edit}
+      <div className="flex items-center gap-2.5">
+        {lead}
+        {text(false)}
+      </div>
+      <div className="flex items-center justify-end gap-2">
+        {brewAgain}
+        {edit}
+      </div>
     </section>
   );
 }

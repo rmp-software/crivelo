@@ -10,6 +10,7 @@
     "siteMenu": "Menu do site",
     "homeAria": "Coa by Crivelo — início",
     "savedRecipes": "Receitas salvas",
+    "savedRecipesWithCount": "Receitas salvas, {count, plural, one {# salva} other {# salvas}}",
     "theHouse": "A casa",
     "theFamily": "A família",
     "youAreHere": "você está aqui",
@@ -59,6 +60,7 @@
     "bean": "Grão",
     "grind": "Moagem",
     "ratingValue": "{n, plural, one {# estrela} other {# estrelas}}",
+    "savedOn": "Salva em {date}",
     "brewAgain": "Preparar de novo",
     "edit": "Editar",
     "deleteAria": "Excluir {name}",
@@ -74,6 +76,7 @@
     "label": "Gosto",
     "summary": "{taste} · {count, plural, one {# despejo} other {# despejos}}",
     "padAria": "Painel de gosto e força. As setas para esquerda e direita ajustam a acidez do doce ao brilhante; as setas para cima e para baixo ajustam a força do mais leve ao mais forte.",
+    "dragHint": "Arraste para ajustar",
     "stronger": "Mais forte",
     "lighter": "Mais leve",
     "sweet": "Doce",
@@ -89,16 +92,20 @@
     "ratio": "Proporção",
     "water": "Água",
     "decrease": "diminuir {label}",
-    "increase": "aumentar {label}"
+    "increase": "aumentar {label}",
+    "edit": "editar {label}"
   },
   "Schedule": {
-    "pourSchedule": "Cronograma de despejos",
+    "pourSchedule": "Despejos",
+    "legendFlavor": "Sabor · 40%",
+    "legendStrength": "Força · 60%",
     "pour": "Despejo {n}",
     "removeDripper": "Retire o coador · escorrimento"
   },
   "BrewTimer": {
     "recipe": "Receita",
     "getReady": "Prepare-se",
+    "ready": "Pronto",
     "brewing": "Preparando",
     "paused": "Pausado",
     "complete": "Concluído",
@@ -127,7 +134,8 @@
     "nowDrawDown": "Agora · escorrimento",
     "letItDrawDown": "Deixe escorrer",
     "finalDrawDown": "Escorrimento final",
-    "stepCounter": "Etapa {n} / {total}",
+    "pourCounter": "Despejo {n} de {total}",
+    "pourCounterDraw": "Despejo {n} de {total} · escorrimento",
     "finished": "concluído",
     "stepsDone": "{count, plural, one {# etapa concluída} other {# etapas concluídas}}",
     "hideCompleted": "Ocultar concluídas",
@@ -136,6 +144,15 @@
     "pause": "Pausar",
     "resume": "Retomar",
     "restartAria": "Reiniciar preparo",
+    "holdToRestart": "Segure para reiniciar",
+    "restartTitle": "Reiniciar este preparo?",
+    "restartBody": "O cronômetro volta ao início.",
+    "restartConfirm": "Reiniciar",
+    "leaveTitle": "Sair deste preparo?",
+    "leaveBody": "Sair interrompe o cronômetro e descarta este preparo.",
+    "keepBrewing": "Continuar preparando",
+    "leave": "Sair",
+    "soundCues": "Alertas sonoros",
     "brewAgain": "Preparar de novo",
     "backToRecipe": "Voltar à receita",
     "totalTime": "Tempo total {time}",
@@ -155,6 +172,7 @@
     "save": "Salvar receita",
     "cancel": "Cancelar",
     "close": "Fechar",
-    "savedToast": "Receita salva"
+    "savedToast": "Receita salva",
+    "view": "Ver"
   }
 }

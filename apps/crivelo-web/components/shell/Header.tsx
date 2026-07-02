@@ -105,10 +105,19 @@ export function Header({
         {showBookmark && (
           <Link
             href="/recipes"
-            aria-label={t("savedRecipes")}
-            className="relative ml-auto inline-flex size-[38px] shrink-0 items-center justify-center rounded-md border border-border bg-surface-raised text-fg-2 no-underline transition-colors hover:border-border-strong hover:text-fg"
+            // The accessible name carries the live count (ICU plural); with no
+            // saved recipes it's just the plain label.
+            aria-label={
+              count > 0 ? t("savedRecipesWithCount", { count }) : t("savedRecipes")
+            }
+            className="relative ml-auto inline-flex h-[38px] w-[38px] shrink-0 items-center justify-center gap-2 rounded-md border border-border bg-surface-raised text-fg-2 no-underline transition-colors hover:border-border-strong hover:text-fg md:w-auto md:px-3"
           >
             <Icon name="bookmark" size={19} stroke={1.7} />
+            {/* Visual-only text label on md+ (icon-only stays on mobile);
+                aria-hidden because aria-label above is the accessible name. */}
+            <span aria-hidden="true" className="hidden text-small font-medium md:inline">
+              {t("savedRecipes")}
+            </span>
             {count > 0 && (
               <span
                 aria-hidden="true"

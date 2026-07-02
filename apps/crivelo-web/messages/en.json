@@ -10,6 +10,7 @@
     "siteMenu": "Site menu",
     "homeAria": "Coa by Crivelo — home",
     "savedRecipes": "Saved recipes",
+    "savedRecipesWithCount": "Saved recipes, {count, plural, one {# saved} other {# saved}}",
     "theHouse": "The house",
     "theFamily": "The family",
     "youAreHere": "you are here",
@@ -59,6 +60,7 @@
     "bean": "Bean",
     "grind": "Grind size",
     "ratingValue": "{n, plural, one {# star} other {# stars}}",
+    "savedOn": "Saved on {date}",
     "brewAgain": "Brew again",
     "edit": "Edit",
     "deleteAria": "Delete {name}",
@@ -74,6 +76,7 @@
     "label": "Taste",
     "summary": "{taste} · {count, plural, one {# pour} other {# pours}}",
     "padAria": "Taste and strength pad. Left and right arrows adjust acidity from sweet to bright; up and down arrows adjust strength from lighter to stronger.",
+    "dragHint": "Drag to adjust",
     "stronger": "Stronger",
     "lighter": "Lighter",
     "sweet": "Sweet",
@@ -89,16 +92,20 @@
     "ratio": "Ratio",
     "water": "Water",
     "decrease": "decrease {label}",
-    "increase": "increase {label}"
+    "increase": "increase {label}",
+    "edit": "edit {label}"
   },
   "Schedule": {
     "pourSchedule": "Pour schedule",
+    "legendFlavor": "Flavor · 40%",
+    "legendStrength": "Strength · 60%",
     "pour": "Pour {n}",
     "removeDripper": "Remove dripper · drawdown"
   },
   "BrewTimer": {
     "recipe": "Recipe",
     "getReady": "Get ready",
+    "ready": "Ready",
     "brewing": "Brewing",
     "paused": "Paused",
     "complete": "Complete",
@@ -127,7 +134,8 @@
     "nowDrawDown": "Now · draw down",
     "letItDrawDown": "Let it draw down",
     "finalDrawDown": "Final draw down",
-    "stepCounter": "Step {n} / {total}",
+    "pourCounter": "Pour {n} of {total}",
+    "pourCounterDraw": "Pour {n} of {total} · draw down",
     "finished": "finished",
     "stepsDone": "{count, plural, one {# step done} other {# steps done}}",
     "hideCompleted": "Hide completed",
@@ -136,6 +144,15 @@
     "pause": "Pause",
     "resume": "Resume",
     "restartAria": "Restart brew",
+    "holdToRestart": "Hold to restart",
+    "restartTitle": "Restart this brew?",
+    "restartBody": "The timer goes back to the start.",
+    "restartConfirm": "Restart",
+    "leaveTitle": "Leave this brew?",
+    "leaveBody": "Leaving stops the timer and discards this brew.",
+    "keepBrewing": "Keep brewing",
+    "leave": "Leave",
+    "soundCues": "Sound cues",
     "brewAgain": "Brew again",
     "backToRecipe": "Back to recipe",
     "totalTime": "Total {time}",
@@ -155,6 +172,7 @@
     "save": "Save recipe",
     "cancel": "Cancel",
     "close": "Close",
-    "savedToast": "Recipe saved"
+    "savedToast": "Recipe saved",
+    "view": "View"
   }
 }

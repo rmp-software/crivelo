@@ -26,10 +26,21 @@
  *
  * Sizing is CSS-driven, not JS: there is no `bp` prop. Responsive Tailwind
  * utilities (`md:` ≥768 = old "wide", `lg:` ≥1024 = old "desktop") pick the
- * container max-width, padding, the two-column grid, and the clock font. The ring
- * keeps a FIXED 272 viewBox (geometry math in the 272 coordinate space) and the
- * rendered dial box scales via responsive width/height utilities (236px mobile →
- * 272px ≥md), so the SVG faithfully scales without recomputing geometry.
+ * container max-width, padding, the two-column grid, and the clock font. The dial
+ * is a 270° gap arc (gauge, gap at the bottom) in a FIXED 272×226 viewBox
+ * (geometry math in the 272 coordinate space, bottom dead space cropped) and the
+ * rendered dial box scales via responsive width/height utilities (236×196 mobile
+ * → 272×226 ≥md, clamped to 190×158 on short mobile viewports), so the SVG
+ * faithfully scales without recomputing geometry.
+ *
+ * Live-brew guards (RMP-234): while a brew is live (countdown/running/paused)
+ * the restart control is hold-to-confirm (~600ms rAF-driven fill; keyboard
+ * activation opens an AlertDialog instead) and the exit affordances confirm via
+ * AlertDialog before discarding the session. A screen wake lock (RMP-235) is
+ * held through countdown/running. Opt-in pour cues (RMP-239): a bell toggle
+ * (persisted under 'coa-brew-sound', default off) fires a short WebAudio chime
+ * + vibration once per crossed pour boundary (and at removeAt), never replayed
+ * on resume/refocus.
  */
 import {
   useEffect,
@@ -40,6 +51,16 @@ import {
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@crivelo/ui/alert-dialog";
 import { Button } from "../ui/Button";
 import {
   clamp,
@@ -50,6 +71,7 @@ import {
 } from "../../lib/four-six";
 import { IS_DEBUG_ENV } from "../../lib/debug-env";
 import { setLastBrew, type RecipeParams } from "../../lib/recipes-store";
+import { useWakeLock } from "../../lib/use-wake-lock";
 import { toBrewSpeed, type BrewSpeed } from "./brew-speed";
 import { Icon } from "./icons";
 import { SaveRecipeForm } from "./SaveRecipeForm";
@@ -87,6 +109,61 @@ function loadDebugSpeed(): BrewSpeed {
 
 /** Seconds the "Get ready" pre-roll runs before the clock starts. */
 const PREROLL = 5;
+
+/** ms the restart button must be held before a live brew restarts (RMP-234). */
+const HOLD_MS = 600;
+
+/** localStorage key for the opt-in pour-cue toggle (RMP-239, default OFF). */
+const SOUND_KEY = "coa-brew-sound";
+
+/**
+ * Single shared AudioContext for the pour chime. Created/resumed ONLY inside
+ * user-gesture handlers (Start / bell-toggle taps) — iOS refuses to unlock
+ * audio outside a gesture. Module-level so re-mounts reuse the unlocked ctx.
+ */
+let audioCtx: AudioContext | null = null;
+
+function unlockAudio(): void {
+  try {
+    audioCtx ??= new AudioContext();
+    if (audioCtx.state === "suspended") void audioCtx.resume();
+  } catch {
+    audioCtx = null; // no WebAudio — cues fall back to vibration only
+  }
+}
+
+/** Two short quiet beeps (<0.4s total). No-op until a gesture unlocked audio. */
+function playChime(): void {
+  const ctx = audioCtx;
+  if (!ctx || ctx.state !== "running") return;
+  const t0 = ctx.currentTime;
+  for (const at of [0, 0.18]) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, t0 + at);
+    gain.gain.exponentialRampToValueAtTime(0.1, t0 + at + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + at + 0.13);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0 + at);
+    osc.stop(t0 + at + 0.15);
+  }
+}
+
+/** Vibrate alongside the chime where supported (no-op on iOS Safari). */
+function buzz(): void {
+  if ("vibrate" in navigator) navigator.vibrate([120, 80, 120]);
+}
+
+/** Read the persisted pour-cue opt-in. Defaults to off. */
+function loadSoundPref(): boolean {
+  try {
+    return localStorage.getItem(SOUND_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 /** tabular + slashed-zero mono numerals (clock / gram readouts). */
 const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
@@ -272,6 +349,16 @@ export function BrewTimer({
   const [debugSpeed, setDebugSpeed] = useState<BrewSpeed>(loadDebugSpeed);
   const speed = IS_DEBUG_ENV ? debugSpeed : 1;
 
+  // RMP-234: live-brew guards. Hold-to-restart fill fraction (0..1, rAF-driven)
+  // plus the two confirm dialogs (restart via keyboard, exit while live).
+  const [holdFrac, setHoldFrac] = useState(0);
+  const holdRaf = useRef(0);
+  const [confirmRestart, setConfirmRestart] = useState(false);
+  const [confirmExit, setConfirmExit] = useState(false);
+
+  // RMP-239: opt-in pour cues (client-only mount — localStorage read is safe).
+  const [soundOn, setSoundOn] = useState(loadSoundPref);
+
   // Persist on every change.
   useEffect(() => {
     try {
@@ -330,6 +417,40 @@ export function BrewTimer({
   const done = sess.status === "done" || finished;
   const paused = sess.status === "paused";
 
+  // RMP-235: keep the screen awake while the brew is actually ticking
+  // (countdown/running); paused/done/ready release, unmount releases.
+  useWakeLock(sess.status === "countdown" || sess.status === "running");
+
+  // RMP-239: pour-boundary cue bookkeeping. Boundaries are each pour start plus
+  // the final removeAt. `lastCueIdx` is the last boundary index already cued;
+  // on a resumed mid-brew mount it syncs silently to the current position so a
+  // reload/refocus never replays cues, and a jump past several boundaries
+  // (backgrounded tab) fires at most one cue.
+  const boundaries = recipe.steps.map((s) => s.t).concat(recipe.removeAt);
+  const crossedIdx = (el: number) => {
+    let i = -1;
+    while (i + 1 < boundaries.length && el >= boundaries[i + 1]) i++;
+    return i;
+  };
+  const lastCueIdx = useRef<number | null>(null);
+  lastCueIdx.current ??=
+    sess.status === "running" || sess.status === "paused" || done
+      ? crossedIdx(elapsed)
+      : -1;
+  useEffect(() => {
+    if (sess.status !== "running") return;
+    const idx = crossedIdx(elapsed);
+    if (idx > (lastCueIdx.current ?? -1)) {
+      // Advance even when the toggle is off so flipping it mid-brew never
+      // replays already-passed boundaries.
+      lastCueIdx.current = idx;
+      if (soundOn) {
+        playChime();
+        buzz();
+      }
+    }
+  });
+
   // Silently capture this brew as the implicit "last brew" the instant it reaches
   // done — no prompt. Guarded so it writes exactly once per done-entry: the 200ms
   // tick re-renders this component ~5×/s while the done screen is shown, and a
@@ -362,6 +483,18 @@ export function BrewTimer({
   const R = SZ / 2 - STROKE / 2 - 13;
   const CX = SZ / 2;
   const CIRC = 2 * Math.PI * R;
+  // 270° gap arc (gauge, RMP-238): gap centered at the bottom. In SVG coords
+  // (y down, angles clockwise) the arc starts at 135° (bottom-left) and sweeps
+  // 270° to 45° (bottom-right) — same direction the circle's dash runs after
+  // `rotate(135)`. Dash pattern `ARC on, CIRC off` has period > path length, so
+  // offset ARC·(1-p) fills exactly [0, p·ARC] with no wraparound tail; p=1 is
+  // the full 270°, never beyond.
+  const ARC = 0.75 * CIRC;
+  const ARC_START = 135;
+  const ARC_SWEEP = 270;
+  // Cropped viewBox height: arc bottom extremes sit at CX + R·sin45° + caps ≈ 225,
+  // so 226 trims the dead space below the gap (box height = 226/272 ≈ 83% of width).
+  const VBH = 226;
   const progress =
     counting || ready
       ? // Ready + the pre-roll's first frame both show a full ring (it depletes
@@ -377,19 +510,71 @@ export function BrewTimer({
   // it still resumes (a stamp drop would look like new params and reset).
   const pause = () =>
     setSess((s) => ({ ...s, status: "paused", base: liveElapsed(), startTs: null }));
-  const resume = () =>
+  const resume = () => {
+    unlockAudio();
     setSess((s) => ({ ...s, status: "running", startTs: Date.now() }));
+  };
   // Start (from the "ready" pre-state) enters the existing countdown → running
-  // flow — the pre-roll, identical to an autostart entry.
-  const start = () =>
+  // flow — the pre-roll, identical to an autostart entry. Start/restart re-arm
+  // the pour-cue tracker and count as the audio-unlock gesture (iOS).
+  const start = () => {
+    unlockAudio();
+    lastCueIdx.current = -1;
     setSess({ status: "countdown", cdStart: Date.now(), params: query });
-  const restart = () =>
+  };
+  const restart = () => {
+    unlockAudio();
+    lastCueIdx.current = -1;
     setSess({ status: "countdown", cdStart: Date.now(), params: query });
-  const startNow = () =>
+  };
+  const startNow = () => {
+    unlockAudio();
+    lastCueIdx.current = -1;
     setSess({ status: "running", base: 0, startTs: Date.now(), params: query });
+  };
   const exit = () => {
     clearBrewSession();
     onExit();
+  };
+  // A live brew (countdown/running/paused) is guarded: exiting confirms first,
+  // restarting requires the hold (pointer) or the confirm dialog (keyboard).
+  const live = isInProgress(sess.status);
+  const requestExit = () => (live ? setConfirmExit(true) : exit());
+
+  // Hold-to-restart: rAF drives the fill; completing the hold restarts, any
+  // early release/leave/cancel aborts. The rendered fill height is a runtime
+  // bridge (per-frame value), so its inline style is legitimate.
+  const beginHold = () => {
+    cancelAnimationFrame(holdRaf.current);
+    const t0 = performance.now();
+    const step = (now: number) => {
+      const f = Math.min(1, (now - t0) / HOLD_MS);
+      setHoldFrac(f);
+      if (f >= 1) {
+        setHoldFrac(0);
+        restart();
+      } else {
+        holdRaf.current = requestAnimationFrame(step);
+      }
+    };
+    holdRaf.current = requestAnimationFrame(step);
+  };
+  const cancelHold = () => {
+    cancelAnimationFrame(holdRaf.current);
+    setHoldFrac(0);
+  };
+  useEffect(() => () => cancelAnimationFrame(holdRaf.current), []);
+
+  // RMP-239: bell toggle. Opting in doubles as the iOS audio-unlock gesture.
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    try {
+      localStorage.setItem(SOUND_KEY, next ? "1" : "0");
+    } catch {
+      /* ignore */
+    }
+    if (next) unlockAudio();
   };
 
   // Dev-only: change the brew speed. Rebase a running clock first — freeze the
@@ -416,8 +601,10 @@ export function BrewTimer({
   };
 
   // Ring-center status word (distinguishes pour vs draw, unlike the top pill).
-  const statusWord =
-    ready || counting
+  // "Ready" (pre-start) and "Get ready" (countdown) are distinct (RMP-244).
+  const statusWord = ready
+    ? t("ready")
+    : counting
       ? t("getReady")
       : done
         ? t("complete")
@@ -500,9 +687,13 @@ export function BrewTimer({
     actionTone = "text-fg-2";
   }
 
-  // Recipe-list bookkeeping.
-  const stepCount = phases.length;
-  const stepNo = Math.min(curIdx + 1, stepCount);
+  // Recipe-list counter — pour-based (RMP-244): "Pour {n} of {total}", with a
+  // draw-down suffix during drainage, matching the 5-pour card count (not the
+  // 10 internal phases).
+  const pourCounter =
+    cur.kind === "pour"
+      ? t("pourCounter", { n: cur.pourNo, total: cur.total })
+      : t("pourCounterDraw", { n: cur.pourNo, total: cur.total });
 
   // ===== sub-components (closures over elapsed, t, paused) =====
   function CurrentCard({ p }: { p: TimerPhase }) {
@@ -796,12 +987,49 @@ export function BrewTimer({
         onOpenChange={setSaveOpen}
         params={params}
       />
+      {/* RMP-234: confirm leaving a live brew (back affordance). */}
+      <AlertDialog open={confirmExit} onOpenChange={setConfirmExit}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-h4 font-bold text-fg">
+              {t("leaveTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-small text-fg-3">
+              {t("leaveBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("keepBrewing")}</AlertDialogCancel>
+            <AlertDialogAction onClick={exit}>{t("leave")}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      {/* RMP-234: keyboard-accessible restart confirm (the pointer path uses
+          hold-to-restart; a keyboard can't hold, so it confirms here). */}
+      <AlertDialog open={confirmRestart} onOpenChange={setConfirmRestart}>
+        <AlertDialogContent size="sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-display text-h4 font-bold text-fg">
+              {t("restartTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-small text-fg-3">
+              {t("restartBody")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("keepBrewing")}</AlertDialogCancel>
+            <AlertDialogAction onClick={restart}>
+              {t("restartConfirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <main className="mx-auto box-border max-w-[390px] px-5 pt-2.5 pb-12 md:max-w-[700px] md:px-6 md:pt-4 md:pb-[60px] lg:max-w-[1000px]">
         {/* top bar — back affordance + status pill */}
         <div className="mb-2 flex items-center justify-between md:mb-4">
           <Button
             type="button"
-            onClick={exit}
+            onClick={requestExit}
             className="-ml-1 inline-flex h-auto cursor-pointer items-center justify-start gap-[5px] rounded-none border-none bg-transparent px-1 py-[6px] font-body text-small font-semibold text-fg-2 hover:bg-transparent hover:text-fg-2 has-[>svg]:px-1 [&_svg:not([class*='size-'])]:size-[18px]"
           >
             <svg
@@ -819,46 +1047,86 @@ export function BrewTimer({
             </svg>
             {t("recipe")}
           </Button>
-          <span
-            className={cn(
-              CAP,
-              "inline-flex items-center gap-[7px]",
-              done ? "text-success" : "text-fg-2",
-            )}
-          >
+          <div className="flex items-center gap-2">
             <span
               className={cn(
-                "h-[7px] w-[7px] rounded-full",
-                done ? "bg-success" : paused || ready ? "bg-fg-4" : "bg-brand",
-                !paused && !done && !ready && PULSE,
+                CAP,
+                "inline-flex items-center gap-[7px]",
+                done ? "text-success" : "text-fg-2",
               )}
-            />
-            {ready
-              ? t("readyTitle")
-              : counting
-                ? t("getReady")
-                : done
-                  ? t("done")
-                  : paused
-                    ? t("paused")
-                    : t("brewing")}
-          </span>
+            >
+              <span
+                className={cn(
+                  "h-[7px] w-[7px] rounded-full",
+                  done ? "bg-success" : paused || ready ? "bg-fg-4" : "bg-brand",
+                  !paused && !done && !ready && PULSE,
+                )}
+              />
+              {ready
+                ? t("ready")
+                : counting
+                  ? t("getReady")
+                  : done
+                    ? t("done")
+                    : paused
+                      ? t("paused")
+                      : t("brewing")}
+            </span>
+            {/* RMP-239: pour-cue opt-in (bell). Inline SVGs match the file's
+                icon idiom; icons.tsx has no bell glyph. */}
+            <Button
+              type="button"
+              onClick={toggleSound}
+              aria-pressed={soundOn}
+              aria-label={t("soundCues")}
+              title={t("soundCues")}
+              className={cn(
+                "flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border-none bg-transparent p-0 hover:bg-transparent has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[18px]",
+                soundOn
+                  ? "text-accent-ink hover:text-accent-ink"
+                  : "text-fg-4 hover:text-fg-4",
+              )}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {soundOn ? (
+                  <>
+                    <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                  </>
+                ) : (
+                  <>
+                    <path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5" />
+                    <path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7" />
+                    <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                    <path d="m2 2 20 20" />
+                  </>
+                )}
+              </svg>
+            </Button>
+          </div>
         </div>
 
         <div className="block items-start md:grid md:grid-cols-[300px_1fr] md:gap-[52px] lg:grid-cols-[340px_1fr]">
           <div>
             {/* ring */}
             <div className="flex justify-center">
-              {/* Dial box: responsive size; the SVG fills it via width/height
-                  100% and a fixed 272 viewBox, so the 272-space geometry scales. */}
-              <div className="relative h-[236px] w-[236px] md:h-[272px] md:w-[272px]">
-                <svg
-                  width="100%"
-                  height="100%"
-                  viewBox={`0 0 ${SZ} ${SZ}`}
-                  // last-resort: ring starts at 12 o'clock
-                  style={{ transform: "rotate(-90deg)" }}
-                >
+              {/* Dial box: responsive size at the arc's 226:272 aspect; the SVG
+                  fills it via width/height 100% and the fixed 272-wide viewBox,
+                  so the 272-space geometry scales. On short viewports (≤700px
+                  tall, mobile only) the dial clamps smaller so the current-step
+                  card keeps its slot. */}
+              <div className="relative h-[196px] w-[236px] max-md:[@media(max-height:700px)]:h-[158px] max-md:[@media(max-height:700px)]:w-[190px] md:h-[226px] md:w-[272px]">
+                <svg width="100%" height="100%" viewBox={`0 0 ${SZ} ${VBH}`}>
                   <circle
                     cx={CX}
                     cy={CX}
@@ -866,6 +1134,10 @@ export function BrewTimer({
                     fill="none"
                     stroke="var(--border-strong)"
                     strokeWidth={STROKE}
+                    strokeLinecap="round"
+                    strokeDasharray={`${ARC} ${CIRC}`}
+                    // last-resort: gauge arc starts at 135° (bottom-left)
+                    transform={`rotate(${ARC_START} ${CX} ${CX})`}
                   />
                   <circle
                     cx={CX}
@@ -875,14 +1147,15 @@ export function BrewTimer({
                     stroke={ringStroke}
                     strokeWidth={STROKE}
                     strokeLinecap="round"
-                    strokeDasharray={CIRC}
+                    strokeDasharray={`${ARC} ${CIRC}`}
+                    transform={`rotate(${ARC_START} ${CX} ${CX})`}
                     className="transition-[stroke-dashoffset] duration-[250ms] ease-linear motion-reduce:transition-none"
-                    // last-resort: live ring fill — runtime strokeDashoffset
-                    strokeDashoffset={CIRC * (1 - progress)}
+                    // last-resort: live arc fill — runtime strokeDashoffset
+                    strokeDashoffset={ARC * (1 - progress)}
                   />
                   {!counting &&
                     pourTicks.map((tick, i) => {
-                      const a = tick * 2 * Math.PI;
+                      const a = ((ARC_START + tick * ARC_SWEEP) * Math.PI) / 180;
                       const dx = CX + Math.cos(a) * R;
                       const dy = CX + Math.sin(a) * R;
                       const passed = progress >= tick - 0.002;
@@ -919,7 +1192,7 @@ export function BrewTimer({
                   <span
                     className={cn(
                       MONO,
-                      "text-[52px] font-semibold leading-[0.92] tracking-[-0.02em] md:text-[60px]",
+                      "text-[52px] font-semibold leading-[0.92] tracking-[-0.02em] max-md:[@media(max-height:700px)]:text-[44px] md:text-[60px]",
                       counting || ready ? "text-accent-ink" : "text-fg",
                     )}
                   >
@@ -1045,10 +1318,32 @@ export function BrewTimer({
                 </Button>
                 <Button
                   type="button"
-                  onClick={restart}
+                  // Hold-to-restart (RMP-234): pointer holds fill and fire;
+                  // keyboard (Enter/Space) opens the confirm dialog instead.
+                  // No onClick — a plain tap must not kill a live brew.
+                  onPointerDown={beginHold}
+                  onPointerUp={cancelHold}
+                  onPointerLeave={cancelHold}
+                  onPointerCancel={cancelHold}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setConfirmRestart(true);
+                    }
+                  }}
+                  onContextMenu={(e) => e.preventDefault()}
                   aria-label={t("restartAria")}
-                  className="flex h-[54px] w-[54px] shrink-0 cursor-pointer items-center justify-center rounded-md border border-border-strong bg-surface p-0 text-fg-2 hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-5"
+                  title={t("holdToRestart")}
+                  className="relative flex h-[54px] w-[54px] shrink-0 cursor-pointer touch-none items-center justify-center overflow-hidden rounded-md border border-border-strong bg-surface p-0 text-fg-2 select-none hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-5"
                 >
+                  {holdFrac > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="pointer-events-none absolute inset-x-0 bottom-0 bg-brand/25"
+                      // last-resort: runtime hold progress → fill height
+                      style={{ height: `${holdFrac * 100}%` }}
+                    />
+                  )}
                   <svg
                     width="20"
                     height="20"
@@ -1073,9 +1368,7 @@ export function BrewTimer({
             <div className="mb-3.5 flex items-center justify-between">
               <span className={cn(CAP, "text-fg-3")}>{t("recipe")}</span>
               <span className={cn(MONO, "text-[12px] font-semibold text-fg-3")}>
-                {done
-                  ? t("finished")
-                  : t("stepCounter", { n: stepNo, total: stepCount })}
+                {done ? t("finished") : pourCounter}
               </span>
             </div>
             <div className="flex flex-col gap-1">{listInner()}</div>

@@ -29,6 +29,7 @@
  * through CSS custom properties consumed by static utilities.
  */
 import {
+  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -47,6 +48,12 @@ import { clamp, tasteKey } from "../../lib/four-six";
  * — a single constant replaces the old per-breakpoint values (38/41/48).
  */
 const PAD_GAP = 41;
+
+/**
+ * localStorage flag for the first-use drag hint (RMP-241). Present ⇒ the user
+ * has already dragged the pad once ⇒ never show the hint again.
+ */
+const HINT_KEY = "coa-pad-hint";
 
 /** Section caption ("TASTE"). */
 const CAP =
@@ -87,6 +94,29 @@ export function TastePad({
   // classes can't express :focus on this drag surface directly here).
   const [focused, setFocused] = useState(false);
 
+  // First-use drag hint (RMP-241). Hidden by default so server + first client
+  // paint match (no hydration mismatch); the post-mount effect reveals it only
+  // when localStorage has no dismissal flag. Dismissed permanently on the first
+  // pointer interaction with the pad. localStorage reads/writes are guarded —
+  // it can throw (privacy modes); the hint just stays off in that case.
+  const [showHint, setShowHint] = useState(false);
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(HINT_KEY) === null) setShowHint(true);
+    } catch {
+      /* localStorage unavailable → no hint */
+    }
+  }, []);
+  const dismissHint = () => {
+    if (!showHint) return;
+    setShowHint(false);
+    try {
+      window.localStorage.setItem(HINT_KEY, "1");
+    } catch {
+      /* best effort */
+    }
+  };
+
   const setFromXY = (clientX: number, clientY: number) => {
     const el = padRef.current;
     if (!el) return;
@@ -101,6 +131,7 @@ export function TastePad({
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
+    dismissHint();
     setFromXY(e.clientX, e.clientY);
   };
 
@@ -221,6 +252,23 @@ export function TastePad({
         <span className={cn(EDGE, "right-3 top-1/2 -translate-y-1/2")}>
           {t("bright")}
         </span>
+        {showHint && (
+          // First-use hint (RMP-241): a soft ring around the puck — pulsing
+          // only under motion-safe (static ring for reduced motion) — plus a
+          // caption below it. The ping animation lives on an inner span so its
+          // scale transform doesn't clobber the wrapper's centering translate.
+          // pointer-events-none: never intercepts pad drags or keyboard focus.
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-[var(--puck-x)] top-[var(--puck-y)] -translate-x-1/2 -translate-y-1/2"
+            style={puckVar}
+          >
+            <span className="block size-11 rounded-full border-2 border-brand/60 motion-safe:animate-ping" />
+            <span className="absolute top-full left-1/2 mt-1 -translate-x-1/2 text-[11px] whitespace-nowrap text-fg-3">
+              {t("dragHint")}
+            </span>
+          </div>
+        )}
         <div
           className={cn(
             "absolute left-[var(--puck-x)] top-[var(--puck-y)] -translate-x-1/2 -translate-y-1/2",

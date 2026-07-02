@@ -12,6 +12,7 @@
  */
 import { useRef, useState, type ReactNode } from "react";
 import { cn } from "@crivelo/ui/lib/utils";
+import { usePathname } from "../../i18n/navigation";
 import { ThemeProvider } from "./ThemeProvider";
 import { Header } from "./Header";
 import { NavSheet } from "./NavSheet";
@@ -29,6 +30,12 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const closeMenu = () => setMenu(false);
 
+  // The immersive /brew timer is chrome-light (same scoping as the Header's
+  // bookmark): no footer scrolling under a live timer. usePathname() is
+  // locale-stripped, so `/brew` matches across /en and /pt.
+  const pathname = usePathname();
+  const showFooter = !pathname.startsWith("/brew");
+
   return (
     <ThemeProvider>
       <div
@@ -41,7 +48,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <Header ref={menuButtonRef} onMenu={() => setMenu(true)} />
         <NavSheet open={menu} onClose={closeMenu} returnFocusRef={menuButtonRef} />
         <div className="flex-1">{children}</div>
-        <Footer />
+        {showFooter && <Footer />}
       </div>
     </ThemeProvider>
   );

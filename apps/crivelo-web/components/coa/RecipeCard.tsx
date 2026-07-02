@@ -9,7 +9,10 @@
  *     Save-form's seeded name): render the dose·ratio AS the title, in mono, and DON'T
  *     render a separate summary subline (no duplication — the key fix the redesign targets).
  *   - **Custom-named recipe**: render the custom `name` as the serif (font-display) title
- *     with the params summary (`paramsSummary`, mono, quiet `text-fg-3`) as a subline.
+ *     with the dose·ratio summary (`doseRatioSummary`, mono, quiet `text-fg-3`) as a
+ *     subline — taste is NOT repeated here since the taste chip below already shows it.
+ * A quiet "saved on" date line follows when the record carries `createdAt` (legacy
+ * records without it render no date).
  *
  * Below the title block: a wrapping chip row — the localized **taste chip** (the flavor
  * identity, always shown: brand-soft bg + accent-ink text) plus optional **bean / grind**
@@ -29,12 +32,12 @@
  * a reload. The AlertDialog confirm is uncontrolled (Radix manages its open state).
  *
  * Styling: house tokens/utilities only (no raw hex / no inline `var()`), the same raised
- * surface as LastBrewCard. Summary/taste reuse `doseRatioSummary` / `paramsSummary` + the
+ * surface as LastBrewCard. Summary/taste reuse `doseRatioSummary` + the
  * localized taste label (single source of truth — never re-derived here). The rating reuses
  * the shared `StarGlyph`.
  */
 import type { ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "@crivelo/ui/lib/utils";
 import {
   AlertDialog,
@@ -51,7 +54,7 @@ import { Button } from "../ui/Button";
 import { useRouter } from "../../i18n/navigation";
 import { brewHref, editHref } from "../../lib/coa-nav";
 import type { SavedRecipe } from "../../lib/recipes-store";
-import { doseRatioSummary, paramsSummary } from "../../lib/recipe-summary";
+import { doseRatioSummary } from "../../lib/recipe-summary";
 import { tasteKey } from "../../lib/four-six";
 import { Icon } from "./icons";
 import { StarGlyph } from "./StarGlyph";
@@ -107,7 +110,8 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
   const tTaste = useTranslations("Taste");
   const router = useRouter();
 
-  const { id, name, bean, grindSize, rating, params } = recipe;
+  const format = useFormatter();
+  const { id, name, bean, grindSize, rating, params, createdAt } = recipe;
   const tasteLabel = tTaste(tasteKey(params.acidity));
   // Identity dedup: if the user kept the default name (the dose·ratio string), the title
   // IS that string (in mono) and there's no separate spec subline. A custom name is the
@@ -116,7 +120,18 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
   // Bind each "·" to the token after it (non-breaking space *after* the middot) so the
   // subline wraps as whole "· value" units — a line break can still land at the normal
   // space *before* a "·", but never right after one (no orphaned middot at 360px / pt-BR).
-  const summary = paramsSummary(params, tasteLabel).replace(/· /g, "· ");
+  // Dose·ratio only — the taste word already renders as the accent Chip below, so
+  // appending it here (the old `paramsSummary`) showed it twice.
+  const summary = doseRatioSummary(params).replace(/· /g, "· ");
+  // Legacy records saved before `createdAt` existed simply render no date.
+  const savedDate =
+    typeof createdAt === "number"
+      ? format.dateTime(new Date(createdAt), {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : null;
 
   return (
     <article
@@ -138,6 +153,11 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
           {isDefaultName ? null : (
             <div className={cn("mt-1 text-[13px] text-fg-3", MONO)}>{summary}</div>
           )}
+          {savedDate ? (
+            <div className="mt-1 text-[12px] text-fg-4">
+              {t("savedOn", { date: savedDate })}
+            </div>
+          ) : null}
         </div>
 
         {rating ? (
@@ -210,7 +230,7 @@ export function RecipeCard({ recipe, onDelete }: RecipeCardProps) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>{t("confirmCancel")}</AlertDialogCancel>
-              <AlertDialogAction onClick={() => onDelete(id)}>
+              <AlertDialogAction variant="destructive" onClick={() => onDelete(id)}>
                 {t("confirmDelete")}
               </AlertDialogAction>
             </AlertDialogFooter>

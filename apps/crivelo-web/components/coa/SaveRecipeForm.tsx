@@ -34,18 +34,17 @@ import {
 import { Input } from "@crivelo/ui/input";
 import { Label } from "@crivelo/ui/label";
 import { cn } from "@crivelo/ui/lib/utils";
+import { useRouter } from "../../i18n/navigation";
 import { Button } from "../ui/Button";
 import { addRecipe, type RecipeParams } from "../../lib/recipes-store";
 import { doseRatioSummary } from "../../lib/recipe-summary";
 import { StarGlyph } from "./StarGlyph";
 
-/** Shared CTA look, matching the BrewTimer pills (54px solid/outline). */
+/** Shared CTA look, matching the BrewTimer pills (54px). */
 const CTA_BASE =
   "flex h-[54px] w-full cursor-pointer items-center justify-center gap-[9px] rounded-md p-0 font-body text-body font-semibold whitespace-normal has-[>svg]:px-0";
 const CTA_SOLID =
   "bg-brand text-white border-none shadow-1 hover:bg-brand disabled:opacity-50 disabled:cursor-not-allowed";
-const CTA_OUTLINE =
-  "bg-transparent text-fg border border-border-strong shadow-none hover:bg-transparent hover:text-fg";
 
 /** 1..5, the tappable rating range. */
 const STARS = [1, 2, 3, 4, 5] as const;
@@ -61,6 +60,7 @@ export interface SaveRecipeFormProps {
 
 export function SaveRecipeForm({ open, onOpenChange, params }: SaveRecipeFormProps) {
   const t = useTranslations("SaveRecipe");
+  const router = useRouter();
 
   // The default name is the dose/ratio summary (e.g. "20 g · 1:15"). It is language-agnostic
   // so it works as a stored name without a locale.
@@ -94,7 +94,9 @@ export function SaveRecipeForm({ open, onOpenChange, params }: SaveRecipeFormPro
       params,
     });
     onOpenChange(false);
-    toast.success(t("savedToast"));
+    toast.success(t("savedToast"), {
+      action: { label: t("view"), onClick: () => router.push("/recipes") },
+    });
   };
 
   return (
@@ -195,10 +197,13 @@ export function SaveRecipeForm({ open, onOpenChange, params }: SaveRecipeFormPro
           >
             {t("save")}
           </Button>
+          {/* Quiet secondary action (ghost — the header's secondary idiom) so
+              Cancel doesn't compete visually with the solid Save CTA. */}
           <Button
             type="button"
+            variant="ghost"
             onClick={() => onOpenChange(false)}
-            className={cn(CTA_BASE, CTA_OUTLINE)}
+            className={cn(CTA_BASE, "text-fg-2 hover:text-fg")}
           >
             {t("cancel")}
           </Button>
