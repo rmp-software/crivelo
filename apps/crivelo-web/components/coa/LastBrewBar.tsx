@@ -20,14 +20,15 @@
  *    in the left column where the old `homeExtras` block lived (a floating bar
  *    reads oddly across the wide canvas).
  *
- * Both variants share the same params summary + the same two actions:
- *  - "Brew again" → `brewHref(params, false)` (autostart=0 → the brew route's
- *    "ready" state), styled **tonal** (brand-soft bg + accent-ink ink/border) so
- *    it stays secondary to the solid "Begin brew" CTA.
- *  - "Edit" → `editHref(params)` (the calculator pre-filled with these params),
- *    an icon button.
- * Both route through the locale-aware `useRouter` so the active locale prefix is
- * preserved.
+ * Actions (both route through the locale-aware `useRouter`):
+ *  - "Brew again" / "Again" → `brewHref(params, false)` (autostart=0 → the brew
+ *    route's "ready" state), styled **tonal** (brand-soft bg + accent-ink
+ *    ink/border) so it stays secondary to the solid "Begin brew" CTA.
+ *  - Edit → `editHref(params)` (the calculator pre-filled with these params).
+ *    In the bar variant the whole TEXT BLOCK is the edit affordance (RMP-237
+ *    mockup: the edit icon-button is dropped — tapping the summary opens the
+ *    calculator pre-filled, which is what edit does); the inline variant keeps
+ *    the icon button.
  *
  * Client-only after mount: `getLastBrew()` reads `localStorage` (null on the
  * server). We read it in an effect behind a `mounted` flag so the server + first
@@ -45,7 +46,7 @@ import { Button } from "../ui/Button";
 import { useRouter } from "../../i18n/navigation";
 import { brewHref, editHref } from "../../lib/coa-nav";
 import { getLastBrew, type LastBrew } from "../../lib/recipes-store";
-import { paramsSummary } from "../../lib/recipe-summary";
+import { doseRatioSummary, paramsSummary } from "../../lib/recipe-summary";
 import { tasteKey } from "../../lib/four-six";
 import { Icon } from "./icons";
 import { CAP, MONO } from "./style-tokens";
@@ -61,7 +62,11 @@ export interface LastBrewBarProps {
  * Read the `coa-last-brew` slot post-mount (SSR-safe) and resolve its localized
  * params summary. Returns `null` until mounted or when there is no last brew.
  */
-function useLastBrewSummary(): { lastBrew: LastBrew; summary: string } | null {
+function useLastBrewSummary(): {
+  lastBrew: LastBrew;
+  summary: string;
+  taste: string;
+} | null {
   const tTaste = useTranslations("Taste");
   const [lastBrew, setLastBrew] = useState<LastBrew | null>(null);
   useEffect(() => {
@@ -69,11 +74,8 @@ function useLastBrewSummary(): { lastBrew: LastBrew; summary: string } | null {
   }, []);
 
   if (!lastBrew) return null;
-  const summary = paramsSummary(
-    lastBrew.params,
-    tTaste(tasteKey(lastBrew.params.acidity)),
-  );
-  return { lastBrew, summary };
+  const taste = tTaste(tasteKey(lastBrew.params.acidity));
+  return { lastBrew, summary: paramsSummary(lastBrew.params, taste), taste };
 }
 
 export function LastBrewBar({ variant }: LastBrewBarProps) {
@@ -94,7 +96,7 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
   }, [hasData]);
 
   if (!data) return null;
-  const { lastBrew, summary } = data;
+  const { lastBrew, summary, taste } = data;
   const { params } = lastBrew;
 
   const brewAgain = (
@@ -125,19 +127,12 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
     </span>
   );
 
-  // `truncateSummary` — the inline row keeps its one-line ellipsis; the bar
-  // variant wraps the full summary instead (RMP-237: no truncation at 320px /
-  // pt-BR).
-  const text = (truncateSummary: boolean) => (
+  // Inline-variant text block (unchanged legacy shape: caption + one-line
+  // ellipsized summary).
+  const text = (
     <div className="min-w-0 flex-1">
       <div className={cn(CAP, "leading-none")}>{t("title")}</div>
-      <div
-        className={cn(
-          "mt-1 text-small text-fg-2",
-          truncateSummary && "truncate",
-          MONO,
-        )}
-      >
+      <div className={cn("mt-1 truncate text-small text-fg-2", MONO)}>
         {summary}
       </div>
     </div>
@@ -152,7 +147,7 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
         className="flex items-center gap-3 rounded-md border border-border bg-surface-raised p-3 shadow-1"
       >
         {lead}
-        {text(true)}
+        {text}
         {brewAgain}
         {edit}
       </section>
@@ -161,26 +156,44 @@ export function LastBrewBar({ variant }: LastBrewBarProps) {
 
   // Sticky bottom bar (narrow). `fixed` + out of flow → zero layout shift. Above
   // the home-indicator safe area; under modals in z-order.
-  // Two-line layout (RMP-237): line 1 = lead + label + full summary (wraps, no
-  // truncation at 320px in either locale); line 2 = actions, right-aligned.
+  // RMP-237 (per the review mockup): single row — payload FIRST. Line 1 is the
+  // recipe numbers + pour count in mono; line 2 is the muted label + taste. The
+  // text block itself is the edit affordance (tap → calculator pre-filled), the
+  // action shrinks to one word, and the redundant edit icon-button is gone.
+  // Nothing truncates: the summary may wrap at very narrow widths instead.
   return (
     <section
       aria-label={t("title")}
       style={{ bottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
       className={cn(
-        "fixed inset-x-3 z-30 mx-auto flex max-w-[366px] flex-col gap-2 rounded-lg border border-border-strong bg-surface-raised/90 p-2.5 pl-3.5 shadow-1 backdrop-blur-md",
+        "fixed inset-x-3 z-30 mx-auto flex max-w-[366px] items-center gap-2.5 rounded-lg border border-border-strong bg-surface-raised/90 p-2 pl-3.5 shadow-1 backdrop-blur-md",
         "transition-[opacity,transform] duration-stage ease-standard motion-reduce:transition-none",
         revealed ? "translate-y-0 opacity-100" : "translate-y-3 opacity-0",
       )}
     >
-      <div className="flex items-center gap-2.5">
-        {lead}
-        {text(false)}
-      </div>
-      <div className="flex items-center justify-end gap-2">
-        {brewAgain}
-        {edit}
-      </div>
+      {lead}
+      <button
+        type="button"
+        onClick={() => router.push(editHref(params))}
+        aria-label={t("edit")}
+        className="min-w-0 flex-1 cursor-pointer text-left"
+      >
+        <div className={cn("text-[13.5px] font-semibold", MONO)}>
+          {doseRatioSummary(params)} ·{" "}
+          {t("pours", { count: params.strengthPours })}
+        </div>
+        <div className="text-[12px] text-fg-3">
+          {t("title")} · {taste}
+        </div>
+      </button>
+      {/* No play glyph here (unlike the inline pill): the icon's ~20px is what
+          keeps the pt-BR payload line unwrapped at 366px. */}
+      <Button
+        onClick={() => router.push(brewHref(params, false))}
+        className="flex h-[38px] shrink-0 items-center rounded-md border border-accent-ink bg-brand-soft px-3.5 font-body text-small font-semibold whitespace-nowrap text-accent-ink shadow-none hover:bg-brand-soft hover:text-accent-ink"
+      >
+        {t("again")}
+      </Button>
     </section>
   );
 }

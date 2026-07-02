@@ -45,6 +45,8 @@
   "LastBrew": {
     "title": "Último preparo",
     "brewAgain": "Preparar de novo",
+    "again": "De novo",
+    "pours": "{count, plural, one {# despejo} other {# despejos}}",
     "edit": "Editar"
   },
   "Offline": {
