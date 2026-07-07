@@ -51,7 +51,7 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
       </div>
 
       {/* Phase bar */}
-      <div className="mb-4 flex h-4 gap-[3px]">
+      <div className="mb-2 flex h-4 gap-[3px]">
         {recipe.steps.map((s) => {
           // last-resort: the segment's flex weight AND fill colour are per-step
           // recipe DATA (flavor pours = --brand / --accent-soft-2; strength pours
@@ -81,6 +81,21 @@ export function PourSchedule({ recipe }: PourScheduleProps) {
             />
           );
         })}
+      </div>
+
+      {/* Legend (RMP-242) — keys the bar's two colour families: flavor pours
+          (brand teal) vs strength pours (the --pour-strength-rgb alpha ramp).
+          The strength swatch is the ramp's mid alpha via the promoted
+          `pour-strength` utility (crivelo-theme.css). */}
+      <div className="mb-4 flex items-center gap-4">
+        <span className="inline-flex items-center gap-1.5 text-[11px] text-fg-3">
+          <span className="size-2.5 rounded-[3px] bg-brand" />
+          {t("legendFlavor")}
+        </span>
+        <span className="inline-flex items-center gap-1.5 text-[11px] text-fg-3">
+          <span className="size-2.5 rounded-[3px] bg-pour-strength/58" />
+          {t("legendStrength")}
+        </span>
       </div>
 
       {/* List */}

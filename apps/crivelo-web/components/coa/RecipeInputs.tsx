@@ -13,8 +13,16 @@
  * container — whether that's the ~298px tablet left column, a 350px phone, or a
  * desktop column. Controls are sized to fit the tightest real container with
  * margin to spare, so there is no viewport-dependent sizing and nothing to clip.
+ *
+ * Input ergonomics: the ± buttons keep their 24px glyph but expose a 32×44px
+ * hit area (RMP-233) — full 44px on the vertical axis, horizontally capped at
+ * 32px because adjacent steppers' inner buttons sit as close as 0–6px apart in
+ * the tightest containers (320px phones, the md two-column squeeze), where
+ * wider invisible targets would overlap and mis-route taps to the neighbour.
+ * Auto-repeat on press-hold, and the value itself is tappable for direct
+ * numeric entry (RMP-243).
  */
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "../ui/Button";
 import { cn } from "@crivelo/ui/lib/utils";
@@ -26,6 +34,11 @@ const MONO = "font-mono tabular-nums [font-feature-settings:'tnum','zero']";
 
 const LABEL =
   "text-[11px] font-semibold uppercase tracking-[0.08em] text-fg-3";
+
+/** Press-hold auto-repeat timings (RMP-243): first repeat after HOLD_DELAY_MS,
+ * then one step every HOLD_INTERVAL_MS until release. */
+const HOLD_DELAY_MS = 450;
+const HOLD_INTERVAL_MS = 80;
 
 function StepButton({
   onClick,
@@ -41,13 +54,59 @@ function StepButton({
   // primitive's buttonVariants defaults (h-9/px, rounded-md, bg-primary, gap-2,
   // transition-all, the 16px svg rule) are neutralised — pixel identical to the
   // prior hand-rolled <button>. Hover recolours the border only, so the default
-  // hover:bg-primary/90 is cancelled with hover:bg-[color:var(--surface)].
+  // hover:bg-primary/90 is cancelled with hover:bg-surface.
+  //
+  // Hit area (RMP-233): the layout box stays 24px so the row metrics don't
+  // change; an ::after overlay grows the effective touch target to 32×44px
+  // (-inset-y-2.5 / -inset-x-1 — see the header comment for why horizontal
+  // expansion is capped).
+  //
+  // Press-hold repeat (RMP-243): pointerdown arms a delay, then an interval
+  // steps until pointerup/leave/cancel. The latest onClick closure is kept in a
+  // ref so repeats never step from a stale value (each step re-renders with a
+  // fresh clamp closure); the release click after a hold is swallowed via
+  // heldRef so a plain tap still steps exactly once. Keyboard activation only
+  // fires click, so its behaviour is unchanged.
+  const stepRef = useRef(onClick);
+  stepRef.current = onClick;
+  const heldRef = useRef(false);
+  const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const repeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const stopHold = () => {
+    if (delayRef.current !== null) clearTimeout(delayRef.current);
+    if (repeatRef.current !== null) clearInterval(repeatRef.current);
+    delayRef.current = null;
+    repeatRef.current = null;
+  };
+  useEffect(() => stopHold, []);
+
   return (
     <Button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        if (heldRef.current) {
+          heldRef.current = false;
+          return; // the hold already stepped; swallow the release click
+        }
+        onClick();
+      }}
+      onPointerDown={() => {
+        heldRef.current = false;
+        delayRef.current = setTimeout(() => {
+          heldRef.current = true;
+          stepRef.current();
+          repeatRef.current = setInterval(
+            () => stepRef.current(),
+            HOLD_INTERVAL_MS,
+          );
+        }, HOLD_DELAY_MS);
+      }}
+      onPointerUp={stopHold}
+      onPointerLeave={stopHold}
+      onPointerCancel={stopHold}
       aria-label={label}
-      className="grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
+      className="relative grid h-6 w-6 shrink-0 cursor-pointer touch-none place-items-center rounded-full border border-border-strong bg-surface p-0 text-fg transition-colors select-none after:absolute after:-inset-x-1 after:-inset-y-2.5 after:rounded-full after:content-[''] hover:border-brand hover:bg-surface has-[>svg]:px-0 [&_svg:not([class*='size-'])]:size-[12px]"
     >
       {children}
     </Button>
@@ -57,18 +116,48 @@ function StepButton({
 function Stepper({
   label,
   value,
+  num,
+  mode,
   dec,
   inc,
+  commit,
   decLabel,
   incLabel,
+  editLabel,
 }: {
   label: string;
   value: string;
+  /** Current numeric value — seeds the direct-entry input. */
+  num: number;
+  /** "decimal" for dose (halves allowed), "numeric" for the integer ratio. */
+  mode: "decimal" | "numeric";
   dec: () => void;
   inc: () => void;
+  /** Direct-entry commit — the caller rounds + clamps before storing. */
+  commit: (n: number) => void;
   decLabel: string;
   incLabel: string;
+  editLabel: string;
 }) {
+  // Direct entry (RMP-243): tap the value to edit. draft === null ⇒ display
+  // mode. Enter/blur commits (parse → caller clamps), Escape reverts.
+  const [draft, setDraft] = useState<string | null>(null);
+  // Unmounting the focused input (Escape's setDraft(null)) can fire a native
+  // blur whose delegated handler still sees the pre-Escape draft — the flag
+  // makes the revert win that race.
+  const cancelingRef = useRef(false);
+  const commitDraft = () => {
+    if (draft === null) return;
+    if (cancelingRef.current) {
+      cancelingRef.current = false;
+      setDraft(null);
+      return;
+    }
+    const n = Number.parseFloat(draft.replace(",", ".")); // pt-BR decimal comma
+    if (Number.isFinite(n)) commit(n);
+    setDraft(null);
+  };
+
   return (
     <div className="flex min-w-0 flex-col items-center gap-1.5">
       <span className={LABEL}>{label}</span>
@@ -76,11 +165,43 @@ function Stepper({
         <StepButton onClick={dec} label={decLabel}>
           <Icon name="minus" size={12} />
         </StepButton>
-        <span
-          className={cn("text-mono font-semibold whitespace-nowrap", MONO)}
-        >
-          {value}
-        </span>
+        {draft === null ? (
+          <button
+            type="button"
+            aria-label={editLabel}
+            onClick={() => {
+              cancelingRef.current = false;
+              setDraft(String(num));
+            }}
+            className={cn(
+              "text-mono cursor-text font-semibold whitespace-nowrap",
+              MONO,
+            )}
+          >
+            {value}
+          </button>
+        ) : (
+          <input
+            autoFocus
+            inputMode={mode}
+            value={draft}
+            aria-label={editLabel}
+            onChange={(e) => setDraft(e.target.value)}
+            onFocus={(e) => e.currentTarget.select()}
+            onBlur={commitDraft}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.currentTarget.blur();
+              if (e.key === "Escape") {
+                cancelingRef.current = true;
+                setDraft(null);
+              }
+            }}
+            className={cn(
+              "text-mono w-12 border-b border-border-strong bg-transparent text-center font-semibold outline-none",
+              MONO,
+            )}
+          />
+        )}
         <StepButton onClick={inc} label={incLabel}>
           <Icon name="plus" size={12} />
         </StepButton>
@@ -114,18 +235,28 @@ export function RecipeInputs({
       <Stepper
         label={coffee}
         value={`${dose} ${tCalc("grams")}`}
+        num={dose}
+        mode="decimal"
         decLabel={t("decrease", { label: coffee })}
         incLabel={t("increase", { label: coffee })}
+        editLabel={t("edit", { label: coffee })}
         dec={() => setDose(clamp(dose - 1, 8, 60))}
         inc={() => setDose(clamp(dose + 1, 8, 60))}
+        // The engine takes any finite dose, so direct entry allows halves —
+        // snap to 0.5 g, then clamp to the stepper range.
+        commit={(n) => setDose(clamp(Math.round(n * 2) / 2, 8, 60))}
       />
       <Stepper
         label={ratioLabel}
         value={`1:${ratio}`}
+        num={ratio}
+        mode="numeric"
         decLabel={t("decrease", { label: ratioLabel })}
         incLabel={t("increase", { label: ratioLabel })}
+        editLabel={t("edit", { label: ratioLabel })}
         dec={() => setRatio(clamp(ratio - 1, 12, 18))}
         inc={() => setRatio(clamp(ratio + 1, 12, 18))}
+        commit={(n) => setRatio(clamp(Math.round(n), 12, 18))}
       />
       <div className="flex min-w-0 flex-col items-center gap-1.5">
         <span className={LABEL}>{t("water")}</span>

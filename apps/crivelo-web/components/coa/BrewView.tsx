@@ -62,7 +62,12 @@ export function BrewSkeleton() {
       <div className="block items-start md:grid md:grid-cols-[300px_1fr] md:gap-[52px] lg:grid-cols-[340px_1fr]">
         <div>
           <div className="flex justify-center">
-            <div className="h-[236px] w-[236px] animate-pulse rounded-full border-8 border-border-strong motion-reduce:animate-none md:h-[272px] md:w-[272px]" />
+            {/* Box mirrors the timer's cropped 270°-arc dial (incl. the
+                short-viewport clamp) so the swap-in doesn't jump; the circle
+                inside is just the pulse glyph. */}
+            <div className="flex h-[196px] w-[236px] items-start justify-center max-md:[@media(max-height:700px)]:h-[158px] max-md:[@media(max-height:700px)]:w-[190px] md:h-[226px] md:w-[272px]">
+              <div className="aspect-square h-full animate-pulse rounded-full border-8 border-border-strong motion-reduce:animate-none" />
+            </div>
           </div>
           <div className="mt-4 flex min-h-[50px] flex-col items-center gap-2">
             <div className="h-6 w-40 rounded-sm bg-surface-raised" />

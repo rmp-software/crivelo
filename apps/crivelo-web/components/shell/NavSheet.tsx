@@ -30,6 +30,7 @@ import {
 } from "@crivelo/ui/sheet";
 import { cn } from "@crivelo/ui/lib/utils";
 import { CriveloLockup } from "../brand";
+import { Icon } from "../coa/icons";
 import { Link } from "../../i18n/navigation";
 import { NAV_ITEMS } from "./nav";
 import { LangToggle } from "./LangToggle";
@@ -199,6 +200,23 @@ export function NavSheet({
               </Link>
             );
           })}
+          {/* Saved recipes — an app page of Coa, not a family product, so it's a
+              dedicated row here rather than a NAV_ITEMS entry (the footer also
+              consumes NAV_ITEMS). The bookmark glyph matches the header's
+              affordance; onClose because it's an in-app navigation (the shell
+              doesn't remount). */}
+          <Link
+            href="/recipes"
+            onClick={onClose}
+            className="flex cursor-pointer items-center gap-3 border-b border-border py-[13px] text-fg no-underline"
+          >
+            <span className="flex w-[9px] shrink-0 justify-center text-fg-3">
+              <Icon name="bookmark" size={17} stroke={1.7} />
+            </span>
+            <span className="flex-1 font-display text-h4 font-bold tracking-[-0.01em]">
+              {t("savedRecipes")}
+            </span>
+          </Link>
         </nav>
 
         <div className="mt-auto flex flex-col gap-[18px] pt-[26px]">

@@ -110,8 +110,12 @@ export interface SavedRecipe {
   /** Optional rating, 1–5. */
   rating?: number;
   params: RecipeParams;
-  /** `Date.now()` at save time. */
-  createdAt: number;
+  /**
+   * `Date.now()` at save time. Optional because records saved before this
+   * field existed lack it — readers must tolerate its absence (render no
+   * date, sort those records last).
+   */
+  createdAt?: number;
 }
 
 /** Calculator defaults — the fallback for any missing / out-of-range param. */

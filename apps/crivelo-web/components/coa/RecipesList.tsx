@@ -47,7 +47,13 @@ export function RecipesList() {
     // would strand the screen blank forever (no list, no empty state, no error) — the
     // `finally` removes that silent-blank failure mode.
     try {
-      setRecipes(getRecipes());
+      // Newest first. Legacy records without `createdAt` fall back to 0, so they
+      // sink to the end in their stored order (Array.prototype.sort is stable).
+      setRecipes(
+        [...getRecipes()].sort(
+          (a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0),
+        ),
+      );
     } finally {
       setMounted(true);
     }
