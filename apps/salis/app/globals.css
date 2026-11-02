@@ -1,0 +1,30 @@
+/*
+ * salis — Tailwind v4 entry stylesheet.
+ *
+ * Order is load-bearing:
+ *   1. `@import "tailwindcss"` pulls in the v4 engine (base reset, theme, utilities).
+ *   2. `@salis/tokens/styles/foundation.css` declares the raw `--*` design
+ *      variables (scales + semantic layer + dark theme) and the element base
+ *      styles, inside its own @layer base.
+ *   3. `@salis/tokens/styles/theme.css` turns those variables into Tailwind
+ *      utility tokens (`bg-brand`, `text-fg-3`, `rounded-lg`, `text-data-hero`, …).
+ *   4. The shadcn ↔ Crivelo alias layer LAST, so by the time it aliases
+ *      `--brand` / `--focus-ring` / `--radius-md` they already hold Salis values
+ *      and the shared @crivelo/ui primitives inherit Salis teal with zero
+ *      per-app shadcn config.
+ *
+ * NOTE: Salis deliberately does NOT import `@crivelo/tokens/styles/foundation.css`.
+ * `@salis/tokens` REPLACES the Crivelo Tier-1 house (cool neutrals, dark theme,
+ * its own typefaces and a tighter radius ramp) rather than overriding an accent
+ * on top of it. Importing both would double-declare the semantic layer — see
+ * packages/salis-tokens/CLAUDE.md.
+ */
+@import "tailwindcss";
+
+/* Scan the shared @crivelo/ui primitives so their utility classes survive the
+ * v4 content purge — v4 does not follow the workspace symlink on its own. */
+@source "../../../packages/ui/src/**/*.{js,ts,jsx,tsx}";
+
+@import "@salis/tokens/styles/foundation.css";
+@import "@salis/tokens/styles/theme.css";
+@import "@crivelo/ui/styles/shadcn-theme.css";

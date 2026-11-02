@@ -173,6 +173,58 @@ importers:
         specifier: ^3.2.4
         version: 3.2.6(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)
 
+  apps/salis:
+    dependencies:
+      '@crivelo/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
+      '@salis/tokens':
+        specifier: workspace:*
+        version: link:../../packages/salis-tokens
+      next:
+        specifier: ^16.2.0
+        version: 16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.7(react@19.2.7)
+    devDependencies:
+      '@crivelo/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@crivelo/tsconfig':
+        specifier: workspace:*
+        version: link:../../packages/tsconfig
+      '@tailwindcss/postcss':
+        specifier: ^4.1.0
+        version: 4.3.0
+      '@types/node':
+        specifier: ^24
+        version: 24.13.1
+      '@types/react':
+        specifier: ^19
+        version: 19.2.17
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.17)
+      eslint:
+        specifier: ^9.13.0
+        version: 9.39.4(jiti@2.7.0)
+      postcss:
+        specifier: ^8
+        version: 8.5.15
+      tailwindcss:
+        specifier: ^4.1.0
+        version: 4.3.0
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.6(@types/node@24.13.1)(jiti@2.7.0)(lightningcss@1.32.0)
+
   packages/eslint-config:
     dependencies:
       '@eslint/js':
@@ -209,6 +261,18 @@ importers:
       serwist:
         specifier: ^9.5.11
         version: 9.5.11(browserslist@4.28.2)(typescript@5.9.3)
+
+  packages/salis-tokens:
+    devDependencies:
+      next:
+        specifier: ^16.2.0
+        version: 16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.7
+      react-dom:
+        specifier: ^19.2.0
+        version: 19.2.7(react@19.2.7)
 
   packages/tokens:
     devDependencies:
@@ -2649,6 +2713,7 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'

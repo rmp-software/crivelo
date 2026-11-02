@@ -1,0 +1,356 @@
+/*
+ * @salis/tokens — Tier 1 foundation for Salis (the cool "lab" house).
+ *
+ * Source of truth: the Salis Claude Design handoff (`tokens/colors.css`,
+ * `typography.css`, `spacing.css`, `base.css`). Salis REPLACES the Crivelo
+ * Tier-1 house rather than overriding its accent: the brand is cool teal/slate
+ * with a full dark theme, its own two typefaces and a deliberately tighter
+ * radius ramp ("modest corners; avoid large blobby radii"). An app-local accent
+ * override on top of `@crivelo/tokens` would have had to restate essentially
+ * every variable, so Salis ships its own foundation and `apps/salis` imports
+ * THIS instead of `@crivelo/tokens/styles/foundation.css`.
+ *
+ * What it deliberately KEEPS from Crivelo is the **semantic token vocabulary**
+ * (`--bg` / `--fg*` / `--surface*` / `--border*` / `--brand*` / `--focus-ring` /
+ * `--danger` / `--radius-*` / `--shadow-*` / `--ease-*` / `--font-*`). That is
+ * what makes `@crivelo/ui` work unchanged: its shadcn bridge
+ * (`packages/ui/src/styles/shadcn-theme.css`) aliases shadcn's vocabulary onto
+ * exactly these names, so every shared primitive renders in Salis teal with no
+ * per-app shadcn config.
+ *
+ * NAME COLLISION — READ BEFORE ADDING TOKENS. The design handoff calls mineral
+ * blue `--secondary` and honey `--accent`. Those two names are CLAIMED by the
+ * shadcn bridge for *neutral fills* (`--secondary: var(--bg-2)`,
+ * `--accent: var(--bg-3)`), and the bridge is imported LAST, so declaring the
+ * brand hues under those names would be silently overwritten. Salis's brand
+ * hues therefore live under collision-free names: mineral blue is `--mineral*`
+ * and honey is `--sweet*`. Never reintroduce `--secondary` / `--accent` here.
+ *
+ * Plain CSS by design (no @apply) so it is independent of the consuming app's
+ * Tailwind pipeline ordering, matching @crivelo/tokens.
+ */
+
+@layer base {
+  :root {
+    /* ---------- Color: raw scales ---------- */
+    /* Teal — primary brand. 700 is "Salis teal". */
+    --teal-50: #eef7f6;
+    --teal-100: #d3ecea;
+    --teal-200: #a8d8d4;
+    --teal-300: #73bdb8;
+    --teal-400: #3f9e99;
+    --teal-500: #1e827e;
+    --teal-600: #136965;
+    --teal-700: #0f5452;
+    --teal-800: #0c4140;
+    --teal-900: #08302f;
+    --teal-950: #051f1f;
+
+    /* Mineral blue — interactive. Marks the BRIGHT end of the sensory plane. */
+    --blue-50: #eef5fd;
+    --blue-100: #d6e8fb;
+    --blue-200: #add0f6;
+    --blue-300: #7ab3ef;
+    --blue-400: #4392e6;
+    --blue-500: #1f76d6;
+    --blue-600: #155fb6;
+    --blue-700: #134c92;
+    --blue-800: #133e75;
+    --blue-900: #11315b;
+
+    /* Honey — the one warm hue. Marks the SWEET end of the sensory plane.
+     * Reserved for the plane and accent badges — never buttons, never warnings. */
+    --honey-50: #fdf6e9;
+    --honey-100: #fae8c4;
+    --honey-200: #f4d08a;
+    --honey-300: #edb552;
+    --honey-400: #e29b2a;
+    --honey-500: #c98114;
+    --honey-600: #a4660e;
+    --honey-700: #7f4f0f;
+    --honey-800: #5e3b10;
+    --honey-900: #40290d;
+
+    /* Slate — cool neutrals with a hint of teal. */
+    --slate-0: #ffffff;
+    --slate-25: #f6f9f9;
+    --slate-50: #eef3f3;
+    --slate-100: #e2e9ea;
+    --slate-200: #cdd7d9;
+    --slate-300: #a9b7ba;
+    --slate-400: #7f9094;
+    --slate-500: #5e6f73;
+    --slate-600: #475659;
+    --slate-700: #344245;
+    --slate-800: #223033;
+    --slate-900: #142022;
+    --slate-950: #0b1416;
+
+    /* Status hues */
+    --green-50: #ebf6ee;
+    --green-100: #cfead7;
+    --green-300: #7bc293;
+    --green-500: #2f8a4a;
+    --green-600: #25703c;
+    --orange-50: #fcf0e8;
+    --orange-100: #f8dac6;
+    --orange-300: #ee9a66;
+    --orange-500: #c2571a;
+    --orange-600: #9e4614;
+    --red-50: #fceded;
+    --red-100: #f7d3d4;
+    --red-300: #ec8b8e;
+    --red-500: #c2353a;
+    --red-600: #a02a2f;
+
+    /* ---------- Semantic: surfaces + ink (light) ---------- */
+    --bg: var(--slate-25);
+    --bg-2: var(--slate-50);
+    --bg-3: var(--slate-100);
+    --bg-inverse: var(--slate-900);
+
+    --surface: var(--slate-0);
+    --surface-raised: var(--slate-0);
+    --surface-sunken: var(--slate-50);
+    /* Quiet teal wash for "this is Salis" panels. No Crivelo equivalent. */
+    --surface-tint: var(--teal-50);
+
+    --fg: var(--slate-900);
+    --fg-2: var(--slate-600);
+    --fg-3: var(--slate-500);
+    --fg-4: var(--slate-300);
+    --fg-muted: var(--slate-500);
+    --fg-inverse: #ffffff;
+
+    --border: var(--slate-100);
+    --border-strong: var(--slate-200);
+    --border-emphasis: var(--slate-900);
+    --divider: var(--slate-100);
+
+    /* ---------- Semantic: brand + interaction ---------- */
+    /* Deep teal is the brand AND the commit colour (primary buttons, active tab). */
+    --brand: var(--teal-700);
+    --brand-hover: var(--teal-800);
+    --brand-press: var(--teal-900);
+    --brand-soft: var(--teal-50);
+    --brand-soft-ink: var(--teal-700);
+
+    /* Mineral blue — the INTERACTIVE hue: links, toggles, selected presets,
+     * secondary buttons. Named `--mineral*`, not `--secondary*` (see header). */
+    --mineral: var(--blue-500);
+    --mineral-hover: var(--blue-600);
+    --mineral-press: var(--blue-700);
+    --mineral-soft: var(--blue-50);
+    --mineral-soft-ink: var(--blue-600);
+    --link: var(--blue-600);
+    --focus-ring: var(--blue-400);
+
+    /* Honey — the sweet end of the plane + accent badges. Named `--sweet*`,
+     * not `--accent*` (see header). Never a button, never a warning. */
+    --sweet: var(--honey-400);
+    --sweet-soft: var(--honey-50);
+    --sweet-ink: var(--honey-700);
+
+    /* ---------- Semantic: status ---------- */
+    --success: var(--green-500);
+    --success-soft: var(--green-50);
+    --success-ink: var(--green-600);
+    --warning: var(--orange-500);
+    --warning-soft: var(--orange-50);
+    --warning-ink: var(--orange-600);
+    /* `--danger*` keeps the Crivelo name: the shadcn bridge reads var(--danger)
+     * for `--destructive`. The handoff calls this `--error`. */
+    --danger: var(--red-500);
+    --danger-soft: var(--red-50);
+    --danger-hover: var(--red-600);
+    --danger-ink: var(--red-600);
+
+    /* ---------- Sensory plane ----------
+     * The palette encodes the two axes: horizontal honey → grey → blue
+     * (doce → brilhante), vertical light teal → deep teal (leve → forte). */
+    --axis-sweet: var(--honey-400);
+    --axis-bright: var(--blue-500);
+    --axis-lighter: var(--teal-200);
+    --axis-stronger: var(--teal-800);
+    --plane-bg: var(--slate-0);
+    --plane-grid: var(--slate-100);
+    --plane-axis: var(--slate-300);
+    --plane-marker: var(--teal-700);
+
+    /* ---------- Brand mark ----------
+     * Motif: water = round forms, salt = one grain. Water in teal, grain in
+     * mineral blue (the grain is also the dot of the "i" in the wordmark). */
+    --mark-ink: var(--teal-700);
+    --mark-water: var(--blue-500);
+    --mark-grain: var(--blue-500);
+
+    --scrim: rgba(11, 20, 22, 0.44);
+
+    /* ---------- Type families ----------
+     * Source Sans 3 for words; IBM Plex Mono (tabular, slashed zero) for every
+     * quantity. The actual @font-face declarations come from `fonts/index.ts`
+     * (next/font/local) — these stacks name the resulting families.
+     * Salis has no display or serif face: `--font-display` resolves to the sans
+     * so any @crivelo/ui primitive reading it still gets a real family. */
+    --font-body: 'Source Sans 3', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-display: 'Source Sans 3', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    /* Tabular figures + slashed zero: quantities must never shift width as they
+     * recompute, and 0/O must be unmistakable on a wet-handed counter screen. */
+    --font-mono-features: 'tnum' 1, 'zero' 1;
+
+    /* ---------- Radii ----------
+     * Deliberately tighter than the Crivelo house (which runs 18/28px): the
+     * handoff calls for "modest, precise" corners. Pills are for chips and
+     * switches only. */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+    --radius-sheet: 24px;
+    --radius-full: 999px;
+
+    /* ---------- Elevation ----------
+     * Low and cool (teal-black). Borders do the separating; shadows only lift
+     * sheets and toasts. Crivelo's `--shadow-1/2` names are kept so shared
+     * primitives resolve, with the Salis xs/sm/md/lg ramp alongside. */
+    --shadow-xs: 0 1px 2px rgba(8, 48, 47, 0.06);
+    --shadow-sm: 0 1px 2px rgba(8, 48, 47, 0.06), 0 2px 6px rgba(8, 48, 47, 0.05);
+    --shadow-md: 0 2px 4px rgba(8, 48, 47, 0.06), 0 8px 20px rgba(8, 48, 47, 0.08);
+    --shadow-lg: 0 8px 16px rgba(8, 48, 47, 0.08), 0 24px 48px rgba(8, 48, 47, 0.14);
+    --shadow-sheet: 0 -8px 32px rgba(8, 48, 47, 0.16);
+    --shadow-1: var(--shadow-xs);
+    --shadow-2: var(--shadow-md);
+
+    /* ---------- Motion ----------
+     * Short, linear-ish, no bounce. Crivelo's `--ease-standard` name is kept;
+     * Salis's curve is the handoff's cubic-bezier(.2,0,0,1). */
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+    --ease-enter: cubic-bezier(0, 0, 0, 1);
+    --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+    --dur-fast: 120ms;
+    --dur-base: 180ms;
+    --dur-slow: 280ms;
+    --dur-sheet: 320ms;
+
+    /* ---------- Layout ----------
+     * Mobile-first: frames are 390px wide, and nothing important sits below the
+     * fold on a 390px phone. `--tap-min` is a hard floor — the dosing screen is
+     * used with wet hands. */
+    --tap-min: 44px;
+    --screen-gutter: 20px;
+    --topbar-height: 56px;
+    --tabbar-height: 64px;
+    --content-max: 440px;
+  }
+
+  /* ---------- Dark theme ----------
+   * Opt-in via [data-theme="dark"] on the root element: only the semantic layer
+   * swaps, never the raw scales. Note the brand INVERTS to a light teal
+   * (--teal-300) so it stays legible on near-black, which is why
+   * `--fg-inverse` flips to near-black here — primary buttons are light-on-dark
+   * in this theme. */
+  :root[data-theme='dark'] {
+    --bg: var(--slate-950);
+    --bg-2: #071012;
+    --bg-3: var(--slate-800);
+    --bg-inverse: var(--slate-25);
+
+    --surface: var(--slate-900);
+    --surface-raised: var(--slate-800);
+    --surface-sunken: #071012;
+    --surface-tint: #0c2726;
+
+    --fg: #e8eff0;
+    --fg-2: var(--slate-300);
+    --fg-3: var(--slate-400);
+    --fg-4: var(--slate-600);
+    --fg-muted: var(--slate-400);
+    --fg-inverse: var(--slate-950);
+
+    --border: #1f2d30;
+    --border-strong: var(--slate-700);
+    --border-emphasis: #e8eff0;
+    --divider: #1a272a;
+
+    --brand: var(--teal-300);
+    --brand-hover: var(--teal-200);
+    --brand-press: var(--teal-100);
+    --brand-soft: #0c2726;
+    --brand-soft-ink: var(--teal-200);
+
+    --mineral: var(--blue-300);
+    --mineral-hover: var(--blue-200);
+    --mineral-press: var(--blue-100);
+    --mineral-soft: #0f2440;
+    --mineral-soft-ink: var(--blue-200);
+    --link: var(--blue-300);
+    --focus-ring: var(--blue-300);
+
+    --sweet: var(--honey-300);
+    --sweet-soft: #2a1f0e;
+    --sweet-ink: var(--honey-200);
+
+    --success: var(--green-300);
+    --success-soft: #0f2a18;
+    --success-ink: var(--green-300);
+    --warning: var(--orange-300);
+    --warning-soft: #2e1a0d;
+    --warning-ink: var(--orange-300);
+    --danger: var(--red-300);
+    --danger-soft: #2e1213;
+    --danger-hover: var(--red-100);
+    --danger-ink: var(--red-300);
+
+    --axis-sweet: var(--honey-300);
+    --axis-bright: var(--blue-300);
+    --axis-lighter: var(--teal-200);
+    --axis-stronger: var(--teal-600);
+    --plane-bg: var(--slate-900);
+    --plane-grid: #1f2d30;
+    --plane-axis: var(--slate-600);
+    --plane-marker: var(--teal-200);
+
+    --mark-ink: var(--teal-300);
+    --mark-water: var(--blue-300);
+    --mark-grain: var(--blue-300);
+
+    --scrim: rgba(0, 0, 0, 0.6);
+  }
+
+  /* ---------- Element defaults ---------- */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 24px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a {
+    color: var(--link);
+    text-decoration: none;
+  }
+
+  a:hover {
+    color: var(--mineral-hover);
+    text-decoration: underline;
+  }
+
+  /* Every quantity on screen is mono, tabular, slashed-zero. */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-feature-settings: var(--font-mono-features);
+  }
+}
