@@ -261,3 +261,53 @@ describe("lessons", () => {
     expect(lesson.body_md).toMatch(/1\. Pese o sal/);
   });
 });
+
+describe("regressions — defects found in adversarial review", () => {
+  const header =
+    "id;name_pt;promise_pt;methods;target_Ca;target_Mg;target_HCO3;target_Na;target_K;concentrate_ids;espresso_safe;plane_x;plane_y;level\n";
+
+  it("rejects the same concentrate listed twice", () => {
+    // A one-character CSV typo used to import clean and produce two identical
+    // rows, each dosing the FULL target — double the mineral in the jug, while
+    // the GH/KH summary still read correct and hid it.
+    const { report } = importWith({
+      recipes: `${header}r;R;p;V60;25;15;30;0;0;"mg-30k, mg-30k, ca-30k, khco3-30k";não;;;iniciante`,
+    });
+    expect(messages(report)).toMatch(/"mg-30k" is listed more than once/);
+  });
+
+  it("rejects two different concentrates supplying the same ion", () => {
+    // Same failure, different shape: both would be dosed the full target_Mg.
+    const { report } = importWith({
+      recipes: `${header}r;R;p;V60;0;15;30;0;0;"mg-30k, mgcl2-30k, khco3-30k";não;;;iniciante`,
+    });
+    expect(messages(report)).toMatch(/both supply Mg/);
+  });
+
+  it("accepts the shipped template, which has one concentrate per ion", () => {
+    const { report } = importWith({});
+    expect(messages(report)).toBe("");
+  });
+
+  it("rejects an ion concentration above the sanity ceiling", () => {
+    // Catches the residual decimal ambiguity: "3.141" reads as 3141 in pt-BR.
+    const { report } = importWith({
+      base_waters:
+        "id;name_pt;Ca;Mg;HCO3;Na;K;source\n" +
+        "destilada;Destilada / RO;0;0;0;0;0;x\n" +
+        "suspeita;Suspeita;3.141;0;0;0;0;rótulo",
+    });
+    expect(messages(report)).toMatch(/above the 2000 mg\/L sanity ceiling/);
+  });
+
+  it("reads a sub-1 label value correctly instead of inflating it 1000×", () => {
+    const { content, report } = importWith({
+      base_waters:
+        "id;name_pt;Ca;Mg;HCO3;Na;K;source\n" +
+        "destilada;Destilada / RO;0;0;0;0;0;x\n" +
+        "leve;Leve;6,2;1,5;18,0;4,1;0.800;rótulo",
+    });
+    expect(report.errors).toHaveLength(0);
+    expect(content.base_waters.find((w) => w.id === "leve")!.K).toBe(0.8);
+  });
+});

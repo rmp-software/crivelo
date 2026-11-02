@@ -143,3 +143,37 @@ describe("parseList", () => {
     expect(parseList("")).toEqual([]);
   });
 });
+
+describe("regressions — defects found in adversarial review", () => {
+  it("does not read a 3-decimal-digit value as thousands", () => {
+    // The heuristic used to match any dot-decimal whose fraction was exactly 3
+    // digits, so "0.125" became 125 — a silent 1000× error, and exactly the
+    // shape of a label value like "0.800 mg/L" copied from an English source.
+    expect(parseDecimal("0.125")).toBe(0.125);
+    expect(parseDecimal("0.420")).toBe(0.42);
+    expect(parseDecimal("-0.125")).toBe(-0.125);
+    expect(parseDecimal("0.800")).toBe(0.8);
+  });
+
+  it("still reads a genuine thousands separator", () => {
+    // A thousands-grouped number never has a leading-zero integer part, which
+    // is what separates these from the cases above.
+    expect(parseDecimal("30.000")).toBe(30000);
+    expect(parseDecimal("1.000")).toBe(1000);
+    expect(parseDecimal("1.234.567")).toBe(1234567);
+    expect(parseDecimal("-30.000")).toBe(-30000);
+  });
+
+  it("normalises CRLF inside a quoted field", () => {
+    // steps_pt and body_md are deliberately multi-line, so a Windows/Excel
+    // export carries CRLF inside the quotes. A stray \r survives any downstream
+    // split on "\n" and renders as a blank artefact.
+    const rows = parseCsv('id;steps\r\nkhco3;"1. Pese.\r\n2. Dissolva.\r\n3. Complete."\r\n');
+    expect(rows[1][1]).toBe("1. Pese.\n2. Dissolva.\n3. Complete.");
+    expect(rows[1][1]).not.toContain("\r");
+  });
+
+  it("normalises a lone CR inside a quoted field", () => {
+    expect(parseCsv('a\n"um\rdois"')[1][0]).toBe("um\ndois");
+  });
+});

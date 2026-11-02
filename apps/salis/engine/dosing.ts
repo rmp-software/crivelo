@@ -80,6 +80,16 @@ export interface SubstitutionInfo {
 }
 
 export interface ComputeRecipeInput {
+  /**
+   * PRECONDITION: `recipe.concentrate_ids` carries at most ONE concentrate per
+   * target ion, with no duplicates. Each row's dose is derived independently
+   * from `targets[ion]`, so two rows supplying the same ion would each dose the
+   * FULL target — double the mineral in the jug, while the GH/KH summary
+   * (computed from targets, not from rows) still reads correct and hides it.
+   *
+   * The importer rejects both shapes. A future custom-recipe builder (S6) must
+   * enforce the same rule before calling this.
+   */
   recipe: Recipe;
   baseWater: BaseWater;
   /** Any superset of the concentrates the recipe references. */

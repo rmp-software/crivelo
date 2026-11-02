@@ -1,6 +1,24 @@
 {
+  "_comment": "Project-wide Linear context for the rmp harness. The TOP-LEVEL keys are the default that rmp 0.4.0 skills read — they know nothing about `products`. This monorepo ships more than one product, so per-product Linear projects are listed below for humans and agents. A feature belonging to a non-default product MUST carry its own `linear_project_id` in its spec frontmatter (docs/specs/<slug>.md), and that value wins over the default. Top-level stays on Crema Arena so existing specs keep resolving.",
   "team_key": "RMP",
   "team_id": "7dc47453-fc18-4261-8540-d52efd0a1395",
   "features_project_id": "aac21a02-f206-4d19-9284-e852b2c0b43c",
-  "features_project_name": "Crema Arena"
+  "features_project_name": "Crema Arena",
+  "products": {
+    "crema-arena": {
+      "features_project_id": "aac21a02-f206-4d19-9284-e852b2c0b43c",
+      "features_project_name": "Crema Arena",
+      "app": "apps/crema-arena"
+    },
+    "crivelo-web": {
+      "features_project_id": "2ac8ab29-150b-4787-b0dc-c75613daa20d",
+      "features_project_name": "Crivelo",
+      "app": "apps/crivelo-web"
+    },
+    "salis": {
+      "features_project_id": "2174444f-c5b2-4b22-ae0c-3f9a3c527684",
+      "features_project_name": "Salis",
+      "app": "apps/salis"
+    }
+  }
 }

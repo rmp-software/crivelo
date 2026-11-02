@@ -65,6 +65,16 @@ export function parseCsv(input: string, delimiter = ";"): string[][] {
         i += 1;
         continue;
       }
+      // Normalise line endings INSIDE a quoted field too, not just between rows.
+      // `steps_pt` and `body_md` are deliberately multi-line, so a Windows/Excel
+      // export carries CRLF inside the quotes; appending the \r verbatim leaves a
+      // stray carriage return on every line, which then survives any downstream
+      // split on "\n" and renders as a blank artefact in the UI.
+      if (char === "\r") {
+        field += "\n";
+        i += text[i + 1] === "\n" ? 2 : 1;
+        continue;
+      }
       field += char;
       i += 1;
       continue;
@@ -148,8 +158,21 @@ export function parseDecimal(value: string): number {
   let normalised = trimmed;
   if (normalised.includes(",")) {
     normalised = normalised.replace(/\./g, "").replace(",", ".");
-  } else if (/^-?\d{1,3}(\.\d{3})+$/.test(normalised)) {
-    // Dots only, and grouped in threes — a thousands separator, not a decimal point.
+  } else if (/^-?[1-9]\d{0,2}(\.\d{3})+$/.test(normalised)) {
+    // Dots only, grouped in threes, AND no leading zero in the first group — a
+    // thousands separator, not a decimal point.
+    //
+    // The leading-zero condition is load-bearing. Without it this branch also
+    // matches any dot-decimal whose fractional part happens to be three digits,
+    // so "0,125" typed with an English dot ("0.125") silently became 125 — a
+    // 1000× error, and exactly the shape a label value like "0.800 mg/L" takes
+    // when copied from an English-formatted source. A genuinely thousands-grouped
+    // number never has a leading-zero integer part, so requiring [1-9] keeps
+    // "30.000" → 30000 while sending "0.125" down the plain-decimal path.
+    //
+    // Residual ambiguity is unavoidable and deliberate: "3.141" reads as 3141,
+    // because in pt-BR the dot IS the thousands separator. The importer's
+    // plausibility bounds catch the implausible results of that reading.
     normalised = normalised.replace(/\./g, "");
   }
 

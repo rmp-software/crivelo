@@ -127,6 +127,32 @@ function optionalNumber(record: CsvRecord, column: string): number {
   return Number.isNaN(value) ? 0 : value;
 }
 
+/**
+ * Generous ceiling for any ion concentration in mg/L.
+ *
+ * Brewing-water targets live under ~200 mg/L and even hard tap water stays well
+ * under 1.000, so 2.000 rejects nothing real. It exists to catch a decimal that
+ * was misread by three orders of magnitude: pt-BR writes the thousands
+ * separator as a dot, so a cell like "3.141" is genuinely ambiguous and reads as
+ * 3141. Without a bound that sails through as a plausible-looking number and
+ * silently produces a wrong dose. See parseDecimal's note in engine/csv.ts.
+ */
+const MAX_ION_MG_PER_L = 2000;
+
+function checkIonPlausible(
+  value: number,
+  column: string,
+  where: string,
+  report: Report
+): void {
+  if (value > MAX_ION_MG_PER_L) {
+    report.error(
+      where,
+      `${column} is ${value} mg/L, above the ${MAX_ION_MG_PER_L} mg/L sanity ceiling — check the decimal separator (a dot is read as a thousands separator)`
+    );
+  }
+}
+
 function requireEnum<T extends string>(
   record: CsvRecord,
   column: string,
@@ -273,6 +299,7 @@ function readRecipes(
     for (const ion of TARGET_IONS) {
       const value = optionalNumber(record, `target_${ion}`);
       if (value < 0) report.error(where, `target_${ion} cannot be negative`);
+      checkIonPlausible(value, `target_${ion}`, where, report);
       if (value > 0) targets[ion] = value;
     }
 
@@ -283,8 +310,27 @@ function readRecipes(
 
     // Every listed concentrate must exist, and must supply an ion this recipe
     // actually targets — otherwise the row would compute zero drops forever.
+    //
+    // A listed concentrate must ALSO be the only source of its ion in this
+    // recipe. The engine derives each row's dose independently from
+    // `targets[ion]`, so two rows supplying the same ion would each dose the
+    // FULL target — the student doses twice and gets double the mineral, while
+    // the GH/KH summary (computed from targets) still reads correct, so nothing
+    // on screen reveals it. One duplicated id in a CSV cell is enough.
     const suppliedIons = new Set<TargetIon>();
+    const seenConcentrateIds = new Set<string>();
+    const ionSource = new Map<TargetIon, string>();
+
     for (const concentrateId of concentrate_ids) {
+      if (seenConcentrateIds.has(concentrateId)) {
+        report.error(
+          where,
+          `concentrate_id "${concentrateId}" is listed more than once — it would be dosed twice, at the full target each time`
+        );
+        continue;
+      }
+      seenConcentrateIds.add(concentrateId);
+
       const concentrate = concentrateById.get(concentrateId);
       if (!concentrate) {
         report.error(
@@ -299,6 +345,17 @@ function readRecipes(
           `concentrate "${concentrateId}" supplies ${concentrate.ion}, but target_${concentrate.ion} is blank or zero`
         );
       }
+
+      const existingSource = ionSource.get(concentrate.ion);
+      if (existingSource) {
+        report.error(
+          where,
+          `"${existingSource}" and "${concentrateId}" both supply ${concentrate.ion} — each would be dosed the full target_${concentrate.ion}. One concentrate per ion per recipe.`
+        );
+      } else {
+        ionSource.set(concentrate.ion, concentrateId);
+      }
+
       suppliedIons.add(concentrate.ion);
     }
 
@@ -447,6 +504,7 @@ function readBaseWaters(records: CsvRecord[], report: Report): BaseWater[] {
     for (const ion of TARGET_IONS) {
       const value = optionalNumber(record, ion);
       if (value < 0) report.error(where, `${ion} cannot be negative`);
+      checkIonPlausible(value, ion, where, report);
       if (value > 0) ions[ion] = value;
     }
 

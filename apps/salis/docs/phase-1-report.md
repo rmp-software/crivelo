@@ -27,7 +27,7 @@ placeholder, and the engine has no DOM and no I/O.
 
 Run the importer with `pnpm --filter salis import:content`.
 
-**117 tests pass, 3 are `todo`.** `type-check`, `lint` and `build` are green.
+**126 tests pass, 3 are `todo`.** `type-check`, `lint` and `build` are green.
 
 ## What passed
 
@@ -52,6 +52,38 @@ Also covered: base-water subtraction and its zero clamp; substitution
 KHCO₃ → NaHCO₃ holding KH while swapping potassium for sodium; the rounding
 rules at both ends; every guard; the plane formula and its override; and the
 importer's validations.
+
+## Defects found in adversarial review, and fixed
+
+An independent correctness reviewer returned **BLOCK** on the first pass with
+three demonstrated defects. All three are fixed, each with a regression test.
+
+**1. A duplicated concentrate silently doubled a dose.** Each row derives its
+dose independently from `targets[ion]`, so two rows supplying the same ion each
+dosed the FULL target. A one-character typo in a CSV cell (`mg-30k, mg-30k, …`)
+imported clean and produced two identical 10-gota rows — 20 drops of magnesium
+instead of 10 — while the GH/KH summary, computed from targets rather than rows,
+still read a correct 124 · 25 and hid it. The importer now rejects both a
+duplicated id and two concentrates sharing an ion, and `ComputeRecipeInput`
+documents the precondition for the future S6 builder.
+
+**2. `parseDecimal` inflated sub-1 decimals by 1000×.** The thousands-separator
+heuristic matched any dot-decimal with exactly three fractional digits, so
+`0.125` became `125` — precisely the shape of a label value like `0.800 mg/L`
+copied from an English-formatted source. A thousands-grouped number never has a
+leading-zero integer part, so the rule now requires `[1-9]` first. A generous
+2.000 mg/L sanity ceiling on every ion value catches the residual ambiguity
+(`3.141` still reads as 3141, correctly for pt-BR).
+
+**3. CRLF inside a quoted field left stray carriage returns.** Line endings were
+normalised between rows but not inside quotes, so a Windows/Excel export of the
+deliberately multi-line `steps_pt` and `body_md` carried `\r` into every line,
+surviving any downstream split on `\n`.
+
+Two further reviews — spec-compliance and architecture — returned no blockers.
+The architecture review did find that the `@crivelo/pwa` single-locale gap
+affects **two** files, not one: `serwist.ts` precaches nothing with `locales: []`,
+alongside the known `sw.ts` fallback gap.
 
 ## Decisions taken (and why)
 
