@@ -1,0 +1,386 @@
+{
+  "version": "2026-11-02",
+  "generated_at": "2026-11-02T02:56:29.500Z",
+  "minerals": [
+    {
+      "id": "mgso4-7h2o",
+      "name_pt": "Sulfato de magnésio (sal de Epsom)",
+      "formula": "MgSO4·7H2O",
+      "ion": "Mg",
+      "counter_ion": "SO4",
+      "sensory_note": "Corpo e complexidade; em excesso, doçura enjoativa.",
+      "espresso_safe": true,
+      "molar_mass": 246.466,
+      "ion_mass_fraction": 0.09861400761159754,
+      "counter_ion_mass_fraction": 0.3897332694976184,
+      "ion_as_caco3_factor": 4.118,
+      "ion_fractions": {
+        "Mg": 0.09861400761159754,
+        "SO4": 0.3897332694976184
+      }
+    },
+    {
+      "id": "cacl2-2h2o",
+      "name_pt": "Cloreto de cálcio di-hidratado",
+      "formula": "CaCl2·2H2O",
+      "ion": "Ca",
+      "counter_ion": "Cl",
+      "sensory_note": "Doçura e clareza; o cloreto não entra em máquina de espresso.",
+      "espresso_safe": false,
+      "molar_mass": 147.008,
+      "ion_mass_fraction": 0.27262461906835,
+      "counter_ion_mass_fraction": 0.4822866782760122,
+      "ion_as_caco3_factor": 2.497,
+      "ion_fractions": {
+        "Ca": 0.27262461906835,
+        "Cl": 0.4822866782760122
+      }
+    },
+    {
+      "id": "caso4-2h2o",
+      "name_pt": "Sulfato de cálcio (gesso)",
+      "formula": "CaSO4·2H2O",
+      "ion": "Ca",
+      "counter_ion": "SO4",
+      "sensory_note": "Clareza e definição, sem cloreto.",
+      "espresso_safe": true,
+      "molar_mass": 172.16400000000002,
+      "ion_mass_fraction": 0.23278966566761924,
+      "counter_ion_mass_fraction": 0.5579331335238493,
+      "ion_as_caco3_factor": 2.497,
+      "ion_fractions": {
+        "Ca": 0.23278966566761924,
+        "SO4": 0.5579331335238493
+      }
+    },
+    {
+      "id": "khco3",
+      "name_pt": "Bicarbonato de potássio",
+      "formula": "KHCO3",
+      "ion": "HCO3",
+      "counter_ion": "none",
+      "sensory_note": "Arredonda a acidez; em excesso apaga o brilho.",
+      "espresso_safe": true,
+      "molar_mass": 100.114,
+      "ion_mass_fraction": 0.6094652096609864,
+      "counter_ion_mass_fraction": 0,
+      "ion_as_caco3_factor": 0.82,
+      "ion_fractions": {
+        "K": 0.3905347903390135,
+        "HCO3": 0.6094652096609864
+      }
+    },
+    {
+      "id": "nahco3",
+      "name_pt": "Bicarbonato de sódio",
+      "formula": "NaHCO3",
+      "ion": "HCO3",
+      "counter_ion": "none",
+      "sensory_note": "Mais redondo que o potássio; adiciona sódio.",
+      "espresso_safe": true,
+      "molar_mass": 84.006,
+      "ion_mass_fraction": 0.7263290717329715,
+      "counter_ion_mass_fraction": 0,
+      "ion_as_caco3_factor": 0.82,
+      "ion_fractions": {
+        "Na": 0.27367092826702855,
+        "HCO3": 0.7263290717329715
+      }
+    },
+    {
+      "id": "mgcl2-6h2o",
+      "name_pt": "Cloreto de magnésio",
+      "formula": "MgCl2·6H2O",
+      "ion": "Mg",
+      "counter_ion": "Cl",
+      "sensory_note": "Mais brilho e menos corpo que o sulfato.",
+      "espresso_safe": false,
+      "molar_mass": 203.29500000000002,
+      "ion_mass_fraction": 0.11955532600408272,
+      "counter_ion_mass_fraction": 0.3487542733466145,
+      "ion_as_caco3_factor": 4.118,
+      "ion_fractions": {
+        "Mg": 0.11955532600408272,
+        "Cl": 0.3487542733466145
+      }
+    }
+  ],
+  "concentrates": [
+    {
+      "id": "mg-30k",
+      "mineral_id": "mgso4-7h2o",
+      "label_pt": "Mg 30.000",
+      "salt_g": 152.1,
+      "water_ml": 500,
+      "shelf_life_days": 90,
+      "storage_note": "Frasco conta-gotas, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "ion": "Mg",
+      "ion_mg_per_ml": 29.99838111544797
+    },
+    {
+      "id": "ca-30k",
+      "mineral_id": "cacl2-2h2o",
+      "label_pt": "Ca 30.000",
+      "salt_g": 55,
+      "water_ml": 500,
+      "shelf_life_days": 90,
+      "storage_note": "Frasco conta-gotas, longe da luz. Nunca misture com bicarbonato no frasco.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "ion": "Ca",
+      "ion_mg_per_ml": 29.9887080975185
+    },
+    {
+      "id": "khco3-30k",
+      "mineral_id": "khco3",
+      "label_pt": "KHCO3 30.000",
+      "salt_g": 24.6,
+      "water_ml": 500,
+      "shelf_life_days": 90,
+      "storage_note": "Frasco conta-gotas, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "ion": "HCO3",
+      "ion_mg_per_ml": 29.98568831532053
+    },
+    {
+      "id": "nahco3-30k",
+      "mineral_id": "nahco3",
+      "label_pt": "NaHCO3 30.000",
+      "salt_g": 20.7,
+      "water_ml": 500,
+      "shelf_life_days": 90,
+      "storage_note": "Frasco conta-gotas, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "ion": "HCO3",
+      "ion_mg_per_ml": 30.070023569745018
+    },
+    {
+      "id": "mgcl2-30k",
+      "mineral_id": "mgcl2-6h2o",
+      "label_pt": "MgCl2 30.000",
+      "salt_g": 125.5,
+      "water_ml": 500,
+      "shelf_life_days": 90,
+      "storage_note": "Frasco conta-gotas, longe da luz. Higroscópico.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "ion": "Mg",
+      "ion_mg_per_ml": 30.008386827024765
+    }
+  ],
+  "recipes": [
+    {
+      "id": "mais-doce",
+      "name_pt": "Mais doce",
+      "promise_pt": "Realça doçura e corpo em cafés lavados.",
+      "methods": [
+        "V60",
+        "Kalita",
+        "prensa"
+      ],
+      "target_Ca": 25,
+      "target_Mg": 15,
+      "target_HCO3": 30,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "ca-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": false,
+      "level": "iniciante",
+      "targets": {
+        "Ca": 25,
+        "Mg": 15,
+        "HCO3": 30
+      },
+      "plane": {
+        "x": 0.8634322177681412,
+        "y": 0.5524374999999999
+      },
+      "plane_is_override": false,
+      "gh_caco3": 124.195,
+      "kh_caco3": 24.599999999999998,
+      "tds_estimate": 192.7313704550142
+    },
+    {
+      "id": "mais-brilhante",
+      "name_pt": "Mais brilhante",
+      "promise_pt": "Acidez viva e corpo leve.",
+      "methods": [
+        "V60",
+        "Origami"
+      ],
+      "target_Ca": 20,
+      "target_Mg": 10,
+      "target_HCO3": 18,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "ca-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": false,
+      "level": "iniciante",
+      "targets": {
+        "Ca": 20,
+        "Mg": 10,
+        "HCO3": 18
+      },
+      "plane": {
+        "x": 0.9801799824407376,
+        "y": 0.13900000000000007
+      },
+      "plane_is_override": false,
+      "gh_caco3": 91.12,
+      "kh_caco3": 14.76,
+      "tds_estimate": 134.43618265170392
+    },
+    {
+      "id": "equilibrada",
+      "name_pt": "Equilibrada",
+      "promise_pt": "Referência SCA, sem cloreto.",
+      "methods": [
+        "V60",
+        "Kalita",
+        "espresso"
+      ],
+      "target_Ca": 0,
+      "target_Mg": 24,
+      "target_HCO3": 49,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": true,
+      "level": "avançado",
+      "targets": {
+        "Mg": 24,
+        "HCO3": 49
+      },
+      "plane": {
+        "x": 0.11700432479937115,
+        "y": 0.2354000000000001
+      },
+      "plane_is_override": false,
+      "gh_caco3": 98.83200000000001,
+      "kh_caco3": 40.18,
+      "tds_estimate": 199.24896140097357
+    }
+  ],
+  "equivalences": [
+    {
+      "from_mineral_id": "khco3",
+      "to_mineral_id": "nahco3",
+      "shared_ion": "HCO3",
+      "note_pt": "Mais redondo, menos brilho; adiciona sódio.",
+      "factor": 0.8391034220988073
+    },
+    {
+      "from_mineral_id": "cacl2-2h2o",
+      "to_mineral_id": "caso4-2h2o",
+      "shared_ion": "Ca",
+      "note_pt": "Troca cloreto por sulfato: menos corpo, mais clareza.",
+      "espresso_note_pt": "Preferível para máquinas de espresso.",
+      "factor": 1.171119939050936
+    },
+    {
+      "from_mineral_id": "mgso4-7h2o",
+      "to_mineral_id": "mgcl2-6h2o",
+      "shared_ion": "Mg",
+      "note_pt": "Mais brilho e menos corpo.",
+      "espresso_note_pt": "Evite em máquinas de espresso.",
+      "factor": 0.8248399373544425
+    }
+  ],
+  "base_waters": [
+    {
+      "id": "destilada",
+      "name_pt": "Destilada / RO",
+      "Ca": 0,
+      "Mg": 0,
+      "HCO3": 0,
+      "Na": 0,
+      "K": 0,
+      "source": "por definição",
+      "ions": {}
+    },
+    {
+      "id": "exemplo-mineral-leve",
+      "name_pt": "Exemplo — mineral leve",
+      "Ca": 6.2,
+      "Mg": 1.5,
+      "HCO3": 18,
+      "Na": 4.1,
+      "K": 0.8,
+      "source": "PLACEHOLDER — substituir pelo rótulo real",
+      "ions": {
+        "Ca": 6.2,
+        "Mg": 1.5,
+        "HCO3": 18,
+        "Na": 4.1,
+        "K": 0.8
+      }
+    },
+    {
+      "id": "exemplo-mineral-media",
+      "name_pt": "Exemplo — mineral média",
+      "Ca": 12,
+      "Mg": 3,
+      "HCO3": 34,
+      "Na": 6.5,
+      "K": 1.2,
+      "source": "PLACEHOLDER — substituir pelo rótulo real",
+      "ions": {
+        "Ca": 12,
+        "Mg": 3,
+        "HCO3": 34,
+        "Na": 6.5,
+        "K": 1.2
+      }
+    }
+  ],
+  "guards": {
+    "precip_ca_hco3_product": 2000,
+    "kh_floor_caco3": 20,
+    "kh_ceiling_caco3": 75,
+    "drops_show_ml_below": 3,
+    "drops_show_ml_above": 60,
+    "default_drops_per_ml": 20
+  },
+  "lessons": [
+    {
+      "id": "por-que-a-agua-vem-primeiro",
+      "order": 1,
+      "title_pt": "Por que a água vem primeiro",
+      "body_md": "A água é mais de 98% da bebida. Antes de trocar de café ou de moagem, olhe para ela.\n\nDois grupos de minerais fazem o trabalho:\n\n- **Dureza (GH)** — cálcio e magnésio. Extraem sabor e dão corpo.\n- **Alcalinidade (KH)** — bicarbonato. Segura a acidez.\n\nA relação entre os dois importa mais do que o total."
+    },
+    {
+      "id": "como-preparar-concentrados",
+      "order": 2,
+      "title_pt": "Como preparar concentrados",
+      "body_md": "Prepare um sal por frasco. Nunca junte cálcio e bicarbonato no mesmo concentrado: eles reagem e formam uma crosta branca.\n\n1. Pese o sal em balança de 0,1 g.\n2. Dissolva em pouco mais da metade da água e agite 1 minuto.\n3. Complete até o volume final.\n4. Rotule com o nome e a data.\n\nGuarde em frasco conta-gotas, longe da luz. Troque a cada 3 meses."
+    },
+    {
+      "id": "calibre-seu-conta-gotas",
+      "order": 3,
+      "title_pt": "Calibre seu conta-gotas",
+      "body_md": "Nem todo conta-gotas entrega a mesma gota. Essa é a maior fonte de erro na dosagem.\n\nPingue 20 gotas dentro de uma seringa e leia o volume. Se der 1 mL, seu conta-gotas é o padrão do app. Se der 0,8 mL, ajuste nos Ajustes.\n\nFaça isso uma vez, com calma. O resto do app depende desse número."
+    },
+    {
+      "id": "lendo-o-plano-sensorial",
+      "order": 4,
+      "title_pt": "Lendo o plano sensorial",
+      "body_md": "Cada receita vira um ponto em dois eixos.\n\n- **Doce ↔ brilhante** vem da relação entre alcalinidade e dureza. Mais bicarbonato puxa para o doce; menos puxa para o brilhante.\n- **Leve ↔ forte** vem da dureza total.\n\nO plano é um mapa, não uma régua. Use o paladar para decidir."
+    },
+    {
+      "id": "onde-comprar-no-brasil",
+      "order": 5,
+      "title_pt": "Onde comprar no Brasil",
+      "body_md": "Procure sais **grau alimentício** ou **P.A.** (para análise). Evite sal de banho perfumado.\n\n- Sulfato de magnésio: farmácia, como sal amargo ou sal de Epsom.\n- Bicarbonato de sódio: supermercado.\n- Bicarbonato de potássio e cloreto de cálcio: lojas de insumos para cervejaria.\n\nÁgua destilada: farmácia ou autopeças. Confira que não tem aditivo."
+    }
+  ]
+}

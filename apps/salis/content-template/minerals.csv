@@ -1,0 +1,7 @@
+id;name_pt;formula;ion;counter_ion;sensory_note;espresso_safe;buy_url
+mgso4-7h2o;Sulfato de magnésio (sal de Epsom);MgSO4·7H2O;Mg;SO4;"Corpo e complexidade; em excesso, doçura enjoativa.";sim;
+cacl2-2h2o;Cloreto de cálcio di-hidratado;CaCl2·2H2O;Ca;Cl;"Doçura e clareza; o cloreto não entra em máquina de espresso.";não;
+caso4-2h2o;Sulfato de cálcio (gesso);CaSO4·2H2O;Ca;SO4;Clareza e definição, sem cloreto.;sim;
+khco3;Bicarbonato de potássio;KHCO3;HCO3;none;"Arredonda a acidez; em excesso apaga o brilho.";sim;
+nahco3;Bicarbonato de sódio;NaHCO3;HCO3;none;"Mais redondo que o potássio; adiciona sódio.";sim;
+mgcl2-6h2o;Cloreto de magnésio;MgCl2·6H2O;Mg;Cl;Mais brilho e menos corpo que o sulfato.;não;
