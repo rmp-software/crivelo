@@ -1,0 +1,237 @@
+/*
+ * @salis/tokens — Tailwind v4 @theme source. Turns the foundation's variables
+ * into the utility vocabulary (`bg-teal-700`, `text-fg-3`, `border-border`,
+ * `rounded-lg`, `shadow-sm`, `font-mono`, `text-data-hero`, …).
+ *
+ * Consumed by apps/salis/app/globals.css:
+ *   @import "tailwindcss";
+ *   @import "@salis/tokens/styles/foundation.css";   (raw --* vars + base styles)
+ *   @import "@salis/tokens/styles/theme.css";        (this file — emits utilities)
+ *   @import "@crivelo/ui/styles/shadcn-theme.css";   (bridge, LAST)
+ *
+ * PRECONDITION (hard): requires a Tailwind v4 pipeline (@tailwindcss/postcss) and
+ * `@import "tailwindcss"` MUST appear before this file. Imported bare or
+ * out-of-order the @theme block is silently ignored and NO utilities generate.
+ *
+ * Colour tokens reference the foundation variables (`var(--teal-700)`) so the
+ * dark-theme swap flows through to every utility. The v4 colour namespace is
+ * `--color-*`, which does not collide with the foundation's raw `--teal-*`.
+ *
+ * Font / radius / shadow / ease tokens share bare names with the foundation's
+ * variables, so they carry LITERAL values here (a `var(--font-mono)`
+ * self-reference would be circular). Values are kept identical to
+ * foundation.css; @theme emits them to :root, so the foundation's element base
+ * styles that read `var(--font-body)` still resolve.
+ *
+ * Tailwind's own numeric type scale (text-sm/base/lg) is deliberately NOT reset
+ * to `initial`: the shared @crivelo/ui primitives are authored against it.
+ * The Salis named sizes are added ALONGSIDE it.
+ */
+
+@theme {
+  /* ---------- Colors: raw scales ---------- */
+  --color-teal-50: var(--teal-50);
+  --color-teal-100: var(--teal-100);
+  --color-teal-200: var(--teal-200);
+  --color-teal-300: var(--teal-300);
+  --color-teal-400: var(--teal-400);
+  --color-teal-500: var(--teal-500);
+  --color-teal-600: var(--teal-600);
+  --color-teal-700: var(--teal-700);
+  --color-teal-800: var(--teal-800);
+  --color-teal-900: var(--teal-900);
+  --color-teal-950: var(--teal-950);
+
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-300: var(--blue-300);
+  --color-blue-400: var(--blue-400);
+  --color-blue-500: var(--blue-500);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-900: var(--blue-900);
+
+  --color-honey-50: var(--honey-50);
+  --color-honey-100: var(--honey-100);
+  --color-honey-200: var(--honey-200);
+  --color-honey-300: var(--honey-300);
+  --color-honey-400: var(--honey-400);
+  --color-honey-500: var(--honey-500);
+  --color-honey-600: var(--honey-600);
+  --color-honey-700: var(--honey-700);
+  --color-honey-800: var(--honey-800);
+  --color-honey-900: var(--honey-900);
+
+  --color-slate-0: var(--slate-0);
+  --color-slate-25: var(--slate-25);
+  --color-slate-50: var(--slate-50);
+  --color-slate-100: var(--slate-100);
+  --color-slate-200: var(--slate-200);
+  --color-slate-300: var(--slate-300);
+  --color-slate-400: var(--slate-400);
+  --color-slate-500: var(--slate-500);
+  --color-slate-600: var(--slate-600);
+  --color-slate-700: var(--slate-700);
+  --color-slate-800: var(--slate-800);
+  --color-slate-900: var(--slate-900);
+  --color-slate-950: var(--slate-950);
+
+  /* ---------- Colors: semantic ---------- */
+  --color-bg: var(--bg);
+  --color-bg-2: var(--bg-2);
+  --color-bg-3: var(--bg-3);
+  --color-bg-inverse: var(--bg-inverse);
+
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-tint: var(--surface-tint);
+
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-fg-3: var(--fg-3);
+  --color-fg-4: var(--fg-4);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-inverse: var(--fg-inverse);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-emphasis: var(--border-emphasis);
+  --color-divider: var(--divider);
+
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-press: var(--brand-press);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-soft-ink: var(--brand-soft-ink);
+
+  --color-mineral: var(--mineral);
+  --color-mineral-hover: var(--mineral-hover);
+  --color-mineral-press: var(--mineral-press);
+  --color-mineral-soft: var(--mineral-soft);
+  --color-mineral-soft-ink: var(--mineral-soft-ink);
+  --color-link: var(--link);
+  --color-focus-ring: var(--focus-ring);
+
+  --color-sweet: var(--sweet);
+  --color-sweet-soft: var(--sweet-soft);
+  --color-sweet-ink: var(--sweet-ink);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-ink: var(--success-ink);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-ink: var(--danger-ink);
+
+  /* Sensory plane */
+  --color-axis-sweet: var(--axis-sweet);
+  --color-axis-bright: var(--axis-bright);
+  --color-axis-lighter: var(--axis-lighter);
+  --color-axis-stronger: var(--axis-stronger);
+  --color-plane-bg: var(--plane-bg);
+  --color-plane-grid: var(--plane-grid);
+  --color-plane-axis: var(--plane-axis);
+  --color-plane-marker: var(--plane-marker);
+
+  /* Brand mark */
+  --color-mark-ink: var(--mark-ink);
+  --color-mark-water: var(--mark-water);
+  --color-mark-grain: var(--mark-grain);
+
+  --color-scrim: var(--scrim);
+
+  /* ---------- Type: families (literal — see header) ---------- */
+  --font-body: 'Source Sans 3', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Source Sans 3', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  /* Tabular figures + slashed zero ride the `font-mono` UTILITY itself, via v4's
+   * `--font-*--font-feature-settings` sub-property. This is deliberate: every
+   * quantity in Salis is mono, and these two features are correctness, not
+   * polish — `tnum` stops drop counts from shifting width as they recompute, and
+   * `zero` makes 0/O unmistakable on a wet-handed counter screen. Hanging them
+   * off the utility means no one has to remember a companion class. */
+  --font-mono--font-feature-settings: 'tnum' 1, 'zero' 1;
+
+  /* ---------- Type: sans scale ----------
+   * Headings are 600 with slight negative tracking. */
+  --text-display: 32px;
+  --text-display--line-height: 36px;
+  --text-display--letter-spacing: -0.02em;
+  --text-h1: 26px;
+  --text-h1--line-height: 32px;
+  --text-h1--letter-spacing: -0.015em;
+  --text-h2: 21px;
+  --text-h2--line-height: 28px;
+  --text-h2--letter-spacing: -0.01em;
+  --text-h3: 18px;
+  --text-h3--line-height: 24px;
+  --text-h3--letter-spacing: -0.005em;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-label: 14px;
+  --text-label--line-height: 20px;
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
+  /* The only uppercase in the system (mono, tracked). */
+  --text-overline: 11px;
+  --text-overline--line-height: 16px;
+  --text-overline--letter-spacing: 0.08em;
+
+  /* ---------- Type: mono "data" scale ----------
+   * Quantities are the largest thing on a screen — drop counts run 28–56px. */
+  --text-data-hero: 56px;
+  --text-data-hero--line-height: 56px;
+  --text-data-hero--letter-spacing: -0.01em;
+  --text-data-xl: 40px;
+  --text-data-xl--line-height: 44px;
+  --text-data-xl--letter-spacing: -0.01em;
+  --text-data-lg: 28px;
+  --text-data-lg--line-height: 32px;
+  --text-data-lg--letter-spacing: -0.01em;
+  --text-data-md: 18px;
+  --text-data-md--line-height: 24px;
+  --text-data-md--letter-spacing: -0.01em;
+  --text-data-sm: 14px;
+  --text-data-sm--line-height: 20px;
+  --text-data-sm--letter-spacing: -0.01em;
+  --text-data-xs: 12px;
+  --text-data-xs--line-height: 16px;
+  --text-data-xs--letter-spacing: -0.01em;
+
+  /* ---------- Radii (literal — see header) ---------- */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-sheet: 24px;
+  --radius-full: 999px;
+
+  /* ---------- Shadows (literal — see header) ---------- */
+  --shadow-xs: 0 1px 2px rgba(8, 48, 47, 0.06);
+  --shadow-sm: 0 1px 2px rgba(8, 48, 47, 0.06), 0 2px 6px rgba(8, 48, 47, 0.05);
+  --shadow-md: 0 2px 4px rgba(8, 48, 47, 0.06), 0 8px 20px rgba(8, 48, 47, 0.08);
+  --shadow-lg: 0 8px 16px rgba(8, 48, 47, 0.08), 0 24px 48px rgba(8, 48, 47, 0.14);
+  --shadow-sheet: 0 -8px 32px rgba(8, 48, 47, 0.16);
+
+  /* ---------- Motion (literal — see header) ---------- */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-enter: cubic-bezier(0, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  /* ---------- Layout ---------- */
+  --spacing-tap-min: 44px;
+  --spacing-gutter: 20px;
+  --spacing-topbar: 56px;
+  --spacing-tabbar: 64px;
+  --container-content: 440px;
+}

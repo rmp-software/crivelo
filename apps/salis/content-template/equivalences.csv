@@ -1,0 +1,4 @@
+from_mineral_id;to_mineral_id;shared_ion;note_pt;espresso_note_pt
+khco3;nahco3;HCO3;"Mais redondo, menos brilho; adiciona sódio.";
+cacl2-2h2o;caso4-2h2o;Ca;"Troca cloreto por sulfato: menos corpo, mais clareza.";Preferível para máquinas de espresso.
+mgso4-7h2o;mgcl2-6h2o;Mg;Mais brilho e menos corpo.;Evite em máquinas de espresso.

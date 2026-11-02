@@ -1,0 +1,4 @@
+id;name_pt;Ca;Mg;HCO3;Na;K;source
+destilada;Destilada / RO;0;0;0;0;0;por definição
+exemplo-mineral-leve;Exemplo — mineral leve;6,2;1,5;18,0;4,1;0,8;PLACEHOLDER — substituir pelo rótulo real
+exemplo-mineral-media;Exemplo — mineral média;12,0;3,0;34,0;6,5;1,2;PLACEHOLDER — substituir pelo rótulo real

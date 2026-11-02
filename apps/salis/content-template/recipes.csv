@@ -1,0 +1,4 @@
+id;name_pt;promise_pt;methods;target_Ca;target_Mg;target_HCO3;target_Na;target_K;concentrate_ids;espresso_safe;plane_x;plane_y;level
+mais-doce;Mais doce;Realça doçura e corpo em cafés lavados.;"V60, Kalita, prensa";25;15;30;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
+mais-brilhante;Mais brilhante;Acidez viva e corpo leve.;"V60, Origami";20;10;18;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
+equilibrada;Equilibrada;Referência SCA, sem cloreto.;"V60, Kalita, espresso";0;24;49;0;0;"mg-30k, khco3-30k";sim;;;avançado
