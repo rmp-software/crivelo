@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-02",
-  "generated_at": "2026-11-02T03:26:01.821Z",
+  "version": "2026-11-12",
+  "generated_at": "2026-11-12T15:30:17.519Z",
   "minerals": [
     {
       "id": "mgso4-7h2o",
@@ -110,23 +110,23 @@
       "id": "mg-30k",
       "mineral_id": "mgso4-7h2o",
       "label_pt": "Mg 30.000",
-      "salt_g": 152.1,
-      "water_ml": 500,
+      "salt_g": 76.1,
+      "water_ml": 250,
       "shelf_life_days": 90,
-      "storage_note": "Frasco conta-gotas, longe da luz.",
-      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "storage_note": "Frasco conta-gotas âmbar, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 180 mL de água destilada e agite até ficar transparente.\n3. Complete até 250 mL.\n4. Rotule com o nome e a data.",
       "ion": "Mg",
-      "ion_mg_per_ml": 29.99838111544797
+      "ion_mg_per_ml": 30.01810391697029
     },
     {
       "id": "ca-30k",
       "mineral_id": "cacl2-2h2o",
       "label_pt": "Ca 30.000",
-      "salt_g": 55,
-      "water_ml": 500,
+      "salt_g": 27.5,
+      "water_ml": 250,
       "shelf_life_days": 90,
-      "storage_note": "Frasco conta-gotas, longe da luz. Nunca misture com bicarbonato no frasco.",
-      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "storage_note": "Frasco conta-gotas âmbar, longe da luz. Nunca misture com bicarbonato no mesmo frasco.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 180 mL de água destilada e agite até ficar transparente.\n3. Complete até 250 mL.\n4. Rotule com o nome e a data.",
       "ion": "Ca",
       "ion_mg_per_ml": 29.9887080975185
     },
@@ -134,11 +134,11 @@
       "id": "khco3-30k",
       "mineral_id": "khco3",
       "label_pt": "KHCO3 30.000",
-      "salt_g": 24.6,
-      "water_ml": 500,
+      "salt_g": 12.3,
+      "water_ml": 250,
       "shelf_life_days": 90,
-      "storage_note": "Frasco conta-gotas, longe da luz.",
-      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "storage_note": "Frasco conta-gotas âmbar, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 180 mL de água destilada e agite até ficar transparente.\n3. Complete até 250 mL.\n4. Rotule com o nome e a data.",
       "ion": "HCO3",
       "ion_mg_per_ml": 29.98568831532053
     },
@@ -146,28 +146,133 @@
       "id": "nahco3-30k",
       "mineral_id": "nahco3",
       "label_pt": "NaHCO3 30.000",
-      "salt_g": 20.7,
-      "water_ml": 500,
+      "salt_g": 10.3,
+      "water_ml": 250,
       "shelf_life_days": 90,
-      "storage_note": "Frasco conta-gotas, longe da luz.",
-      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "storage_note": "Frasco conta-gotas âmbar, longe da luz.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 180 mL de água destilada e agite até ficar transparente.\n3. Complete até 250 mL.\n4. Rotule com o nome e a data.",
       "ion": "HCO3",
-      "ion_mg_per_ml": 30.070023569745018
+      "ion_mg_per_ml": 29.924757755398424
     },
     {
       "id": "mgcl2-30k",
       "mineral_id": "mgcl2-6h2o",
       "label_pt": "MgCl2 30.000",
-      "salt_g": 125.5,
-      "water_ml": 500,
+      "salt_g": 62.7,
+      "water_ml": 250,
       "shelf_life_days": 90,
-      "storage_note": "Frasco conta-gotas, longe da luz. Higroscópico.",
-      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 300 mL, agite 1 min.\n3. Complete até 500 mL.",
+      "storage_note": "Frasco conta-gotas âmbar, longe da luz. O sal é higroscópico: feche o pacote bem.",
+      "steps_pt": "1. Pese o sal em balança de 0,1 g.\n2. Dissolva em 180 mL de água destilada e agite até ficar transparente.\n3. Complete até 250 mL.\n4. Rotule com o nome e a data.",
       "ion": "Mg",
-      "ion_mg_per_ml": 30.008386827024765
+      "ion_mg_per_ml": 29.984475761823948
     }
   ],
   "recipes": [
+    {
+      "id": "leve",
+      "name_pt": "Leve",
+      "promise_pt": "Pouco mineral. Realça florais em torras claras.",
+      "methods": [
+        "V60",
+        "Origami",
+        "Chemex"
+      ],
+      "target_Ca": 8,
+      "target_Mg": 6,
+      "target_HCO3": 27,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "ca-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": false,
+      "level": "iniciante",
+      "targets": {
+        "Ca": 8,
+        "Mg": 6,
+        "HCO3": 27
+      },
+      "plane": {
+        "x": -0.0029687839686944086,
+        "y": -0.44145
+      },
+      "plane_is_override": false,
+      "gh_caco3": 44.684,
+      "kh_caco3": 22.139999999999997,
+      "tds_estimate": 96.16618866101837
+    },
+    {
+      "id": "mais-brilhante",
+      "name_pt": "Mais brilhante",
+      "promise_pt": "Acidez viva e corpo leve.",
+      "methods": [
+        "V60",
+        "Kalita",
+        "Origami"
+      ],
+      "target_Ca": 28,
+      "target_Mg": 5,
+      "target_HCO3": 28,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "ca-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": false,
+      "level": "iniciante",
+      "targets": {
+        "Ca": 28,
+        "Mg": 5,
+        "HCO3": 28
+      },
+      "plane": {
+        "x": 0.7855079852638027,
+        "y": 0.131325
+      },
+      "plane_is_override": false,
+      "gh_caco3": 90.506,
+      "kh_caco3": 22.959999999999997,
+      "tds_estimate": 148.2358698231814
+    },
+    {
+      "id": "equilibrada",
+      "name_pt": "Equilibrada",
+      "promise_pt": "Ponto de partida para quase todo café.",
+      "methods": [
+        "V60",
+        "Kalita",
+        "prensa"
+      ],
+      "target_Ca": 17,
+      "target_Mg": 10,
+      "target_HCO3": 49,
+      "target_Na": 0,
+      "target_K": 0,
+      "concentrate_ids": [
+        "mg-30k",
+        "ca-30k",
+        "khco3-30k"
+      ],
+      "espresso_safe": false,
+      "level": "iniciante",
+      "targets": {
+        "Ca": 17,
+        "Mg": 10,
+        "HCO3": 49
+      },
+      "plane": {
+        "x": 0.05811799734541849,
+        "y": 0.04536250000000006
+      },
+      "plane_is_override": false,
+      "gh_caco3": 83.629,
+      "kh_caco3": 40.18,
+      "tds_estimate": 176.99329670705265
+    },
     {
       "id": "mais-doce",
       "name_pt": "Mais doce",
@@ -177,98 +282,65 @@
         "Kalita",
         "prensa"
       ],
-      "target_Ca": 25,
-      "target_Mg": 15,
-      "target_HCO3": 30,
+      "target_Ca": 8,
+      "target_Mg": 18,
+      "target_HCO3": 60,
       "target_Na": 0,
       "target_K": 0,
       "concentrate_ids": [
         "mg-30k",
         "ca-30k",
-        "khco3-30k"
+        "nahco3-30k"
       ],
       "espresso_safe": false,
       "level": "iniciante",
       "targets": {
-        "Ca": 25,
-        "Mg": 15,
-        "HCO3": 30
+        "Ca": 8,
+        "Mg": 18,
+        "HCO3": 60
       },
       "plane": {
-        "x": 0.8634322177681412,
-        "y": 0.5524374999999999
+        "x": -0.434184468649078,
+        "y": 0.1762500000000001
       },
       "plane_is_override": false,
-      "gh_caco3": 124.195,
-      "kh_caco3": 24.599999999999998,
-      "tds_estimate": 192.7313704550142
+      "gh_caco3": 94.10000000000001,
+      "kh_caco3": 49.199999999999996,
+      "tds_estimate": 193.8975429684279
     },
     {
-      "id": "mais-brilhante",
-      "name_pt": "Mais brilhante",
-      "promise_pt": "Acidez viva e corpo leve.",
+      "id": "encorpada",
+      "name_pt": "Encorpada",
+      "promise_pt": "Mais extração e mais corpo. Para torras médias.",
       "methods": [
-        "V60",
-        "Origami"
+        "Prensa",
+        "Clever"
       ],
-      "target_Ca": 20,
-      "target_Mg": 10,
-      "target_HCO3": 18,
+      "target_Ca": 15,
+      "target_Mg": 28,
+      "target_HCO3": 75,
       "target_Na": 0,
       "target_K": 0,
       "concentrate_ids": [
         "mg-30k",
         "ca-30k",
-        "khco3-30k"
+        "nahco3-30k"
       ],
       "espresso_safe": false,
-      "level": "iniciante",
-      "targets": {
-        "Ca": 20,
-        "Mg": 10,
-        "HCO3": 18
-      },
-      "plane": {
-        "x": 0.9801799824407376,
-        "y": 0.13900000000000007
-      },
-      "plane_is_override": false,
-      "gh_caco3": 91.12,
-      "kh_caco3": 14.76,
-      "tds_estimate": 134.43618265170392
-    },
-    {
-      "id": "equilibrada",
-      "name_pt": "Equilibrada",
-      "promise_pt": "Referência SCA, sem cloreto.",
-      "methods": [
-        "V60",
-        "Kalita",
-        "espresso"
-      ],
-      "target_Ca": 0,
-      "target_Mg": 24,
-      "target_HCO3": 49,
-      "target_Na": 0,
-      "target_K": 0,
-      "concentrate_ids": [
-        "mg-30k",
-        "khco3-30k"
-      ],
-      "espresso_safe": true,
       "level": "avançado",
       "targets": {
-        "Mg": 24,
-        "HCO3": 49
+        "Ca": 15,
+        "Mg": 28,
+        "HCO3": 75
       },
       "plane": {
-        "x": 0.11700432479937115,
-        "y": 0.2354000000000001
+        "x": -0.15138004515817038,
+        "y": 0.9094875000000002
       },
       "plane_is_override": false,
-      "gh_caco3": 98.83200000000001,
-      "kh_caco3": 40.18,
-      "tds_estimate": 199.24896140097357
+      "gh_caco3": 152.75900000000001,
+      "kh_caco3": 61.49999999999999,
+      "tds_estimate": 283.45377787754546
     }
   ],
   "equivalences": [
@@ -276,24 +348,31 @@
       "from_mineral_id": "khco3",
       "to_mineral_id": "nahco3",
       "shared_ion": "HCO3",
-      "note_pt": "Mais redondo, menos brilho; adiciona sódio.",
+      "note_pt": "Mais redondo e menos brilho; adiciona sódio.",
       "factor": 0.8391034220988073
     },
     {
-      "from_mineral_id": "cacl2-2h2o",
-      "to_mineral_id": "caso4-2h2o",
-      "shared_ion": "Ca",
-      "note_pt": "Troca cloreto por sulfato: menos corpo, mais clareza.",
-      "espresso_note_pt": "Preferível para máquinas de espresso.",
-      "factor": 1.171119939050936
+      "from_mineral_id": "nahco3",
+      "to_mineral_id": "khco3",
+      "shared_ion": "HCO3",
+      "note_pt": "Mais brilho e sem sódio; adiciona potássio.",
+      "factor": 1.1917482084613005
     },
     {
       "from_mineral_id": "mgso4-7h2o",
       "to_mineral_id": "mgcl2-6h2o",
       "shared_ion": "Mg",
       "note_pt": "Mais brilho e menos corpo.",
-      "espresso_note_pt": "Evite em máquinas de espresso.",
+      "espresso_note_pt": "Evite em máquinas de espresso: o cloreto corrói a caldeira.",
       "factor": 0.8248399373544425
+    },
+    {
+      "from_mineral_id": "mgcl2-6h2o",
+      "to_mineral_id": "mgso4-7h2o",
+      "shared_ion": "Mg",
+      "note_pt": "Mais corpo e menos brilho.",
+      "espresso_note_pt": "Preferível para máquinas de espresso.",
+      "factor": 1.2123564278511523
     }
   ],
   "base_waters": [
@@ -305,46 +384,46 @@
       "HCO3": 0,
       "Na": 0,
       "K": 0,
-      "source": "por definição",
+      "source": "Por definição. Farmacopeia Brasileira: água purificada tem condutividade ≤1,3 µS/cm.",
       "ions": {}
     },
     {
-      "id": "exemplo-mineral-leve",
-      "name_pt": "Exemplo — mineral leve",
-      "Ca": 6.2,
-      "Mg": 1.5,
-      "HCO3": 18,
-      "Na": 4.1,
-      "K": 0.8,
-      "source": "PLACEHOLDER — substituir pelo rótulo real",
+      "id": "bonafont",
+      "name_pt": "Bonafont",
+      "Ca": 1.4,
+      "Mg": 0.6,
+      "HCO3": 7.5,
+      "Na": 1.2,
+      "K": 1.7,
+      "source": "Rótulo (fonte Jacutinga-MG). CONFIANÇA MÉDIA — confirmar com foto do rótulo atual.",
       "ions": {
-        "Ca": 6.2,
-        "Mg": 1.5,
-        "HCO3": 18,
-        "Na": 4.1,
-        "K": 0.8
+        "Ca": 1.4,
+        "Mg": 0.6,
+        "HCO3": 7.5,
+        "Na": 1.2,
+        "K": 1.7
       }
     },
     {
-      "id": "exemplo-mineral-media",
-      "name_pt": "Exemplo — mineral média",
-      "Ca": 12,
-      "Mg": 3,
-      "HCO3": 34,
-      "Na": 6.5,
+      "id": "minalba",
+      "name_pt": "Minalba sem gás",
+      "Ca": 16.8,
+      "Mg": 11.1,
+      "HCO3": 110.8,
+      "Na": 1.2,
       "K": 1.2,
-      "source": "PLACEHOLDER — substituir pelo rótulo real",
+      "source": "Rótulo (fonte Água Santa, Campos do Jordão-SP). Valores variam por lote.",
       "ions": {
-        "Ca": 12,
-        "Mg": 3,
-        "HCO3": 34,
-        "Na": 6.5,
+        "Ca": 16.8,
+        "Mg": 11.1,
+        "HCO3": 110.8,
+        "Na": 1.2,
         "K": 1.2
       }
     }
   ],
   "guards": {
-    "precip_ca_hco3_product": 2000,
+    "precip_ca_hco3_product": 10000,
     "kh_floor_caco3": 20,
     "kh_ceiling_caco3": 75,
     "drops_show_ml_below": 3,

@@ -27,7 +27,7 @@ placeholder, and the engine has no DOM and no I/O.
 
 Run the importer with `pnpm --filter salis import:content`.
 
-**126 tests pass, 3 are `todo`.** `type-check`, `lint` and `build` are green.
+**128 tests pass, 3 are `todo`.** `type-check`, `lint` and `build` are green.
 
 ## What passed
 
@@ -113,6 +113,34 @@ content). The importer runs on plain `node` — Node 24 strips TypeScript
 natively — so no `ts-node`/`tsx` either. This is why engine imports carry
 explicit `.ts` extensions.
 
+## Researched defaults now fill the template
+
+`content-template/` ships researched, sourced defaults rather than placeholders,
+so the app is testable end to end today. Every value is traceable and meant to be
+overwritten — see **`content-assumptions.md`** for the full record.
+
+The two questions that blocked this report are now answered by evidence:
+
+**"30.000 ppm" means ppm of the ION.** Settled by arithmetic, not opinion: it is
+the only one of the three possible readings where every salt keeps its drop count
+under the app's own 60-drop ceiling (the "as salt" reading needs 189 drops of
+magnesium). It reproduces docs/01's S4 screen exactly, and matches the per-drop
+potency of Lotus Water, the only commercial drop-dosed product. Note that
+published *gram* recipes all use ppm as CaCO₃ instead — if her sheet came from
+that lineage her grams differ, and only the template changes.
+
+**The dropper must stay calibrated.** USP's "20 drops per mL" holds for water
+only; Farmacopeia Brasileira requires per-device calibration, and real Brazilian
+droppers span 10–40 gotas/mL. The onboarding calibration screen stays.
+
+Two corrections came out of the research:
+
+- **`docs/03`'s precipitation threshold of 2000 was wrong** — it fires inside the
+  SCA's own core zone (the Rao/Perger recipe sits at 1954). No published Ca × HCO₃
+  heuristic exists at all; the value is now 10000, above every SCA corner.
+- **`docs/02`'s SBQ Itumbiara citation could not be found.** The claim it supports
+  still holds via Bertolo et al. (2007, 303 brands) and an Embrapa label study.
+
 ## What blocks the gate
 
 Three `test.todo` fixtures name these; none is a code change.
@@ -135,13 +163,18 @@ Three `test.todo` fixtures name these; none is a code change.
 
 These came out of building the template and are content decisions, not bugs.
 
-**1. Gypsum cannot be a drop-dosed concentrate — which breaks the espresso
-substitution.** CaSO₄·2H₂O dissolves at roughly 2,4 g/L. A 30.000 ppm stock
-would need about 64 g in 500 mL, some 50× past saturation. So the
-CaCl₂ → CaSO₄ rule — the one that makes a recipe espresso-safe by removing
-chloride — has no bottle behind it. The importer now warns about exactly this.
-Options: weigh gypsum directly into the jug, ship a much weaker stock and accept
-large doses, or drop the rule and source calcium another way. **Her call.**
+**1. Gypsum cannot be a drop-dosed concentrate, so NOTHING is espresso-safe.**
+Confirmed by research: CaSO₄·2H₂O dissolves at only ~2,6 g/L — about 400× less
+than its neighbours — and its solubility is *retrograde*, peaking near 40 °C, so
+heating does not help. At EspressoAF's recommended ~1,72 g/L working stock a
+normal calcium dose would need ~70 mL per litre. Homebrewing practice is to weigh
+gypsum dry into the full volume, not to make a stock.
+
+The consequence is bigger than one substitution: **CaCl₂ is the only calcium
+stock and it is a chloride, so with the current salt set no recipe can earn the
+*espresso ok* badge at all.** Three ways out, all hers — dose gypsum dry, add a
+soluble non-chloride calcium source (calcium lactate, ~66 g/L, food grade), or
+drop the badge from v1.
 
 **2. A 30.000 ppm magnesium stock needs 152 g of Epsom per 500 mL.** Magnesium
 is only 9,9 % of the heptahydrate, so matching the bicarbonate stock's strength

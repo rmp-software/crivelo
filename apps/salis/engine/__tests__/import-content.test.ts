@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { hardnessAsCaCO3 } from "../dosing.ts";
 import { Report, buildContent } from "../../scripts/import-content.ts";
 
 const TEMPLATE_DIR = join(import.meta.dirname, "..", "..", "content-template");
@@ -62,25 +63,41 @@ describe("the shipped template", () => {
     }
   });
 
-  it('reproduces "GH 124 · KH 25" for Mais doce, as printed in docs/01', () => {
-    const maisDoce = content.recipes.find((r) => r.id === "mais-doce")!;
-    expect(Math.round(maisDoce.gh_caco3)).toBe(124);
-    expect(Math.round(maisDoce.kh_caco3)).toBe(25);
+  it("puts every preset where its name says it should be on the plane", () => {
+    // docs/01's illustrative targets for "Mais doce" (Ca 25 · Mg 15 · HCO3 30)
+    // actually land at x = +0.86 — the BRIGHT end, contradicting the name — so
+    // the template's targets were redesigned against the plane model. The
+    // docs/01 worked example itself is still asserted, in dosing.test.ts.
+    const plane = (id: string) => content.recipes.find((r) => r.id === id)!.plane;
+
+    expect(plane("mais-doce").x).toBeLessThan(-0.2); // doce
+    expect(plane("mais-brilhante").x).toBeGreaterThan(0.2); // brilhante
+    expect(Math.abs(plane("equilibrada").x)).toBeLessThan(0.2); // neutral
+    expect(plane("leve").y).toBeLessThan(-0.2); // leve
+    expect(plane("encorpada").y).toBeGreaterThan(0.2); // forte
+  });
+
+  it("keeps every preset inside the guard band", () => {
+    for (const recipe of content.recipes) {
+      expect(recipe.kh_caco3).toBeGreaterThanOrEqual(content.guards.kh_floor_caco3);
+      expect(recipe.kh_caco3).toBeLessThanOrEqual(content.guards.kh_ceiling_caco3);
+    }
   });
 
   it("counts spectator ions in the TDS estimate", () => {
-    // Targets alone sum to 70 mg/L; the potassium from KHCO3 and the chloride
-    // from CaCl2 are really in the cup, so the estimate must be well above it.
+    // The sodium from NaHCO3 and the chloride from CaCl2 are really in the cup,
+    // so the estimate must exceed the sum of the targeted ions alone.
     const maisDoce = content.recipes.find((r) => r.id === "mais-doce")!;
-    expect(maisDoce.tds_estimate).toBeGreaterThan(150);
+    const targetSum = Object.values(maisDoce.targets).reduce((a, b) => a + (b ?? 0), 0);
+    expect(maisDoce.tds_estimate).toBeGreaterThan(targetSum * 1.2);
   });
 
-  it("warns that the gypsum substitution can never be offered", () => {
-    // CaSO4·2H2O is too insoluble to be a drop-dosed concentrate, so the
-    // espresso-friendly CaCl2 → CaSO4 rule has no bottle behind it.
-    expect(report.warnings.map((w) => w.message).join("\n")).toMatch(
-      /no concentrate is defined for caso4-2h2o/
-    );
+  it("imports with no warnings either", () => {
+    // The CaCl2 → CaSO4 rule was removed from the template: gypsum dissolves at
+    // only ~2.6 g/L, so a drop-dosed stock would need ~70 mL per litre of
+    // brewing water. It stays in the minerals tab for future dry dosing. See
+    // docs/content-assumptions.md.
+    expect(report.warnings).toHaveLength(0);
   });
 });
 
@@ -225,9 +242,22 @@ describe("base waters", () => {
 
   it("reads Brazilian decimals", () => {
     const { content } = importWith({});
-    const light = content.base_waters.find((w) => w.id === "exemplo-mineral-leve")!;
-    expect(light.Ca).toBe(6.2);
-    expect(light.HCO3).toBe(18);
+    const minalba = content.base_waters.find((w) => w.id === "minalba")!;
+    expect(minalba.Ca).toBe(16.8);
+    expect(minalba.HCO3).toBe(110.8);
+  });
+
+  it("models a bottled water hard enough to cover a recipe's targets", () => {
+    // Minalba is the useful default precisely because it is hard: at KH 91 it
+    // already exceeds every preset's bicarbonate target, so the base-water
+    // subtraction and its "já presente" flag are exercised on real label data.
+    const { content } = importWith({});
+    const minalba = content.base_waters.find((w) => w.id === "minalba")!;
+    const { kh } = hardnessAsCaCO3(minalba.ions);
+    expect(kh).toBeGreaterThan(content.guards.kh_ceiling_caco3);
+    for (const recipe of content.recipes) {
+      expect(minalba.HCO3).toBeGreaterThan(recipe.targets.HCO3 ?? 0);
+    }
   });
 });
 

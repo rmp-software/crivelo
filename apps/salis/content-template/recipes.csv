@@ -1,4 +1,6 @@
 id;name_pt;promise_pt;methods;target_Ca;target_Mg;target_HCO3;target_Na;target_K;concentrate_ids;espresso_safe;plane_x;plane_y;level
-mais-doce;Mais doce;Realça doçura e corpo em cafés lavados.;"V60, Kalita, prensa";25;15;30;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
-mais-brilhante;Mais brilhante;Acidez viva e corpo leve.;"V60, Origami";20;10;18;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
-equilibrada;Equilibrada;Referência SCA, sem cloreto.;"V60, Kalita, espresso";0;24;49;0;0;"mg-30k, khco3-30k";sim;;;avançado
+leve;Leve;Pouco mineral. Realça florais em torras claras.;"V60, Origami, Chemex";8;6;27;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
+mais-brilhante;Mais brilhante;Acidez viva e corpo leve.;"V60, Kalita, Origami";28;5;28;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
+equilibrada;Equilibrada;Ponto de partida para quase todo café.;"V60, Kalita, prensa";17;10;49;0;0;"mg-30k, ca-30k, khco3-30k";não;;;iniciante
+mais-doce;Mais doce;Realça doçura e corpo em cafés lavados.;"V60, Kalita, prensa";8;18;60;0;0;"mg-30k, ca-30k, nahco3-30k";não;;;iniciante
+encorpada;Encorpada;Mais extração e mais corpo. Para torras médias.;"Prensa, Clever";15;28;75;0;0;"mg-30k, ca-30k, nahco3-30k";não;;;avançado

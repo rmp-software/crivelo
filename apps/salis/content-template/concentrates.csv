@@ -1,16 +1,21 @@
 id;mineral_id;label_pt;salt_g;water_ml;shelf_life_days;storage_note;steps_pt
-mg-30k;mgso4-7h2o;Mg 30.000;152,1;500;90;Frasco conta-gotas, longe da luz.;"1. Pese o sal em balança de 0,1 g.
-2. Dissolva em 300 mL, agite 1 min.
-3. Complete até 500 mL."
-ca-30k;cacl2-2h2o;Ca 30.000;55,0;500;90;"Frasco conta-gotas, longe da luz. Nunca misture com bicarbonato no frasco.";"1. Pese o sal em balança de 0,1 g.
-2. Dissolva em 300 mL, agite 1 min.
-3. Complete até 500 mL."
-khco3-30k;khco3;KHCO3 30.000;24,6;500;90;Frasco conta-gotas, longe da luz.;"1. Pese o sal em balança de 0,1 g.
-2. Dissolva em 300 mL, agite 1 min.
-3. Complete até 500 mL."
-nahco3-30k;nahco3;NaHCO3 30.000;20,7;500;90;Frasco conta-gotas, longe da luz.;"1. Pese o sal em balança de 0,1 g.
-2. Dissolva em 300 mL, agite 1 min.
-3. Complete até 500 mL."
-mgcl2-30k;mgcl2-6h2o;MgCl2 30.000;125,5;500;90;Frasco conta-gotas, longe da luz. Higroscópico.;"1. Pese o sal em balança de 0,1 g.
-2. Dissolva em 300 mL, agite 1 min.
-3. Complete até 500 mL."
+mg-30k;mgso4-7h2o;Mg 30.000;76,1;250;90;Frasco conta-gotas âmbar, longe da luz.;"1. Pese o sal em balança de 0,1 g.
+2. Dissolva em 180 mL de água destilada e agite até ficar transparente.
+3. Complete até 250 mL.
+4. Rotule com o nome e a data."
+ca-30k;cacl2-2h2o;Ca 30.000;27,5;250;90;"Frasco conta-gotas âmbar, longe da luz. Nunca misture com bicarbonato no mesmo frasco.";"1. Pese o sal em balança de 0,1 g.
+2. Dissolva em 180 mL de água destilada e agite até ficar transparente.
+3. Complete até 250 mL.
+4. Rotule com o nome e a data."
+khco3-30k;khco3;KHCO3 30.000;12,3;250;90;Frasco conta-gotas âmbar, longe da luz.;"1. Pese o sal em balança de 0,1 g.
+2. Dissolva em 180 mL de água destilada e agite até ficar transparente.
+3. Complete até 250 mL.
+4. Rotule com o nome e a data."
+nahco3-30k;nahco3;NaHCO3 30.000;10,3;250;90;Frasco conta-gotas âmbar, longe da luz.;"1. Pese o sal em balança de 0,1 g.
+2. Dissolva em 180 mL de água destilada e agite até ficar transparente.
+3. Complete até 250 mL.
+4. Rotule com o nome e a data."
+mgcl2-30k;mgcl2-6h2o;MgCl2 30.000;62,7;250;90;Frasco conta-gotas âmbar, longe da luz. O sal é higroscópico: feche o pacote bem.;"1. Pese o sal em balança de 0,1 g.
+2. Dissolva em 180 mL de água destilada e agite até ficar transparente.
+3. Complete até 250 mL.
+4. Rotule com o nome e a data."
