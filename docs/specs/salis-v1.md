@@ -5,7 +5,7 @@ created: 2026-11-02
 tracker: linear
 linear_project_id: 2174444f-c5b2-4b22-ae0c-3f9a3c527684   # Salis project (NOT the .linear_features.json default, which is Crema Arena)
 linear_parent_issue: RMP-246
-feature_branch: feature/salis-bootstrap
+feature_branch: feature/salis-v1
 design_link: https://claude.ai/code/artifact/12e7b5fe-e36f-46ef-ab1e-2497aa1fd02d
 design_handoff_local: apps/salis/.design/   # gitignored — NOT committed; pull from the design system's live link
 ---
