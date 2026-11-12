@@ -1,0 +1,7 @@
+key;value
+precip_ca_hco3_product;10000
+kh_floor_caco3;20
+kh_ceiling_caco3;75
+drops_show_ml_below;3
+drops_show_ml_above;60
+default_drops_per_ml;20

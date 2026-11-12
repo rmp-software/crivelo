@@ -1,0 +1,24 @@
+{
+  "name": "@salis/tokens",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": [
+    "*.css"
+  ],
+  "exports": {
+    "./fonts": "./fonts/index.ts",
+    "./styles/foundation.css": "./styles/foundation.css",
+    "./styles/theme.css": "./styles/theme.css",
+    "./assets/*": "./assets/*"
+  },
+  "peerDependencies": {
+    "next": ">=15",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "next": "^16.2.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}

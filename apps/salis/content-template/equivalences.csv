@@ -1,0 +1,5 @@
+from_mineral_id;to_mineral_id;shared_ion;note_pt;espresso_note_pt
+khco3;nahco3;HCO3;"Mais redondo e menos brilho; adiciona sódio.";
+nahco3;khco3;HCO3;"Mais brilho e sem sódio; adiciona potássio.";
+mgso4-7h2o;mgcl2-6h2o;Mg;Mais brilho e menos corpo.;Evite em máquinas de espresso: o cloreto corrói a caldeira.
+mgcl2-6h2o;mgso4-7h2o;Mg;Mais corpo e menos brilho.;Preferível para máquinas de espresso.
