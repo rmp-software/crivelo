@@ -45,7 +45,14 @@ function EmptyState({
         {title}
       </h3>
       {description && (
-        <p className="mb-6 max-w-md text-fg-3">{description}</p>
+        // The bottom margin is the gap to the action, so it exists only when
+        // there is an action below to be separated from. Unconditional, it left
+        // every action-less panel (a search that found nothing; an empty list
+        // whose "create" flow does not exist yet) bottom-heavy, and consumers
+        // reaching in with `[&_p]:mb-0` to undo it.
+        <p className={cn("max-w-md text-fg-3", action && "mb-6")}>
+          {description}
+        </p>
       )}
       {action && (
         // `default` is the canonical primary — equivalent to the deprecated
