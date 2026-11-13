@@ -231,3 +231,22 @@ be better.
 | Her guard limits | `guards.csv`. |
 | Gypsum decision | Possibly a new mineral row, or the espresso badge leaves v1. |
 | Real label photos | `base_waters.csv`. |
+
+---
+
+## Content refresh (how the cached-and-refreshed requirement is met)
+
+- `docs/03-content-schema.md` and `docs/01` § Offline describe the content as
+  "cached on first load and refreshed in the background when `version` changes".
+  Mechanism: `content.json` is **imported**, so it ships inside the page's JS
+  bundle; the service worker (`@crivelo/pwa`, RMP-259) caches that bundle and
+  fetches a new one in the background when a deploy changes its hash, activating
+  it on the next launch. The requirement is satisfied one layer down, by the
+  worker — there is no separate content fetch, so `content.version` is a display
+  and diagnostic field (which sheet revision a student is holding), not a runtime
+  refresh trigger.
+- **This holds only while the content is a static import.** The bundle hash is
+  what makes it true. The moment `content.json` is fetched at runtime instead —
+  a CDN URL, an API, a Sheets export — the service worker no longer versions it,
+  and the requirement comes back unmet: that change must also ship a real
+  refresh path, and `content.version` becomes the trigger it is not today.

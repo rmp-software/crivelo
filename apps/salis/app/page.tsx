@@ -1,41 +1,67 @@
-import { Button } from "@crivelo/ui/button";
+"use client";
+
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useDeviceStore } from "./device-store";
 
 /**
- * Placeholder root route — a token smoke test, NOT a screen.
+ * `/` is not a screen — it is the one decision the app makes before showing
+ * anything: has this student been through onboarding?
  *
- * Phase 1 of the build order ships the content pipeline and the pure dosing
- * engine with **no UI at all**; the real screens (S0–S6) are Phase 2 and must be
- * built against the design handoff, not improvised here. This page exists only
- * to prove the stack is wired: both typefaces load, the mono "data" scale
- * renders tabular, the Salis semantic tokens resolve, and a shared @crivelo/ui
- * shadcn primitive picks up Salis teal with no per-app config.
+ * Receitas is the home tab, but it owns `/receitas` rather than `/` so that its
+ * pushed screens nest under it (`/receitas/[recipeId]`) and the tab bar's
+ * visibility can be read off the path alone — see `isRootTabPath` in
+ * `app/tabs.ts`. A tab at `/` would have no segment to nest under and would make
+ * "is this a root tab?" a special case.
  *
- * Delete it when S1 (Receitas) lands.
+ * **Client-side, necessarily.** `onboarding_done` lives in `localStorage`, which
+ * the server cannot read, so this cannot stay a server `redirect()` — a server
+ * redirect has to guess, and guessing sends a first-time student straight past
+ * onboarding or a returning one back through it. The gate therefore renders
+ * NOTHING until the store reports `loaded` (the hydration render still holds the
+ * server defaults, where `onboarding_done` is `false` for everyone), and only
+ * then routes. Nothing is painted in the meantime, so no screen flashes before
+ * the right one.
+ *
+ * `replace`, not `push`: `/` is a decision, not a step a back gesture should
+ * return to.
+ *
+ * **It degrades instead of dying.** A gate that paints nothing is a blank page
+ * for anyone whose JS never arrives — scripts disabled, or a bundle that failed
+ * on a bad connection — and this is an offline-first PWA, so a dead root route
+ * is the one regression a client gate can introduce over the server `redirect()`
+ * it replaced. The `<noscript>` below ships in the server HTML and gives that
+ * visitor the two real destinations as plain anchors. Browsers with JS ignore
+ * it, so the client gate above remains the only path anyone normally takes.
+ *
+ * NOTE for RMP-259 (PWA): point the manifest's `start_url` at `/` so a
+ * standalone launch runs this gate — a fresh install has to land in onboarding,
+ * and `/receitas` as `start_url` would skip it.
  */
 export default function Page() {
+  const router = useRouter();
+  const { state, loaded } = useDeviceStore();
+
+  useEffect(() => {
+    if (!loaded) return;
+    router.replace(state.onboarding_done ? "/receitas" : "/onboarding");
+  }, [loaded, state.onboarding_done, router]);
+
   return (
-    <main className="mx-auto flex min-h-dvh max-w-content flex-col gap-6 p-gutter">
-      <header className="flex flex-col gap-1">
-        <p className="font-mono text-overline uppercase text-fg-3">
-          Phase 1 · motor
-        </p>
+    <noscript>
+      <div className="flex flex-col gap-4 px-gutter py-8">
         <h1 className="text-h1 font-semibold text-fg">Salis</h1>
         <p className="text-body text-fg-2">
-          Água mineralizada para café especial, em gotas.
+          Esta tela precisa de JavaScript para saber onde você parou. Siga por
+          um destes caminhos.
         </p>
-      </header>
-
-      <section className="flex flex-col gap-2 rounded-lg border border-border bg-surface p-4 shadow-xs">
-        <p className="text-caption text-fg-3">
-          Smoke test: mono tabular + escala de dados
-        </p>
-        {/* Tabular figures: these two rows must align digit-for-digit. */}
-        <p className="font-mono text-data-lg font-medium text-brand">10 gotas</p>
-        <p className="font-mono text-data-lg font-medium text-brand">17 gotas</p>
-        <p className="font-mono text-data-sm text-fg-2">GH 124 · KH 25</p>
-      </section>
-
-      <Button>Botão compartilhado</Button>
-    </main>
+        <a href="/onboarding" className="text-body">
+          Primeira vez por aqui
+        </a>
+        <a href="/receitas" className="text-body">
+          Ver as receitas
+        </a>
+      </div>
+    </noscript>
   );
 }

@@ -123,19 +123,28 @@ Avoid: lifestyle/ritual language ("seu ritual", "a xícara perfeita"),
 diminutives ("gotinhas"), exclamation marks, "Ops!", emoji, vague quantities
 ("uma pitada").
 
-## Known gap for Phase 2 (offline)
+## Offline (done — RMP-259)
 
-`@crivelo/pwa`'s offline half assumes **locale-prefixed routing**:
-`createServiceWorker({ locales })` builds navigation fallbacks at
-`/{locale}{offlinePath}`, and with `locales: []` it emits **no fallback at all**
-(the catch-all is behind a `locales.length > 0` guard). Salis is single-locale
-pt-BR with no locale segment, so it is the second consumer and the one that
-reveals the assumption.
+Installability + offline come from `@crivelo/pwa`, driven by `app/pwa.config.tsx`
+(the drop mark from `@salis/tokens/assets`, teal `theme_color`). The wrappers are
+thin: `app/{manifest.ts,icon.tsx,apple-icon.tsx,pwa-icon/[variant],pwa-splash/[size],
+serwist/[path],sw.ts}` + `tsconfig.worker.json`.
 
-Per the root `CLAUDE.md` rule on shared-package API design, fix this **in the
-package** (support an unprefixed app — one document fallback at `offlinePath`
-plus a catch-all to `/`), not with an app-local workaround. Do it when Phase 2
-wires offline, not speculatively before.
+**Salis is the app that forced `@crivelo/pwa`'s single-locale fix.** The package's
+offline half assumed locale-prefixed routing; it now reads an **empty `locales`
+array as "this app's routes are unprefixed"** — one document fallback at
+`/offline`, and `/` precached as the shell. Pass `locales: []`, never `["pt"]`,
+and keep `app/sw.ts` and `app/serwist/[path]/route.ts` in step. See
+`packages/pwa/CLAUDE.md` § `locales: []`.
+
+**The app lists its own HTML routes for the precache.** `app/serwist/[path]/route.ts`
+passes `additionalPrecacheEntries` derived from `content`, because the package only
+precaches the shell + offline page and Serwist's build manifest covers assets, not
+rendered routes. Without it the first in-app push dies offline: Next's RSC payloads
+are cached under their exact `?_rsc=<hash>` URL, and that hash differs between the
+prefetch and the navigation, so the router falls back to a full browser navigation —
+which only works if the document is precached. A recipe Juliana adds is covered
+automatically; a NEW static route (a new tab, say) must be added to `appRoutes`.
 
 ## Repo layout (target, from the plan)
 

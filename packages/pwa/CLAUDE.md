@@ -32,6 +32,7 @@ crema-arena does NOT consume this package.
 - `splash.tsx` — `renderSplash(cfg, {width, height})` → `ImageResponse` (the splash renderer) **and** `createSplashRoute(cfg)` → `{ GET }`, the factory that owns the `pwa-splash/[size]` route logic (size parsing + max-dimension guard) so the app wrapper is a one-liner.
 - `devices.ts` — `splashDevices` (the unique-geometry Apple matrix) + `DEFAULT_SPLASH_BASE_PATH`.
 - `metadata.ts` — `pwaMetadata(cfg)` / `pwaViewport(cfg)` → layout fragments.
+- `offline-routing.test.ts` — the only tests in this package (`pnpm --filter @crivelo/pwa test`). Guards the `locales` convention below in BOTH halves: the unprefixed (`[]`) shape, the localized shape crivelo-web runs on, and the bounded locale-prefix test.
 
 ### Offline (service worker) — separate import paths
 - `sw.ts` (`@crivelo/pwa/sw`) — **WORKER-CONTEXT entry.** `createServiceWorker({ manifest, locales, offlinePath, defaultCache })` builds + activates the Serwist instance (precache `manifest`, `cleanupOutdatedCaches`, `skipWaiting`/`clientsClaim`, navigation preload, `runtimeCaching` = a StaleWhileRevalidate rule for the dynamic next/og routes prepended to the injected `defaultCache`, localized navigation `fallbacks`). See the worker-context constraint below.
@@ -49,13 +50,35 @@ drags in the `next/og` modules (and importing those never drags in worker code).
 `offlinePath` is **locale-relative** (e.g. `"/offline"`); the package prefixes it
 per locale → `/{locale}{offlinePath}` for both the precache entries and the
 fallbacks (with a bounded `/{locale}` or `/{locale}/…` prefix test, never a bare
-`startsWith`). The `self.__SW_MANIFEST` injection token must physically appear in
+`startsWith`).
+
+The `self.__SW_MANIFEST` injection token must physically appear in
 the **app's** `app/sw.ts`, not here — it is the build-time precache-manifest
 replacement point. The runtime-cache matcher for the on-the-fly next/og routes
 defaults to `iconBasePath: "/pwa-icon"` + `splashBasePath: "/pwa-splash"` (plus
 the fixed `/icon`, `/apple-icon`); **if an app customizes `PwaConfig.iconBasePath`
 or `splash.basePath`, pass the matching `iconBasePath`/`splashBasePath` to
 `createServiceWorker`** or those tiles won't be runtime-cached.
+
+#### `locales: []` means the app's routes are UNPREFIXED (the convention)
+A single-locale app with no locale segment (`apps/salis` serves `/receitas`, not
+`/pt/receitas`) passes **`locales: []`** — never `["pt"]`, which would build
+fallbacks and precache entries under a `/pt` prefix those routes don't have. The
+type can't express this, so it is written into the JSDoc of
+`CreateServiceWorkerOptions.locales` and `CreateCriveloSerwistRouteOptions.locales`
+and guarded by `offline-routing.test.ts`. `offlinePath` is then taken verbatim as a
+root-relative path. In that branch the package:
+- **`sw.ts`** registers exactly ONE fallback — a document fallback at `offlinePath`,
+  no locale matching — and deliberately **no catch-all**. The localized catch-all
+  exists only to map an unprefixed request onto a prefixed shell (next-intl's
+  redirect middleware doesn't run offline); an unprefixed app has nothing to map
+  because `/` is a real, precached route served straight from the precache. A
+  second entry pointing at `/` would compete for the uncached paths the single
+  entry is there to catch.
+- **`serwist.ts`** precaches `/` (the root shell) + `offlinePath`.
+
+Pass the SAME `locales` value to `createServiceWorker` and
+`createCriveloSerwistRoute` — they are two halves of one routing shape.
 
 The package owns the **logic**; App-Router convention files (`manifest.ts`,
 `icon.tsx`, `apple-icon.tsx`, `pwa-icon/[variant]/route.tsx`) must live in the
@@ -119,11 +142,22 @@ The package owns all the SW logic; an app keeps only framework-convention files.
    export const { GET, generateStaticParams, dynamic, dynamicParams, revalidate } =
      createCriveloSerwistRoute({ swSrc: "app/sw.ts", locales: ["en", "pt"], offlinePath: "/offline" });
    ```
-   The `[path]` segment must be named `path`. Override `useNativeEsbuild`/etc. via the spread options if a build target lacks the native esbuild binary.
+   The `[path]` segment must be named `path`. Override `useNativeEsbuild`/etc. via the spread options if a build target lacks the native esbuild binary. **Most apps must also pass `additionalPrecacheEntries` here — see step 7; without it offline navigation is broken.**
 4. Root layout — mount `<SerwistProvider swUrl="/serwist/sw.js">` (from `@crivelo/pwa/serwist-provider`) around the app.
 5. `next.config` (already ESM/TS per the prerequisite) — compose `withCriveloSerwist` (from `@crivelo/pwa/serwist`) under the app's other plugins, e.g. `withNextIntl(withCriveloSerwist(cfg))`. Keep `transpilePackages` + `htmlLimitedBots`.
-6. A localized offline page at `app/[locale]/offline/` (statically rendered, inside normal i18n routing) — matches the `offlinePath`/`locales` passed above.
-7. Vercel `Cache-Control: public, max-age=0, must-revalidate` header on `/serwist/sw.js` (the SW itself must not be cached long).
+6. An offline page matching the `offlinePath`/`locales` passed above, statically
+   rendered: `app/[locale]/offline/` for a localized app, or `app/offline/` for a
+   single-locale app on `locales: []` (see the convention above).
+7. **List EVERY statically-reachable HTML route in `additionalPrecacheEntries`** (step 3),
+   beyond the shell + offline page the package adds — or offline navigation to that route
+   silently falls back to the offline page. Why: the build manifest precaches build ASSETS,
+   not rendered HTML, and `@serwist/turbopack`'s `pages-rsc` rule caches a route's RSC
+   payload under its exact `?_rsc=<hash>` URL — a hash that differs between prefetch and
+   navigation, so the client router never hits that cache and falls back to a full document
+   request, which only succeeds if the document itself is precached. Derive the list from the
+   app's content rather than hand-maintaining it. Worked example:
+   `apps/salis/app/serwist/[path]/route.ts`.
+8. Vercel `Cache-Control: public, max-age=0, must-revalidate` header on `/serwist/sw.js` (the SW itself must not be cached long).
 
 ## Gotchas (these bite)
 - **next-intl middleware 307s the icon routes.** If the app uses i18n middleware,

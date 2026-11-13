@@ -5,7 +5,7 @@ created: 2026-11-02
 tracker: linear
 linear_project_id: 2174444f-c5b2-4b22-ae0c-3f9a3c527684   # Salis project (NOT the .linear_features.json default, which is Crema Arena)
 linear_parent_issue: RMP-246
-feature_branch: feature/salis-bootstrap
+feature_branch: feature/salis-v1
 design_link: https://claude.ai/code/artifact/12e7b5fe-e36f-46ef-ab1e-2497aa1fd02d
 design_handoff_local: apps/salis/.design/   # gitignored — NOT committed; pull from the design system's live link
 ---
@@ -135,5 +135,5 @@ The first two block Phase 1's gate; the rest can be answered while Phase 2 runs.
 ## Known constraints
 
 - **UI strings pt-BR; everything else English.** Teacher's voice, sentence case, no emoji, no diminutives, pt-BR number formats.
-- **`@crivelo/pwa`'s offline half assumes locale-prefixed routing.** Salis is single-locale, so `createServiceWorker({ locales: [] })` emits no fallback at all. Fix in the package (per the root CLAUDE.md shared-package rule), not app-side, when Phase 2 wires offline.
+- **`@crivelo/pwa` reads `locales: []` as "this app's routes are unprefixed"** (fixed in the package in RMP-259, per the root CLAUDE.md shared-package rule — never app-side). Salis is single-locale and passes `locales: []`, never `["pt"]`: `createServiceWorker` then emits exactly one document fallback at `offlinePath` and no catch-all, and `createCriveloSerwistRoute` precaches `/` plus the offline page. The convention is documented in `packages/pwa/CLAUDE.md` § `locales: []` and guarded by `offline-routing.test.ts`; the app also lists its own HTML routes in `additionalPrecacheEntries` (`apps/salis/app/serwist/[path]/route.ts`), because the package precaches the shell and offline page only.
 - **The design handoff's chemistry must not be ported** — it hand-types ion fractions from the anhydrous formulas. Visual truth from the handoff, numeric truth from `docs/01` + `docs/03`.

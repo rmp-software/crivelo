@@ -340,4 +340,25 @@ describe("regressions — defects found in adversarial review", () => {
     expect(report.errors).toHaveLength(0);
     expect(content.base_waters.find((w) => w.id === "leve")!.K).toBe(0.8);
   });
+
+  it("rejects a bicarbonate that is not last in the mixing order", () => {
+    // `concentrate_ids` IS the mixing order, and S3 renders it as tile order.
+    // The shipped sheet happens to list the bicarbonate last; nothing used to
+    // REQUIRE it, so a reordered cell imported clean and modo preparo would
+    // teach the wrong order while still looking right.
+    const { report } = importWith({
+      recipes: `${header}r;R;p;V60;25;15;30;0;0;"khco3-30k, mg-30k, ca-30k";não;;;iniciante`,
+    });
+    expect(messages(report)).toMatch(
+      /"khco3-30k" supplies HCO3 and must be LAST in concentrate_ids/,
+    );
+  });
+
+  it("accepts a recipe with no bicarbonate stage at all", () => {
+    // target_HCO3 = 0: nothing to put last, so nothing to reject.
+    const { report } = importWith({
+      recipes: `${header}r;R;p;V60;25;15;0;0;0;"mg-30k, ca-30k";não;;;iniciante`,
+    });
+    expect(messages(report)).toBe("");
+  });
 });

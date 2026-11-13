@@ -40,12 +40,20 @@ export interface CreateServiceWorkerOptions {
    * The app's locale codes (e.g. `["en", "pt"]`). Drives the per-locale
    * navigation fallbacks so an offline document request lands on the offline
    * page for its own locale.
+   *
+   * **AN EMPTY ARRAY MEANS THE APP'S ROUTES ARE UNPREFIXED** — a single-locale
+   * app with no locale segment (Salis serves `/receitas`, not `/pt/receitas`).
+   * The worker then registers ONE document fallback at `offlinePath` verbatim,
+   * with no locale matching and no catch-all. Pass `[]`, never `["pt"]`, for
+   * such an app: a one-element array would build fallbacks under `/pt`, a
+   * prefix those routes do not have.
    */
   locales: string[];
   /**
-   * Locale-RELATIVE path of the offline fallback page (e.g. `"/offline"`). The
-   * worker prefixes it per locale → `/{locale}{offlinePath}`. The matching
-   * precache entries are added app-side via `createCriveloSerwistRoute`.
+   * Path of the offline fallback page. Locale-RELATIVE when `locales` is
+   * non-empty (e.g. `"/offline"` → `/{locale}/offline`); taken VERBATIM as a
+   * root-relative path when `locales` is empty. The matching precache entries
+   * are added app-side via `createCriveloSerwistRoute`.
    */
   offlinePath: string;
   /**
@@ -115,8 +123,30 @@ function makeDynamicPwaAssetMatcher(
  * locale-PREFIXED routes (`/{locale}/never-visited`). The catch-all matcher
  * explicitly EXCLUDES every known locale prefix so it never shadows a localized
  * entry regardless of Serwist's match-iteration order.
+ *
+ * **`locales: []` means the app's routes are UNPREFIXED** (single-locale, no
+ * locale segment) and yields exactly ONE entry: a document fallback at
+ * `offlinePath`, matching every document request with no locale test.
+ *
+ * There is deliberately NO catch-all in that branch, and adding one would be a
+ * bug. The localized catch-all exists only to *map* an unprefixed document
+ * request onto a prefixed shell, because next-intl's redirect middleware does
+ * not run offline. An unprefixed app has nothing to map: `/` is a real route and
+ * is precached by `createCriveloSerwistRoute`, so it is served from the precache
+ * and never reaches a fallback at all. The single `isDocument` entry is what
+ * catches a genuinely uncached path (`/never-visited`) — the same job the
+ * per-locale entries do inside their own prefixes. A second entry pointing at
+ * `/` would compete for exactly those uncached paths and could open the home
+ * screen instead of the offline page.
+ *
+ * Exported for this package's own tests (`offline-routing.test.ts`), not as part
+ * of the supported surface — and nothing enforces that. `@crivelo/pwa/sw` and
+ * `@crivelo/pwa/serwist` are public subpath exports of these very files, so a
+ * consumer *can* import and call this; the repo has no api-extractor and no lint
+ * rule to stop it. Treat it as unsupported by convention only: it may change
+ * shape with the tests and without notice.
  */
-function offlineFallbackEntries(
+export function offlineFallbackEntries(
   locales: string[],
   offlinePath: string
 ): PrecacheFallbackEntry[] {
@@ -125,21 +155,26 @@ function offlineFallbackEntries(
   const pathOf = (param: HandlerDidErrorCallbackParam): string =>
     new URL(param.request.url).pathname;
 
+  if (locales.length === 0) {
+    // Unprefixed single-locale app: one fallback, no locale matching.
+    // Salis serves /receitas, not /pt/receitas.
+    return [{ url: offlinePath, matcher: isDocument }];
+  }
+
   const entries: PrecacheFallbackEntry[] = locales.map((locale) => ({
     url: `/${locale}${offlinePath}`,
     matcher: (param) => isDocument(param) && matchesLocale(pathOf(param), locale),
   }));
 
-  if (locales.length > 0) {
-    entries.push({
-      // Default-locale SHELL (precached), not the offline page — an unlocalized
-      // document request ("/") should open the app offline, not the fallback.
-      url: `/${locales[0]}`,
-      matcher: (param) =>
-        isDocument(param) &&
-        !locales.some((locale) => matchesLocale(pathOf(param), locale)),
-    });
-  }
+  // Unconditional: the empty case returned above, so there IS a default locale.
+  entries.push({
+    // Default-locale SHELL (precached), not the offline page — an unlocalized
+    // document request ("/") should open the app offline, not the fallback.
+    url: `/${locales[0]}`,
+    matcher: (param) =>
+      isDocument(param) &&
+      !locales.some((locale) => matchesLocale(pathOf(param), locale)),
+  });
 
   return entries;
 }

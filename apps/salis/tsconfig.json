@@ -10,5 +10,8 @@
     "allowImportingTsExtensions": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  // app/sw.ts is the ServiceWorker entry: it is checked under WebWorker libs by
+  // tsconfig.worker.json instead (see the type-check script), and would fail here
+  // because the DOM lib's `self` is a Window.
+  "exclude": ["node_modules", "app/sw.ts"]
 }

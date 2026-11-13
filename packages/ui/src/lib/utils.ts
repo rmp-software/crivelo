@@ -30,6 +30,14 @@ const twMerge = extendTailwindMerge({
       // Custom type scale from @crivelo/tokens foundation (--fs-*). Appended to the
       // built-in `font-size` group so `text-<custom> text-sm` resolves to the last.
       "font-size": [
+        // NOTE: `text-caption` below was missing from this list even though it
+        // is a Crivelo token (--text-caption in @crivelo/tokens). It was
+        // therefore being dropped in apps/crivelo-web's PourSchedule, which
+        // writes cn(MONO, "text-caption text-fg-3") — that text has been
+        // rendering at the 16px default rather than caption size. Registering
+        // it restores what the author wrote; expect that one span to get
+        // smaller.
+        // @crivelo/tokens (--fs-*)
         "text-display",
         "text-h1",
         "text-h2",
@@ -39,6 +47,24 @@ const twMerge = extendTailwindMerge({
         "text-small",
         "text-mono-lg",
         "text-mono",
+        // @salis/tokens — Salis replaces the Crivelo house at Tier 1 and brings
+        // its own type scale, including the mono "data" scale every quantity in
+        // that app renders with. Unregistered, tailwind-merge cannot tell
+        // `text-data-sm` IS a font-size, buckets it with whatever colour class
+        // follows, and SILENTLY DELETES it — `cn("text-data-sm", "text-fg")`
+        // returned just "text-fg", so dose rows rendered at the 16px default
+        // instead of their 14px token. A dropped class, not a wrong one, which
+        // is why nothing failed and only the pixels showed it.
+        "text-body-sm",
+        "text-label",
+        "text-caption",
+        "text-overline",
+        "text-data-hero",
+        "text-data-xl",
+        "text-data-lg",
+        "text-data-md",
+        "text-data-sm",
+        "text-data-xs",
       ],
       // Custom shadow tokens from the foundation (--shadow-1/2/inset) surfaced as
       // shadow-1 / shadow-2 / shadow-inset utilities. Appended to the built-in
