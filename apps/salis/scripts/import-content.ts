@@ -366,6 +366,23 @@ function readRecipes(
       }
     }
 
+    // `concentrate_ids` IS the mixing order: the engine emits dose rows in this
+    // sequence and S3 (modo preparo) renders them as tiles with no sort of its
+    // own. The bicarbonate goes in LAST — dosed before the calcium it
+    // precipitates in the jug. Nothing downstream can recover a reordered cell,
+    // and a screen whose whole job is the order would go on looking right while
+    // teaching the wrong one, so a reorder is rejected here instead.
+    // The one-concentrate-per-ion rule above means there is at most one.
+    const bicarbIndex = concentrate_ids.findIndex(
+      (concentrateId) => concentrateById.get(concentrateId)?.ion === "HCO3"
+    );
+    if (bicarbIndex >= 0 && bicarbIndex !== concentrate_ids.length - 1) {
+      report.error(
+        where,
+        `"${concentrate_ids[bicarbIndex]}" supplies HCO3 and must be LAST in concentrate_ids — it is at position ${bicarbIndex + 1} of ${concentrate_ids.length}. concentrate_ids is the mixing order, and the bicarbonate goes in last.`
+      );
+    }
+
     const espresso_safe = requireBoolean(record, "espresso_safe", where, report);
     if (espresso_safe) {
       // A warning, not an error, so Juliana can override knowingly (docs/03).
