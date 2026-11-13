@@ -51,3 +51,6 @@ pnpm-debug.log*
 
 # tsc incremental cache from type-check runs
 .claude/tsc-cache/
+
+# graphify knowledge-graph output (derived, machine-specific)
+graphify-out/
