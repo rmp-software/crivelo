@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { fontVariables } from "@salis/tokens/fonts";
+import { AppShell } from "./app-shell";
 import "./globals.css";
 
 /**
@@ -32,7 +33,13 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       {/* fontVariables binds the next/font families into --font-body / --font-mono. */}
-      <body className={fontVariables}>{children}</body>
+      <body className={fontVariables}>
+        {/* AppShell is the navigation frame (440 px column, top bar, tab bar).
+            It is the frame's only client component — it reads the path to decide
+            the active tab and whether the tab bar shows — and `children` passes
+            through it, so every screen stays a Server Component. */}
+        <AppShell>{children}</AppShell>
+      </body>
     </html>
   );
 }
