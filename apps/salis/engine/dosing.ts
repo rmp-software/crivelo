@@ -31,23 +31,62 @@ import type {
 } from "./types.ts";
 import { TARGET_IONS } from "./types.ts";
 
-export type WarningCode =
+/**
+ * A guard that tripped: the code, plus exactly the numbers that tripped it.
+ *
+ * A DISCRIMINATED UNION on `code`, not a code beside an untyped bag. The copy
+ * layer (`app/receitas/[recipeId]/warnings.ts`) reads these fields by name to
+ * build a sentence, and a `Record<string, string | number>` context made that a
+ * string match no compiler checked: renaming `ceiling` below would have
+ * type-checked clean and shipped `Number(undefined)` → `Intl…format(NaN)` →
+ * the literal "NaN" into a student's dose row. Keyed by `code`, the same rename
+ * is a compile error at the consumer, which is where it has to be — a test with
+ * a hardcoded expected string is a net, not a guarantee.
+ *
+ * Each variant carries the fields `computeRecipe` actually pushes, at their real
+ * types. Widening one to `string | number` to make a builder fit would put the
+ * hole straight back.
+ */
+export type Warning =
   /** The starting water already meets or exceeds this ion's target. */
-  | "base_water_covers"
-  /** Ca × HCO3 is above Juliana's threshold; the jug may precipitate chalk. */
-  | "precipitation_risk"
-  /** KH below her floor — "pode ficar ácida". */
-  | "kh_below_floor"
-  /** KH above her ceiling — "pode ficar chata". */
-  | "kh_above_ceiling"
+  | {
+      code: "base_water_covers";
+      context: {
+        /** What makes a row-scoped warning addressable to one dose row. */
+        concentrate_id: string;
+        ion: TargetIon;
+        target: number;
+        base: number;
+        base_water: string;
+      };
+    }
   /** More drops than is reasonable to count; suggest a stronger stock. */
-  | "high_drop_count";
+  | {
+      code: "high_drop_count";
+      context: {
+        concentrate_id: string;
+        drops: number;
+        ml: number;
+        ceiling: number;
+      };
+    }
+  /** Ca × HCO3 is above Juliana's threshold; the jug may precipitate chalk. */
+  | {
+      code: "precipitation_risk";
+      context: { product: number; threshold: number; Ca: number; HCO3: number };
+    }
+  /** KH below her floor — "pode ficar ácida". */
+  | { code: "kh_below_floor"; context: { kh: number; floor: number } }
+  /** KH above her ceiling — "pode ficar chata". */
+  | { code: "kh_above_ceiling"; context: { kh: number; ceiling: number } };
 
-export interface Warning {
-  code: WarningCode;
-  /** Everything the UI needs to render the message, already computed. */
-  context: Record<string, string | number>;
-}
+export type WarningCode = Warning["code"];
+
+/** The context of one code, for a consumer that handles codes one at a time. */
+export type WarningContext<C extends WarningCode> = Extract<
+  Warning,
+  { code: C }
+>["context"];
 
 /** Which number leads the row. Under 3 drops or over 60, mL is the honest unit. */
 export type RowDisplay = "drops" | "ml";
@@ -239,7 +278,16 @@ export function computeRecipe(input: ComputeRecipeInput): RecipeResult {
     if (coveredByBase) {
       warnings.push({
         code: "base_water_covers",
-        context: { ion, target, base, base_water: baseWater.name_pt },
+        // `concentrate_id` is what makes a row-scoped warning addressable. The
+        // UI renders these on the row they describe, and it finds the row the
+        // same way for every row-scoped code (`high_drop_count`, just below).
+        context: {
+          concentrate_id: concentrate.id,
+          ion,
+          target,
+          base,
+          base_water: baseWater.name_pt,
+        },
       });
     }
     if (highDropCount) {

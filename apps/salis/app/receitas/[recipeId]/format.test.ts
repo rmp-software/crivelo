@@ -8,6 +8,7 @@ import {
   formatMl,
   formatWhole,
   rowNoteKind,
+  splitQuantities,
   stepWaterMl,
 } from "./format";
 
@@ -140,5 +141,65 @@ describe("rowNoteKind", () => {
     expect(rowNoteKind({ ...nothing, highDropCount: true, hasPrepDate: true })).toBe(
       "high-drop-count",
     );
+  });
+});
+
+describe("splitQuantities", () => {
+  // The invariant the renderer relies on: even indices are literals, odd
+  // indices are the quantities it sets in mono.
+  it("interleaves literals and quantities", () => {
+    expect(splitQuantities("Mais de 60 gotas.")).toEqual([
+      "Mais de ",
+      "60",
+      " gotas.",
+    ]);
+  });
+
+  it("leaves a digit welded to a word alone", () => {
+    // The regression this guard exists for: no word boundary meant "HCO3" came
+    // back as ["HCO", "3", …] and rendered a mono 3 mid-formula. Dormant today
+    // only because warnings.ts spells its ions out — a convention, not a fence.
+    expect(splitQuantities("HCO3 já presente.")).toEqual(["HCO3 já presente."]);
+    expect(splitQuantities("CaCO3")).toEqual(["CaCO3"]);
+    // Accented letters are letters: `\w` would have split "ção2" here.
+    expect(splitQuantities("solução2")).toEqual(["solução2"]);
+  });
+
+  it("keeps a pt-BR decimal in one run", () => {
+    expect(splitQuantities("Meça 3,27 mL.")).toEqual(["Meça ", "3,27", " mL."]);
+  });
+
+  it("keeps a pt-BR thousands mark in one run", () => {
+    expect(splitQuantities("1.000 mL")).toEqual(["", "1.000", " mL"]);
+  });
+
+  it("keeps thousands and decimal together in one run", () => {
+    expect(splitQuantities("são 1.000,5 mL")).toEqual([
+      "são ",
+      "1.000,5",
+      " mL",
+    ]);
+  });
+
+  it("keeps a terminal period out of the quantity", () => {
+    expect(splitQuantities("Mais de 60.")).toEqual(["Mais de ", "60", "."]);
+  });
+
+  it("holds the alternation across adjacent quantities", () => {
+    expect(splitQuantities("de 60 a 3,27 mL")).toEqual([
+      "de ",
+      "60",
+      " a ",
+      "3,27",
+      " mL",
+    ]);
+    expect(splitQuantities("20 30")).toEqual(["", "20", " ", "30", ""]);
+  });
+
+  it("returns the whole string when there is nothing to mark", () => {
+    expect(splitQuantities("Alcalinidade baixa.")).toEqual([
+      "Alcalinidade baixa.",
+    ]);
+    expect(splitQuantities("")).toEqual([""]);
   });
 });
