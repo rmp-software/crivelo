@@ -1,16 +1,20 @@
 import { notFound } from "next/navigation";
 import { content } from "../../content";
-import { TopBar } from "../../top-bar";
+import { RecipeCounter } from "./recipe-counter";
 
 /**
- * S2 · Receita — the pushed screen, and the one the frame needs in order to be
- * provable: it is not a root tab, so the shell hides the tab bar and the header
- * switches to the compact centred title with a back control.
+ * S2 · Receita — the counter screen.
  *
- * PLACEHOLDER BODY: RMP-254 builds the real counter screen (water amount, the
- * drop list as the hero, the GH/KH line, mixing order). Only the title is real,
- * read from Juliana's content so an unknown id 404s instead of rendering an
- * empty header.
+ * The page itself is a Server Component and does exactly one thing: resolve the
+ * id, so an unknown recipe 404s on the server instead of rendering a header
+ * over nothing. Everything below it depends on device state — the last water
+ * volume, this device's dropper calibration, what is on the shelf — so the
+ * screen itself is the client island.
+ *
+ * The resolved recipe is PASSED DOWN rather than looked up again on the client.
+ * It costs one recipe's worth of JSON in the RSC payload (the content module is
+ * already in the client bundle, so every other lookup down there stays free),
+ * and it buys a `RecipeCounter` with no unreachable not-found branch of its own.
  */
 export default async function ReceitaPage({
   params,
@@ -23,23 +27,5 @@ export default async function ReceitaPage({
     notFound();
   }
 
-  return (
-    <>
-      {/* Hardcoded only until RMP-254 owns the water volume this reports. The
-          handoff's JSDoc writes it lowercase ("para 1 L") but that illustrates
-          the prop's SHAPE; rendered alone it is the whole text node, so the
-          app's own sentence-case rule applies. */}
-      <TopBar
-        title={recipe.name_pt}
-        subtitle="Para 1 L"
-        backHref="/receitas"
-      />
-      <div className="flex flex-col gap-3 px-gutter pb-6">
-        <p className="text-body text-fg-2">{recipe.promise_pt}</p>
-        <p className="text-body-sm text-fg-3">
-          As gotas de cada concentrado aparecem aqui.
-        </p>
-      </div>
-    </>
-  );
+  return <RecipeCounter recipe={recipe} />;
 }
