@@ -29,9 +29,9 @@ import {
   formatMl,
   formatWhole,
   rowNoteKind,
-  splitQuantities,
   stepWaterMl,
 } from "./format";
+import { Quantities } from "./quantities";
 import { recipeWarningTexts, rowWarningText } from "./warnings";
 
 /**
@@ -748,38 +748,6 @@ function Vial({ have }: { have: boolean | null }) {
         )}
       />
     </span>
-  );
-}
-
-/**
- * A warning sentence, with its quantities set in mono.
- *
- * "Mono type marks quantities" is a house rule, and inside a dose row's note
- * band it is load-bearing rather than decorative: the numbers in those sentences
- * are functions of the water volume and the device's calibration, so
- * proportional digits change the line's width — and move the `truncate`
- * ellipsis — on every press of +. Marking them mechanically is what lets
- * `./warnings.ts` stay plain pt-BR strings: Juliana reviews sentences, and a
- * sentence spliced into JSX spans is not one.
- *
- * The splitting is `splitQuantities` (`./format.ts`), which interleaves
- * literals and quantities so the odd indices are exactly the quantities — it
- * lives there, with its own tests, because the node test environment has no
- * renderer to pull this component into.
- */
-function Quantities({ text }: { text: string }) {
-  return (
-    <>
-      {splitQuantities(text).map((part, index) =>
-        index % 2 === 0 ? (
-          part
-        ) : (
-          <span key={index} className="font-mono">
-            {part}
-          </span>
-        ),
-      )}
-    </>
   );
 }
 

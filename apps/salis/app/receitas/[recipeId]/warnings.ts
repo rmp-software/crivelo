@@ -25,7 +25,7 @@
  * **Plain strings, no JSX.** The node test environment has no DOM
  * (`vitest.config.ts`), the sentences are reviewed as sentences, and the one
  * typographic rule they need — mono digits — is applied mechanically by the
- * renderer (`recipe-counter.tsx` § Quantities), not spelled out per string.
+ * renderer (`quantities.tsx`), not spelled out per string.
  */
 import type { Warning, WarningCode, WarningContext } from "@/engine/dosing";
 import type { TargetIon } from "@/engine/types";

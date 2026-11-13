@@ -142,9 +142,9 @@ export function rowNoteKind(flags: {
  * Split a sentence into alternating literal / quantity segments.
  *
  * Even indices are literal text, odd indices are the quantities — the capture
- * group in `split` is what interleaves them, and `recipe-counter.tsx`
- * § Quantities sets the odd ones in mono. Here rather than in the component so
- * the node test environment can assert it without a renderer (see the header).
+ * group in `split` is what interleaves them, and `quantities.tsx` sets the odd
+ * ones in mono. Here rather than in the component so the node test environment
+ * can assert it without a renderer (see the header).
  *
  * `(?<!\p{L})` is load-bearing: without it a digit sitting inside a word gets
  * peeled into its own span mid-word — `"HCO3 já presente."` splits as

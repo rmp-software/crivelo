@@ -10,6 +10,8 @@ import { content } from "../../../content";
 import { useDeviceStore } from "../../../device-store";
 import { TopBar } from "../../../top-bar";
 import { clampWaterMl, dropsUnit, formatMl, formatWhole } from "../format";
+import { Quantities } from "../quantities";
+import { rowWarningText } from "../warnings";
 
 /**
  * Juliana's starting water, until RMP-261 turns it into a chip.
@@ -56,6 +58,19 @@ const MINERAL_NAME_BY_ID = new Map(
  *
  * **A concentrate the student does not own is DIMMED, never dropped.** Same
  * rule and same visual language as S2 — see `DoseTile`.
+ *
+ * **ROW-scoped warnings only, and that is a decision.** The engine's other
+ * three codes (`precipitation_risk`, `kh_below_floor`, `kh_above_ceiling`) are
+ * properties of the FINISHED water, not of any bottle: they describe the
+ * recipe the student is choosing, which is S2's job, and S2 renders them in the
+ * list under the summary (`../recipe-counter.tsx`). Mid-pour they are noise —
+ * the jug is already being made and none of the three is actionable with a
+ * dropper in hand. The row-scoped pair is the opposite: `high_drop_count` is
+ * the single most useful sentence on this screen (put the dropper down, reach
+ * for the syringe) and it is about the tile the thumb is on. Reading the split
+ * off `warnings.ts` rather than deciding it here is what keeps a sixth code
+ * from quietly landing on the wrong screen — hence `rowWarningText`, never a
+ * hand-written lookup and never a second copy of the sentence.
  *
  * **Ticks are ephemeral.** ponytail: per-session `useState`, never the device
  * store. A half-ticked prep has no meaning after the app closes — the jug is
@@ -121,6 +136,7 @@ export function PrepMode({ recipe }: { recipe: Recipe }) {
                 have={haveConcentrate(row.concentrate_id)}
                 done={ticked.includes(row.concentrate_id)}
                 onToggle={() => toggle(row.concentrate_id)}
+                warning={rowWarningText(result.warnings, row.concentrate_id)}
               />
             </li>
           ))}
@@ -173,18 +189,52 @@ export function PrepMode({ recipe }: { recipe: Recipe }) {
  * at full ink and the tile stays tappable, because "never block a brew" means
  * a student who is one bottle short still works through the ones they have and
  * still sees what the missing one would have taken.
+ *
+ * **The row's engine warning renders as a band UNDER the tile's two columns.**
+ * Same copy and the same `bg-warning-soft` / `text-warning-ink` as S2's note
+ * band, because the two screens describe one jug and must not describe it in
+ * two voices. Its POSITION is the one thing that differs, and deliberately: on
+ * S2 the band is the row's footer, edge to edge; here it sits inside the tile's
+ * own padding, below both the identity and the numbers. Below, because the
+ * sentence is a footnote to the whole tile and the hero drop count is the
+ * reason this screen exists — anything beside or above it competes with the one
+ * number a student mid-pour is looking for. Inside the padding, because the
+ * tile is a `<button>` whose whole surface is the tap target, and a band bled
+ * to its edges would read as a second, separate control.
+ *
+ * **It does not collide with the missing-concentrate signal, which lives on the
+ * PERIMETER.** Missing is a dashed 1,5 px rule on the tile's edge with the
+ * identity dimmed and no words of its own; the warning is a solid filled block
+ * with a sentence in it, inset from that edge. Same colour family on purpose —
+ * both are "pay attention to this bottle" — but one is a border and one is a
+ * paragraph, so a tile that is BOTH (no bottle on the shelf AND over the drop
+ * ceiling) reads as two facts: a dashed tile saying "you do not have this", and
+ * a band inside it saying "and it would take a syringe". Neither one swallows
+ * the other, and the drop count behind both stays at full ink.
+ *
+ * **A ticked tile keeps the band's SPACE and drops its ink** (`invisible`, the
+ * same primitive S2's empty note band uses). Once the concentrate is dosed the
+ * instruction is spent — "reach for the syringe" is about a pour that already
+ * happened — so leaving it lit competes with the success state for a tile that
+ * is finished. But removing the box would shorten the tile on tick, and every
+ * tile below it would jump up under the thumb that just tapped — on the one
+ * screen operated with wet hands, mid-pour, where the next tap is already on
+ * its way down. Hidden, not removed.
  */
 function DoseTile({
   row,
   have,
   done,
   onToggle,
+  warning,
 }: {
   row: DoseRow;
   /** `null` before the device state loads: neither owned nor missing. */
   have: boolean | null;
   done: boolean;
   onToggle: () => void;
+  /** This row's engine warning in Juliana's Portuguese, if it raised one. */
+  warning: string | undefined;
 }) {
   // Only a KNOWN absence dims the tile. Unknown reads as the plain tile, which
   // claims nothing either way. A ticked tile has been dosed, so its success
@@ -204,7 +254,7 @@ function DoseTile({
       aria-pressed={done}
       onClick={onToggle}
       className={cn(
-        "flex w-full min-h-24 cursor-pointer items-center gap-4 rounded-lg border px-4 py-3.5 text-left transition-colors",
+        "flex w-full min-h-24 cursor-pointer flex-col justify-center gap-2.5 rounded-lg border px-4 py-3.5 text-left transition-colors",
         // No `outline-none` anywhere near this: in Tailwind v4 it sets
         // `--tw-outline-style: none`, which `outline-2` then reads — and the
         // ring silently stops painting. See `top-bar.tsx` for the same trap.
@@ -220,48 +270,58 @@ function DoseTile({
             : "border-border bg-surface shadow-xs",
       )}
     >
-      <Check done={done} />
+      <span className="flex w-full items-center gap-4">
+        <Check done={done} />
 
-      <span className="flex min-w-0 flex-1 flex-col">
-        {/* label_pt verbatim, as on S2 and S4: it is what the student wrote on
-            the bottle, so it has to match the sticker they are reading. */}
-        <span
-          className={cn(
-            "truncate font-mono text-data-md font-medium",
-            done ? "text-success-ink" : missing ? "text-fg-3" : "text-fg",
-          )}
-        >
-          {row.label_pt}
-        </span>
-        <span
-          className={cn(
-            "truncate text-body-sm",
-            done ? "text-success-ink" : "text-fg-3",
-          )}
-        >
-          {MINERAL_NAME_BY_ID.get(row.mineral_id)}
-        </span>
-        {last && (
+        <span className="flex min-w-0 flex-1 flex-col">
+          {/* label_pt verbatim, as on S2 and S4: it is what the student wrote on
+              the bottle, so it has to match the sticker they are reading. */}
           <span
             className={cn(
-              "truncate text-body-sm font-semibold",
-              done ? "text-success-ink" : "text-fg-2",
+              "truncate font-mono text-data-md font-medium",
+              done ? "text-success-ink" : missing ? "text-fg-3" : "text-fg",
             )}
           >
-            por último
+            {row.label_pt}
           </span>
-        )}
-      </span>
-
-      <span className="flex shrink-0 flex-col items-end gap-0.5">
-        <span className="flex items-baseline gap-1.5">
           <span
             className={cn(
-              "font-mono text-data-lg font-medium",
-              done ? "text-success-ink" : "text-fg",
+              "truncate text-body-sm",
+              done ? "text-success-ink" : "text-fg-3",
             )}
           >
-            {leadsWithMl ? formatMl(row.ml) : formatWhole(row.drops)}
+            {MINERAL_NAME_BY_ID.get(row.mineral_id)}
+          </span>
+          {last && (
+            <span
+              className={cn(
+                "truncate text-body-sm font-semibold",
+                done ? "text-success-ink" : "text-fg-2",
+              )}
+            >
+              por último
+            </span>
+          )}
+        </span>
+
+        <span className="flex shrink-0 flex-col items-end gap-0.5">
+          <span className="flex items-baseline gap-1.5">
+            <span
+              className={cn(
+                "font-mono text-data-lg font-medium",
+                done ? "text-success-ink" : "text-fg",
+              )}
+            >
+              {leadsWithMl ? formatMl(row.ml) : formatWhole(row.drops)}
+            </span>
+            <span
+              className={cn(
+                "font-mono text-data-xs",
+                done ? "text-success-ink" : "text-fg-3",
+              )}
+            >
+              {leadsWithMl ? "mL" : dropsUnit(row.drops)}
+            </span>
           </span>
           <span
             className={cn(
@@ -269,20 +329,31 @@ function DoseTile({
               done ? "text-success-ink" : "text-fg-3",
             )}
           >
-            {leadsWithMl ? "mL" : dropsUnit(row.drops)}
+            {leadsWithMl
+              ? `${formatWhole(row.drops)} ${dropsUnit(row.drops)}`
+              : `${formatMl(row.ml)} mL`}
           </span>
         </span>
+      </span>
+
+      {/* The engine's row-scoped sentence, from the module S2 reads it out
+          of (`../warnings.ts`) — never re-worded here, and never re-derived
+          from `row.high_drop_count`: the copy and the scope split live in one
+          place so the two screens cannot drift. `truncate` makes the band's
+          line count a constant rather than a function of the volume, the
+          calibration and the frame width, exactly as on S2. */}
+      {warning !== undefined && (
         <span
           className={cn(
-            "font-mono text-data-xs",
-            done ? "text-success-ink" : "text-fg-3",
+            "block w-full truncate rounded-md bg-warning-soft px-3 py-1.5 text-body-sm text-warning-ink",
+            // Dosed: the space stays, the ink goes. See the note above on
+            // why the tile must not change height on tick.
+            done && "invisible",
           )}
         >
-          {leadsWithMl
-            ? `${formatWhole(row.drops)} ${dropsUnit(row.drops)}`
-            : `${formatMl(row.ml)} mL`}
+          <Quantities text={warning} />
         </span>
-      </span>
+      )}
     </button>
   );
 }
