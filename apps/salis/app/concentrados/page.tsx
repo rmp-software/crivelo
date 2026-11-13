@@ -1,23 +1,21 @@
 import { TopBar } from "../top-bar";
+import { Inventory } from "./inventory";
 
 /**
- * S5 · Concentrados — the inventory tab.
+ * S5 · Concentrados — the inventory tab (`docs/01-v1-plan.md` § Screens).
  *
- * PLACEHOLDER BODY: RMP-256 builds the real shelf (what the student has, prep
- * dates and shelf life, what each missing one unlocks).
+ * The screen stays a Server Component: the header is static and the shelf is
+ * the only part that reads device state, so the `"use client"` boundary sits
+ * one level down in `Inventory` — the same split as S1's `RecipeList`.
  */
 export default function ConcentradosPage() {
   return (
     <>
       <TopBar
         title="Concentrados"
-        subtitle="Marque os que você já preparou."
+        subtitle="O que você já preparou e o que ainda falta."
       />
-      <div className="px-gutter pb-6">
-        <p className="text-body text-fg-2">
-          A sua estante de concentrados aparece aqui.
-        </p>
-      </div>
+      <Inventory />
     </>
   );
 }
