@@ -4,7 +4,7 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "comment": "Normal (DOM/React/Next) package surface. The worker entry sw.ts is checked separately under WebWorker libs via tsconfig.worker.json (see the type-check script), so it is excluded here.",
+  "comment": "Normal (DOM/React/Next) package surface. The worker entry sw.ts is not listed: it is checked under WebWorker libs via tsconfig.worker.json (see the type-check script), and THAT is what proves it worker-safe. offline-routing.test.ts imports it, so sw.ts is pulled into this project transitively — harmless, because the proof lives in the other project rather than in this one's omission.",
   "include": [
     "index.ts",
     "manifest.ts",
@@ -13,6 +13,7 @@
     "devices.ts",
     "metadata.ts",
     "serwist.ts",
-    "serwist-provider.tsx"
+    "serwist-provider.tsx",
+    "offline-routing.test.ts"
   ]
 }
