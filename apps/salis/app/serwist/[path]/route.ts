@@ -41,7 +41,13 @@ const appRoutes = [
   "/receitas",
   "/concentrados",
   "/aprender",
-  ...content.recipes.map((recipe) => `/receitas/${recipe.id}`),
+  ...content.recipes.flatMap((recipe) => [
+    `/receitas/${recipe.id}`,
+    // S3 modo preparo. The screen most likely to be opened with no network —
+    // it is the one you hold over the counter — so it needs its own entry, not
+    // merely a recipe that links to it.
+    `/receitas/${recipe.id}/preparo`,
+  ]),
   ...content.concentrates.map(
     (concentrate) => `/concentrados/${concentrate.id}`,
   ),
