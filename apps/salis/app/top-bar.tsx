@@ -33,10 +33,12 @@ const titleFocus =
  *   the title centred and compact. No large title, and the shell hides the tab
  *   bar.
  *
- * Back is a `Link` to the owning tab, not `router.back()`. A student reaches a
- * pushed screen from a shared link or a cold standalone launch just as often as
- * from inside the app, and in those cases there is no history entry to pop — the
- * control has to land them on the right tab either way.
+ * Back is a `Link` to a fixed destination, not `router.back()`. A student
+ * reaches a pushed screen from a shared link or a cold standalone launch just
+ * as often as from inside the app, and in those cases there is no history entry
+ * to pop — so the destination has to be named rather than popped. It is the
+ * owning tab, EXCEPT for a screen pushed from another pushed screen, which
+ * returns to its parent (S3 modo preparo → S2 the recipe).
  */
 export function TopBar({
   title,
@@ -51,7 +53,7 @@ export function TopBar({
    * in mono (e.g. 'para 1 L')"). Both shapes render it.
    */
   subtitle?: string;
-  /** Set on a pushed screen: the tab the back control returns to. */
+  /** Set on a pushed screen: where the back control goes — see above. */
   backHref?: string;
   /**
    * Trailing control on the 56 px bar — `Salis ⚙` on a root tab, `⋯` on a
