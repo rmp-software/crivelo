@@ -12,7 +12,7 @@ import {
 } from "@crivelo/ui/sheet";
 import { ToggleGroup, ToggleGroupItem } from "@crivelo/ui/toggle-group";
 import { cn } from "@crivelo/ui/lib/utils";
-import { computeRecipe, type DoseRow, type WarningCode } from "@/engine/dosing";
+import { computeRecipe, type DoseRow } from "@/engine/dosing";
 import type { BaseWater, IonKey, IonProfile, Recipe } from "@/engine/types";
 import { formatBrDate } from "../../concentrados/[concentrateId]/prep-content";
 import { shelfLife } from "../../concentrados/shelf-life";
@@ -29,8 +29,10 @@ import {
   formatMl,
   formatWhole,
   rowNoteKind,
+  splitQuantities,
   stepWaterMl,
 } from "./format";
+import { recipeWarningTexts, rowWarningText } from "./warnings";
 
 /**
  * Juliana's starting water, until RMP-261 turns it into a chip.
@@ -60,26 +62,6 @@ const SHELF_LIFE_DAYS_BY_ID = new Map(
     concentrate.shelf_life_days,
   ]),
 );
-
-/**
- * TEMPORARY pt-BR copy for the engine's warning codes.
- *
- * The engine deliberately emits `{ code, context }` and no Portuguese, and
- * **RMP-258 owns the code → copy mapping**. This map exists only so the guards
- * are not silently swallowed on the screen that has to show them; delete it
- * when RMP-258 lands rather than growing it into a copy module here.
- *
- * Only the RECIPE-level codes live here. `base_water_covers` and
- * `high_drop_count` are row-scoped — their context names a concentrate — and
- * are rendered on the row they describe: a student doses row by row, so a flag
- * three sections further down is a flag they will not read.
- */
-const RECIPE_WARNING_PT: Partial<Record<WarningCode, string>> = {
-  precipitation_risk:
-    "Cálcio e bicarbonato altos na mesma água. Pode formar depósito branco no frasco.",
-  kh_below_floor: "Alcalinidade baixa. A água pode ficar ácida.",
-  kh_above_ceiling: "Alcalinidade alta. A água pode ficar chata.",
-};
 
 /** The ion sheet's reading order (`docs/01-v1-plan.md` § Screens, S2). */
 const ION_ORDER: IonKey[] = ["Ca", "Mg", "HCO3", "Na", "K", "Cl", "SO4", "citrate"];
@@ -135,10 +117,12 @@ export function RecipeCounter({ recipe }: { recipe: Recipe }) {
   const haveConcentrate = (concentrateId: string) =>
     loaded ? owned.has(concentrateId) : null;
 
-  // The row-scoped codes are rendered on their rows — see RECIPE_WARNING_PT.
-  const recipeWarnings = result.warnings
-    .map((warning) => RECIPE_WARNING_PT[warning.code])
-    .filter((copy): copy is string => copy !== undefined);
+  // Every warning the engine raised, in Juliana's Portuguese and split by the
+  // scope the copy module declares (`./warnings.ts`): the recipe's own warnings
+  // go in the list under the summary, and the row-scoped ones are handed to the
+  // row they describe. A student doses row by row, so a flag about one bottle
+  // three sections further down is a flag they will not read.
+  const recipeWarnings = recipeWarningTexts(result.warnings);
 
   return (
     <>
@@ -171,7 +155,7 @@ export function RecipeCounter({ recipe }: { recipe: Recipe }) {
                   row={row}
                   have={haveConcentrate(row.concentrate_id)}
                   preparedOn={state.prepared_on[row.concentrate_id]}
-                  dropCeiling={content.guards.drops_show_ml_above}
+                  warning={rowWarningText(result.warnings, row.concentrate_id)}
                 />
               </li>
             ))}
@@ -192,7 +176,7 @@ export function RecipeCounter({ recipe }: { recipe: Recipe }) {
                 key={copy}
                 className="rounded-md bg-warning-soft px-4 py-2.5 text-body-sm text-warning-ink"
               >
-                {copy}
+                <Quantities text={copy} />
               </li>
             ))}
           </ul>
@@ -350,7 +334,7 @@ function DoseRowCard({
   row,
   have,
   preparedOn,
-  dropCeiling,
+  warning,
 }: {
   row: DoseRow;
   /** `null` before the device state loads: neither owned nor missing. */
@@ -360,7 +344,8 @@ function DoseRowCard({
    * loads, and for a bottle S0 seeded without a date.
    */
   preparedOn: string | undefined;
-  dropCeiling: number;
+  /** This row's engine warning in Juliana's Portuguese, if it raised one. */
+  warning: string | undefined;
 }) {
   // Only a KNOWN absence dims the row and dashes it. Unknown reads as the plain
   // card, which claims nothing either way.
@@ -423,7 +408,7 @@ function DoseRowCard({
         row={row}
         missing={missing}
         preparedOn={preparedOn}
-        dropCeiling={dropCeiling}
+        warning={warning}
       />
     </div>
   );
@@ -474,12 +459,12 @@ function RowNote({
   row,
   missing,
   preparedOn,
-  dropCeiling,
+  warning,
 }: {
   row: DoseRow;
   missing: boolean;
   preparedOn: string | undefined;
-  dropCeiling: number;
+  warning: string | undefined;
 }) {
   // The date maths lives in `app/concentrados/shelf-life.ts` — the inventory row
   // and this row ask the same question of the same two values, and RMP-256's
@@ -520,10 +505,18 @@ function RowNote({
     );
   }
 
-  if (kind === "covered-by-base") {
+  // The two row-scoped engine warnings, rendered where the student is looking.
+  // Their copy — like every warning's — comes from `./warnings.ts`; the `&&` is
+  // type narrowing, not a policy: `rowNoteKind` picked this kind off the very
+  // row flags the engine raised the warning from, so the string is there.
+  if (kind === "covered-by-base" && warning) {
     return (
+      // The quiet treatment, not the warning one: the dose is simply zero and
+      // the water is already right. Nothing for the student to do about it.
       <p className={cn(shape, "bg-surface-sunken text-fg-2")}>
-        <span className="truncate">Já presente na água de partida.</span>
+        <span className="truncate">
+          <Quantities text={warning} />
+        </span>
       </p>
     );
   }
@@ -552,21 +545,11 @@ function RowNote({
     );
   }
 
-  // Row-scoped engine warning, rendered where the student is looking. Copy is
-  // temporary — see RECIPE_WARNING_PT and RMP-258 — and is shorter than the
-  // sentence that band carried while it was free to wrap: the hero number has
-  // already switched to millilitres by the time this shows, so the band's job is
-  // to say why, in one line, not to restate both figures.
-  if (kind === "high-drop-count") {
+  if (kind === "high-drop-count" && warning) {
     return (
       <p className={cn(shape, "bg-warning-soft text-warning-ink")}>
-        {/* Both numbers are mono: "mono type marks quantities" applies inside a
-            sentence too, and it is why these two don't jitter as the volume
-            steps. The sans fragments stay sans. */}
         <span className="truncate">
-          Mais de <span className="font-mono">{formatWhole(dropCeiling)}</span>{" "}
-          gotas. Meça <span className="font-mono">{formatMl(row.ml)}</span> mL na
-          seringa.
+          <Quantities text={warning} />
         </span>
       </p>
     );
@@ -765,6 +748,38 @@ function Vial({ have }: { have: boolean | null }) {
         )}
       />
     </span>
+  );
+}
+
+/**
+ * A warning sentence, with its quantities set in mono.
+ *
+ * "Mono type marks quantities" is a house rule, and inside a dose row's note
+ * band it is load-bearing rather than decorative: the numbers in those sentences
+ * are functions of the water volume and the device's calibration, so
+ * proportional digits change the line's width — and move the `truncate`
+ * ellipsis — on every press of +. Marking them mechanically is what lets
+ * `./warnings.ts` stay plain pt-BR strings: Juliana reviews sentences, and a
+ * sentence spliced into JSX spans is not one.
+ *
+ * The splitting is `splitQuantities` (`./format.ts`), which interleaves
+ * literals and quantities so the odd indices are exactly the quantities — it
+ * lives there, with its own tests, because the node test environment has no
+ * renderer to pull this component into.
+ */
+function Quantities({ text }: { text: string }) {
+  return (
+    <>
+      {splitQuantities(text).map((part, index) =>
+        index % 2 === 0 ? (
+          part
+        ) : (
+          <span key={index} className="font-mono">
+            {part}
+          </span>
+        ),
+      )}
+    </>
   );
 }
 

@@ -137,3 +137,29 @@ export function rowNoteKind(flags: {
   if (flags.highDropCount) return "high-drop-count";
   return flags.hasPrepDate ? "prepared-on" : "none";
 }
+
+/**
+ * Split a sentence into alternating literal / quantity segments.
+ *
+ * Even indices are literal text, odd indices are the quantities — the capture
+ * group in `split` is what interleaves them, and `recipe-counter.tsx`
+ * § Quantities sets the odd ones in mono. Here rather than in the component so
+ * the node test environment can assert it without a renderer (see the header).
+ *
+ * `(?<!\p{L})` is load-bearing: without it a digit sitting inside a word gets
+ * peeled into its own span mid-word — `"HCO3 já presente."` splits as
+ * `["HCO", "3", " já presente."]` and renders `HCO` beside a mono `3`. Nothing
+ * stops a chemical formula reaching this function; today's sentences only avoid
+ * it because `warnings.ts` spells every ion out in Portuguese, which is a
+ * convention in another file, not a guarantee. `\w` would not do — it excludes
+ * `á`, `ç` and every other accented letter Portuguese actually uses.
+ *
+ * `[.,]` must be followed by a digit, which keeps a terminal period
+ * (`…de 60.`) and a pt-BR thousands/decimal mark apart correctly: `1.000,5` is
+ * one quantity, `60.` is a quantity and a full stop.
+ */
+const QUANTITY = /((?<!\p{L})\d+(?:[.,]\d+)*)/u;
+
+export function splitQuantities(text: string): string[] {
+  return text.split(QUANTITY);
+}
