@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "type-check": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.worker.json --noEmit"
+    "type-check": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.worker.json --noEmit",
+    "test": "vitest run"
   },
   "exports": {
     ".": "./index.ts",
@@ -33,6 +34,7 @@
     "@types/react": "^19",
     "next": "^16",
     "react": "^19.1.0",
-    "serwist": "^9.5.11"
+    "serwist": "^9.5.11",
+    "vitest": "^3.2.4"
   }
 }

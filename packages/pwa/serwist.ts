@@ -31,9 +31,23 @@ export interface CreateCriveloSerwistRouteOptions
   extends Omit<Partial<SerwistRouteOptions>, "swSrc"> {
   /** Path to the app's `app/sw.ts` (e.g. `"app/sw.ts"`), relative to cwd. */
   swSrc: string;
-  /** The app's locale codes (e.g. `["en", "pt"]`). */
+  /**
+   * The app's locale codes (e.g. `["en", "pt"]`) — one precached shell
+   * (`/{locale}`) and one precached offline page per locale.
+   *
+   * **AN EMPTY ARRAY MEANS THE APP'S ROUTES ARE UNPREFIXED** — a single-locale
+   * app with no locale segment (Salis serves `/receitas`, not `/pt/receitas`).
+   * It then precaches the root shell `/` plus `offlinePath` verbatim. Pass `[]`,
+   * never `["pt"]`, for such an app: a one-element array would precache `/pt`
+   * and `/pt/offline`, routes that do not exist. Must match the `locales` passed
+   * to `createServiceWorker` in the app's `app/sw.ts`.
+   */
   locales: string[];
-  /** Locale-RELATIVE offline page path (e.g. `"/offline"`). */
+  /**
+   * Offline page path. Locale-RELATIVE when `locales` is non-empty (e.g.
+   * `"/offline"` → `/{locale}/offline`); taken VERBATIM as a root-relative path
+   * when `locales` is empty.
+   */
   offlinePath: string;
   /**
    * Revision stamped on the precached HTML shells + offline pages. Server-
@@ -76,12 +90,31 @@ function deploymentId(): string | undefined {
  * manifest (it precaches build ASSETS, not rendered HTML routes). One localized
  * app shell (`/{locale}`) and one localized offline page (`/{locale}{offlinePath}`)
  * per locale, each stamped with `revision`.
+ *
+ * **`locales: []` means the app's routes are UNPREFIXED** (single-locale, no
+ * locale segment): the shell is the root `/` and the offline page is
+ * `offlinePath` verbatim. Precaching `/` is what lets the installed app launch
+ * offline from the default `start_url` — and it is also why the worker's
+ * unprefixed fallback branch needs no catch-all (see `offlineFallbackEntries`).
+ *
+ * Exported for this package's own tests (`offline-routing.test.ts`), not as part
+ * of the supported surface — and nothing enforces that. `@crivelo/pwa/sw` and
+ * `@crivelo/pwa/serwist` are public subpath exports of these very files, so a
+ * consumer *can* import and call this; the repo has no api-extractor and no lint
+ * rule to stop it. Treat it as unsupported by convention only: it may change
+ * shape with the tests and without notice.
  */
-function offlinePrecacheEntries(
+export function offlinePrecacheEntries(
   locales: string[],
   offlinePath: string,
   revision: string
 ): PrecacheManifestEntry[] {
+  if (locales.length === 0) {
+    return [
+      { url: "/", revision },
+      { url: offlinePath, revision },
+    ];
+  }
   return locales.flatMap((locale) => [
     { url: `/${locale}`, revision },
     { url: `/${locale}${offlinePath}`, revision },
